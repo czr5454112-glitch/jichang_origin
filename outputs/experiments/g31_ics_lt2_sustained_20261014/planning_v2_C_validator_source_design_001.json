@@ -1,0 +1,42 @@
+{
+  "schema": "g31.planning_v2.C_validator.source_design.v1",
+  "status": "source_draft_pending_review_and_pure",
+  "source_sha256": {
+    "scripts/experiments/g31_ics_circulation/planning_v2_c_encoder_authority.py": "3e50a8f155b96c49fd9824dd2e236b49dd8167f4e6374635de2783ab8a6a194d",
+    "scripts/experiments/g31_ics_circulation/delivered_peer_c_encoder_probe.py": "adfc785cfb09a4abe6a44b3b46d5bb3ef496e97887c4280e4c13300a971c35bf",
+    "scripts/experiments/g31_ics_circulation/measure_delivered_peer_c_encoder.py": "d2cc8434422ead345a0e55d6072c37b4d6bf01559957e2eac12039e96c5db4c0",
+    "tests/test_g31_circulation_delivered_peer_c_encoder.py": "20bada948e3b9b2b3dfc8f8796906ca3403a42c5a00773c4b5ca097c1a9ea9fb"
+  },
+  "synthetic_tests_expected_not_run": 63,
+  "actual_fixture_decodes": 0,
+  "C_loads": 0,
+  "actual_validator_calls": 0,
+  "build_functional_sources_unchanged": true,
+  "next_scope": {
+    "query_ordinals": [
+      27212,
+      27215
+    ],
+    "envelopes": "All envelopes in each exact original query, original order; fixed prior metadata currently declares one each.",
+    "arms": [
+      "A",
+      "B",
+      "B",
+      "A"
+    ],
+    "repetitions_per_batch": 4,
+    "validator_calls": 32,
+    "batches": 8,
+    "A": "Original delivered_peer",
+    "B": "Exact same code/defaults/closure/full globals except capture_digest_v2. Original _digest dispatcher around actual C try; per-call candidate verification and classification remain inside measured validator.",
+    "byte_oracle": "Before measured calls, original bytes plus actual C bytes retained completely for each envelope; fallback is explicitly original-fallback not direct C. Two direct bodies imply two C and two original writer calls. Unsupported adds explicitly counted original fallback writing, not hidden direct C support.",
+    "known_limitation": "Both historical query outcomes were absent. Full original guards run, but these are not successful-current-capture coverage or actual full-policy frequency."
+  },
+  "budget": {
+    "shared_seconds": 120,
+    "includes": "Complete dependency/source entry/exit,7779toolchain/3082runtime, C load and origin/DLL checks, compressed/raw input hashes/decode, full byte oracle, metadata/mutation guards,32 calls,8 batch setup/export, all outcome files, strict saved readback, cleanup and Python process exit. External Stopwatch required; experiment wrapper startup/export separate.",
+    "basis": "Synthetic functional full120 gate used88.1473211s. Original two-query validator diagnostic used14.6178315s separately. These do not add to a forecast or guarantee; no budget enlargement if the combined complete gate times out."
+  },
+  "source_domain": "Explicit union of new static closure and original16 file domain including bare test fixture/C/CMake; conflict rejection. Original gate source/build/functional evidence remains pinned; loaded_sources gets only the exact frozen union, no wildcard.",
+  "failure": "Ordinary original ValueError/KeyError/TypeError dispositions stay in all32 denominator and full outcomes. Resource/unexpected failure preserves completed rows and failing attempt as unknown. No expiry reordering, no automatic retry, no actual full600 audit."
+}

@@ -1,0 +1,155 @@
+{
+  "schema": "g31.regional_path_pool.actual_pair.v1",
+  "status": "verified_exact_pair",
+  "runs": [
+    {
+      "arm": "original",
+      "command": [
+        "C:\\PROGRAMING\\python3.11.9\\python.exe",
+        "-m",
+        "scripts.experiments.g31_ics_circulation.run_regional_path_pool",
+        "--output",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\regional_path_pool_native_001",
+        "--worker",
+        "original"
+      ],
+      "status": "finished",
+      "exit_code": 0,
+      "wall_seconds": 21.249560600001132
+    },
+    {
+      "arm": "pooled",
+      "command": [
+        "C:\\PROGRAMING\\python3.11.9\\python.exe",
+        "-m",
+        "scripts.experiments.g31_ics_circulation.run_regional_path_pool",
+        "--output",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\regional_path_pool_native_001",
+        "--worker",
+        "pooled"
+      ],
+      "status": "finished",
+      "exit_code": 0,
+      "wall_seconds": 22.135279000000082
+    }
+  ],
+  "process_wall_seconds": 64.02246550000018,
+  "prelaunch_pin_and_claim_seconds": 0.14762920000066515,
+  "parent_clock_scope": "execute entry before plan/pins/claim through evidence hashing; Python interpreter startup/imports excluded, actual worker subprocess times include their startup/imports",
+  "plan_sha256": "727d915e4f72adef35d68ec176479fd81c59b27a86fdbf55804f875e0882e6c5",
+  "complete_business_100ms_certified": false,
+  "verification": {
+    "status": "verified_exact_pair",
+    "arms": [
+      {
+        "arm": "original",
+        "api_rows": 24571,
+        "ordered_api_hashes": [
+          "74a05ce8532d9f052da458284e79b6069b76537d6c62c8e8c656b949e4565ebe",
+          "4ca9e74b571380aed044e1c8b313435b096e537e143969d62ef759cb6ff7573b"
+        ],
+        "ordered_part_hashes": [
+          "43e216f27d9e0c3480547707c8060bfd3d04abcabf6cdd80839ca93fd8938b10",
+          "51f0ca50b7ded36df3d837d8bafa79baabf0047c2621fed9933d2d261221b176"
+        ],
+        "final_native_seal": "bdf3f42bf7ebea6c540fc68983a731bfc6b273894db8c669d6991ff2421baf34",
+        "full_offered": 28506,
+        "owner_activations": 1000,
+        "owner_outer_max_ms": 28.641,
+        "owner_outer_over_100ms": 0,
+        "controller_window_ms": 10633.849,
+        "complete_worker_process_ms": 21249.560600001132,
+        "gc_capture_ms": 222.2849,
+        "pool_final": null,
+        "diagnostic_result_sha256": "c2565c8884b47a22e8ab6947016b8b4415e30c69d53f96253390a03799e7d465"
+      },
+      {
+        "arm": "pooled",
+        "api_rows": 24571,
+        "ordered_api_hashes": [
+          "74a05ce8532d9f052da458284e79b6069b76537d6c62c8e8c656b949e4565ebe",
+          "4ca9e74b571380aed044e1c8b313435b096e537e143969d62ef759cb6ff7573b"
+        ],
+        "ordered_part_hashes": [
+          "43e216f27d9e0c3480547707c8060bfd3d04abcabf6cdd80839ca93fd8938b10",
+          "51f0ca50b7ded36df3d837d8bafa79baabf0047c2621fed9933d2d261221b176"
+        ],
+        "final_native_seal": "bdf3f42bf7ebea6c540fc68983a731bfc6b273894db8c669d6991ff2421baf34",
+        "full_offered": 28506,
+        "owner_activations": 1000,
+        "owner_outer_max_ms": 32.1996,
+        "owner_outer_over_100ms": 0,
+        "controller_window_ms": 11539.014,
+        "complete_worker_process_ms": 22135.279000000082,
+        "gc_capture_ms": 234.9862,
+        "pool_final": {
+          "handles": 1000,
+          "key_builds": 1000,
+          "fallback_calls": 0,
+          "local_hits": 4579,
+          "cross_activation_hits": 2574,
+          "path_misses": 5,
+          "graph_evictions": 0,
+          "path_evictions": 0,
+          "resident_graphs": 2,
+          "resident_paths": 5
+        },
+        "diagnostic_result_sha256": "c2565c8884b47a22e8ab6947016b8b4415e30c69d53f96253390a03799e7d465"
+      }
+    ],
+    "complete_business_100ms_certified": false,
+    "timing_scope": "All measured controller/key/tracing/GC costs retained; worker setup/reconstruction/export separately retained. Owner activations are not a business-request certificate."
+  },
+  "verification_process": {
+    "command": [
+      "C:\\PROGRAMING\\python3.11.9\\python.exe",
+      "-m",
+      "scripts.experiments.g31_ics_circulation.verify_regional_path_pool",
+      "--output",
+      "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\regional_path_pool_native_001",
+      "--report",
+      "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\regional_path_pool_native_001\\independent_verification.json"
+    ],
+    "status": "finished",
+    "exit_code": 0
+  },
+  "evidence_sha256": {
+    "execution_claim.json": "01e3f0cbd976e8b281efdfbb8c260e2b33df3ce183f489a1f98fdd7bd2f20f5c",
+    "independent_verification.json": "db36d7e9736ddbe4fe3e694ff1dd09f97e8a782dfd9aec0a2bd063c0af47156c",
+    "notification_endpoint026.txt": "ed7ed6b2e25129da3ce5350e967328e5b28414623c757fb5610590df49840c1a",
+    "original.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "original_process.json": "7d89bc1ecd396736cab383c4ecc977ea3a6c009019f0bd61dee69762f34f920e",
+    "plan.json": "727d915e4f72adef35d68ec176479fd81c59b27a86fdbf55804f875e0882e6c5",
+    "pooled.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "pooled_process.json": "6eadc9748bf00d46b8bc0e3a8f86d9323c4c1bba78059e3f8682ee718f7e66ac",
+    "prepared.json": "100f3691b35d5de08353708787c37e15cd28cdc165544d48b5a4bab918e5e6c3",
+    "ready.json": "93ec09795c86516d5184c9614e64f414ab2d13e296120e43e28f467e0b4fd4c9",
+    "root_source_review.json": "e1e343236df98293d83df778fde6cd18ae6210fc43293adc202ff3fc36d58d62",
+    "timing_field_inventory.json": "accdcffce5933c574fcabba64fa7e5ea0c2a2c9580dd7920d94febd569aa6bf5",
+    "verification.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "original\\api_0010.jsonl.gz": "180f9a8b68598bb28ac361f8867115345a89cb14f5d9e4e4af09b6714302095e",
+    "original\\api_0011.jsonl.gz": "d17edf170d1f79d2b6a0022bc8a161481f8518b7ba8473cbcd13a6a1fae2686a",
+    "original\\capture_0010.json.gz": "80c7769c01b73ae7f51365c03a0e87e395bf42c12ddc1c1f95215dc4b6c6723b",
+    "original\\capture_0011.json.gz": "46027c19f2a39e10ce3e507aa5ccf1a13844ef81f4290c78c4d3101c2b74af40",
+    "original\\entry_views.json.gz": "16ff84afe27b5b04f8cc1cb278d0a6461d90d5443ad4a9f03e3bae6ca9104bf0",
+    "original\\exit_views.json.gz": "0777a79717deed692d4c370bb9914342526805583fe25546eabdd4d44cefd8e6",
+    "original\\manifest.json": "0c50b5b7e8d1d4b706f930025c3e4d5ae9bf5e2edf7a886e76fdff21aaf86621",
+    "original\\offline_result.json.gz": "ab9384c9886f90972b09e980acd59ebb4b2b26c09e6c423d35acee50de1bd2ad",
+    "original\\reconstruction.json": "c6d73f3b337439f87f3054bbcbc13fd0aac4eeb76bb5b2b11586d4138af9cb13",
+    "original\\segment_0010.json.gz": "3ac5c255083a3e15b31f92da48be1eb9516cc6643aade5ed585c5146a2fb1814",
+    "original\\segment_0011.json.gz": "5b31d0be450dfd6a6982e896fe02a6d785c9db9eca8a3e80861e5c267c8f3993",
+    "original\\started.json": "121b0846f068c3568b849fea2b3231a4b5404780d47c2e5e271344718a072f57",
+    "pooled\\api_0010.jsonl.gz": "b79768c9101d715d7fc8fe807ec2cbb25551eac0a32b55b6dacb3b3c1fdc9512",
+    "pooled\\api_0011.jsonl.gz": "6446a14c11c088fde1f11f998b7552d1aee03b2d5bbdc69a52c04fd51d5a8e78",
+    "pooled\\capture_0010.json.gz": "155d30eb5035ab5efa922c18c449ac331325c688fd14507f33ad1ae04bfb105b",
+    "pooled\\capture_0011.json.gz": "6a5b2a838665f8add0e7f6c1665268f797dda2786560df87a2481dda7ceae5cb",
+    "pooled\\entry_views.json.gz": "5ba013cdf38ae99011d37dfeda97506b7bcf4a2c838174db254834700c01cd87",
+    "pooled\\exit_views.json.gz": "b6d9b375c54448c5a914818ee3535e4495bb7f0933b599fe1d98193f8753079e",
+    "pooled\\manifest.json": "43ed96e034610be3ecc68e736f05e9611e21d9ffcb6169af4f75401697f98208",
+    "pooled\\offline_result.json.gz": "93fd766d9364fb1e9e563a15ae311d3cb3641dcd01cbbb724507d3a3e146554a",
+    "pooled\\reconstruction.json": "067e6ebb10fa1361a66acf3c3069deeb66469914abad15c11034c5bf29a82f28",
+    "pooled\\segment_0010.json.gz": "ccd78ef65d8b936abddb189b6cb174d351f0e607423d6c6a5207e3dbf145394c",
+    "pooled\\segment_0011.json.gz": "d312f32b144cd7366c1d2ed7acc1c951a325f02d1d735a28aa00613f691b1849",
+    "pooled\\started.json": "8b2752f72b400260a0308a3f168b356dcd8d464ae49dfb84a6562df4fab9dc1e"
+  }
+}

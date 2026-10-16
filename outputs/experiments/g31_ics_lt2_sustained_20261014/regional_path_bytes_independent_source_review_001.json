@@ -1,0 +1,22 @@
+{
+  "schema": "g31.regional_path_bytes.independent_source_review.v1",
+  "status": "no_concrete_source_blocker_found",
+  "review_scope": "Read-only comparison of bytes key with original strict typed tuple domain, inherited handle/cache behavior and 74-case XML. No tests or native rerun by reviewer.",
+  "source_sha256": {
+    "scripts/experiments/g31_ics_circulation/regional_path_bytes.py": "7b0d3f402d2832fd68caf3de1c4bfd1222a11e330e2ef6a7e35c939ca2db8f12",
+    "scripts/experiments/g31_ics_circulation/regional_path_pool.py": "5085f459348dd58756ceba24b1502d1ca6d705af952300236f866883deb2affd",
+    "tests/test_g31_circulation_regional_path_bytes.py": "1baea06065bbbe09e0e76d8cdc2cf553589be4b3c7213dcfeb4e6c24decf63f8",
+    "tests/test_g31_circulation_regional_path_pool.py": "4497a3d612db73d20107dcb2856aaccb06465ab34768be6e4b4c5af650e62956",
+    "outputs/experiments/g31_ics_lt2_sustained_20261014/regional_path_bytes_pure_001.xml": "dbe4d7432ec8a587990d27698e5c1d8326c3e4bbd6a9c026e25f437c221fcfba"
+  },
+  "observations": [
+    "Every encoded value is exact built-in primitive; float finite/type guards preserve signed-zero/int-vs-float distinctions. Pickle protocol5 is dumps-only; custom reducers/subclasses cannot enter the payload.",
+    "Owner, ordered nodes/occupancy presence, services, ordered edge values, capacity values and fault tuples are included. Equal bytes decode uniquely within this closed primitive domain; alias-sensitive pickle output can at worst reduce hits, never conflate different encoded values.",
+    "Only newly built primitive tuples are serialized; no observation, job, ACK, source truth or mutable object is retained by bytes keys. Unsupported shapes still fall back to unchanged original routing.",
+    "Serial factory/key replacement is restored in finally; overlap and unexpected key mutation are rejected. Existing live-handle lifetime caveat and read-only observation contract remain unchanged."
+  ],
+  "pure_xml_cases_inspected": 74,
+  "native_executions_by_reviewer": 0,
+  "actual_new_cache_speedup_certified": false,
+  "complete_100ms_certified": false
+}

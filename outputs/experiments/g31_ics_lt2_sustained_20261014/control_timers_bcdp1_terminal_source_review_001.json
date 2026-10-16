@@ -1,0 +1,72 @@
+{
+  "schema": "g31.bridge.C_digest.driver_pure_terminal_source_review.v1",
+  "review_scope": "Small saved plan/external receipt, complete current/archive source hashes, and source-only call graph. No test/collector rerun, C load, actual stream decode, profile, or native.",
+  "terminal": {
+    "session": 2424,
+    "status": "CLOSED1_outer_timeout",
+    "python_exit_code": -1,
+    "whole_python_seconds": 120.0867485,
+    "fixed_limit_seconds": 120,
+    "source_changed": [],
+    "external_sha256": "b81b5d0a409d4a49ad0c632eb3d084c645264973fdd75c05e77942706020a75f",
+    "plan_sha256": "df4bb1995188626493f7f9e93b709240c90472ad8c24a730b10219e543d44af4",
+    "tests_declared": 12,
+    "test_result": "unknown_no_XML_or_worker_receipt",
+    "retry_performed": false
+  },
+  "source_archive_readback": {
+    "source_count": 134,
+    "current_archive_pairs_independently_rehashed": 134,
+    "archive_bytes": 2551024,
+    "missing": [],
+    "changed": [],
+    "extra_unlisted_files_not_enumerated": true
+  },
+  "saved_state": {
+    "present": ["plan.json", "external_application_wall.json"],
+    "absent": ["receipt.json", "worker.json", "bounded_execution.json", "tests.xml", "parent_stdout.log", "parent_stderr.log"],
+    "control_flow_inference": "The original main writes plan at line115, then calls source_check at116, computes remaining budget at117, opens parent logs at119, and only then invokes owned child at121. With no externally removed files, this state places the stop after plan write and before child launch; it does not identify an exact inner function or CPU cost.",
+    "mtime_used_as_CPU_or_stage_clock": false,
+    "no_log_used_as_CPU_attribution": false
+  },
+  "source_call_graph": [
+    "new runner sources -> driver.source_files -> driver.closure",
+    "driver.closure -> previous text-actor closure + routing_gate.sources + three separate base.source_paths clones",
+    "text-actor closure -> linear-v3 closure + three base.source_paths clones",
+    "linear-v3 closure -> linear closure + frozen-preparation source union/checks + three base.source_paths clones",
+    "linear closure -> initial saved-audit closure + three base.source_paths clones",
+    "initial saved-audit closure -> serialize runner source_paths + two base.source_paths clones",
+    "serialize runner source_paths -> cooperative runner special collector + five base.source_paths clones",
+    "routing_gate.sources -> original pure source union, multiple image.source_closure traversals, explicit old executable manual roots and accepted C project closure"
+  ],
+  "structural_count": {
+    "base_source_paths_independent_graph_walks_per_top_level_collection": 19,
+    "scope": "This counts source-declared call sites, not runtime samples. Their reachable graphs overlap but are not asserted identical. Additional image/C/cooperative collectors are separate.",
+    "complete_pure_source_collections_if_no_early_failure": 5,
+    "locations": "Parent initial collection, parent pre-child check, child entry, child exit, parent exit. No claim those five happened in this timeout."
+  },
+  "new_version_proposal_not_implemented": {
+    "principle": "Gather the exact original root lists first; use one shared visited set per unchanged resolver semantics within each collection. Do not cache source bytes or hashes across checks.",
+    "resolver_distinctions": [
+      "base.source_paths resolves absolute ImportFrom through ROOT and ROOT/src; it has different bare-helper behavior from cooperative source_paths.",
+      "cooperative source_paths additionally searches ROOT/tests for ImportFrom and has an explicit missing-file guard.",
+      "image.source_closure resolves module names and package initializers through ROOT and ROOT/src.",
+      "C project closure searches ROOT/tests too and adds explicitly reviewed C/CMake/fixture files. These rules must not be silently merged or weakened."
+    ],
+    "preserved": [
+      "Every old134 source and all new version files; old115 remains unchanged.",
+      "All manual/bare helper roots, frozen historical union and C gate16 checks.",
+      "Every entry/exit current/archive file hash and complete loaded-module domain check.",
+      "Original120/12 denominator and unknown timeout/error behavior."
+    ],
+    "exact_equivalence_gate": [
+      "Use bcdp1's hash-pinned plan as the actually returned original134 domain; every current/archive pair is now verified. Do not rerun the slow original full collector merely to reproduce that recorded domain.",
+      "For each resolver, inverse-AST prove the traversal body unchanged apart from replacing a single-entry seed by the exact union root list and shared visited initialization.",
+      "Synthetic diamonds/cycles/repeated roots/package initializers/relative imports/bare tests/missing symbols and missing mandatory entries compare the union of original per-entry collectors against the new shared traversal.",
+      "In one future bounded pure gate, require the optimized old-root result to equal the exact recorded134 paths and hashes; separately report the exact added new-version files. Missing or extra original-domain members fail closed.",
+      "Add small stage-start/end journal for collect/archive/pre-child check/child start; journal and all hashing remain inside120. No performance attribution from file mtime or absent logs."
+    ],
+    "execution_authorized_by_this_report": false
+  },
+  "window": "Root and legal_context notified CLOSED; no child remains. No metadata prepare or full600 run executed."
+}

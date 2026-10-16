@@ -1,0 +1,23 @@
+# Short-link mechanical contract: existing work and remaining evidence
+
+Read-only recheck on 2026-10-15: no native execution, physical change or new implementation. The attached LT2 plan distinguishes source requirements from unconfirmed physical semantics and does not supply the missing mechanical facts below.
+
+This interpretation was already investigated. See [the finite-footprint review](LT2_FINITE_FOOTPRINT_PHYSICS_REVIEW_20261014.md), [manufacturer/reference report](LT2_FINITE_BODY_MANUFACTURER_REFERENCE_20261014.md), [pure reference](../../scripts/experiments/g31_ics_circulation/finite_body_reference.py) and [15-case saved test receipt](../../outputs/experiments/g31_ics_lt2_sustained_20261014/finite_body_reference_001/receipt.json). All five source/test/document/result hashes in that receipt were checked again and matched; those tests were not rerun.
+
+Workbook 2, adjacency row 7, records ICS103→ICS104, length 0.6 m, speed 2 m/s and numeric pallet count 0 with no stored formula. All 227 counts equal floor(length / 2 m). That pattern does not independently establish tray dimensions or that zero whole-tray storage forbids continuous passage. The current zero-as-closed native contract remains unchanged. The old legacy adapter retained this field only as metadata. [Saved workbook-cell audit](../../outputs/experiments/g31_ics_long_term_20261013/p2_zero_capacity_semantics_001.json), [physical ledger](PHYSICAL_SEMANTICS_LEDGER.md).
+
+The manufacturer's manual describes allocating multiple base zones to a long product, with a base-zone separation gap. This demonstrates that coordinated multi-zone conveyance exists, not that it is installed here. [Hytrol EZLogic4.0 manual, printed pp.16–17](https://cdn.hytrol.com/H2-MN-NP-001.1.0_EZLogic4.0_Network_Model_User_Manual_EN-2.pdf). The train-scheduling paper models occupancy while any body part remains, with overlapping consecutive activities; its stopped-train example shows why an elapsed tail timer is insufficient. This is a modeling precedent, not a rigid-tray mechanical validation. [Švancara and Barták, 2022, §§3.1–3.2, pp.309–310](https://www.scitepress.org/PublishedPapers/2022/108697/108697.pdf). Both primary sources were reopened for this recheck.
+
+The existing exact-rational reference demonstrates a 2 m body crossing a 0.6 m connector between declared 2 m support bays at 2 m/s. The front exits at 0.3 s, the rear clears the source at 1 s and the connector at 1.3 s. Every intersected resource stays occupied through rear clearance, including stops and a censored horizon. No count is rounded up and no tray is created. Those bays are synthetic declared geometry, not additional airport space. The witness omits node services, turns, braking, drive cooperation and distributed permission failures.
+
+Those omissions matter here: 97 and 98 are DD3/ICS103 and DD4/ICS104, both divert devices with 1.5 s service; their coordinates are explicitly routing-only zero placeholders. A straight conveyor witness cannot establish that a rigid body may bridge these diverts or perform both services. Before a separate physical variant is justified, establish:
+
+| Missing evidence | Constraint it must determine |
+| --- | --- |
+| Measured tray length, width, rigidity and support; surveyed DD3/DD4 geometry and what 0.6 m measures | Continuous support and swept-volume clearance; no invented bay, bend or physical overlap. |
+| Drive cooperation, braking distance and sensor uncertainty | Safe motion and stops while a body spans sections; no tail clearance inferred from elapsed time alone. |
+| Trigger/completion reference for each 1.5 s service; switch locking | Both services remain; a divert cannot reconfigure beneath the body. |
+| Actual source/receiving space and adjacent conflict regions | Reserve every occupied region until rear clearance; preserve FIFO and count each physical tray once. |
+| Owner authorization and recovery rules | Legitimate joint grants before entry; expiry or lost messages cannot erase an entered body or release its occupied space. |
+
+The useful next step is to resolve these facts for DD3→DD4, then test that declared contract against occupied receiver, stopped straddling, incompatible divert movement and lost/expired grants. Repeating the existing straight reference adds no new evidence. A later alternative must preserve the original zero-as-closed result and all-offered denominator. It cannot retroactively invalidate the current 4,001 mandatory-path failures or claim field feasibility. Those failures are conditional on the research contract, not proof that the real airport is impassable.

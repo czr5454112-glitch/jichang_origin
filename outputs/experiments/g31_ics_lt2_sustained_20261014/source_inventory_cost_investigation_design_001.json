@@ -1,0 +1,100 @@
+{
+  "schema": "g31.source_inventory_cost_investigation_design.v1",
+  "status": "source_only_proposal_no_measurement_no_cache",
+  "accepted_prerequisite": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\owned_full32_runtime_terminal_readback_001.json",
+    "sha256": "ac7bdb61a0133a19cfdce41d8fba34368fbe2543a410f801832d9c74571cc118"
+  },
+  "sources": {
+    "live_obligation_future_later_fork.py": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_future_later_fork.py",
+      "sha256": "309c4fad570ffce9ae6ef9606a95ef52e0451896cc29f4c0cf9e2368ceca5a17"
+    },
+    "live_obligation_conditional_continuation.py": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_conditional_continuation.py",
+      "sha256": "31ad32a9a74d90dc64400b801a16fceb73abc73db1d9cf9850aa8fa3f4fb6b63"
+    },
+    "live_obligation_owned_prefix_evaluator.py": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_owned_prefix_evaluator.py",
+      "sha256": "b6fcdb012035886d73628bbb4da967b8a13b54ae18784e83a833e90889014c20"
+    },
+    "live_obligation_owned_initial_provider.py": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_owned_initial_provider.py",
+      "sha256": "91f34194b7b8857db27f05ab8a87647fd07a576f1bf19fb36ccb425eca7ade5b"
+    },
+    "validate_owned_full32_runtime.py": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\validate_owned_full32_runtime.py",
+      "sha256": "4854c8207d29d5cd5132343a01d170963b04a098a9a7efccb0ef54a7f4455935"
+    }
+  },
+  "source_findings": [
+    {
+      "source": "live_obligation_future_later_fork.py",
+      "line": 187,
+      "finding": "source_proof first validates loaded effective methods, PARTS, core entry points and code identities; it then calls _source_inventory and deep-copies its proof."
+    },
+    {
+      "source": "live_obligation_future_later_fork.py",
+      "line": 98,
+      "finding": "_source_inventory hashes source, rebuilds control-flow parts, parses effective and inherited methods for action consumption, walks constructors/event schedulers, and parses the capture module. Several method ASTs are reconstructed more than once in each call."
+    },
+    {
+      "source": "live_obligation_conditional_continuation.py",
+      "line": 99,
+      "finding": "build_parts also checks source, splits and inverse-reconstructs decide/activate/run, and compiles fresh helper code. The generated temporary parts serve proof reconstruction here; the active model still uses pinned PARTS."
+    },
+    {
+      "source": "live_obligation_future_later_fork.py",
+      "line": 195,
+      "finding": "_cut depends on this exact live continuation, supplied information, deadlines, current tray, action history and heap. It is a dynamic obligation, not a reusable static proof."
+    },
+    {
+      "source": "live_obligation_future_later_fork.py",
+      "line": 251,
+      "finding": "Both fork and resume call source_proof and _cut; the whole graph clone, action-field restriction and post-clone validation remain mandatory."
+    }
+  ],
+  "next_diagnostic_only": {
+    "proposed_budget_seconds": 120,
+    "requires_separate_source_review_and_dispatch": true,
+    "model_predictions": 0,
+    "native_calls": 0,
+    "actual_C_loads": 0,
+    "fixed_calls": 65,
+    "call": "Unchanged future.source_proof(), serially, with default GC and no monkeypatch/cache.",
+    "count_basis": "One provider source proof plus 32 fork and 32 resume proofs for the declared successful full32 path. This is a controlled source-audit workload, not a claim that complete driver startup/export/audit has only65 proof calls.",
+    "procedure": [
+      "Freeze source/import closure and interpreter plus accepted output/reference identities before starting.",
+      "Load the saved proof as a comparison target only. Run exactly65 original source_proof calls under one cProfile session; retain per-call ordinal/status and complete proof-byte equivalence.",
+      "Write raw pstats and compact self/cumulative/call-count records for source_proof/_source_inventory/build_parts/tree_of/inspect.getsource/ast.parse/ast.walk/compile/deepcopy/source-file hashing. Do not add overlapping cumulative times.",
+      "Record separately imports/setup/pins, profiled65-call work, report export/readback, and complete external Python lifetime; all remain within the same owned120 budget.",
+      "On failure preserve the exact failing ordinal and remaining unexecuted denominator, raw profile if available, source entry/exit evidence and failure receipt; no automatic repeat."
+    ],
+    "interpretation": "cProfile timing is diagnostic overhead, not a speed comparison or product deadline measurement. Repeated source calls may warm filesystem/inspect caches. Attribution cannot be divided into this run170.49s to claim a controlled optimization gain."
+  },
+  "possible_followup_only_after_attribution": {
+    "static_scope": "The full once-owned batch may retain a source-derived action-consumption/control-flow proof only after a separately reviewed new implementation and equivalence gate.",
+    "required_identity_boundary": [
+      "Bind PID, unique active batch identity and exact function/method/MRO map; revoke on normal completion and all exceptions, reject reuse or concurrent use.",
+      "Bind code, defaults, keyword defaults, closure cells, complete defining-global dependencies and relevant immutable configuration. Object identity alone is insufficient for mutable dictionaries/defaults/closure values.",
+      "Audit every transitive dependency used by the static source proof. Any dependency that cannot be safely frozen or checked remains freshly checked; fail closed on unknown mutation.",
+      "Keep exact loaded identity checks at every original fork/resume boundary, and explicit source/archive pins at entry/exit. Do not claim these observations establish absence of arbitrary transient changes.",
+      "Never cache current supplied contexts, _cut outcomes, view/ACK/age/deadline/owner checks, or successful action guards. Retain16 fullinitial contexts,80 cuts,32 graphclones and all32 candidate outputs unless a later independent experiment proves a separate change."
+    ],
+    "future_negative_tests": [
+      "Code/method/PARTS/MRO rebind",
+      "defaults/kwdefaults/closure/global dependency mutation",
+      "same-object mutable configuration change",
+      "source file drift",
+      "wrong PID/batch or closed/exception-revoked token",
+      "changed current state after static admission",
+      "unknown cut and post-save terminal failure retained"
+    ],
+    "not_implemented": true
+  },
+  "limits": [
+    "The96 conformance result certifies only the declared output comparison; no hidden-state/native authority or online protection.",
+    "The100ms complete-request target is unchanged and not met or certified here.",
+    "No runtime source, accepted API, candidate budget, physical rule or proof frequency has been changed by this design."
+  ]
+}

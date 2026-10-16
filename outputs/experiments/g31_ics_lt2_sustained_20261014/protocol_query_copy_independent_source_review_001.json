@@ -1,0 +1,20 @@
+{
+  "schema": "g31.protocol_query_copy.independent_source_review.v1",
+  "status": "no_concrete_source_blocker_found",
+  "source_sha256": {
+    "scripts/experiments/g31_ics_circulation/protocol_query_copy.py": "7736529f474d5dee76457527f894e18a4452c470793a87b688698d2630e79eee",
+    "tests/test_g31_circulation_protocol_query_copy.py": "4cd0e25544f5f9e01ca02cd3ed71befa95225d5ad63ca3c3ca828c615f7dd35f",
+    "outputs/experiments/g31_ics_lt2_sustained_20261014/protocol_query_copy_pure_001.xml": "b540d0e34b7203d4773d93ba6a4fa1555db7d71ad157c90b30a0df460ffd2c5d",
+    "outputs/experiments/g31_ics_lt2_sustained_20261014/protocol_query_copy_actual_pure_001/receipt.json": "a47c123de0200e61bea80e15d09ef3fbad0fa3393b6f0fa12f3a9949e5b1434f"
+  },
+  "scope": "Read-only source/23-case XML/saved pure receipt inspection; no new tests/native or independent full raw24571 replay by reviewer.",
+  "observations": [
+    "Exact built-in dictionary, string keys, closed four top-level shapes and exact immutable scalar types prevent custom callbacks or nested mutable aliases from entering the fast path.",
+    "A fresh root and fresh ACK dictionary preserve order and mutation isolation; shared immutable atoms match ordinary deepcopy, including NaN/signed zero identity.",
+    "Explicit memo, cyclic or shared mutable structures, unknown fields and custom types use standard deepcopy unchanged; the fast path does not validate or reinterpret query authority.",
+    "Only protocol_control.copy module reference is temporarily replaced; stdlib copy module/functions remain unchanged. Serial overlap is rejected and finally restores prior standard module.",
+    "Pure saved-data median improvement does not imply end-to-end improvement; reported slower tail is retained and no GC attribution or100ms certification follows."
+  ],
+  "native_executions_by_reviewer": 0,
+  "complete_100ms_certified": false
+}

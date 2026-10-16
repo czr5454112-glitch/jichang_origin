@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="27" time="1.416" timestamp="2026-10-14T20:26:41.184998+08:00" hostname="LAPTOP-M3GASC4G"><testcase classname="tests.test_g31_circulation_native_timing_stream" name="test_three_shards_reconstruct_exact_raw_namespace_tables_and_existing_validator" time="0.033" /><testcase classname="tests.test_g31_circulation_native_timing_stream" name="test_streamed_and_retained_capture_exact_under_same_calls_and_clock" time="0.027" /><testcase classname="tests.test_g31_circulation_native_timing_stream" name="test_exception_and_overflow_are_retained_verbatim_and_fail_closed[True-False]" time="0.028" /><testcase classname="tests.test_g31_circulation_native_timing_stream" name="test_exception_and_overflow_are_retained_verbatim_and_fail_closed[False-True]" time="0.028" /><testcase classname="tests.test_g31_circulation_native_timing_stream" name="test_missing_or_changed_stream_fails_closed[missing_middle]" time="0.014"><failure message="PermissionError: [WinError 5] 拒绝访问。: 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\pytest_native_stream_003\\test_missing_or_changed_stream0\\stream\\manifest.json.tmp' -&gt; 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\pytest_native_stream_003\\test_missing_or_changed_stream0\\stream\\manifest.json'">tmp_path = WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_lt2_sustained_20261014/pytest_native_stream_003/test_missing_or_changed_stream0')
+defect = 'missing_middle'
+
+    @pytest.mark.parametrize("defect", ["missing_middle", "missing_final", "changed_chunk", "changed_manifest",
+        "duplicate_chunk", "open_manifest", "reordered_manifest", "reference_namespace"])
+    def test_missing_or_changed_stream_fails_closed(tmp_path, defect):
+&gt;       captured, reference, _ = make_stream(tmp_path)
+                                 ^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_native_timing_stream.py:117: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_g31_circulation_native_timing_stream.py:76: in make_stream
+    captured.flush()
+scripts\experiments\g31_ics_circulation\stream_native_request_timing.py:163: in flush
+    descriptor = self.stream.append(self.batches, self.envelopes, self.errors)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts\experiments\g31_ics_circulation\stream_native_request_timing.py:95: in append
+    _atomic_manifest(self.manifest_path, updated)
+scripts\experiments\g31_ics_circulation\stream_native_request_timing.py:35: in _atomic_manifest
+    temporary.replace(path)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_lt2_sustained_20261014/pytest_native_stream_003/test_missing_or_changed_stream0/stream/manifest.json.tmp')
+target = WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_lt2_sustained_20261014/pytest_native_stream_003/test_missing_or_changed_stream0/stream/manifest.json')
+
+    def replace(self, target):
+        """
+        Rename this path to the target path, overwriting if that path exists.
+    
+        The target path may be absolute or relative. Relative paths are
+        interpreted relative to the current working directory, *not* the
+        directory of the Path object.
+    
+        Returns the new Path instance pointing to the target path.
+        """
+&gt;       os.replace(self, target)
+E       PermissionError: [WinError 5] 拒绝访问。: 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\pytest_native_stream_003\\test_missing_or_changed_stream0\\stream\\manifest.json.tmp' -&gt; 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\pytest_native_stream_003\\test_missing_or_changed_stream0\\stream\\manifest.json'
+
+..\..\python3.11.9\Lib\pathlib.py:1188: PermissionError</failure></testcase><testcase classname="tests.test_g31_circulation_native_timing_stream" name="test_missing_or_changed_stream_fails_closed[missing_final]" time="0.026" /><testcase classname="tests.test_g31_circulation_native_timing_stream" name="test_missing_or_changed_stream_fails_closed[changed_chunk]" time="0.024" /><testcase classname="tests.test_g31_circulation_native_timing_stream" name="test_missing_or_changed_stream_fails_closed[changed_manifest]" time="0.028" /><testcase classname="tests.test_g31_circulation_native_timing_stream" name="test_missing_or_changed_stream_fails_closed[duplicate_chunk]" time="0.024" /><testcase classname="tests.test_g31_circulation_native_timing_stream" name="test_missing_or_changed_stream_fails_closed[open_manifest]" time="0.021" /><testcase classname="tests.test_g31_circulation_native_timing_stream" name="test_missing_or_changed_stream_fails_closed[reordered_manifest]" time="0.027" /><testcase classname="tests.test_g31_circulation_native_timing_stream" name="test_missing_or_changed_stream_fails_closed[reference_namespace]" time="0.023" /><testcase classname="tests.test_g31_circulation_native_timing_stream" name="test_rebound_hashes_do_not_hide_broken_identity_or_coverage[ordinal_reset]" time="0.030" /><testcase classname="tests.test_g31_circulation_native_timing_stream" name="test_rebound_hashes_do_not_hide_broken_identity_or_coverage[batch_namespace]" time="0.032" /><testcase classname="tests.test_g31_circulation_native_timing_stream" name="test_rebound_hashes_do_not_hide_broken_identity_or_coverage[chunk_namespace]" time="0.033" /><testcase classname="tests.test_g31_circulation_native_timing_stream" name="test_rebound_hashes_do_not_hide_broken_identity_or_coverage[span_id]" time="0.031" /><testcase classname="tests.test_g31_circulation_native_timing_stream" name="test_rebound_hashes_do_not_hide_broken_identity_or_coverage[envelope_missing]" time="0.029" /><testcase classname="tests.test_g31_circulation_native_timing_stream" name="test_rebound_hashes_do_not_hide_broken_identity_or_coverage[batch_missing]" time="0.031" /><testcase classname="tests.test_g31_circulation_native_timing_stream" name="test_rebound_hashes_do_not_hide_broken_identity_or_coverage[range_overlap]" time="0.031" /><testcase classname="tests.test_g31_circulation_native_timing_stream" name="test_rebound_hashes_do_not_hide_broken_identity_or_coverage[mutated_identity]" time="0.030" /><testcase classname="tests.test_g31_circulation_native_timing_stream" name="test_rebound_hashes_do_not_hide_broken_identity_or_coverage[final_leaf_missing]" time="0.030" /><testcase classname="tests.test_g31_circulation_native_timing_stream" name="test_export_failure_preserves_buffers_and_prevents_silent_retry" time="0.009" /><testcase classname="tests.test_g31_circulation_native_timing_stream" name="test_no_silent_reopen_or_unflushed_final_records" time="0.015" /><testcase classname="tests.test_g31_circulation_native_timing_stream" name="test_streaming_preserves_explicit_type_capability_and_query_argument" time="0.007" /><testcase classname="tests.test_g31_circulation_native_timing_stream" name="test_driver_hook_cleanup_and_no_early_reconstruction" time="0.004" /><testcase classname="tests.test_g31_circulation_native_timing_stream" name="test_gc_callback_cleanup_and_timestamps_on_failed_controller" time="0.008" /><testcase classname="tests.test_g31_circulation_native_timing_stream" name="test_default_new_driver_storage_is_retained" time="0.001" /></testsuite></testsuites>

@@ -68,6 +68,7 @@ inline std::string EventDrivenJunctionRuntime::submit_circulation_transfer(
 
 inline std::string EventDrivenJunctionRuntime::cancel_circulation_transfer(
     const std::string& id, const std::string& owner,bool protocol_internal) {
+  auto timing_cancel = request_timing_.scoped(TimingPhase::cancellation);
   if (!circulation_.enabled || runtime_phase_ == EventDrivenJunctionRuntimePhase::kIdle ||
       runtime_phase_ == EventDrivenJunctionRuntimePhase::kFinalized)
     throw std::logic_error("circulation:live_session_required");
@@ -131,7 +132,7 @@ inline std::string EventDrivenJunctionRuntime::publish_circulation_demand(
   for(std::size_t i=0;i<circulation_.jobs.size();++i) {
     const auto& job=circulation_.input.jobs[i];
     if(circulation_.jobs[i].status=="waiting_for_tray" && circulation_.owner(job.origin)==source)
-      message.jobs.push_back({job.business_bag_id,job.origin,job.arrival,job.deadline});
+      message.jobs.push_back(i);
   }
   const int index=static_cast<int>(circulation_.demand_messages.size());
   circulation_.demand_messages.push_back(std::move(message));
@@ -213,6 +214,7 @@ inline std::string EventDrivenJunctionRuntime::publish_circulation_service_forec
 
 inline std::string EventDrivenJunctionRuntime::withdraw_circulation_service_forecast(
     const std::string& source,const std::string& original_message_id,double delay,bool protocol_internal) {
+  auto timing_withdraw = request_timing_.scoped(TimingPhase::withdrawal);
   if (!circulation_.enabled || runtime_phase_==EventDrivenJunctionRuntimePhase::kIdle ||
       runtime_phase_==EventDrivenJunctionRuntimePhase::kFinalized)
     throw std::logic_error("circulation:live_session_required");

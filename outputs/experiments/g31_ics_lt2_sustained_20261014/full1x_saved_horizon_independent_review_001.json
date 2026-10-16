@@ -1,0 +1,82 @@
+{
+  "schema": "g31.saved_horizon_limited_independent_review.v1",
+  "status": "passed_limited_evidence_review",
+  "created_utc": "2026-10-15T04:44:42.209380+00:00",
+  "review_source": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\review_saved_horizon_report.py",
+    "sha256": "7bae5dfac963c9849a7634ec7462df52462d82129c92de87bb9cc7d205c417f7"
+  },
+  "audit_report": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\full1x_saved_horizon_audit_001.json",
+    "sha256": "424b27acb33bf71870602bf536db825cabc04f3ec1436bde8affaf6d08fbaa10"
+  },
+  "bounded_execution": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\saved_horizon_audit_prepare_001\\bounded_execution.json",
+    "sha256": "a126aa1918444315946a967f7adc3a2b1871624a0e5dee79f8817ace4b1fb59c"
+  },
+  "preparation": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\saved_horizon_audit_prepare_001\\preparation.json",
+    "sha256": "51eba5bb9b8b5470d8bd1dda0106648b46fec5c4ddd723c8e3c904d3209a0e6c"
+  },
+  "checked_small_and_final_evidence": {
+    "receipt.json": "aef53902a786e12107b0d77253c2ecdf66a9899c68468e50bddf577f4aad35ed",
+    "run_shards.json": "d95ea74fbf7a9432eb71e30c3419368de84fe315aa14bb53f702970cfc960386",
+    "input.json.gz": "d37118333de2aa60fb5e9b9d41bab53cccb7ddbab5842862b88a2818e08709a1",
+    "input_manifest.json": "e1c5cc304809037eac8cc44d61b9cba60882f2756d31745fad61c17c4c47ef96",
+    "resume_source/cut_manifest.json": "c7f7cdc8398c613c5bfef9531f9b9af1457d32242d8f872261635c04dfd3ad59",
+    "resume_source/stop_receipt.json": "463d54b74e99db355d1b969567de3ddd8eaa4e0ad3f7a914ddcdce6e14af641a",
+    "reconstruction.json": "635bf2f20585519c4b951c431148572f31904366f02fd22cd01b10f1ea8d737f",
+    "resume_source/source_receipt_snapshot.json": "28ce0f263daa78af00814de5409bcffe61a9cfa4a0c0802d79e15d59df943371",
+    "resume_source/source_heartbeat_snapshot.json": "82c9591f1176464cb8a46a3650106db59542bef93e3b3273a857dc6067011fa9",
+    "summary.json": "4deeef183a8352d5b7032bf849bb4fd6440ba4b311c37c57c82494a657a67503",
+    "native_offline_diagnostics.json.gz": "38a5914b975eef23a65bfb764191bb6fa291d7db948dc648fd9f141efdf436fd",
+    "segments\\0450.json.gz": "7b42944de4b87b734e08ff51927c3336d11ccba40568f304cec0f78c3aac7b66"
+  },
+  "source_counts": {
+    "producer": 48,
+    "auditor": 42,
+    "prepared": 44
+  },
+  "manifest_parts": 451,
+  "decoded_raw_shards": [
+    "segments\\0450.json.gz"
+  ],
+  "new_native_executions": 0,
+  "new_native_seal_replay": false,
+  "producer_receipt_still_hard_timeout": true,
+  "producer_summary_present_and_hash_verified": true,
+  "business": {
+    "offered": 28506,
+    "completed": 0,
+    "unfinished": 28506,
+    "strict_deadline_violations": 28506,
+    "legacy_summary_tolerance_deadline_violations": 28506
+  },
+  "physical_audit_saved_result": {
+    "status": "passed",
+    "completed_traversals": 238,
+    "open_traversals": 0,
+    "tray_count": 22,
+    "optimality": "unknown",
+    "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+  },
+  "tray_modes": {
+    "loaded": 18,
+    "empty_transit": 3,
+    "quarantined": 1
+  },
+  "findings": [
+    "The bounded saved-file auditor exited0 within1800s. Its output hash matches the bounded receipt.",
+    "Producer summary.json really exists, has the pinned hash and agrees with final raw facts; its creation did not make the producer process successful.",
+    "The451-entry manifest and all saved per-shard hashes/counts agree with the report; only final0450 was rehashed and decoded in this limited review.",
+    "Final timestamp is fully drained. All28506 identities remain present;0businesses completed and all28506 violate their strict deadline byH86400.",
+    "Physical-audit passed means the stated identity/lifecycle/edge/headway/parked-incoming-reception capacity replay passed. It is not business success, optimality or a fresh native hidden-state proof.",
+    "The1e-8 field documents legacy summary deadline classification only. Strict deadline counting uses>deadline without tolerance. No paired protection is established; future per-job protection must enforce delta<=0 with noepsilon."
+  ],
+  "limitations": [
+    "Did not rehash/decompress all3GiB history or rerun the complete physical auditor; relies on the source-bound completed saved-file audit for intermediate traces and full physical replay.",
+    "Intermediate controller-state objects were opaque byte-bound subtrees in the first audit, as explicitly stated there.",
+    "The final native seal remains producer-reported; no new NativeSession or seal reconstruction was executed.",
+    "No complete-request100ms, paired zero-regression, deadlock-freedom or business-success claim."
+  ]
+}

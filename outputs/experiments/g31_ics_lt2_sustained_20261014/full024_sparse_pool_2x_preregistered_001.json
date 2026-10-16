@@ -1,0 +1,40 @@
+{
+  "schema": "g31.full024_sparse_pooled_2x_preregistration.v1",
+  "created_utc": "2026-10-14T13:27:25.636450+00:00",
+  "status": "preregistered_unexecuted",
+  "suite": "full2x",
+  "offered_total": 57012,
+  "horizon": 86400,
+  "event_budget": 1000000,
+  "max_activations": 1000000,
+  "activation_shard_budget": 500,
+  "segment_seconds": 3600,
+  "hard_timeout_seconds": 7200,
+  "binary_sha256": "030e4e116cd0ced9e4acc6a00ba5e111cbd5d2a48f14b62e9f2539f1e6a7710c",
+  "travel_pool": "on_cold_owner_isolated",
+  "output": "outputs\\experiments\\g31_ics_lt2_sustained_20261014\\full024_sparse_pool_2x_001",
+  "gates": {
+    "native024_build_001/receipt.json": "d29103a71936c59bcb65a7fe95392f9f358a4d098d35873f4812c7643aca6596",
+    "native024_acceptance_001/receipt.json": "16b6c47236c90ca951d5a7de046c6c797d032d4d04642ae635dfa50dd70d9bc3",
+    "resume_native_gate_002/assessment.json": "a178f320c6f6df6e93d3e79a52c220912fde6de53399a42ea212c8a314516c49",
+    "full024_resume_native_001/reconstruction.json": "b516ffd3ece9ae5a4ee78153ac0c0d1937cf381b9bf11997f057f7d40fdd7d67",
+    "sparse_full_day_native_gate_001/receipt.json": "5ee1f283de41276f5c4b5f55ce50d010eb47b50b709da5cb7278b6a607fc7ce4",
+    "sparse_full_day_native_gate_001/assessment.json": "bef6e50f4c2401e2a214db5bc69942fb28fdd76d93c550961c837f3fe155fedb",
+    "public_travel_pool_native_001/independent_assessment.json": "575684b3bceb31a748416e50fe0141152281ce4b4900dd55c8294b9327c7c576",
+    "sparse_pool_native_gate_001/receipt.json": "4b191fcd66921e497cc1e232fe544dd663012652ef6a203bb8e1a8a4828dadbe",
+    "sparse_pool_native_gate_001/assessment.json": "b12fee56852a9950f8465cdf962a95616485cbaba37bc9171b317974068df662",
+    "full024_resume_preregistered_001.json": "8c27829992f0ba07187e431ff0c338412d657debc50a60ec16e2b68301ac3f40"
+  },
+  "schedule_amendment": {
+    "supersedes_only": "full024_resume_preregistered_001.json full2x sequencing after1x completion",
+    "new_sequence": "After verified actual1x cut reconstruction, fresh sparse and cache composition gates passed, run independent2x concurrently with continuing1x. All short025/rolling experiments have stopped.",
+    "reason": "The2x driver no longer depends on1x output. Use both declared native slots for complete inputs while independent pure analysis continues. This is declared before2x launch; no running budget or threshold changes."
+  },
+  "maximum_native_workers_global": 2,
+  "other_native_worker": "full024_resume_native_001",
+  "policy_constraints": "Unchanged input population, graph/direction/capacity/FIFO/trays/mandatoryStorage/permissions/command delays; no dropped requests, failures or unknowns. Cached facts only owner-isolated public static paths; all dynamic decisions fresh.",
+  "storage": "All500-owner raw shards and file hashes retained; actualnative seals atH3600 boundaries and normalfinal budget/status exit. Full independent verifier only after actualH86400.",
+  "timing": "Shared concurrent load; cache keys/searches/checkouts inside controllerwindows; all diagnostics/parentcost separately recorded; complete100ms uncertified.",
+  "full_day_metrics": null,
+  "publication": "No commit, push or external review message authorized or performed."
+}

@@ -1,0 +1,44 @@
+{
+  "schema": "g31.low_wip_coverage_order_independent_review.v1",
+  "status": "read_only_source_review_no_concrete_blocker",
+  "at_utc": "2026-10-15T04:25:56.195442+00:00",
+  "source": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_original_low_wip.py",
+    "sha256": "157f4fd7eb333c4dccb9c63635cd548e91015eb1f2b0d9df5de5da65fb6fe96c"
+  },
+  "tests": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\tests\\test_g31_circulation_original_low_wip.py",
+    "sha256": "648dbaf71dd4741f033e1557b6a0a27007deb22004a52139f419b1278b0bb57b"
+  },
+  "saved_pure_xml": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_low_wip_pure_008.xml",
+    "sha256": "94861837f275e2ba6794441e1afab79d6f3d9bc195608e1301befc0cfdaba7cd"
+  },
+  "saved_xml_counts": {
+    "tests": 69,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "reviewed_native_authority": [
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\native026_build_001\\source\\cpp\\ics_core\\runtime\\circulation_planning_snapshot_impl.hpp",
+      "sha256": "6fcd5ee8520e4f4228ad6791d66275bc0d8294b6a54833b695ab36d40d9c1337"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\native026_build_001\\source\\cpp\\ics_core\\bindings\\circulation_session_binding.hpp",
+      "sha256": "dd7dd9ddad84582883f3327ab43aec9cd8a74b997f0ee85d232bf5281589dca4"
+    }
+  ],
+  "findings": [
+    "coverage_matches_rows preserves native renderer row order and requires unique nonempty strings; it does not assume lexicographic tray/job order.",
+    "Node coverage equals native node-body order and exact full source-owner node set, with strict nonnegative integer IDs.",
+    "Terminal business IDs/receipt IDs are unique and terminal node coverage retains capture-node order.",
+    "Submitted physical request IDs match action row order; unresolved IDs equal order-preserving filtered rows under the accepted026 operation-specific delivered-ACK predicate.",
+    "Saved003 prefix test pins source plan and16-row manifest then requires missing_tape_call after exactly all16 records atphysical10. This proves progress past the old validator failure only, not any new native outcome."
+  ],
+  "limitations": [
+    "This review inspected source and the saved69-test XML; reviewer did not independently rerun these tests or invoke NativeSession.",
+    "Earlier003 membership failure remains preserved. Native004 execution and business result are still pending."
+  ]
+}

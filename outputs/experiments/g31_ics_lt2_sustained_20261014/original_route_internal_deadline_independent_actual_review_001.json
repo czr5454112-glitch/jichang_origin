@@ -1,0 +1,408 @@
+{
+  "schema": "g31.original_route_internal_deadline_probe.independent_actual_review.v1",
+  "status": "passed_saved_actual_and_external_launch_review",
+  "evidence_sha256": {
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_internal_deadline_prepare_001\\ready_receipt.json": "4d5623b10f0ee79ca44f24c1ceb506d3ad2ecb9b97a615c944fdfcd968247135",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_internal_deadline_prepare_001\\preregistered_protocol.json": "011affb7bc858a53de116aa415f8d610b1d705bef7359bf646163b2ccf3ac54e",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_internal_deadline_prepare_001\\receipt.json": "a233e312208304089fdbdf22e17db845c7d7917d214f38d39c1e501de60fd7ff",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_internal_deadline_prepare_001\\external_launch_receipt.json": "0b3057e34471688aa3efe499d565f79ae6a3793fc1807fb0f160e20698d86e83",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_internal_deadline_prepare_001\\independent_verification.json": "df34efe08cc6419a2c58689a3e49b3493f4fa875aa54441a98205f311e3a2ae0"
+  },
+  "review_source": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\review_original_route_update_internal_deadline_saved.py",
+    "sha256": "66a913de8616b9a18c9e3ed8bb6a1730cbb0e07d48a22045c1a962b34eb851cc"
+  },
+  "declared_roots": 3,
+  "closed_roots": 2,
+  "open_roots": 1,
+  "cases": {
+    "baseline": {
+      "status": "closed_finite_request",
+      "job": "projected:1x:4",
+      "disposition": {
+        "sequence": 5,
+        "at": 9605.7,
+        "wall_ns": 18245314516900,
+        "disposition": "completed"
+      },
+      "intent_status": "updated_ack_and_actual_edge",
+      "warm_elapsed_upper_ms": 82.8126,
+      "worker_setup_prefix_ms": 7944.7453,
+      "child_cold_elapsed_upper_ms": 8398.9249,
+      "shared_measured_parent_setup_charged_fully_ms": 3828.8782,
+      "child_plus_measured_parent_setup_ms": 12227.8031,
+      "full_cold_upper_ms": null,
+      "parent_startup_import_cost": "unmeasured; require externally pinned launch-to-exit bound for full campaign charge",
+      "native_call_envelopes_within_root_ms": 14.1982,
+      "native_call_count_within_root": 33,
+      "request_api_rows": 8,
+      "all_warm_native_api_rows": 1273,
+      "controller_trace_rows": 2796,
+      "owner_activations": 1006,
+      "exact_pre_admission_original_prefix": {
+        "parts": 2,
+        "status": "ordered_exact_except_listed_clock_fields",
+        "excluded": [
+          "wall_seconds",
+          "control_records[].compute_wall_ms",
+          "control_records[].compute_cpu_ms",
+          "native_batches[].wall_ms",
+          "native_batches[].cpu_ms",
+          "client_calls[].submit_compute_ms",
+          "result.advance.wall_seconds"
+        ]
+      },
+      "split_deadline_actual_reference": {
+        "status": "exact_request_api_and_common9900_producer_seal",
+        "request_rows": 8,
+        "physical_horizon": 9900.0,
+        "native_state_sha256": "c41257b955faaf6d5bc4dbb704f174fd7820d7723a6ad8455283897f5d54c7ad",
+        "excluded_request_fields": [
+          "outer ordinal",
+          "outer role (both filtered request)",
+          "outer start_ns/end_ns",
+          "advance_to.result.wall_seconds"
+        ],
+        "reference_raw_sha256": "16ce70086dd0e2ac32dc88454c7a726d3c2dad5e36b1677b6b3a1db797184fc4",
+        "reference_api_sha256": "d9b67e88e4d1ddca6c756324fa858224874b8a43fa7620c90169aa4e234e84d5",
+        "independent_native_seal_replay": false
+      },
+      "eligibility_schedule": {
+        "first_observed_at": 9600.0,
+        "source_service_seconds": 1.5,
+        "wire_seconds": 2.0,
+        "deadline": 9603.5,
+        "fired_at": 9603.5,
+        "source": "initial_admitted_root_fresh_view",
+        "initial_candidate_count": 1
+      },
+      "root_request_ids": [
+        "live:21:owner:system_domestic:route:0"
+      ],
+      "attempts": 1,
+      "raw_sha256": "bd80896191e3f7e1699afa77fa744c2a54231466700ac153af3d95f6ecf1eaf7",
+      "producer_native_seal": "c41257b955faaf6d5bc4dbb704f174fd7820d7723a6ad8455283897f5d54c7ad",
+      "whole_child_wall_seconds": 16.5655931,
+      "post_capture_seal_export_and_process_tail_upper_ms": 173.5726,
+      "scope": "Exact saved REQUEST-SIDE API replay. Background controller/native transcript is retained, hash/order/clock/denominator checked, but controller policy is not recomputed. No new native seal reconstruction, exclusive phase subtraction or long-term maintenance proof.",
+      "complete_100ms_certified": false,
+      "physical_end": 9900.0,
+      "root_closed_at": {
+        "sequence": 7,
+        "at": 9605.7,
+        "wall_ns": 18245314963300
+      },
+      "submitted_at": 9603.5,
+      "actual_ack": {
+        "sequence": 1,
+        "attempt": 1,
+        "observed_at": 9605.5,
+        "delivered_at": 9605.7,
+        "executed_at": 9605.5,
+        "completed_at": 9605.5,
+        "status": "updated",
+        "reason": "allowed",
+        "result_id": "live:21:owner:system_domestic:route:0"
+      },
+      "actual_edge": {
+        "from": 112,
+        "to": 113,
+        "observed_at": 9605.5,
+        "owner": "owner:system_domestic",
+        "local_tray": {
+          "tray_id": "initial:0:1",
+          "node": 112,
+          "mode": "loaded",
+          "edge_from": 112,
+          "edge_to": 113,
+          "available_at": 0.0,
+          "reception_node": -1,
+          "generation": 1,
+          "traversal_id": 6,
+          "business_bag_id": "projected:1x:4",
+          "committed_prefix": [
+            0,
+            1,
+            27,
+            28,
+            29,
+            112
+          ],
+          "edge_exit_at": 9607.0
+        },
+        "evidence": "matched_observed_entry_inflight"
+      },
+      "actual_attempt_times": [
+        9603.5
+      ],
+      "full_application_campaign_charge_ms": 155623.7658,
+      "charge_interpretation": "Full application execution charge for each root without division, including all other cases and verification. Closed-root conservative envelope; an open root's eventual service completion remains unknown.",
+      "complete_root_cold_upper_ms": 155623.7658,
+      "actual_split_deadline_reference": {
+        "report_sha256": "ff2e1f94794bec499b72d36f3d277ce5a76c22d5fc69ea911e406cad18691c62",
+        "status": "closed_finite_request",
+        "native_calls_within_root": 34,
+        "warm_ms": 1049.5904,
+        "scope": "Separate saved executions, potentially concurrent with other experiments. Exact pre-admission prefix, request-side API sequence and actual common9900 producer seal are checked; native seal was not independently replayed. This is not an isolated repeated performance estimate."
+      },
+      "observed_warm_difference_ms": -966.7778000000001
+    },
+    "drop_first_ack": {
+      "status": "closed_finite_request",
+      "job": "projected:1x:4",
+      "disposition": {
+        "sequence": 6,
+        "at": 9667.4,
+        "wall_ns": 18264389171200,
+        "disposition": "completed"
+      },
+      "intent_status": "updated_ack_and_actual_edge",
+      "warm_elapsed_upper_ms": 1499.9973,
+      "worker_setup_prefix_ms": 9014.606,
+      "child_cold_elapsed_upper_ms": 10902.4437,
+      "shared_measured_parent_setup_charged_fully_ms": 3828.8782,
+      "child_plus_measured_parent_setup_ms": 14731.3219,
+      "full_cold_upper_ms": null,
+      "parent_startup_import_cost": "unmeasured; require externally pinned launch-to-exit bound for full campaign charge",
+      "native_call_envelopes_within_root_ms": 294.2883,
+      "native_call_count_within_root": 2019,
+      "request_api_rows": 79,
+      "all_warm_native_api_rows": 6233,
+      "controller_trace_rows": 3794,
+      "owner_activations": 1340,
+      "exact_pre_admission_original_prefix": {
+        "parts": 2,
+        "status": "ordered_exact_except_listed_clock_fields",
+        "excluded": [
+          "wall_seconds",
+          "control_records[].compute_wall_ms",
+          "control_records[].compute_cpu_ms",
+          "native_batches[].wall_ms",
+          "native_batches[].cpu_ms",
+          "client_calls[].submit_compute_ms",
+          "result.advance.wall_seconds"
+        ]
+      },
+      "split_deadline_actual_reference": {
+        "status": "exact_request_api_and_common9900_producer_seal",
+        "request_rows": 79,
+        "physical_horizon": 9900.0,
+        "native_state_sha256": "425364a12ef280fc386907b79b15c9cb7b705d5cdc1b960ad4e3ed1c5390c6a7",
+        "excluded_request_fields": [
+          "outer ordinal",
+          "outer role (both filtered request)",
+          "outer start_ns/end_ns",
+          "advance_to.result.wall_seconds"
+        ],
+        "reference_raw_sha256": "7791f87d9a2335dd36906d00ae1ed625673f976f74396cb891f8049a43f88290",
+        "reference_api_sha256": "990e459e662333752d6858848c1e999478cb5264d8eae521164cdd88490b1473",
+        "independent_native_seal_replay": false
+      },
+      "eligibility_schedule": {
+        "first_observed_at": 9600.0,
+        "source_service_seconds": 1.5,
+        "wire_seconds": 2.0,
+        "deadline": 9603.5,
+        "fired_at": 9603.5,
+        "source": "initial_admitted_root_fresh_view",
+        "initial_candidate_count": 1
+      },
+      "root_request_ids": [
+        "live:21:owner:system_domestic:route:0"
+      ],
+      "attempts": 2,
+      "raw_sha256": "462b0ee7677c77b48161e1f1b33c686c7d2e18495d6c91ec83d1336cd70ceabd",
+      "producer_native_seal": "425364a12ef280fc386907b79b15c9cb7b705d5cdc1b960ad4e3ed1c5390c6a7",
+      "whole_child_wall_seconds": 19.1945397,
+      "post_capture_seal_export_and_process_tail_upper_ms": 148.5964,
+      "scope": "Exact saved REQUEST-SIDE API replay. Background controller/native transcript is retained, hash/order/clock/denominator checked, but controller policy is not recomputed. No new native seal reconstruction, exclusive phase subtraction or long-term maintenance proof.",
+      "complete_100ms_certified": false,
+      "physical_end": 9900.0,
+      "root_closed_at": {
+        "sequence": 8,
+        "at": 9667.4,
+        "wall_ns": 18264389463200
+      },
+      "submitted_at": 9603.5,
+      "actual_ack": {
+        "sequence": 2,
+        "attempt": 2,
+        "observed_at": 9667.199999999999,
+        "delivered_at": 9667.4,
+        "executed_at": 9605.5,
+        "completed_at": 9605.5,
+        "status": "updated",
+        "reason": "allowed",
+        "result_id": "live:21:owner:system_domestic:route:0"
+      },
+      "actual_edge": {
+        "from": 112,
+        "to": 113,
+        "observed_at": 9605.5,
+        "owner": "owner:system_domestic",
+        "local_tray": {
+          "tray_id": "initial:0:1",
+          "node": 112,
+          "mode": "loaded",
+          "edge_from": 112,
+          "edge_to": 113,
+          "available_at": 0.0,
+          "reception_node": -1,
+          "generation": 1,
+          "traversal_id": 6,
+          "business_bag_id": "projected:1x:4",
+          "committed_prefix": [
+            0,
+            1,
+            27,
+            28,
+            29,
+            112
+          ],
+          "edge_exit_at": 9607.0
+        },
+        "evidence": "matched_observed_entry_inflight"
+      },
+      "actual_attempt_times": [
+        9603.5,
+        9665.199999999999
+      ],
+      "full_application_campaign_charge_ms": 155623.7658,
+      "charge_interpretation": "Full application execution charge for each root without division, including all other cases and verification. Closed-root conservative envelope; an open root's eventual service completion remains unknown.",
+      "complete_root_cold_upper_ms": 155623.7658,
+      "actual_split_deadline_reference": {
+        "report_sha256": "ff2e1f94794bec499b72d36f3d277ce5a76c22d5fc69ea911e406cad18691c62",
+        "status": "closed_finite_request",
+        "native_calls_within_root": 2020,
+        "warm_ms": 2768.9834,
+        "scope": "Separate saved executions, potentially concurrent with other experiments. Exact pre-admission prefix, request-side API sequence and actual common9900 producer seal are checked; native seal was not independently replayed. This is not an isolated repeated performance estimate."
+      },
+      "observed_warm_difference_ms": -1268.9861
+    },
+    "ack_withheld_in_window": {
+      "status": "open_censored_request",
+      "job": "projected:1x:4",
+      "disposition": null,
+      "intent_status": "awaiting_delivered_ack_and_edge",
+      "warm_elapsed_prefix_ms": 33384.5651,
+      "worker_setup_prefix_ms": 19436.3775,
+      "child_cold_elapsed_prefix_ms": 53188.1354,
+      "shared_measured_parent_setup_charged_fully_ms": 3828.8782,
+      "child_plus_measured_parent_setup_ms": 57017.0136,
+      "full_cold_upper_ms": null,
+      "parent_startup_import_cost": "unmeasured; require externally pinned launch-to-exit bound for full campaign charge",
+      "native_call_envelopes_within_root_ms": 4414.8624,
+      "native_call_count_within_root": 147653,
+      "request_api_rows": 977,
+      "all_warm_native_api_rows": 147653,
+      "controller_trace_rows": 13241,
+      "owner_activations": 4512,
+      "exact_pre_admission_original_prefix": {
+        "parts": 6,
+        "status": "ordered_exact_except_listed_clock_fields",
+        "excluded": [
+          "wall_seconds",
+          "control_records[].compute_wall_ms",
+          "control_records[].compute_cpu_ms",
+          "native_batches[].wall_ms",
+          "native_batches[].cpu_ms",
+          "client_calls[].submit_compute_ms",
+          "result.advance.wall_seconds"
+        ]
+      },
+      "split_deadline_actual_reference": {
+        "status": "exact_request_api_and_common9900_producer_seal",
+        "request_rows": 977,
+        "physical_horizon": 9900.0,
+        "native_state_sha256": "f32a0efc994617f476088c4bf724a67b819c7c79bd480bc4ebdc4a1f8ee8586d",
+        "excluded_request_fields": [
+          "outer ordinal",
+          "outer role (both filtered request)",
+          "outer start_ns/end_ns",
+          "advance_to.result.wall_seconds"
+        ],
+        "reference_raw_sha256": "e44469a335808f6e35f9ff578812bde9e782204e2a3256e9f6a89a6fcc5352ff",
+        "reference_api_sha256": "2f622c795e67c5c9e99e4ddd8af1f3f703f185b3ee3e82c8a44e3bf66af7581c",
+        "independent_native_seal_replay": false
+      },
+      "eligibility_schedule": {
+        "first_observed_at": 9600.0,
+        "source_service_seconds": 1.5,
+        "wire_seconds": 2.0,
+        "deadline": 9603.5,
+        "fired_at": 9603.5,
+        "source": "initial_admitted_root_fresh_view",
+        "initial_candidate_count": 1
+      },
+      "root_request_ids": [
+        "live:21:owner:system_domestic:route:0"
+      ],
+      "attempts": 5,
+      "raw_sha256": "328a0062fb1dd32123dcaf038837a2baad2f22811c9765c61028d2681157ca6b",
+      "producer_native_seal": "f32a0efc994617f476088c4bf724a67b819c7c79bd480bc4ebdc4a1f8ee8586d",
+      "whole_child_wall_seconds": 58.084512,
+      "post_capture_seal_export_and_process_tail_upper_ms": 193.369,
+      "scope": "Exact saved REQUEST-SIDE API replay. Background controller/native transcript is retained, hash/order/clock/denominator checked, but controller policy is not recomputed. No new native seal reconstruction, exclusive phase subtraction or long-term maintenance proof.",
+      "complete_100ms_certified": false,
+      "physical_end": 9900.0,
+      "root_closed_at": null,
+      "submitted_at": 9603.5,
+      "actual_ack": null,
+      "actual_edge": {
+        "from": 112,
+        "to": 113,
+        "observed_at": 9605.5,
+        "owner": "owner:system_domestic",
+        "local_tray": {
+          "tray_id": "initial:0:1",
+          "node": 112,
+          "mode": "loaded",
+          "edge_from": 112,
+          "edge_to": 113,
+          "available_at": 0.0,
+          "reception_node": -1,
+          "generation": 1,
+          "traversal_id": 6,
+          "business_bag_id": "projected:1x:4",
+          "committed_prefix": [
+            0,
+            1,
+            27,
+            28,
+            29,
+            112
+          ],
+          "edge_exit_at": 9607.0
+        },
+        "evidence": "matched_observed_entry_inflight"
+      },
+      "actual_attempt_times": [
+        9603.5,
+        9665.000872,
+        9725.000872,
+        9785.000872,
+        9845.000872
+      ],
+      "full_application_campaign_charge_ms": 155623.7658,
+      "charge_interpretation": "Full application execution charge for each root without division, including all other cases and verification. Closed-root conservative envelope; an open root's eventual service completion remains unknown.",
+      "complete_root_cold_upper_ms": null,
+      "actual_split_deadline_reference": {
+        "report_sha256": "ff2e1f94794bec499b72d36f3d277ce5a76c22d5fc69ea911e406cad18691c62",
+        "status": "open_censored_request",
+        "native_calls_within_root": 147654,
+        "warm_ms": 38942.2021,
+        "scope": "Separate saved executions, potentially concurrent with other experiments. Exact pre-admission prefix, request-side API sequence and actual common9900 producer seal are checked; native seal was not independently replayed. This is not an isolated repeated performance estimate."
+      },
+      "observed_warm_difference_ms": -5557.637000000002
+    }
+  },
+  "native_executions_by_reviewer": 0,
+  "new_native_seal_replay": false,
+  "background_controller_recomputed": false,
+  "request_side_saved_api_replayed": true,
+  "whole_application_campaign_charge_ms_per_root": 155623.7658,
+  "exclusions": "External PowerShell/tool startup before the measured clock; prelaunch PowerShell hash and command checks (included in measured_harness_and_campaign but outside application campaign); final evidence rehashes and writing this external receipt after application exit. These are experiment-harness work, not a certified platform cold-start measurement.",
+  "unbiased_business_sample": false,
+  "long_term_route_maintenance_certified": false,
+  "complete_100ms_certified": false
+}

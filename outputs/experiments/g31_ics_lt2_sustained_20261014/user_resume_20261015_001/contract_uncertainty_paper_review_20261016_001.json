@@ -1,0 +1,63 @@
+{
+  "schema": "g31.lt2.paper_review.v1",
+  "status": "literature_review_and_mapping_only_no_implementation_or_validation",
+  "review_date": "2026-10-16",
+  "source": {
+    "path": "C:/Users/38908/Downloads/1-s2.0-S1751570X26001093-main.pdf",
+    "sha256": "a60996dc6fc4d5628a6cd4b471ef8dcc3c7651c5a49f6b8385be9c75a2ce9f5e",
+    "title": "Contract-based multi-agent logical controller synthesis under uncertainty",
+    "authors": ["Ashwani Anand", "Satya Prakash Nayak", "Anne-Kathrin Schmuck"],
+    "doi": "10.1016/j.nahs.2026.101783",
+    "publisher_url": "https://www.sciencedirect.com/science/article/abs/pii/S1751570X26001093",
+    "pages": 30,
+    "read_scope": "Main text pages 1-21, including model assumptions, definitions, negotiation algorithm, theorem statements and presented proofs, experimental setup and caveats. Pages 5 and 20 rendered and visually inspected. Appendix derivations pages 22-28 and all cited external proofs were not independently verified. No tool replication or performance reproduction."
+  },
+  "findings": [
+    {
+      "pages": [2, 4, 5, 6, 7],
+      "claim": "Each component has its own objective, but synthesis uses a given joint finite game graph and the model assumes full observation. Runtime independence does not mean private local information or delayed-message correctness.",
+      "g31_mapping_inference": "Keep the existing owner-local observation and delivered-message boundary. A shared-port abstraction might be synthesized offline, but it needs an abstraction/refinement argument before game guarantees apply to native FIFO, physical inventory and asynchronous messages. The game-state count is not the physical conveyor-node count."
+    },
+    {
+      "pages": [8, 9],
+      "claim": "Independently realizable contracts require the local guarantee unconditionally, with the local objective conditional on the assumption: G_p and (A_p implies Phi_p). Merely mutually conditional promises are insufficient for the general omega-regular composition argument.",
+      "g31_mapping_inference": "Do not turn an estimated future tray release into a firm supply promise. A region can unconditionally promise only controllable local behavior such as not entering an ungranted receiving resource. Conditional ETA, firm reservation and actual available inventory must stay separate. Existing contracts need dependency-cycle checks rather than circular assumptions that both sides will release first."
+    },
+    {
+      "pages": [10, 11, 12, 15, 16],
+      "claim": "Permissive templates retain sets of legal strategies using forbidden edges, live groups, conditional live groups and co-live edges. Negotiation resolves incompatible templates rather than fixing a unique path for every agent.",
+      "g31_mapping_inference": "Consider an interface template that restricts export/receive/capacity obligations while leaving several G31-local legal suffixes available. A simple instantaneous forbidden-action mask alone does not implement liveness: a policy may choose WAIT forever. Any practical starvation bound requires explicit timing and fair-execution assumptions beyond the paper's qualitative liveness."
+    },
+    {
+      "pages": [4, 14, 17],
+      "claim": "The framework's soundness and completeness are conditional: the negotiation algorithm is complete for k or k+0.5 games without an adversarial environment; the k+1 and k+1.5 constructions are sound but not generally complete. Maximality is claimed for the two-system-player case. Theorem 26 gives O(k*n^6) worst-case time in game vertices.",
+      "g31_mapping_inference": "Do not cite the abstract's broad wording as universal completeness under arbitrary failures, partial information or any number of regions. Almost-sure eventual success is not a per-request deadline or worst-case 100ms computation guarantee."
+    },
+    {
+      "pages": [19, 20],
+      "claim": "For a new objective, synthesize an additional template; compose directly if it creates no conflict, otherwise negotiate again. Temporary-objective experiments compare CoSMo against centralized genZiel over 2244 games.",
+      "g31_mapping_inference": "This motivates incremental repair after a legally delivered release revision, receiver rejection or capacity change. It does not authorize retaining stale dynamic proofs or mutating issued physical actions. Limit repair to a justified dependency closure and account for all refresh, compatibility and native checks in full-request time."
+    },
+    {
+      "pages": [17, 18, 19, 20, 21],
+      "claim": "Experiments use two-system-player games on an Apple M1 Pro, 16GB. The factory suite has 2357 instances; reported large 50x50 cases take minutes to under an hour depending on objective type. The agnes comparison excludes segmentation-fault cases and uses 120 considered instances with a 300s timeout. The shielding example blends learned preferences with safety/liveness constraints.",
+      "g31_mapping_inference": "This supports an offline or bounded small-interface synthesis prototype, not a claim that online whole-network synthesis satisfies 100ms. Preserve exclusions/timeouts if reproducing comparisons. A learned candidate ranker can be supervised by exact existing guards, but the guards' protection and performance must still be measured."
+    }
+  ],
+  "priority": "High conceptual value for permissive interface contracts and incremental dependency repair; not a drop-in online solver.",
+  "history_overlap": [
+    "The repository already distinguishes actual, firm, conditional and obligated supply, and implements forecast revision/tombstone and immutable committed transfers. These are existing capabilities, not new contributions inferred from this paper.",
+    "Generic closure and rolling repair were already identified as strong baselines. A new method must explain and validate which downstream tray-service obligations require joint repair under finite stock/FIFO, beyond ordinary MPC or LNS."
+  ],
+  "next_experiment_proposal": {
+    "scope": "A small shared-port abstraction under the existing physical and information contract; no full-network product-game construction.",
+    "comparisons": ["Existing same-information analytic/window controller", "Same-information rolling MPC", "Same-information generic closure/LNS", "Local permissive interface contracts with dependency-triggered repair"],
+    "cases": ["No conflict / sufficient supply", "Release prediction revision before commitment", "Delayed or lost ACK", "Shared-capacity conflict", "Three-way contention", "Infeasible permanent closure"],
+    "requirements": ["Keep all offered jobs and failures", "Protect every normal task", "Preserve FIFO and physical tray conservation", "Only delivered information", "Keep committed prefixes immutable", "Report every full-request latency including unknowns and overruns"],
+    "status": "Proposed only; no new native, model, synthesis or training execution"
+  },
+  "native_runs": 0,
+  "model_runs": 0,
+  "training_runs": 0,
+  "external_messages_sent": 0
+}

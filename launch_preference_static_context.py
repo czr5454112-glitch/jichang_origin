@@ -1,0 +1,44 @@
+"""Own a120s pure worker tree; no native session is constructed."""
+import time
+BOOT = time.perf_counter()
+import argparse
+import hashlib
+import json
+from pathlib import Path
+import sys
+from scripts.experiments.g31_ics_circulation import bounded_windows_job
+
+
+def main():
+    parser = argparse.ArgumentParser(); parser.add_argument('--mode', choices=('tests', 'profile'), required=True)
+    parser.add_argument('--output', type=Path, required=True); args = parser.parse_args()
+    root = Path(__file__).resolve().parent; output = args.output.resolve(); output.mkdir(parents=True, exist_ok=False)
+    sha = lambda path: hashlib.sha256(Path(path).read_bytes()).hexdigest()
+    admission = sha(root / 'measure_preference_static_context.py')
+    command = [sys.executable, '-m', 'measure_preference_static_context', '--mode', args.mode,
+        '--output', str(output / 'worker'), '--admission', admission]
+    receipt = {'status': 'unknown_before_dispatch', 'mode': args.mode, 'command': command,
+        'worker_source_sha256': admission, 'launcher_sha256': sha(__file__), 'native_executions': 0,
+        'shared_owned_job_seconds': 120., 'parent_startup_before_BOOT': 'External Stopwatch required.'}
+    try:
+        remaining = 120.-(time.perf_counter()-BOOT)
+        if remaining <= 0: raise TimeoutError('static_launch:setup_budget')
+        with (output / 'stdout.log').open('x', encoding='utf8') as stdout, (output / 'stderr.log').open('x', encoding='utf8') as stderr:
+            result = bounded_windows_job.run(command, timeout=remaining, stdout=stdout, stderr=stderr,
+                admission=admission, cwd=root)
+        receipt['process'] = result
+        receipt['status'] = 'child_passed' if result['status'] == 'exited' and result['exitcode'] == 0 else 'child_failed_or_unknown'
+    except BaseException as error:
+        receipt.update(status='launcher_failed_or_unknown', error=repr(error)); raise
+    finally:
+        receipt['evidence_sha256'] = {str(path.relative_to(output)): sha(path) for path in output.rglob('*') if path.is_file()}
+        receipt['dispatch_through_evidence_hash_wall_seconds'] = time.perf_counter()-BOOT
+        if receipt['dispatch_through_evidence_hash_wall_seconds'] > 120.:
+            receipt['status'] = 'unknown_dispatch_budget_exceeded'
+        receipt['timing_scope'] = 'Whole child startup/import/tests-or-pair/output plus parent evidence hashes; final parent receipt/startup excluded internally, retained by external wrapper.'
+        (output / 'receipt.json').write_text(json.dumps(receipt, indent=2)+'\n', encoding='utf8')
+    print(json.dumps({'status': receipt['status'], 'wall_seconds': receipt['dispatch_through_evidence_hash_wall_seconds']}))
+    return 0 if receipt['status'] == 'child_passed' else 1
+
+
+if __name__ == '__main__': raise SystemExit(main())

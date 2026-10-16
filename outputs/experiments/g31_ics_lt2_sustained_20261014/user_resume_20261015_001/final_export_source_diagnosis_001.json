@@ -1,0 +1,36 @@
+{
+  "schema": "g31.final_export.source_hypothesis.v1",
+  "status": "source_hypothesis_unimplemented_unbenchmarked",
+  "problem": "Original bridge reached H86400 but its final export left only about51seconds for saved audit before fixed2400 timeout.",
+  "producer_file_creation_to_last_write_seconds": 293.2170503,
+  "interval_scope": "Filesystem wall interval, not an isolated CPU or compression measurement.",
+  "compressed_bytes": 74383534,
+  "gzip_footer_isize_mod_2pow32": 1337978093,
+  "footer_scope": "Only final4bytes read; ISIZE is modulo2^32, not a full decode/completeness proof.",
+  "primary_sources": [
+    "https://github.com/python/cpython/blob/v3.11.9/Lib/json/__init__.py",
+    "https://github.com/python/cpython/blob/v3.11.9/Lib/json/encoder.py"
+  ],
+  "source_facts": [
+    "dump calls iterencode without one-shot and writes each yielded fragment.",
+    "encode uses one-shot, which selects the C encoder when available and indent is None.",
+    "This explains a potential implementation cost difference; it does not measure its fraction of this producer run."
+  ],
+  "local_interpreter": "C:/PROGRAMING/python3.11.9/python.exe",
+  "local_json_init_sha256": "feb17670e443e5db2723f217727dcc5d5e155c40e4e6935b16061c88542f24e7",
+  "local_json_encoder_sha256": "7db65c95f09297d57cc6273d78858b25ffcba65bc83709c4a15584d1dbef3c38",
+  "local_c_encoder_available": true,
+  "memory_snapshot_bytes": {
+    "physical_total": 33736028160,
+    "physical_available": 18809397248,
+    "pagefile_commit_available": 27249528832,
+    "method": "read-only GlobalMemoryStatusEx; instantaneous, not a guaranteed resource allocation"
+  },
+  "next_hypothesis": "Separate fixed shallow decomposition into complete subtrees encoded by the existing C JSON encoder, keeping byte-exact order/separators/scalars and all data. Avoid a whole1.34GB additional string. First bounded synthetic tests and source review, then a separate fixed full-output validation; no live rerun yet.",
+  "limits": [
+    "No source implementation or performance claim in this record.",
+    "No policy/native/physical change, record omission, archival removal or denominator reduction proposed.",
+    "No assumption that subtree size is bounded merely by fixed nesting depth.",
+    "CIM query failed; the successful memory observation used the documented Windows memory-status API through ctypes."
+  ]
+}

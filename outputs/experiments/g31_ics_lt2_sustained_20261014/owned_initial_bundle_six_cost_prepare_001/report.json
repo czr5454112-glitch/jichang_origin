@@ -1,0 +1,624 @@
+{
+  "status": "passed_fixed_six_ABBA24_complete_prediction",
+  "model_calls": 24,
+  "exact": 24,
+  "unknown": 0,
+  "summary_ms": {
+    "A": {
+      "count": 12,
+      "min": 133.1291,
+      "median": 154.09455,
+      "max": 206.7047,
+      "sum": 1865.6961000000001
+    },
+    "B": {
+      "count": 12,
+      "min": 130.0416,
+      "median": 142.63569999999999,
+      "max": 218.7902,
+      "sum": 1845.9013
+    }
+  },
+  "paired_median_ms": {
+    "mechanism/vector_00": {
+      "A": 139.2892,
+      "B": 134.7862
+    },
+    "mechanism/vector_25": {
+      "A": 133.3231,
+      "B": 131.79125
+    },
+    "no_overlap/vector_00": {
+      "A": 151.82875,
+      "B": 151.37009999999998
+    },
+    "no_overlap/vector_25": {
+      "A": 156.5221,
+      "B": 155.73534999999998
+    },
+    "insufficient_advance/vector_00": {
+      "A": 162.00639999999999,
+      "B": 142.48815000000002
+    },
+    "insufficient_advance/vector_17": {
+      "A": 189.8785,
+      "B": 206.77960000000002
+    }
+  },
+  "negative_or_equal_cases": [
+    "insufficient_advance/vector_17"
+  ],
+  "setup": [
+    {
+      "key": "mechanism/vector_00",
+      "status": "public_input_loaded_only",
+      "seconds": 0.0009541999897919595
+    },
+    {
+      "key": "mechanism/vector_25",
+      "status": "public_input_loaded_only",
+      "seconds": 0.0010518999915802851
+    },
+    {
+      "key": "no_overlap/vector_00",
+      "status": "public_input_loaded_only",
+      "seconds": 0.0010117999918293208
+    },
+    {
+      "key": "no_overlap/vector_25",
+      "status": "public_input_loaded_only",
+      "seconds": 0.0012082000030204654
+    },
+    {
+      "key": "insufficient_advance/vector_00",
+      "status": "public_input_loaded_only",
+      "seconds": 0.0010211000044364482
+    },
+    {
+      "key": "insufficient_advance/vector_17",
+      "status": "public_input_loaded_only",
+      "seconds": 0.0010123000101884827
+    }
+  ],
+  "ledger": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\owned_initial_bundle_six_cost_prepare_001\\ledger.json",
+    "sha256": "a75bcfb8299a8fcd45045b333e0b57b3e89f36667cb74f34492daee50d712acd"
+  },
+  "source_changed": [],
+  "GC_enabled": true,
+  "native_calls": 0,
+  "C_extension_loads": 0,
+  "worker_seconds": 5.271797099994728,
+  "complete_request100ms_certified": false,
+  "all_method_setup_and_state_filtering_costed": false,
+  "closed_fixed_domain_only": true,
+  "schema": "g31.initial_scoped_vs_owned_bundle.ABBA6.v1",
+  "source_proof": {
+    "schema": "g31.initial_scoped_vs_owned_bundle.ABBA6.v1",
+    "historical_worker_proof": {
+      "schema": "g31.initial_context_and_predict.ABBA6.v1",
+      "original_worker_AST_sha256": "978d342ecf13eada07e25ab15056cdb04c58a1e147e10c7ff82073a761d05001",
+      "inverse_AST_only_outside_context_to_public_status_label_final_audit_and_receipt_counts": true,
+      "complete_component": {
+        "schema": "g31.live_obligation.initial_and_prediction_scoped_inputs.v1",
+        "original_initial_caller_AST_sha256": "a4a527f6292b6265f32e2068c99663d9f0ec67810299f05de1c3497adfeb1d43",
+        "original_initial_caller_same_function_code_globals_defaults_closure": true,
+        "provider_injection": "Original explicit prior parameter, context field only",
+        "initial_owner_order": [
+          "A",
+          "B"
+        ],
+        "independent_fact_comparison_order": [
+          "jobs",
+          "trays",
+          "contract",
+          "now"
+        ],
+        "both_exact_supplied_context_types_required": true,
+        "same_scope_context_and_predictor_in_B": true,
+        "new_scope_each_call": true,
+        "cross_call_context_or_result_cache": false,
+        "changed_original_guard_or_model_code": false,
+        "A_boundary": "Original two-owner context creation/comparison plus scoped-v2 fresh-scope prediction",
+        "B_boundary": "Fresh scoped-v2 construction plus identical two-owner context creation/comparison plus same-scope prediction",
+        "prior_predict_only_ABBA_is_not_this_boundary": true,
+        "default_GC_required": true,
+        "per_sample_cycle_cleanup_certified": false,
+        "allocation_failure_timing_equivalent": false,
+        "native_authority": false,
+        "complete_request100ms_certified": false,
+        "scope": "Closed fixed public input construction; stable private builtin state, no concurrent private-table or module mutation."
+      },
+      "initial_context_calls_per_sample": 2,
+      "sample_start_precedes_all_initial_context_and_scope_work": true,
+      "initial_evidence_load_and_all_checks_in_whole": true,
+      "first_saved_before_lazy_target_read": true,
+      "comparison_to_v2_only_after_all_predictions": true,
+      "per_sample_cycle_cleanup_certified": false,
+      "complete_request100ms_certified": false
+    },
+    "original_complete_component_worker_code_unchanged": true,
+    "changed_private_globals_only": [
+      "_extend_report",
+      "candidate",
+      "lazy",
+      "pins_now"
+    ],
+    "component": {
+      "original_projection_AST_sha256": "bbe218408a12e9462330140cc9392938c44cdcaae3e784d405eb1ec3116c5457",
+      "modified_projection_AST_sha256": "c8fb35ce43f35c937e07bdf0fae580f74c34dedd12899f17dc2a3d6da5fc70db",
+      "inverse_AST_exact": true,
+      "changed_statement_only": "bundle = copy.deepcopy(result['bundle']) -> bundle = result['bundle']",
+      "schema": "g31.live_obligation.owned_initial_bundle.v1",
+      "ownership_revalidate_AST_sha256": "8d2ef1e8ab7121b361ad3a3568d2bcc6de2cd745ebfa917a87f490e7f6cfeae0",
+      "revalidate_full_guards_and_deepcopy_return_retained": true,
+      "removed_copy_count_per_projection_bundle_call": 1,
+      "fresh_result_ownership": "Original revalidate returns deepcopy of a private json.loads tree; its result is only a local variable here.",
+      "protocol_copy_resource_conversion_load_end_and_output_fields_unchanged": true,
+      "initial_A_B_guards_fact_comparison_and_predictor_unchanged": true,
+      "cross_call_validation_or_observation_or_output_cache": false,
+      "allocation_failure_timing_equivalent": false,
+      "per_sample_cycle_cleanup_certified": false,
+      "all_scope_construction_and_guards_must_be_charged": true,
+      "source_domain": "Frozen serial builtin supplied-data implementation; no concurrent private-namespace mutation or callback injection.",
+      "native_authority": false,
+      "complete_request100ms_certified": false
+    },
+    "A": "current initial_scope.predict, original bundle deepcopy",
+    "B": "fresh owned-bundle scope, retained full revalidation deepcopy and protocol copy",
+    "both_samples_start_before_scope_initial_guards_fact_comparisons_and_model": true,
+    "input_decode_action_precheck_all_exports_all_target_checks_cleanup_in_whole": true,
+    "save_before_lazy_target_read_retained": true,
+    "additional_initial_scope_target_after_all24_callbacks": true,
+    "target_read_order_proof": "Source order only, not an independent read-time authority",
+    "per_sample_cycle_cleanup_certified": false,
+    "complete_request100ms_certified": false
+  },
+  "A_version": "initial_scope_original_bundle_copy",
+  "B_version": "initial_scope_private_owned_bundle",
+  "per_sample_scope_construction_included": true,
+  "initial_context_caller_separate_unchanged_inside_whole": false,
+  "default_GC_retained": true,
+  "per_sample_cycle_cleanup_certified": false,
+  "whole_process_includes_teardown": true,
+  "saved_targets_provided_to_predictor": false,
+  "both_initial_context_constructions_and_fact_comparisons_inside_each_sample": true,
+  "worker_seconds_scope": "Original core before the added complete saved-output check; whole owned/external wall includes all work.",
+  "comparison_with_previous_predict_only_ABBA_valid": false,
+  "initial_scope_full_output_checks": [
+    {
+      "key": "mechanism/vector_00",
+      "arm": "A",
+      "position": 0,
+      "status": "exact_initial_scope_full_output",
+      "checks": {
+        "full_bytes_exact": true,
+        "full_ordered_types_and_float_semantics_exact": true
+      },
+      "raw": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\owned_initial_bundle_six_cost_prepare_001\\raw\\000.json.gz",
+        "sha256": "1614926a313842e5ab598e4247aae2af9ee530a4f280971325ddd96291e718ee"
+      },
+      "comparison_only_initial_scope_prediction": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\live_communication_initial_scoped_inputs_prepare_001\\mechanism\\vector_00.json.gz",
+        "sha256": "1614926a313842e5ab598e4247aae2af9ee530a4f280971325ddd96291e718ee"
+      }
+    },
+    {
+      "key": "mechanism/vector_00",
+      "arm": "B",
+      "position": 1,
+      "status": "exact_initial_scope_full_output",
+      "checks": {
+        "full_bytes_exact": true,
+        "full_ordered_types_and_float_semantics_exact": true
+      },
+      "raw": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\owned_initial_bundle_six_cost_prepare_001\\raw\\001.json.gz",
+        "sha256": "1614926a313842e5ab598e4247aae2af9ee530a4f280971325ddd96291e718ee"
+      },
+      "comparison_only_initial_scope_prediction": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\live_communication_initial_scoped_inputs_prepare_001\\mechanism\\vector_00.json.gz",
+        "sha256": "1614926a313842e5ab598e4247aae2af9ee530a4f280971325ddd96291e718ee"
+      }
+    },
+    {
+      "key": "mechanism/vector_00",
+      "arm": "B",
+      "position": 2,
+      "status": "exact_initial_scope_full_output",
+      "checks": {
+        "full_bytes_exact": true,
+        "full_ordered_types_and_float_semantics_exact": true
+      },
+      "raw": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\owned_initial_bundle_six_cost_prepare_001\\raw\\002.json.gz",
+        "sha256": "1614926a313842e5ab598e4247aae2af9ee530a4f280971325ddd96291e718ee"
+      },
+      "comparison_only_initial_scope_prediction": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\live_communication_initial_scoped_inputs_prepare_001\\mechanism\\vector_00.json.gz",
+        "sha256": "1614926a313842e5ab598e4247aae2af9ee530a4f280971325ddd96291e718ee"
+      }
+    },
+    {
+      "key": "mechanism/vector_00",
+      "arm": "A",
+      "position": 3,
+      "status": "exact_initial_scope_full_output",
+      "checks": {
+        "full_bytes_exact": true,
+        "full_ordered_types_and_float_semantics_exact": true
+      },
+      "raw": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\owned_initial_bundle_six_cost_prepare_001\\raw\\003.json.gz",
+        "sha256": "1614926a313842e5ab598e4247aae2af9ee530a4f280971325ddd96291e718ee"
+      },
+      "comparison_only_initial_scope_prediction": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\live_communication_initial_scoped_inputs_prepare_001\\mechanism\\vector_00.json.gz",
+        "sha256": "1614926a313842e5ab598e4247aae2af9ee530a4f280971325ddd96291e718ee"
+      }
+    },
+    {
+      "key": "mechanism/vector_25",
+      "arm": "A",
+      "position": 0,
+      "status": "exact_initial_scope_full_output",
+      "checks": {
+        "full_bytes_exact": true,
+        "full_ordered_types_and_float_semantics_exact": true
+      },
+      "raw": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\owned_initial_bundle_six_cost_prepare_001\\raw\\004.json.gz",
+        "sha256": "7fd3462cdc396ffa2dc1634c5cca8967e33d44235f1c1c9893b403843c1350ed"
+      },
+      "comparison_only_initial_scope_prediction": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\live_communication_initial_scoped_inputs_prepare_001\\mechanism\\vector_25.json.gz",
+        "sha256": "7fd3462cdc396ffa2dc1634c5cca8967e33d44235f1c1c9893b403843c1350ed"
+      }
+    },
+    {
+      "key": "mechanism/vector_25",
+      "arm": "B",
+      "position": 1,
+      "status": "exact_initial_scope_full_output",
+      "checks": {
+        "full_bytes_exact": true,
+        "full_ordered_types_and_float_semantics_exact": true
+      },
+      "raw": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\owned_initial_bundle_six_cost_prepare_001\\raw\\005.json.gz",
+        "sha256": "7fd3462cdc396ffa2dc1634c5cca8967e33d44235f1c1c9893b403843c1350ed"
+      },
+      "comparison_only_initial_scope_prediction": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\live_communication_initial_scoped_inputs_prepare_001\\mechanism\\vector_25.json.gz",
+        "sha256": "7fd3462cdc396ffa2dc1634c5cca8967e33d44235f1c1c9893b403843c1350ed"
+      }
+    },
+    {
+      "key": "mechanism/vector_25",
+      "arm": "B",
+      "position": 2,
+      "status": "exact_initial_scope_full_output",
+      "checks": {
+        "full_bytes_exact": true,
+        "full_ordered_types_and_float_semantics_exact": true
+      },
+      "raw": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\owned_initial_bundle_six_cost_prepare_001\\raw\\006.json.gz",
+        "sha256": "7fd3462cdc396ffa2dc1634c5cca8967e33d44235f1c1c9893b403843c1350ed"
+      },
+      "comparison_only_initial_scope_prediction": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\live_communication_initial_scoped_inputs_prepare_001\\mechanism\\vector_25.json.gz",
+        "sha256": "7fd3462cdc396ffa2dc1634c5cca8967e33d44235f1c1c9893b403843c1350ed"
+      }
+    },
+    {
+      "key": "mechanism/vector_25",
+      "arm": "A",
+      "position": 3,
+      "status": "exact_initial_scope_full_output",
+      "checks": {
+        "full_bytes_exact": true,
+        "full_ordered_types_and_float_semantics_exact": true
+      },
+      "raw": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\owned_initial_bundle_six_cost_prepare_001\\raw\\007.json.gz",
+        "sha256": "7fd3462cdc396ffa2dc1634c5cca8967e33d44235f1c1c9893b403843c1350ed"
+      },
+      "comparison_only_initial_scope_prediction": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\live_communication_initial_scoped_inputs_prepare_001\\mechanism\\vector_25.json.gz",
+        "sha256": "7fd3462cdc396ffa2dc1634c5cca8967e33d44235f1c1c9893b403843c1350ed"
+      }
+    },
+    {
+      "key": "no_overlap/vector_00",
+      "arm": "A",
+      "position": 0,
+      "status": "exact_initial_scope_full_output",
+      "checks": {
+        "full_bytes_exact": true,
+        "full_ordered_types_and_float_semantics_exact": true
+      },
+      "raw": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\owned_initial_bundle_six_cost_prepare_001\\raw\\008.json.gz",
+        "sha256": "b153ea93376711e494bc30a679322108503bcc7958ba61beb5ab93815361761f"
+      },
+      "comparison_only_initial_scope_prediction": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\live_communication_initial_scoped_inputs_prepare_001\\no_overlap\\vector_00.json.gz",
+        "sha256": "b153ea93376711e494bc30a679322108503bcc7958ba61beb5ab93815361761f"
+      }
+    },
+    {
+      "key": "no_overlap/vector_00",
+      "arm": "B",
+      "position": 1,
+      "status": "exact_initial_scope_full_output",
+      "checks": {
+        "full_bytes_exact": true,
+        "full_ordered_types_and_float_semantics_exact": true
+      },
+      "raw": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\owned_initial_bundle_six_cost_prepare_001\\raw\\009.json.gz",
+        "sha256": "b153ea93376711e494bc30a679322108503bcc7958ba61beb5ab93815361761f"
+      },
+      "comparison_only_initial_scope_prediction": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\live_communication_initial_scoped_inputs_prepare_001\\no_overlap\\vector_00.json.gz",
+        "sha256": "b153ea93376711e494bc30a679322108503bcc7958ba61beb5ab93815361761f"
+      }
+    },
+    {
+      "key": "no_overlap/vector_00",
+      "arm": "B",
+      "position": 2,
+      "status": "exact_initial_scope_full_output",
+      "checks": {
+        "full_bytes_exact": true,
+        "full_ordered_types_and_float_semantics_exact": true
+      },
+      "raw": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\owned_initial_bundle_six_cost_prepare_001\\raw\\010.json.gz",
+        "sha256": "b153ea93376711e494bc30a679322108503bcc7958ba61beb5ab93815361761f"
+      },
+      "comparison_only_initial_scope_prediction": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\live_communication_initial_scoped_inputs_prepare_001\\no_overlap\\vector_00.json.gz",
+        "sha256": "b153ea93376711e494bc30a679322108503bcc7958ba61beb5ab93815361761f"
+      }
+    },
+    {
+      "key": "no_overlap/vector_00",
+      "arm": "A",
+      "position": 3,
+      "status": "exact_initial_scope_full_output",
+      "checks": {
+        "full_bytes_exact": true,
+        "full_ordered_types_and_float_semantics_exact": true
+      },
+      "raw": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\owned_initial_bundle_six_cost_prepare_001\\raw\\011.json.gz",
+        "sha256": "b153ea93376711e494bc30a679322108503bcc7958ba61beb5ab93815361761f"
+      },
+      "comparison_only_initial_scope_prediction": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\live_communication_initial_scoped_inputs_prepare_001\\no_overlap\\vector_00.json.gz",
+        "sha256": "b153ea93376711e494bc30a679322108503bcc7958ba61beb5ab93815361761f"
+      }
+    },
+    {
+      "key": "no_overlap/vector_25",
+      "arm": "A",
+      "position": 0,
+      "status": "exact_initial_scope_full_output",
+      "checks": {
+        "full_bytes_exact": true,
+        "full_ordered_types_and_float_semantics_exact": true
+      },
+      "raw": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\owned_initial_bundle_six_cost_prepare_001\\raw\\012.json.gz",
+        "sha256": "e4599323d955832420a107e7bc0afaf9a35a0a78394276d33c0ea13c7393aed6"
+      },
+      "comparison_only_initial_scope_prediction": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\live_communication_initial_scoped_inputs_prepare_001\\no_overlap\\vector_25.json.gz",
+        "sha256": "e4599323d955832420a107e7bc0afaf9a35a0a78394276d33c0ea13c7393aed6"
+      }
+    },
+    {
+      "key": "no_overlap/vector_25",
+      "arm": "B",
+      "position": 1,
+      "status": "exact_initial_scope_full_output",
+      "checks": {
+        "full_bytes_exact": true,
+        "full_ordered_types_and_float_semantics_exact": true
+      },
+      "raw": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\owned_initial_bundle_six_cost_prepare_001\\raw\\013.json.gz",
+        "sha256": "e4599323d955832420a107e7bc0afaf9a35a0a78394276d33c0ea13c7393aed6"
+      },
+      "comparison_only_initial_scope_prediction": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\live_communication_initial_scoped_inputs_prepare_001\\no_overlap\\vector_25.json.gz",
+        "sha256": "e4599323d955832420a107e7bc0afaf9a35a0a78394276d33c0ea13c7393aed6"
+      }
+    },
+    {
+      "key": "no_overlap/vector_25",
+      "arm": "B",
+      "position": 2,
+      "status": "exact_initial_scope_full_output",
+      "checks": {
+        "full_bytes_exact": true,
+        "full_ordered_types_and_float_semantics_exact": true
+      },
+      "raw": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\owned_initial_bundle_six_cost_prepare_001\\raw\\014.json.gz",
+        "sha256": "e4599323d955832420a107e7bc0afaf9a35a0a78394276d33c0ea13c7393aed6"
+      },
+      "comparison_only_initial_scope_prediction": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\live_communication_initial_scoped_inputs_prepare_001\\no_overlap\\vector_25.json.gz",
+        "sha256": "e4599323d955832420a107e7bc0afaf9a35a0a78394276d33c0ea13c7393aed6"
+      }
+    },
+    {
+      "key": "no_overlap/vector_25",
+      "arm": "A",
+      "position": 3,
+      "status": "exact_initial_scope_full_output",
+      "checks": {
+        "full_bytes_exact": true,
+        "full_ordered_types_and_float_semantics_exact": true
+      },
+      "raw": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\owned_initial_bundle_six_cost_prepare_001\\raw\\015.json.gz",
+        "sha256": "e4599323d955832420a107e7bc0afaf9a35a0a78394276d33c0ea13c7393aed6"
+      },
+      "comparison_only_initial_scope_prediction": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\live_communication_initial_scoped_inputs_prepare_001\\no_overlap\\vector_25.json.gz",
+        "sha256": "e4599323d955832420a107e7bc0afaf9a35a0a78394276d33c0ea13c7393aed6"
+      }
+    },
+    {
+      "key": "insufficient_advance/vector_00",
+      "arm": "A",
+      "position": 0,
+      "status": "exact_initial_scope_full_output",
+      "checks": {
+        "full_bytes_exact": true,
+        "full_ordered_types_and_float_semantics_exact": true
+      },
+      "raw": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\owned_initial_bundle_six_cost_prepare_001\\raw\\016.json.gz",
+        "sha256": "e25d66d6edd5d06429cfb2d5c99843345a183e7b4619bc3d0ca1540d29660d5c"
+      },
+      "comparison_only_initial_scope_prediction": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\live_communication_initial_scoped_inputs_prepare_001\\insufficient_advance\\vector_00.json.gz",
+        "sha256": "e25d66d6edd5d06429cfb2d5c99843345a183e7b4619bc3d0ca1540d29660d5c"
+      }
+    },
+    {
+      "key": "insufficient_advance/vector_00",
+      "arm": "B",
+      "position": 1,
+      "status": "exact_initial_scope_full_output",
+      "checks": {
+        "full_bytes_exact": true,
+        "full_ordered_types_and_float_semantics_exact": true
+      },
+      "raw": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\owned_initial_bundle_six_cost_prepare_001\\raw\\017.json.gz",
+        "sha256": "e25d66d6edd5d06429cfb2d5c99843345a183e7b4619bc3d0ca1540d29660d5c"
+      },
+      "comparison_only_initial_scope_prediction": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\live_communication_initial_scoped_inputs_prepare_001\\insufficient_advance\\vector_00.json.gz",
+        "sha256": "e25d66d6edd5d06429cfb2d5c99843345a183e7b4619bc3d0ca1540d29660d5c"
+      }
+    },
+    {
+      "key": "insufficient_advance/vector_00",
+      "arm": "B",
+      "position": 2,
+      "status": "exact_initial_scope_full_output",
+      "checks": {
+        "full_bytes_exact": true,
+        "full_ordered_types_and_float_semantics_exact": true
+      },
+      "raw": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\owned_initial_bundle_six_cost_prepare_001\\raw\\018.json.gz",
+        "sha256": "e25d66d6edd5d06429cfb2d5c99843345a183e7b4619bc3d0ca1540d29660d5c"
+      },
+      "comparison_only_initial_scope_prediction": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\live_communication_initial_scoped_inputs_prepare_001\\insufficient_advance\\vector_00.json.gz",
+        "sha256": "e25d66d6edd5d06429cfb2d5c99843345a183e7b4619bc3d0ca1540d29660d5c"
+      }
+    },
+    {
+      "key": "insufficient_advance/vector_00",
+      "arm": "A",
+      "position": 3,
+      "status": "exact_initial_scope_full_output",
+      "checks": {
+        "full_bytes_exact": true,
+        "full_ordered_types_and_float_semantics_exact": true
+      },
+      "raw": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\owned_initial_bundle_six_cost_prepare_001\\raw\\019.json.gz",
+        "sha256": "e25d66d6edd5d06429cfb2d5c99843345a183e7b4619bc3d0ca1540d29660d5c"
+      },
+      "comparison_only_initial_scope_prediction": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\live_communication_initial_scoped_inputs_prepare_001\\insufficient_advance\\vector_00.json.gz",
+        "sha256": "e25d66d6edd5d06429cfb2d5c99843345a183e7b4619bc3d0ca1540d29660d5c"
+      }
+    },
+    {
+      "key": "insufficient_advance/vector_17",
+      "arm": "A",
+      "position": 0,
+      "status": "exact_initial_scope_full_output",
+      "checks": {
+        "full_bytes_exact": true,
+        "full_ordered_types_and_float_semantics_exact": true
+      },
+      "raw": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\owned_initial_bundle_six_cost_prepare_001\\raw\\020.json.gz",
+        "sha256": "6888421db79e5871ef19e602bf6345116eb134076f249e19ccbdba81f1ccfd16"
+      },
+      "comparison_only_initial_scope_prediction": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\live_communication_initial_scoped_inputs_prepare_001\\insufficient_advance\\vector_17.json.gz",
+        "sha256": "6888421db79e5871ef19e602bf6345116eb134076f249e19ccbdba81f1ccfd16"
+      }
+    },
+    {
+      "key": "insufficient_advance/vector_17",
+      "arm": "B",
+      "position": 1,
+      "status": "exact_initial_scope_full_output",
+      "checks": {
+        "full_bytes_exact": true,
+        "full_ordered_types_and_float_semantics_exact": true
+      },
+      "raw": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\owned_initial_bundle_six_cost_prepare_001\\raw\\021.json.gz",
+        "sha256": "6888421db79e5871ef19e602bf6345116eb134076f249e19ccbdba81f1ccfd16"
+      },
+      "comparison_only_initial_scope_prediction": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\live_communication_initial_scoped_inputs_prepare_001\\insufficient_advance\\vector_17.json.gz",
+        "sha256": "6888421db79e5871ef19e602bf6345116eb134076f249e19ccbdba81f1ccfd16"
+      }
+    },
+    {
+      "key": "insufficient_advance/vector_17",
+      "arm": "B",
+      "position": 2,
+      "status": "exact_initial_scope_full_output",
+      "checks": {
+        "full_bytes_exact": true,
+        "full_ordered_types_and_float_semantics_exact": true
+      },
+      "raw": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\owned_initial_bundle_six_cost_prepare_001\\raw\\022.json.gz",
+        "sha256": "6888421db79e5871ef19e602bf6345116eb134076f249e19ccbdba81f1ccfd16"
+      },
+      "comparison_only_initial_scope_prediction": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\live_communication_initial_scoped_inputs_prepare_001\\insufficient_advance\\vector_17.json.gz",
+        "sha256": "6888421db79e5871ef19e602bf6345116eb134076f249e19ccbdba81f1ccfd16"
+      }
+    },
+    {
+      "key": "insufficient_advance/vector_17",
+      "arm": "A",
+      "position": 3,
+      "status": "exact_initial_scope_full_output",
+      "checks": {
+        "full_bytes_exact": true,
+        "full_ordered_types_and_float_semantics_exact": true
+      },
+      "raw": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\owned_initial_bundle_six_cost_prepare_001\\raw\\023.json.gz",
+        "sha256": "6888421db79e5871ef19e602bf6345116eb134076f249e19ccbdba81f1ccfd16"
+      },
+      "comparison_only_initial_scope_prediction": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\live_communication_initial_scoped_inputs_prepare_001\\insufficient_advance\\vector_17.json.gz",
+        "sha256": "6888421db79e5871ef19e602bf6345116eb134076f249e19ccbdba81f1ccfd16"
+      }
+    }
+  ],
+  "allocation_failure_timing_equivalent": false,
+  "previous_initial_scope_ABBA_is_historical_not_current_arm_measurement": true
+}

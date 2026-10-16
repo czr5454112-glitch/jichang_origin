@@ -1,0 +1,80 @@
+{
+  "schema": "g31.bridge.saved_audit_equivalent_optimization_design.v1",
+  "status": "source_only_not_implemented_or_executed",
+  "original_audit": "bridge_serialize_saved_audit_prepare_002",
+  "fixed_limit_for_any_later_approved_attempt_seconds": 600,
+  "no_automatic_retry": true,
+  "new_native_calls": 0,
+  "new_predictions": 0,
+  "actual_timeout_attribution": "Unknown. Only unchanged_full_saved_replay start was persisted. The following are statically reachable costs, not a measured decomposition of the failed600s.",
+  "source_bound_costs": [
+    {
+      "site": "verify_original_cooperative_bridge.verify_case -> private.verify_saved -> research_original_low_wip.verify_saved",
+      "fact": "The outer verifier decodes raw_final and input, retains them, then the inner full replay verifier decodes both again. The 1.34GB uncompressed raw is therefore represented by two complete parsed trees if execution reaches the second load.",
+      "risk": "Peak memory, allocator pressure and parsing work. No evidence currently proves paging or that this stage was reached."
+    },
+    {
+      "site": "research_original_low_wip.ReplayTape.__init__ and __getattr__",
+      "fact": "Initialization hashes every new manifested compressed file. Replay then opens/decompresses/decodes every row again. The full37270 hash requirement is correct and must remain.",
+      "first_candidate_change": "Retain this hash pass unchanged; add bounded hash-row progress. Combining hash and decode reads is a later optional improvement, not required for the initial proposal."
+    },
+    {
+      "site": "ReplayTape.__getattr__ -> verify_original_cooperative_bridge.ObservedTape.call",
+      "fact": "The base method returns deepcopy(row.result); the immediate observer then performs another deepcopy(value) before returning the first copy to policy. This occurs for every replayed API response, including the large local-view and planning-query responses.",
+      "first_candidate_change": "Keep the policy-return deepcopy exactly. Let the observer retain the original decoded row.result from that same validated read, which policy never receives. Keep reconstructed canonical actual args/kwargs and original observer key order."
+    },
+    {
+      "site": "verify_original_bridge_serialize_once.PrefixComparison.consume",
+      "fact": "Each of27218 old manifested rows is hashed, decoded, then both old and new rows are fully compact-JSON-encoded for ordered equality, excluding only finite nonnegative advance_to.result.wall_seconds.",
+      "first_candidate_change": "Replace only this ordered comparison with a proved exact ordered JSON-value comparison over the already-decoded builtin trees. Retain each old hash/decode, every field, both row counts and the same single timing exclusion. This may save temporary strings; no speed gain is assumed."
+    },
+    {
+      "site": "research_original_low_wip.verify_saved policy_replay_mismatch / normalized_owners",
+      "fact": "At policy completion both full owner summaries are canonicalized through JSON dumps then loads before comparison, with only submit_compute_ms removed. This can create additional large temporary strings/trees. Owner.summary may itself copy nested state.",
+      "first_candidate_change": "Instrument before/after each canonicalization and the owner-summary construction. Leave its semantics unchanged initially; replacing this normalization requires a separate exact representation proof, including tuple/list and numeric-key collision behavior."
+    }
+  ],
+  "minimal_new_auditor_scope": [
+    "Add only new audit modules/tests/package. Preserve old84 files, audit002 directory, original producer2400 failure and the separate600 failure.",
+    "Clone original verifier functions into private namespaces. Pin all originals, new functions and explicit substitutions; retain a source/AST transformation proof that every existing require, physical audit, FIFO check, Storage check, source check and denominator remains.",
+    "Share one decoded final raw/input object between the two known read-only verifier consumers by an exact-path local loader cache. No process-global cache, no caching API responses across logical calls, no copying NativeSession, and no capability restoration.",
+    "Before approving shared decoded objects, review the complete pinned consumer call graph for mutation; pure differential tests must check inputs remain unchanged and returned results/metadata do not give mutable raw aliases to the replayed policy. Existing source/file hash checks remain at their original sites.",
+    "Retain original base ReplayTape returned-result isolation. Publish the current decoded row only to the private observer before returning the policy copy. Bind it by exact current ordinal/endpoint and forbid a second outstanding read. Release stale rows except those retained by the original latest/submits/frames logic.",
+    "Do not substitute saved args for actual reconstructed args. The base ReplayTape payload comparison uses Python equality; the old observer's subsequent ordered comparison additionally checks the replayed argument ordering, which must not be weakened.",
+    "The new comparison must match ordered compact JSON semantics: dictionary key order, list order and length, exact scalar type, finite float representation including negative zero, strings and all unknown fields. Booleans must not equal integers. Unsupported input must use the old comparator or fail with the same uncertified status, never silently pass.",
+    "Retain new37270 and old27218 hashes, complete replay, original bootstrap comparison, all28506 job states, all22 tray identities, policy summaries, immutable retries, physical audit, complete returned lifecycles, cap/relay proof, clocks and final recorded seal format. Do not turn heartbeat39 into a certificate.",
+    "Keep the exact single all_job_states write/hash redirect into the new audit directory. No other writes to old output. No source-pin domain deletion or sys.modules hiding."
+  ],
+  "bounded_progress_design": {
+    "stage_events": [
+      "entry source/artifact/runtime checks",
+      "new raw compressed read+decode start/end",
+      "input and bootstrap raw decode start/end",
+      "new manifest validation and complete compressed-hash pass",
+      "policy API replay with old-prefix comparison",
+      "owner summary construction",
+      "each normalized_owners invocation",
+      "independent audit_result",
+      "physical_outcomes and actual frame/relay binding",
+      "clock audit and assessment",
+      "all_job_states export",
+      "final source/artifact/runtime checks and report export"
+    ],
+    "periodic_records": "Append a small progress record after every256 completed hash rows and every256 completed replay rows, plus all stage boundaries. Include monotonic_ns, completed/new-old row counters, current ordinal and endpoint, and phase-local cumulative durations. A start record is never a success record.",
+    "maximum_journal_records": 1024,
+    "journal_behavior": "Create-new, bounded JSONL, flush each small progress record, no fsync/powerloss promise. Never emit raw API payloads. Journal failure makes the audit unknown; complete lines surviving a kill only attest progress, not whole verification.",
+    "large_decode_visibility": "Persist compressed-read/decode start and end separately. A single json.loads call has no internal progress certificate; if killed there the last start only identifies that bounded stage. Do not infer decoding progress from elapsed time.",
+    "cost": "All journal, hash, decode, comparison, replay, export and cleanup costs belong to the same fixed600s attempt and the external complete Python launch-to-exit wall. No subtraction or budget extension."
+  },
+  "pure_acceptance_required_before_prepare": [
+    "Small complete synthetic replay through old and new auditors, exact final policy/physical result and all existing rejection cases.",
+    "Shared-loader raw/input unchanged after all consumers; nested mutable alias attack cannot affect policy or cached evidence.",
+    "Actor response mutation leaves retained observer evidence unchanged, and observer bookkeeping never changes returned policy responses.",
+    "Tamper, delete, reorder, duplicate and truncate either manifest/row; wrong ordinal, endpoint, args, kwargs, clock and immutable retry all reject.",
+    "Actual replay args with different dictionary order are rejected where the old ordered bootstrap/prefix check rejects; saved-row substitution must not mask it.",
+    "Comparator differential corpus covers bool/int/float, negative zero, nonfinite, dictionary key order, list length, escaped Unicode and arbitrary extra nested fields. Only the exact native wall scalar is excluded after finite/nonnegative validation.",
+    "Stage failures preserve original exception and old output; fixed journal limits and truncated final progress lines cannot create success.",
+    "Source/AST proof lists every intentional substitution; original full guards and original all_job_states redirect remain."
+  ],
+  "recommendation": "First implement and review this minimal instrumented equivalent audit without a new full scan. Preserve the original hash pass and physical logic. Approve any later fixed600 execution only after meaningful pure gates; do not promise completion or speed based on this source diagnosis. Keep the separate finalwriter idea out of this audit change."
+}

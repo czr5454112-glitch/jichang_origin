@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="1.583" timestamp="2026-10-15T20:22:24.242128+08:00" hostname="LAPTOP-M3GASC4G"><testcase classname="tests.test_g31_circulation_json_prediction_shards" name="test_campaign_real_path_plan_reaches_first_constructor_without_prediction" time="0.014"><failure message="TypeError: 'WindowsPath' object is not subscriptable">tmp_path = WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/jsp_wiring_negative_001/test_campaign_real_path_plan_r0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x0000021DB89FE890&gt;
+
+    def test_campaign_real_path_plan_reaches_first_constructor_without_prediction(tmp_path,monkeypatch):
+        plan=fixed_plan()
+        for key in ('single','split'):
+            plan['images'][key]['version']='fixed-'+key
+        measure.check_plan(plan)
+        measure.write(tmp_path/'preregistered_protocol.json',plan)
+        checked=[]
+        monkeypatch.setattr(measure,'verify_pins',lambda output,value: checked.append((output,value)))
+        calls=[]
+        class ReachedFirstClient(RuntimeError):
+            pass
+        def stop_before_process(arm,images,*,timeout,stderrs,startup_attempts):
+            calls.append((arm,images))
+            assert arm=='single' and len(stderrs)==1 and startup_attempts==[] and timeout&gt;0
+            assert images=={key:{'path':tmp_path/('image_'+key),'version':'fixed-'+key}
+                           for key in ('single','split')}
+            raise ReachedFirstClient('intentional_no_worker_no_prediction')
+        monkeypatch.setattr(measure,'LogicalClient',stop_before_process)
+        with pytest.raises(ReachedFirstClient,match='intentional_no_worker_no_prediction'):
+&gt;           measure.campaign(tmp_path,measure.sha(tmp_path/'preregistered_protocol.json'))
+
+tests\test_g31_circulation_json_prediction_shards.py:195: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\measure_json_prediction_shards.py:208: in campaign
+    images={key:{'path':output[value['directory']],'version':value['version']} for key,value in plan['images'].items()}
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+.0 = &lt;dict_itemiterator object at 0x0000021DB8AD7380&gt;
+
+&gt;   images={key:{'path':output[value['directory']],'version':value['version']} for key,value in plan['images'].items()}
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+E   TypeError: 'WindowsPath' object is not subscriptable
+
+scripts\experiments\g31_ics_circulation\measure_json_prediction_shards.py:208: TypeError</failure></testcase></testsuite></testsuites>

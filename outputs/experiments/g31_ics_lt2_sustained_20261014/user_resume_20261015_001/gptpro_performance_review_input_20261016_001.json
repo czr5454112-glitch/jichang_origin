@@ -1,0 +1,273 @@
+{
+  "schema": "g31.gptpro.performance_and_full_day_review_input.v1",
+  "status": "readonly_evidence_summary_not_new_acceptance",
+  "prepared_on_local_date": "2026-10-16",
+  "timezone": "Asia/Shanghai",
+  "requested_yesterday_local_date": "2026-10-15",
+  "workspace_root": "C:/PROGRAMING/czr005/.g31_ics_circulation_worktree",
+  "review_scope": {
+    "small_saved_reports_and_source_read": true,
+    "new_experiments_tests_native_models_profiles": 0,
+    "large_raw_decompression": 0,
+    "engineering_source_changes": 0,
+    "new_artifact_only": "This JSON review input. Existing evidence is unchanged.",
+    "authority": "This is a source/report-bound summary. It relies on the listed completed audits and their stated limits; it is not a new full trace replay or independent reimplementation of physics."
+  },
+  "headline": [
+    "昨日已证实一些有限方法行为及保存证据闭合，但原图全天业务与完整100ms目标仍未达成。",
+    "1x原全天28506与2x57012两组保存审计均报告0业务完成；物理合法性审计通过不等于业务成功。",
+    "单盘保守供给已有8件完整全天证据，39件桥接producer见证仍缺完整saved policy/physical审核，不能升级为全日已验收结果。",
+    "579.4566→308.20205ms是今日两个独立actual18轮次的闭合根中位数，非ABBA；不能归因成确定加速，二者均16closed、2unknown、0/18在100ms内。",
+    "65次源码证明诊断是真实受限profile；195是3×65的模型域结构数量推导，非已执行195次诊断，也非完整driver所有静态证明调用总数。",
+    "最新bcdm2在600秒停止于ReplayTape第20224条检查点，完整37270条policy消费与physical审核尚未闭合。下一步应由GPTPro决定方法研究与验收工程的投入边界。"
+  ],
+  "calendar_rules": {
+    "execution_date_basis": "Only explicit UTC launch/exit fields converted to Asia/Shanghai. File names, folder names, modification times and milestone writing dates are not execution dates.",
+    "yesterday_body": [
+      {
+        "item": "initial_owner_route_campaign_v3_prepare_001 actual18",
+        "utc": ["2026-10-15T14:40:03.1219722Z", "2026-10-15T14:41:36.0942079Z"],
+        "local": "2026-10-15 22:40:03–22:41:36 +08:00",
+        "evidence_id": "initial_v3_external"
+      },
+      {
+        "item": "original_bridge_serialize_once_prepare_001 producer",
+        "utc": ["2026-10-15T14:43:33.2827924Z", "2026-10-15T15:23:33.5083372Z"],
+        "local": "2026-10-15 22:43:33–23:23:33 +08:00",
+        "evidence_id": "bridge_producer_external"
+      },
+      {
+        "item": "2x chained full saved audit, not the whole multi-stage producer history",
+        "utc": ["2026-10-15T08:45:27.5902265Z", "2026-10-15T09:20:39.7809083Z"],
+        "local": "2026-10-15 16:45:27–17:20:39 +08:00",
+        "evidence_id": "full2x_saved_external"
+      }
+    ],
+    "today_supplement_not_yesterday": [
+      {
+        "item": "single_owned_C18_prepare_002 actual18 (579.4566ms median)",
+        "utc_python_launch": "2026-10-15T23:38:29.0548273Z",
+        "utc_python_exit": "2026-10-15T23:42:11.5835264Z",
+        "local": "2026-10-16 07:38:29–07:42:11 +08:00",
+        "evidence_id": "owned_C18_external"
+      },
+      {
+        "item": "sicm1 actual18 (308.20205ms median)",
+        "utc_python_launch": "2026-10-16T01:16:33.7336379Z",
+        "utc_python_exit": "2026-10-16T01:20:04.1225924Z",
+        "local": "2026-10-16 09:16:33–09:20:04 +08:00",
+        "evidence_id": "static_C18_external"
+      },
+      {
+        "item": "bcdm2 saved audit timeout",
+        "utc": ["2026-10-16T02:10:42.0204979Z", "2026-10-16T02:20:42.0757116Z"],
+        "local": "2026-10-16 10:10:42–10:20:42 +08:00",
+        "evidence_id": "bcdm2_external"
+      }
+    ],
+    "date_not_promoted": [
+      "full1x limited independent review was recorded 2026-10-15T04:44:42.209380Z; that dates the review, not every producer/resume segment.",
+      "cap8 result review was recorded 2026-10-15T10:11:59.228856Z; this summary does not infer every underlying execution timestamp from that.",
+      "si65d1 selected external/root review supplies duration but no UTC launch field; exact execution date remains unspecified here.",
+      "Static endpoint/carrier-bound design reports and retained-policy/profile drafts without explicit execution UTC are background or undated supplementary artifacts, not automatically yesterday's experiments."
+    ]
+  },
+  "performance": {
+    "yesterday_initial_v3_actual18": {
+      "evidence_id": "initial_v3_review",
+      "branches": 18,
+      "closed": 16,
+      "unknown": 2,
+      "observed_roots_at_most_100ms": 0,
+      "closed_warm_ms_range": [857.7709, 3696.6162],
+      "whole_python_seconds": 92.9546363,
+      "scope": "Original finite initial-owner two-choice request, with real endpoint/RPC/ACK/first-hop/drain and full five-job outcome checks. This is not a joint full32 rolling solver.",
+      "normal_pair_result": "Six normal pairs preserve all five modeled job completion times without tolerance; three strictly improve. Fault/open cases remain in the denominator.",
+      "prediction_account": "Eight RPC requests, eight full baselines and eight additional candidate simulations; these counts do not mean 32 candidates were searched."
+    },
+    "today_cross_round_comparison": {
+      "A": {
+        "evidence_id": "owned_C18_review",
+        "label": "single capture + owned C publisher",
+        "closed": 16,
+        "unknown": 2,
+        "under100": 0,
+        "closed_warm_ms": {"min": 414.5762, "median": 579.4566, "max": 885.403},
+        "whole_python_seconds": 222.5240049,
+        "normal_pairs_five_job_nonregression": 6,
+        "normal_pairs_strict_improvement": 1
+      },
+      "B": {
+        "evidence_id": "static_C18_review",
+        "label": "same finite cohort with cold static constructor inventory binding and fresh runtime checks",
+        "closed": 16,
+        "unknown": 2,
+        "under100": 0,
+        "closed_warm_ms": {"min": 174.4935, "median": 308.20205, "max": 601.8734},
+        "whole_python_seconds": 210.3875392,
+        "normal_pairs_five_job_nonregression": 6,
+        "normal_pairs_strict_improvement": 2,
+        "cold_static_bind_ms": 275.8036,
+        "constructor_nested_wall_ms": {"min": 8.2544, "median": 9.6768, "max": 11.8709, "sum": 179.8264}
+      },
+      "causal_speedup_certified": false,
+      "why_not_ABBA": "Different actual runs, code closures, execution times and deadline-induced selected actions. There is no within-window randomized/ABBA A/B comparison of the full request. Closed-only medians also exclude two explicitly retained unknown roots; the overall denominator remains 18.",
+      "unmet": "Neither run establishes complete-request <=100ms. No cold-start or shared campaign charge is amortized away.",
+      "clock_caution": "Full warm root wall is a conservative envelope. It is not isolated CPU/compute time; message/physical advancement and shared work need a sound exclusive partition if the requested metric distinguishes computation from end-to-end waiting. Do not redefine the target as whole multi-case campaign <100ms, or subtract unclassified work."
+    },
+    "source_proof_65_and_195": {
+      "evidence_id": "source_inventory65_review",
+      "actual_diagnostic_calls": 65,
+      "exact_full_proof_pairs": 65,
+      "unknown": 0,
+      "proof_bytes_each": 2604,
+      "whole_python_seconds": 105.4363922,
+      "profiled_original_call_wall_seconds_sum": 99.8138111,
+      "profiled_original_call_seconds_median": 1.5297592,
+      "source_inventory_profile_cumulative_seconds": 99.7226485,
+      "structural_formula_per_full32": "1 provider + 32 fork + 32 resume = 65 in the specified provider path.",
+      "three_full32_domains_derived_count": 195,
+      "derived_count_scope": "3×65 for the three model-domain paths; not an observed 195-call profile, not a complete driver count, and not the number of actual18 constructor inventories. Startup, final checks, source_proof recursion and harness checks may add calls.",
+      "evidence_interpretation": "The diagnostic executes the unchanged source_proof 65 times with cProfile. It does not run a predictor or measure the full96 runtime. Nested cumulative times overlap and cannot be summed; cProfile timings cannot be subtracted from unprofiled full-request wall.",
+      "static_dynamic_boundary": "Only fixed source/code/AST proof may be reused with invalidation. Request snapshot, current state, delivered messages, deadlines, source/receiver validation and cut/ACK/union guards remain fresh. Cold proof construction and cleanup remain charged."
+    },
+    "local_optimization_evidence_limits": [
+      "Publisher ABBA and same-input typed digest ABBA establish only their own component cost and value/byte equality; they do not by themselves establish full-request or all-day benefit.",
+      "C delivered-peer digest ABBA covered fixed actual rows27212/27215, 32 validator calls and four premeasurement byte oracles. Original medians33.2986/56.4458ms versus C8.40715/12.7397ms; all32 outcomes were absent, B16 direct C/0fallback. Successful validation paths and full-flow call frequency are not covered.",
+      "Python batched writer was slower despite complete bytes equality (28.7789→70.9182ms and48.73495→115.8761ms). Keep the negative result; removing its preflight to manufacture speed is not justified.",
+      "Full-root earlier finite one-case 82.8126/64.3337ms bounds and component <100ms measurements cannot be merged with this18-root cohort or used as full32/whole-day certification."
+    ]
+  },
+  "full_day": {
+    "immutable_problem": "Original topology/capacities, FIFO and mandatory Storage rules, offered jobs and22 existing trays; no extra trays, no new cancellation/FIFO-bypass permission and no speculative graph edits.",
+    "original_1x": {
+      "evidence_id": "full1x_review",
+      "H": 86400,
+      "offered": 28506,
+      "business_completed": 0,
+      "unfinished": 28506,
+      "strict_deadline_violations": 28506,
+      "trays": 22,
+      "saved_shards": 451,
+      "saved_physical_audit": "passed identity/lifecycle/edge/headway/parked-incoming-reception capacity replay",
+      "completed_traversals": 238,
+      "open_traversals": 0,
+      "producer_status": "hard_timeout retained",
+      "not_claimed": "No business success, optimality, paired protection, deadlock freedom or complete100ms. The limited independent review references the completed saved auditor rather than repeating all history."
+    },
+    "original_2x": {
+      "evidence_ids": ["full2x_review", "full2x_endpoint"],
+      "H": 86400,
+      "offered": 57012,
+      "business_completed": 0,
+      "unfinished": 57012,
+      "trays": 22,
+      "saved_shards": 526,
+      "completed_traversals": 287,
+      "open_traversals": 0,
+      "producer_status": "hard_timeout retained",
+      "first_ancestor_source_drift_finalization": "unknown retained; not converted into empty drift list",
+      "saved_audit_whole_python_seconds": 2112.1846536,
+      "endpoint": "17 loaded +5 empty_transit, zero active edges. Native completed_count10 is transport legs, not completed business jobs.",
+      "not_claimed": "Saved physical horizon legality does not repair producer termination, certify business success or establish the hidden event heap/current route independently."
+    },
+    "verified_restricted_cap8": {
+      "evidence_id": "cap8_review",
+      "H": 86400,
+      "offered": 28506,
+      "completed": 8,
+      "on_time_completed": 3,
+      "unfinished": 28498,
+      "failed": 0,
+      "strict_horizon_deadline_violations": 28503,
+      "saved_API_replay_rows": 24070,
+      "whole_application_seconds": 849.7147176,
+      "scope": "One circulating token with other trays parked, limited supply policy and true return/relay ACK evidence. Full input denominator retained. Accepted026 archive/binary is authority; live027 differences are not execution drift.",
+      "all_jobs_strict_protection": "unknown for unfinished offered jobs; eight completed jobs are not full-system service or normal-job protection."
+    },
+    "bridge39_and_latest_audit": {
+      "evidence_ids": ["bridge_producer_external", "bcdm2_terminal", "bcdm2_external"],
+      "producer": "H86400/39 completed were producer/heartbeat/raw observations, followed by2400.2095334s campaign timeout. Complete saved policy/physical acceptance was not obtained.",
+      "latest_saved_audit_whole_seconds": 600.0507775,
+      "latest_saved_audit_status": "timeout, exit-1; no retry",
+      "new_rows_required": 37270,
+      "old_prefix_rows_required": 27218,
+      "latest_checkpoint_completed": 20224,
+      "latest_checkpoint_ordinal": 20223,
+      "checkpoint_endpoint": "protocol_planning_snapshots_v2",
+      "checkpoint_meaning": "Nth ReplayTape guard, old-prefix comparison and actor-return construction reached its counter. The row's outer observer and policy consumer may still be running. This is not N fully certified policy steps or a business completion fraction.",
+      "all_new_compressed_row_hashes": "37270 completed before policy replay",
+      "C_entry": "passed/load observed; actual digest direct/fallback mix during this audit is uninstrumented",
+      "C_exit_verified": false,
+      "missing_final_artifacts": ["bounded_execution.json", "report.json", "C_encoder_exit.json", "all_job_states.json.gz"],
+      "owned_job_normal_terminal_receipt": "missing; do not equate outer kill with clean owned completion",
+      "full_policy_physical_certificate": false,
+      "pending_profile": "Fixed actual-prefix512 source design only, not executed. It must be labeled partial-prefix attribution, not whole-day acceptance. No new600 rerun is justified by component medians alone."
+    },
+    "physical_obstruction_and_39_scope": {
+      "evidence_ids": ["full2x_endpoint", "completion_baton_static", "carrier_bound_review"],
+      "supported": "Positive-capacity directed path analysis finds specific unreachable destination contracts, including Storage53→99 for early jobs. Saved receiving rows were full and form a dependency DAG into53. This does not prove a circular-wait deadlock or a universally impossible airport.",
+      "39_assumptions": "Sum of reachable FIFO prefixes while never loading an unreachable head, fixed original input/no ties and no off-carrier release. The actual incumbent additionally uses one circulating tray and21 parked trays. Do not call39 an unconditional global upper bound.",
+      "371_relaxation": "The21-bad-load resource relaxation gives371 only as a relaxed upper bound, not an achievable schedule or permission to sacrifice jobs.",
+      "important_exception": "Native max_decisions_exceeded can fail_bag and erase a queue head. Therefore do not write unconditional permanent blocking. Any study of naturally triggered failures must retain identical baseline rules, all28506 jobs, failed counts and residual loaded-tray resources; proactively failing bad heads is not normal-service improvement.",
+      "next_method_gap": "A multi-active-tray/rolling cooperation method needs fresh local possession, actual receiving capacity, delivered obligation evidence, per-job protection and a failure-aware FIFO argument. Local reachability is necessary but not sufficient for a realizable protected schedule."
+    }
+  },
+  "questions_for_GPTPro_in_priority_order": [
+    {
+      "question": "下一阶段是否把主要研究资源转向合法局部信息下的滚动预测与双向空盘协商，只给证据工程一个明确受限预算？",
+      "why": "多个codec/copy/digest局部收益已真实存在，但完整18仍无100ms、全天39仍未审核闭合。继续盲目600或通用日志微调并不能证明方法效用。",
+      "decision_needed": "给出方法研究与验收工程各自的停止条件；建议先一次受限真实prefix成本归因，再由归因决定是否值得修审计，不把修审计当方法贡献。"
+    },
+    {
+      "question": "原图FIFO/Storage不可达任务下，应如何准确界定可达业务目标与正常任务保护，而不降低28506/57012分母或偷偷改图？",
+      "why": "现有具体不可达头阻塞与自然失败分支意味着全完成不能被默认许诺，也不能宣称39是全球上限。",
+      "decision_needed": "选择一个可证伪的局部供给/接收/滚动计划机制与同规则基线；把failed、unfinished、on-time及各任务保护逐项列出。任何图或取消权限变更须另行明确授权并做单独问题定义。"
+    },
+    {
+      "question": "完整100ms的验证应采用什么不重复计费且不遗漏的计算/等待边界？",
+      "why": "全根wall保守、constructor/profiler累计嵌套、共享冷启动不能摊薄。把600campaign或物理消息等待直接当纯计算同样会误定义目标。",
+      "decision_needed": "明确完整请求计算所含collection/codec/search/final source+receiver validation/submit/ACK处理/retry/drain/日志，以及单列等待、共享工作和cold；要求失败根也保留，拒绝片段平均或只报median达标。"
+    },
+    {
+      "question": "有限两候选首阶段、full32模型一致性、初始在线保留suffix与真正执行后滚动重估，应怎样设置逐级方法验收？",
+      "why": "16closed及五任务正常pair保护只支持有限初始合同；retained policy22pure只证明记录/调用路由，没有重新预测后续状态。",
+      "decision_needed": "规定实际owner局部信息、公开合作合同、每次重新采集/重估/协商/执行的对照；禁止用离线未来target或opaque action ID填补未送达信息。"
+    }
+  ],
+  "evidence": {
+    "initial_v3_review": {"path": "outputs/experiments/g31_ics_lt2_sustained_20261014/initial_owner_route_v3_independent_actual_review_001/report.json", "sha256": "6619c11ca5aca23cb7bb083a7198d5fd6b56e9b7697a5c700b12a93628e641a5", "bytes": 83106},
+    "initial_v3_external": {"path": "outputs/experiments/g31_ics_lt2_sustained_20261014/initial_owner_route_campaign_v3_prepare_001/external_application_wall.json", "sha256": "2452e435633edf431209dc161fb5677d74a4ccecf5a2dfcfb16a69672756a18b", "bytes": 1982},
+    "owned_C18_review": {"path": "outputs/experiments/g31_ics_lt2_sustained_20261014/single_owned_C18_prepare_002/root_saved_review_001.json", "sha256": "e2a661c6295e030ad1dff3171d9b4225bc1410b35981055ddefd655e185023b3", "bytes": 8019},
+    "owned_C18_external": {"path": "outputs/experiments/g31_ics_lt2_sustained_20261014/single_owned_C18_prepare_002/actual_external_application_wall.json", "sha256": "1a80c1e0e9cf82cd2bb1704ea917b51d0c7dc77c12aff9d8a30764dc3703c3e2", "bytes": 5483},
+    "static_C18_review": {"path": "outputs/sicm1/root_saved_review_001.json", "sha256": "2998f1def4ecb95de857cf7ebc3d0267e5223abd4d1ca2a649879b5dd0f295e5", "bytes": 8232},
+    "static_C18_external": {"path": "outputs/sicm1/actual_external_application_wall.json", "sha256": "f33d1debdde90b47c59f6db13b1c432bb571546a37d499aca2fe46895333298a", "bytes": 10356},
+    "source_inventory65_review": {"path": "outputs/si65d1/root_saved_review_001.json", "sha256": "e5e6252e5727e9df2c36adc13f08b22bbd392f2adfb8df264855840ba269c8ae", "bytes": 1258},
+    "full1x_review": {"path": "outputs/experiments/g31_ics_lt2_sustained_20261014/full1x_saved_horizon_independent_review_001.json", "sha256": "0090b0fa3fa2d081ddab5eed33d3319ac3106fe4115c5ca1023cbdaf8133028e", "bytes": 4969},
+    "full2x_review": {"path": "outputs/experiments/g31_ics_lt2_sustained_20261014/full024_chained_2x_20261015_002_saved_audit_independent_review_001.json", "sha256": "ecee737c38991859d85e02258fc8c1ea63fd4c7cb25f352d3a8fd87adbed6feb", "bytes": 6500},
+    "full2x_saved_external": {"path": "outputs/experiments/g31_ics_lt2_sustained_20261014/full024_chained_2x_20261015_002_saved_audit_external_001.json", "sha256": "671756e8a62afb723c3f774b740ca1ae77e700d1528316dc2a44bba6bd3784d3", "bytes": 1072},
+    "cap8_review": {"path": "outputs/experiments/g31_ics_lt2_sustained_20261014/original_low_wip_cap_relay_actual_review_001.json", "sha256": "9b30bdc7abb24e65e4ad4816653f2835e4259d1b882145f517db357cc450e69e", "bytes": 4566},
+    "bridge_producer_external": {"path": "outputs/experiments/g31_ics_lt2_sustained_20261014/original_bridge_serialize_once_prepare_001/external_application_wall.json", "sha256": "95a682b80bb76d1788ae6c7f3ab522cfc44ca8a8d248308527b53bcc64b317a4", "bytes": 2147},
+    "bcdm2_terminal": {"path": "outputs/experiments/g31_ics_lt2_sustained_20261014/control_timers_bcdm2_terminal_readback_002.json", "sha256": "bed37a7c8f089d318c5a094903f5d3909ac465f5501f6872f3dbfa1b441d6f03", "bytes": 13954},
+    "bcdm2_external": {"path": "outputs/experiments/g31_ics_lt2_sustained_20261014/bcdm2/actual_external_application_wall.json", "sha256": "06bc6252a03b94219cd72a778557d88d7cc3a1a09e8f94681cd70f33ec19a0ae", "bytes": 24378},
+    "full2x_endpoint": {"path": "outputs/experiments/g31_ics_lt2_sustained_20261014/full2x_endpoint_diagnostic_002/report.json", "sha256": "f5461811fed8fc464d933d1484d01b17a6e404651a8d4bf580ccd6fbabb3839d", "bytes": 88837},
+    "completion_baton_static": {"path": "outputs/experiments/g31_ics_lt2_sustained_20261014/completion_baton_static_design_001/report.json", "sha256": "de1f68d690c37f3a1cb55e02e39ac7e95e412fe5c56dc162cbb480d4945069e7", "bytes": 14571},
+    "carrier_bound_review": {"path": "outputs/experiments/g31_ics_lt2_sustained_20261014/original_carrier_bound_002_independent_review/review.json", "sha256": "25987a2332a292d6eab8fef43d5983e364b98589420440cb96d995f64bdfbe8d", "bytes": 3514}
+  },
+  "upload_pack_recommendation": {
+    "small_primary_selection": ["initial_v3_review", "initial_v3_external", "full1x_review", "full2x_review", "full2x_saved_external", "cap8_review", "bridge_producer_external"],
+    "clearly_labeled_today_supplement": ["owned_C18_review", "owned_C18_external", "static_C18_review", "static_C18_external", "bcdm2_terminal", "bcdm2_external"],
+    "undated_diagnostic_supplement": ["source_inventory65_review"],
+    "obstruction_appendix": ["full2x_endpoint", "completion_baton_static", "carrier_bound_review"],
+    "full_package_directories_only_if_GPTPro_needs_source_audit": [
+      "outputs/experiments/g31_ics_lt2_sustained_20261014/initial_owner_route_campaign_v3_prepare_001",
+      "outputs/experiments/g31_ics_lt2_sustained_20261014/original_low_wip_cap_relay_prepare_001",
+      "outputs/experiments/g31_ics_lt2_sustained_20261014/original_bridge_serialize_once_prepare_001",
+      "outputs/experiments/g31_ics_lt2_sustained_20261014/bcdm2",
+      "outputs/experiments/g31_ics_lt2_sustained_20261014/single_owned_C18_prepare_002",
+      "outputs/sicm1",
+      "outputs/si65d1"
+    ],
+    "exclude_from_default_upload": "Do not include giant raw tapes/shards or claim this summary has revalidated them. Full source archives/compiled authority plans can be a second pack if necessary. Exact source/runtime identity remains package-specific; accepted026 and live027 must not be conflated."
+  }
+}

@@ -1,0 +1,91 @@
+{
+  "schema": "g31.bcdm1.producer_terminal_small_readback.v1",
+  "status": "unknown_failed_saved_audit",
+  "scope": "Small terminal receipts, failure traceback, four progress rows and frozen source read only. Producer author readback, not an independent full saved certificate. No new C load/native/model, large gzip decode or policy replay. No retry authorized or attempted.",
+  "directory": "C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_lt2_sustained_20261014/bcdm1",
+  "session": 25946,
+  "terminal": {
+    "exit_code": 1,
+    "whole_python_seconds": 51.430112,
+    "start_ticks": 866327303527,
+    "end_ticks": 866841604647,
+    "elapsed_ticks": 514301120,
+    "tick_frequency": 10000000,
+    "budget_ticks": 6000000000,
+    "outer_timeout": false,
+    "source_changed": [],
+    "outer_exception": null,
+    "cleanup_errors": [],
+    "owned_process_status": "exited",
+    "owned_process_exitcode": 1,
+    "owned_process_wall_seconds": 50.5630000000092,
+    "owned_process_hard_timeout_seconds": 599.3899999999994,
+    "windows_job_kill_on_close": true,
+    "child_released_only_after_job_assignment": true,
+    "complete_saved_audit_checked": false,
+    "missing_outputs": ["report.json", "C_encoder_entry.json", "C_encoder_exit.json", "all_job_states.json.gz"]
+  },
+  "pins": {
+    "plan.json": "ce7168ac603be884b45c8822aefadef70a65a0f546971a4b675e52539af87b57",
+    "preparation.json": "7d8244159213584e73415188f1ae383dd9c42b96c7c586ca81deab63b018c7d8",
+    "root_execution_review_001.json": "e73ddb7f3071a56ebdc9a22f572d04d0fafb366a7f530042b3413966d49ac440",
+    "actual_external_application_wall.json": "0017ceb2d9ba71c81fe137cc164f9f3435167ed5d92845b757a14c51fad3d91e",
+    "execution_claim.json": "d6b9cdc6b3d3cdd8cead29528bccbf7b45f5074c6154f8d4241b50a1f4f04ee5",
+    "bounded_execution.json": "3bce4da65a6e56368275d64bcc2075e3fb1e9027f2d178e57bffd7f340888fde",
+    "failure.json": "38292e274e4c7eafbb4f7a8aed0c2c63457981da12ac8658a70ae81b57a02a31",
+    "progress.jsonl": "62bf4e38630049d50d7673ba490c07f616685b59b03dce72b0aef4e18149dc7f",
+    "stderr.log": "a13dde3ca62b1f832f79827f61e53b5ad69ea9d12d2909acd2e91586d46c543a",
+    "stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "source_identity": {
+    "actual_wrapper_path": "outputs/experiments/g31_ics_lt2_sustained_20261014/control_timers_bcdm1_saved600_001.ps1",
+    "actual_wrapper_sha256": "97afe655ed1f124fc51ff3840d8ad5769f6d7e973b0c5c0258661fa0d56d809b",
+    "preflight_helper_path": "outputs/experiments/g31_ics_lt2_sustained_20261014/user_resume_20261015_001/control_timers_preflight_bcdm1_001.py",
+    "preflight_helper_sha256": "892be5adefe236136463924f45854ca29bd47a06c2e10bc71adebd456e669df8",
+    "C_gate_plan_path": "outputs/experiments/g31_ics_lt2_sustained_20261014/planning_v2_C_encoder_gate_prepare_003/plan.json",
+    "C_gate_plan_sha256": "d6912d695e36707dbba6bd7a0359e5ec6c6ed1a964323e99c4aae4fecf28579b",
+    "C_authority_source": "scripts/experiments/g31_ics_circulation/planning_v2_c_encoder_authority.py",
+    "C_authority_begin_line": 104,
+    "C_gate_source": "scripts/experiments/g31_ics_circulation/run_planning_v2_c_encoder_gate.py",
+    "C_gate_environment_check_line": 278
+  },
+  "failure": {
+    "type": "ValueError",
+    "text": "typed_C_gate:python_startup_environment_changed",
+    "source_causal_chain": "C authority begin calls original verify_plan before load_candidate; verify_plan rejects startup environment equality after source/toolchain/runtime checks. No extension load or complete_policy_replay is reached on this path.",
+    "C_gate_expected_startup_environment": {
+      "PYTHONPATH": null,
+      "PYTHONHOME": null,
+      "PYTHONNOUSERSITE": null,
+      "SETUPTOOLS_USE_DISTUTILS": null
+    },
+    "actual_wrapper_explicit_environment": {
+      "PYTHONPATH": "src;.;tests",
+      "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1",
+      "PYTHONIOENCODING": "utf-8"
+    },
+    "guaranteed_field_difference": {"field": "PYTHONPATH", "expected": null, "actual_explicit": "src;.;tests"},
+    "other_C_bound_fields": "The other three values were inherited and were not individually captured by the actual outer receipt. This readback does not infer their launch values from a later process or print unrelated environment.",
+    "preflight_gap": "The independent metadata helper bound the wrapper and C plan separately but did not compare the wrapper's launch environment with the frozen C gate startup environment. Pure gates use the three explicit test settings; that is not C authority compatibility.",
+    "permitted_fix_scope": "A new plan/output/wrapper with the correct startup environment and explicit prelaunch cross-check, subject to root review. Do not loosen or mask the original C gate environment comparison, mutate os.environ only around verification, rewrite old receipts or retry this output. No repair is executed by this readback."
+  },
+  "progress": {
+    "records": 4,
+    "entry_plan_source_artifact_and_runtime_checks_completed_seconds": 13.2858723,
+    "C_encoder_entry_full_dependency_and_load_checks_failed_span_seconds": 36.3859788,
+    "span_scope": "Observed monotonic journal interval; nested wall includes all stage work and is not CPU attribution. The stage failed before its C load substep, despite the stage name.",
+    "policy_replay_entered": false,
+    "new_or_old_rows_certified": 0,
+    "whole_policy_certificate": false
+  },
+  "preserved_contract": {
+    "separate_total_seconds": 600,
+    "new_rows_required": 37270,
+    "old_prefix_rows_required": 27218,
+    "offered_jobs": 28506,
+    "trays": 22,
+    "native_calls": 0,
+    "predictions": 0,
+    "scope": "The separate600 still includes Python startup/entry/exit authority checks, C load, all saved checks/exports and exit. Original producer2400 and all earlier saved600 failures stay failed. No partial progress upgrades any business/physical claim."
+  }
+}

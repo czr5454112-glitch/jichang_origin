@@ -21,6 +21,7 @@ inline bool EventDrivenJunctionRuntime::circulation_protocol_transfer_available(
 
 inline std::string EventDrivenJunctionRuntime::submit_circulation_protocol_transfer(
     CirculationTransfer request,const std::string& owner) {
+  auto timing_admission = request_timing_.scoped(TimingPhase::admission);
   if(!circulation_.input.owner_protocol.enabled) return "rejected:owner_protocol_not_enabled";
   require_checkpoint_safe_boundary();
   if(runtime_phase_==EventDrivenJunctionRuntimePhase::kIdle ||
@@ -73,6 +74,8 @@ inline void EventDrivenJunctionRuntime::circulation_protocol_send_ack(int index,
   if(!std::isfinite(delivered) || !std::isfinite(duplicated))
     throw std::invalid_argument("circulation:nonfinite_protocol_ack_time");
   auto& client=circulation_.protocol_requests.at(index);
+  auto timing_ack = request_timing_.scoped(TimingPhase::ack_create,
+      {TimingIdentity::transfer, client.transfer, attempt ? attempt : client.attempt}, TimingMethod::none, 0, time);
   const auto& physical=circulation_.transfers.at(client.transfer);
   CirculationProtocolAck ack;ack.request=index;ack.sequence=client.next_ack_sequence++;
   ack.attempt=attempt ? attempt : client.attempt;
@@ -88,6 +91,7 @@ inline void EventDrivenJunctionRuntime::circulation_protocol_send_ack(int index,
 inline bool EventDrivenJunctionRuntime::process_circulation_protocol_event(const RuntimeEvent& event) {
   const double time=event.time;
   if(event.reason=="protocol_owner_down" || event.reason=="protocol_owner_up") {
+    auto timing_recovery = request_timing_.scoped(TimingPhase::recovery, {}, TimingMethod::none, event.seq, time);
     const auto& outage=circulation_.input.owner_protocol.outages.at(event.task_id);
     auto& count=circulation_.protocol_owner_down[outage.owner];
     count+=event.reason=="protocol_owner_down" ? 1 : -1;
@@ -125,6 +129,8 @@ inline bool EventDrivenJunctionRuntime::process_circulation_protocol_event(const
   }
   if(event.reason=="protocol_timeout") {
     auto& request=circulation_.protocol_requests.at(event.task_id);
+    auto timing_timeout = request_timing_.scoped(TimingPhase::timeout,
+        {TimingIdentity::transfer, request.transfer, event.wakeup_generation}, TimingMethod::none, event.seq, time);
     if(event.wakeup_generation==request.attempt && request.delivered_attempt<request.attempt && request.client_status!="timeout_unknown") {
       request.client_status="timeout_unknown";
       circulation_.notify_owner(request.owner,now_,32);
@@ -133,6 +139,8 @@ inline bool EventDrivenJunctionRuntime::process_circulation_protocol_event(const
   }
   if(event.reason=="protocol_resend") {
     auto& client=circulation_.protocol_requests.at(event.task_id);
+    auto timing_retry = request_timing_.scoped(TimingPhase::retry,
+        {TimingIdentity::transfer, client.transfer, event.wakeup_generation}, TimingMethod::none, event.seq, time);
     if(!circulation_protocol_transfer_available(client.transfer)) {
       client.waiting_for_owner=true;
       client.waiting_attempt=std::max(client.waiting_attempt,event.wakeup_generation);return true;
@@ -145,6 +153,8 @@ inline bool EventDrivenJunctionRuntime::process_circulation_protocol_event(const
   if(event.reason=="protocol_ack") {
     auto& ack=circulation_.protocol_acks.at(event.task_id);
     auto& client=circulation_.protocol_requests.at(ack.request);
+    auto timing_ack = request_timing_.scoped(TimingPhase::ack_delivery,
+        {TimingIdentity::transfer, client.transfer, ack.attempt}, TimingMethod::none, event.seq, time);
     CirculationReceipt row;row.time=time;
     row.reason=circulation_.input.transfers.at(client.transfer).request_id+":"+std::to_string(ack.sequence);
     if(client.remaining_ack_drops>0) {

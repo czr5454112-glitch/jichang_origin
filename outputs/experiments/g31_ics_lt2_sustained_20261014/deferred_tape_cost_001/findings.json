@@ -1,0 +1,84 @@
+{
+  "schema": "g31.deferred_tape.pure_findings.v1",
+  "status": "completed_pure_comparison_no_native",
+  "inputs": {
+    "plan.json": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\deferred_tape_cost_001\\plan.json",
+      "sha256": "f28f6a13e74129d741b7ffe28e9a689fc920854bc2f765f56b0f571d1ff75b54"
+    },
+    "report.json": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\deferred_tape_cost_001\\report.json",
+      "sha256": "a519a8d072625f37854c8715c9496411dd674196ac31ef663a1d1ead86cc9db8"
+    },
+    "process.json": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\deferred_tape_cost_001\\process.json",
+      "sha256": "bb49aae2b01892b0314a641bc9916718e6c757b96f282eebe527a5dbd9ad6472"
+    },
+    "external_wall.json": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\deferred_tape_cost_001\\external_wall.json",
+      "sha256": "9a754c5aa74cd98f8baf6f4fc0a9931921f08bf63e97befcc80d912254d7da15"
+    }
+  },
+  "pure_tests": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\deferred_tape_pure_003.xml",
+    "sha256": "e8ce9751b37c91d0b1c85c7b556fe7318f62c4519f37f511b3dbb10b4b1e3cbb",
+    "tests": 42,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "source_archive_count": 76,
+  "current_and_archive_match_after_run": true,
+  "external_wall_seconds": 65.4334627,
+  "comparisons": [
+    {
+      "case": "baseline",
+      "rows": 1272,
+      "uncompressed_bytes": 30953795,
+      "spool_hot_json_write_flush_change_percent": -23.665560030471955,
+      "spool_close_seconds": 0.2163842,
+      "spool_full_replay_change_percent": -1.2955715123716849,
+      "reference_full_replay_seconds": 1.6165993,
+      "spool_full_replay_seconds": 1.5956551,
+      "row_limit_remaining": 158728,
+      "byte_limit_remaining": 237481661
+    },
+    {
+      "case": "drop_first_ack",
+      "rows": 6197,
+      "uncompressed_bytes": 44030830,
+      "spool_hot_json_write_flush_change_percent": -23.91186629714529,
+      "spool_close_seconds": 0.3343691,
+      "spool_full_replay_change_percent": 1.184038309201929,
+      "reference_full_replay_seconds": 2.3216563,
+      "spool_full_replay_seconds": 2.3491456,
+      "row_limit_remaining": 153803,
+      "byte_limit_remaining": 224404626
+    },
+    {
+      "case": "ack_withheld_in_window",
+      "rows": 147171,
+      "uncompressed_bytes": 212969774,
+      "spool_hot_json_write_flush_change_percent": -24.709517690608727,
+      "spool_close_seconds": 1.6735147,
+      "spool_full_replay_change_percent": -3.566115285094673,
+      "reference_full_replay_seconds": 14.5474938,
+      "spool_full_replay_seconds": 14.0287134,
+      "row_limit_remaining": 12829,
+      "byte_limit_remaining": 55465682
+    }
+  ],
+  "recommendation": "Spool is viable only as a separately declared diagnostic-pipeline experiment: about24% lower in-loop JSON/write/flush cost in these saved tapes, but net whole replay gain is small and one case regresses. It is not an algorithmic or complete-request speedup; root may decide one future exact three-fault native pair after review. No native package dispatched or performance claim promoted.",
+  "limits": [
+    "Each tape extends beyond warm root closure to retained controller boundaries; whole-tape measurements are not per-root elapsed estimates.",
+    "Only one serial sample per arm/case; ordering and host-load effects unresolved.",
+    "RAM is comparison only and lacks hardkill prefix retention. Future native uses spool only with immediate perAPI flush; fsync/powerloss not guaranteed.",
+    "Original JSON serialization remains before API return. Deferred gzip/readback and additional uncompressed disk storage remain full child/campaign cost.",
+    "Any fixed256MiB/160000row overflow is unknown; no post-result capacity tuning.",
+    "Failed short writes can retain partial final row; such tape is never complete.",
+    "Source-only reviewer noted final spool flush failure skips close: successful path unaffected, failure remains unknown; robust handle-finally closing would be a new source version if adopted."
+  ],
+  "preserved_failure": "deferred_tape_pure_001.xml two wrong test exception-type expectations; original endpoint rejection correctly ValueError. Fixed test only, all42 finalpassed.",
+  "native_executions": 0,
+  "complete_100ms_certified": false
+}

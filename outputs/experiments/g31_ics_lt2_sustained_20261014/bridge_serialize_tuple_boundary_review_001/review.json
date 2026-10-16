@@ -1,0 +1,34 @@
+{
+  "schema": "g31.bridge.serialize_tuple_boundary.source_review.v1",
+  "status": "no_concrete_tuple_list_comparison_blocker_found",
+  "reviewed_at_utc": "2026-10-15T14:36:48.1678129Z",
+  "scope": "Narrow source-only review of tuple/list representation boundaries in the new serialize-once bridge campaign and retained policy/replay dependencies.",
+  "native_authority": "Archived accepted native026 binding; not current native027 or assumptions from other experiments.",
+  "source_sha256": {
+    "scripts/experiments/g31_ics_circulation/research_original_bridge_serialize_once.py": "97230fd04a3eebcb3b50c5e2ced838b8982c4902253047e8bc89b8f66c59d009",
+    "scripts/experiments/g31_ics_circulation/verify_original_bridge_serialize_once.py": "a0ef97e52cbc9b5330db5a29573fce7a7f603ebe1d35b64e79340ae5675cb8c1",
+    "scripts/experiments/g31_ics_circulation/serialize_once_low_wip_tape.py": "528359583e23778d6d0f97f82cb6cf6f1500b664ecd83f003ce9015ec9167272",
+    "scripts/experiments/g31_ics_circulation/cooperative_bridge_policy.py": "4697a415538fae22cb7b6e472549178158f7f2de7f44faa4ae9a1341703cec90",
+    "scripts/experiments/g31_ics_circulation/current_empty_possession_permit.py": "a97048354707269311bbde53a0a45501fe122b199de5d38f5ca2d218a4acca96",
+    "scripts/experiments/g31_ics_circulation/research_original_low_wip.py": "729cbbdd03ecff3a85bd5324653db424bd601632a5fbecdc72c02bb83c3c7bc9",
+    "scripts/experiments/g31_ics_circulation/research_original_low_wip_reuse.py": "e91ada16a9f6089ffb49ac79e06fff492be467e54ee8074bd46c3c47e1742a02",
+    "scripts/experiments/g31_ics_circulation/verify_original_cooperative_bridge.py": "268c19e1420b94213eaf27d050a9f4fe09207f70ea4d7efed2c785bffaed30e8",
+    "scripts/experiments/g31_ics_circulation/planning_capture_v2_digest.py": "01fc49cbded5ba70851f1294fce9f5aaa06b66e82bfb5b9862740c310faf9fd5",
+    "outputs/experiments/g31_ics_lt2_sustained_20261014/native026_build_001/source/cpp/ics_core/bindings/circulation_session_binding.hpp": "dd7dd9ddad84582883f3327ab43aec9cd8a74b997f0ee85d232bf5281589dca4"
+  },
+  "findings": [
+    "Native026 node_records/edge_records contain tuple rows inside a list. Bridge path/role logic uses ordered iteration and scalar indexing, not direct equality to saved list rows.",
+    "Native026 typed capture jobs/trays/nodes and coverage identities, terminal/action extension rows and current FIFO groups/heads are explicitly py::list; strict list membership guards match this renderer.",
+    "PossessionGate compares nine scalar current-token fields only; it does not directly compare committed_prefix containers. Typed v2 digest iterates sequence elements rather than requiring tuple/list equality.",
+    "ReplayTape canonicalizes new call args/kwargs before comparison with persisted JSON. normalized_owners canonicalizes both live summaries and replay summaries.",
+    "Additional old27218/new prefix comparison compares ordered JSON semantic rows. Only the previously allowed finite nonnegative advance_to.result.wall_seconds is excluded; no other fields are removed.",
+    "Saved physical/action-frame checks compare persisted JSON values on both sides. No raw native tuple is mixed with persisted list at those checks."
+  ],
+  "limitations": [
+    "No native execution, model execution, test rerun, or complete raw-tape scan was performed for this narrow review.",
+    "No claim that the future full bridge run or full saved replay has passed. The actual campaign still must pass its complete verifier.",
+    "No changes to policy, Tape, Replay, frozen runtime files, or representation guards were made."
+  ],
+  "package_ready_sha256": "88a6f4e68680fefe183f049c737da08926206c967628a8738ce0a6037dc6560e",
+  "campaign_sha256": "d976e7f2d473e64ddb4e11895c06bfb9f21a11b43133babb71cd02491bb94464"
+}

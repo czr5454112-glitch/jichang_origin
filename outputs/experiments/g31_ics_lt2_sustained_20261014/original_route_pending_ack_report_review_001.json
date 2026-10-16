@@ -1,0 +1,59 @@
+{
+  "schema": "g31.pending_ack.report_only_review.v1",
+  "status": "passed_pinned_reports_and_current_source_review",
+  "recorded_utc": "2026-10-15T09:04:34.883379+00:00",
+  "evidence_sha256": {
+    "ready.json": "5277299e4bf81a397b50b5417514b26ac931375e363a40874bd8d09c43beb542",
+    "independent_verification.json": "660547e068fe019793090200ff269b2697fe1bdb7465dff03e6465edb1f8c0cc",
+    "powershell_launch_receipt.json": "f2255ed74dc120fa1f88f6054328407474e3b5b05f2dc94a77aa5dbe016689be",
+    "independent_source_review_001.json": "5c6888eec306d1ad1327e402320122eec32f5d68614c19326dd713fdf4182563",
+    "receipt.json": "3e362645d8074b6e21c4bf49418ebdf14aaf7995327391e00ebc45cbcfd9ed9b",
+    "external_launch_receipt.json": "8c4a941028b2b88529905551c2e1214ac58c0a10b09c4b5ffe33a3fd134db163",
+    "campaign.json": "d019d4842a736051a24d869e6a220017e0ac1c1b65674fc75867ef17502cfc50"
+  },
+  "script_sha256": "4a97b7c649f88d141689eee3c185be74a18d13d1ef367cdc5e3979ac7fa9fb83",
+  "runtime_sources_rechecked": 88,
+  "cases": {
+    "baseline": {
+      "warm_elapsed_upper_ms": 64.3337,
+      "status": "closed_finite_request",
+      "attempts": 1,
+      "request_api_rows": 7,
+      "native_call_envelopes_within_root_ms": 11.3171,
+      "all_warm_native_api_rows": 1272,
+      "producer_native_seal": "c41257b955faaf6d5bc4dbb704f174fd7820d7723a6ad8455283897f5d54c7ad",
+      "omitted_postproof_full_observations": 1
+    },
+    "drop_first_ack": {
+      "warm_elapsed_upper_ms": 970.5869,
+      "status": "closed_finite_request",
+      "attempts": 2,
+      "request_api_rows": 43,
+      "native_call_envelopes_within_root_ms": 204.6564,
+      "all_warm_native_api_rows": 6197,
+      "producer_native_seal": "425364a12ef280fc386907b79b15c9cb7b705d5cdc1b960ad4e3ed1c5390c6a7",
+      "omitted_postproof_full_observations": 36
+    },
+    "ack_withheld_in_window": {
+      "warm_elapsed_prefix_ms": 27365.3727,
+      "status": "open_censored_request",
+      "attempts": 5,
+      "request_api_rows": 495,
+      "native_call_envelopes_within_root_ms": 3487.3148,
+      "all_warm_native_api_rows": 147171,
+      "producer_native_seal": "f32a0efc994617f476088c4bf724a67b819c7c79bd480bc4ebdc4a1f8ee8586d",
+      "omitted_postproof_full_observations": 482
+    }
+  },
+  "whole_application_seconds": 199.1382522,
+  "complete_computation_available": false,
+  "complete_100ms_certified": false,
+  "native_executions": 0,
+  "raw_api_replay_repeated": false,
+  "scope": "Independent narrow review of exact producer/verifier/outer report identities and 88 live/archive source files. Full raw policy replay was performed by the pinned separate verifier, not repeated here. Background parity and producer seals are not an independent native state reconstruction.",
+  "limits": [
+    "One uncontrolled-machine observation per case; no general latency or causal speedup estimate.",
+    "Normal closed warm envelope <=100ms does not certify cold/burst/other requests or two machines.",
+    "Dropped ACK envelope still >100ms; withheld ACK remains open. No physics subtraction or full-root division."
+  ]
+}

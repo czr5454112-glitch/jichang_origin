@@ -1,0 +1,55 @@
+{
+  "schema": "g31.initial_single_capture_failure.independent_source_review.v1",
+  "status": "no_concrete_standalone_source_blocker",
+  "plan": {
+    "path": "outputs\\experiments\\g31_ics_lt2_sustained_20261014\\initial_single_failure_pure_001\\plan.json",
+    "sha256": "a3598e38238cfb1999313833d50b7148a335b8013dfe001de3a0543b8b5354d9"
+  },
+  "reviewed_source_pins": [
+    {
+      "path": "scripts/experiments/g31_ics_circulation/verify_initial_single_capture_failure.py",
+      "sha256": "0ff9b5fa22f72035e7e65a6ed72d2a93352c40372d8c9a690f2d67a2b67dabd1",
+      "archive_matches": true
+    },
+    {
+      "path": "tests/test_g31_circulation_single_capture_failure_review.py",
+      "sha256": "cb9479764d510595f20ccf9a6e2faa59174d634193d7ace95477fd0f961a123b",
+      "archive_matches": true
+    },
+    {
+      "path": "scripts/experiments/g31_ics_circulation/initial_owner_route_single_capture.py",
+      "sha256": "7836823bce6e05c92a3a4113b7a38780c9700b4c7e28f3c4ee076fddfe4b16ea",
+      "archive_matches": true
+    },
+    {
+      "path": "scripts/experiments/g31_ics_circulation/initial_owner_route_json_v3.py",
+      "sha256": "e2b5ac243b0722905b60ef36d7bd9d2a7afca95a24c97a98b020a0eef1724353",
+      "archive_matches": true
+    }
+  ],
+  "saved_pure_xml": {
+    "path": "outputs\\experiments\\g31_ics_lt2_sustained_20261014\\initial_single_failure_pure_001\\tests.xml",
+    "sha256": "a9af7fc5fc9482f6b768cbeeeef64b4136eed462a2d13572127c1eada9e9f2fa",
+    "tests": 36,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "findings": [
+    "Typed decoding preserves insertion order, tuple/list, scalar type and float hex; canonical re-encoding and bounded nodes/depth/cycles reject inconsistent export.",
+    "Completed fields must be an exact view/command/received prefix; active endpoint and nonnegative exact-int start clocks are bound to the supplied owner/request and optional actual branch attempt envelope.",
+    "No endpoint finish clocks are inferred from start clocks; returned endpoint durations remain unavailable.",
+    "A prefix_export_error remains returned_payload_verified=false even if partial record assignments exist; it never creates authority or a successful branch.",
+    "Malformed view/command identity is rejected rather than accepted as valid endpoint data; malformed received data remains failed evidence and is not passed to planning validation.",
+    "Every successful return from this standalone checker remains closed=false/root_must_remain_unknown=true/native_authority=false."
+  ],
+  "integration_requirements": [
+    "Caller must retain the failed record and its complete branch attempt timing/denominator even when this checker raises for malformed identity/structure.",
+    "Missing/failed typed export cannot be converted to complete evidence.",
+    "Unchanged successful endpoint_replay remains separate; this standalone module has not made full branch integration ready."
+  ],
+  "scope": "Read-only source and four current/archive hashes plus saved36 XML. No test/model/native rerun, no full131-source independent rehash.",
+  "native_calls": 0,
+  "model_calls": 0,
+  "tests_rerun": 0
+}

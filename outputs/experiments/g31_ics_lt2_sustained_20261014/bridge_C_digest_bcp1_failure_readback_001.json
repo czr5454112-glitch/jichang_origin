@@ -1,0 +1,82 @@
+{
+  "schema": "g31.bridge_C_digest.bcp1.author_failure_readback.v1",
+  "role": "Producer-author saved-output and source readback, not an independent review.",
+  "actual_status": "CLOSED1_failed_or_unknown",
+  "session_id": 75613,
+  "whole_python_seconds": 45.2230876,
+  "shared_seconds": 120,
+  "external_elapsed_ticks": 452230876,
+  "external_tick_frequency": 10000000,
+  "external_clock_within_budget": true,
+  "source_changed": [],
+  "missing_outputs": [],
+  "source_count": 113,
+  "tests_collected": 37,
+  "tests_passed": 36,
+  "tests_failed": 1,
+  "failed_test": "test_both_assess_layers_resolve_same_fresh_factory_namespace",
+  "evidence_sha256": {
+    "receipt.json": "3730d1e722dac45849e57f2a854d15f95a82824895995ae73b9c7e6d891db9e0",
+    "tests.xml": "efdd6d535a51e84b93ff91ce4a2c35b50de811aa39b9531e0fb04203a08bbf38",
+    "plan.json": "bb4a9eac921337b52ce108c06f634ff7cc5799c19bc4b6f2dbd80a53ae85b7cc",
+    "worker.json": "f805d82f44da0a461b2d422d9751350220fc89931d4d7f0e2fd90ad9ff70cedb",
+    "bounded_execution.json": "1c8f141eaab31d364a8414724b164c73778b36797dd344bfa0b5b7755d9b4601",
+    "external_application_wall.json": "371abe87919ba367ae89ae6cec5f1fba840c3693aecb90a0b9913f31ac9a5356",
+    "parent_stdout.log": "add5a48c929e1b2ab8900a5f08d27b28be8d45c6127338b0b0c82eb5da75fd6f",
+    "parent_stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "source_cause": {
+    "original_schema": {
+      "file": "research_original_cooperative_bridge.py",
+      "line": 22,
+      "value": "g31.original_cooperative_bridge.campaign.v1"
+    },
+    "actual_old_schema": {
+      "file": "research_original_bridge_serialize_once.py",
+      "line": 17,
+      "value": "g31.original_bridge.serialize_once.campaign.v1"
+    },
+    "factory": {
+      "file": "research_original_bridge_serialize_once.py",
+      "lines": [
+        76,
+        81
+      ],
+      "binding": "Original functions cloned into one fresh dictionary, then SCHEMA and other runner settings replaced."
+    },
+    "assessor": {
+      "file": "research_original_cooperative_bridge.py",
+      "lines": [
+        95,
+        105
+      ],
+      "binding": "Returned schema reads its defining globals SCHEMA; it is not a fixed literal."
+    },
+    "wrong_test_reference": "c.r.original.assess(raw, plan)",
+    "corrected_test_reference": "c.r.runner_namespace()['assess'](raw, plan)",
+    "conclusion": "The old test compared different actual runner schemas. A mismatch is certain from source; this is not a reason to remove schema or ordered full-value comparison.",
+    "limit": "The failed test stopped at its first whole-output assertion. Its later inner-output assertion and spy2 assertion did not complete; new version must still run both."
+  },
+  "repair_draft": {
+    "new_source_sha256": {
+      "scripts/experiments/g31_ics_circulation/run_bridge_saved_c_digest_pure_v2.py": "8d86a94f5008734cb78098280430669f87254dc34e5cf82b47785ac8f35b9966",
+      "tests/test_g31_circulation_bridge_saved_c_digest_v2.py": "c4f31ce0e81c41e38b51a51fba2a5fb7c4690147dad308665ed382a6108c66f5"
+    },
+    "test_delta": "Exactly one baseline expression; all other test bytes unchanged. Fixed37 retained, full ordered bytes plus two actual private assess calls and spy2 retained.",
+    "runner": "New private full-globals runner with original main/worker/source_check code, only new TEST/MODULE/SCHEMA/BOOT/sources. Closure keeps old frozen gate and explicit helper.",
+    "command": [
+      "C:/PROGRAMING/python3.11.9/python.exe",
+      "-m",
+      "scripts.experiments.g31_ics_circulation.run_bridge_saved_c_digest_pure_v2",
+      "--output",
+      "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\bcp2"
+    ],
+    "executed": false
+  },
+  "changed_frozen_sources": false,
+  "retries": 0,
+  "C_loads": 0,
+  "native_calls": 0,
+  "actual_fixture_reads": 0,
+  "full_saved_audit_accepted": false
+}

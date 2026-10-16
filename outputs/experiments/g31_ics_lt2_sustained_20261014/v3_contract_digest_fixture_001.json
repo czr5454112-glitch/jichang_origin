@@ -1,0 +1,276 @@
+{
+  "schema": "g31.planning_v3_pure_digest_fixture.v1",
+  "contract": {
+    "node_contracts": [
+      {
+        "node": 0,
+        "resource_owner": "A",
+        "capacity": 2
+      },
+      {
+        "node": 1,
+        "resource_owner": "B",
+        "capacity": 2
+      },
+      {
+        "node": 2,
+        "resource_owner": "A",
+        "capacity": 2
+      }
+    ],
+    "edge_records": [
+      [
+        0,
+        1,
+        2.0,
+        2.0
+      ]
+    ],
+    "edge_contracts": [
+      {
+        "from": 0,
+        "to": 1,
+        "capacity": 1
+      }
+    ],
+    "native_semantics": {
+      "minimum_service_seconds": 0.001
+    }
+  },
+  "bodies": [
+    {
+      "schema": "g31.planning_capture.v3",
+      "capture_v2": {
+        "schema": "g31.planning_capture.v2",
+        "local_capture": {
+          "schema": "g31.planning_capture.v1",
+          "message_id": "planning-v3:A",
+          "source_owner": "A",
+          "target_owner": "B",
+          "publication_sequence": 1,
+          "captured_at": 0.5,
+          "valid_until": 2.0,
+          "static_contract_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "semantics": {
+            "queue_discipline": "fifo",
+            "resource_semantics": "receiving",
+            "event_semantics": "strict",
+            "scorer_mode": "S4_queue_aware_rule_only",
+            "merge_grant_rule": "M3",
+            "merge_grant_timing_mode": "jit_fair_aging_deadline",
+            "minimum_service_seconds": 0.001
+          },
+          "jobs": [],
+          "trays": [
+            {
+              "tray_id": "E",
+              "business_bag_id": "",
+              "mode": "empty",
+              "ready_kind": "unknown",
+              "node": 0,
+              "edge_from": 0,
+              "edge_to": 1,
+              "reception_node": 1,
+              "generation": 2,
+              "traversal_id": 3,
+              "available_at": 0.0,
+              "service_ready_at": -1.0,
+              "load_complete_at": -1.0,
+              "service_ready_known": false,
+              "committed_prefix": [
+                0
+              ]
+            }
+          ],
+          "nodes": [
+            {
+              "node": 0,
+              "occupancy": 0,
+              "actual_available": 0,
+              "unrepresented_occupancy": 0
+            },
+            {
+              "node": 2,
+              "occupancy": 0,
+              "actual_available": 0,
+              "unrepresented_occupancy": 0
+            }
+          ],
+          "known_faults": [],
+          "coverage": {
+            "scope": "source_waiting_or_locally_carried_released_jobs_and_local_trays",
+            "complete_for_declared_local_scope": true,
+            "local_node_ids": [
+              0,
+              2
+            ],
+            "tray_ids": [
+              "E"
+            ],
+            "business_bag_ids": [],
+            "unrepresented_occupancy": 0,
+            "future_arrivals_included": false
+          }
+        },
+        "extension": {
+          "schema": "g31.planning_extension.v2",
+          "source_owner": "A",
+          "captured_at": 0.5,
+          "terminal_receipts": [],
+          "submitted_physical_actions": [],
+          "completion_coverage": {
+            "scope": "all_source_owned_destination_unload_completions_through_capture",
+            "complete_for_declared_scope": true,
+            "through": 0.5,
+            "source_owned_destination_nodes": [
+              0,
+              2
+            ],
+            "future_events_included": false,
+            "completed_business_bag_ids": []
+          },
+          "action_coverage": {
+            "scope": "all_source_submitted_physical_operations_last_delivered_ack",
+            "through": 0.5,
+            "complete_for_declared_scope": true,
+            "includes_unsubmitted_python_plans": false,
+            "uses_hidden_execution_truth": false,
+            "submitted_request_ids": [],
+            "unresolved_request_ids": []
+          }
+        }
+      },
+      "extension": {
+        "schema": "g31.planning_inflight_receipts.v1",
+        "source_owner": "A",
+        "captured_at": 0.5,
+        "source_observed_inflight": [
+          {
+            "source_owner": "A",
+            "receipt_event": "EDGE_ENTER",
+            "tray_id": "E",
+            "business_bag_id": "",
+            "generation": 2,
+            "traversal_id": 3,
+            "edge_from": 0,
+            "edge_to": 1,
+            "entered_at": 0.25,
+            "static_edge_travel_seconds": 1.0,
+            "derived_edge_exit_at": 1.25
+          }
+        ],
+        "coverage": {
+          "scope": "all_current_source_owned_committed_edges_with_matching_observed_entries",
+          "source_owned_inflight_tray_ids": [
+            "E"
+          ],
+          "capture_cutoff": 0.5,
+          "complete_for_declared_source_inflight": true,
+          "unmatched_tray_ids": [],
+          "uses_future_event_heap": false
+        }
+      }
+    },
+    {
+      "schema": "g31.planning_capture.v3",
+      "capture_v2": {
+        "schema": "g31.planning_capture.v2",
+        "local_capture": {
+          "schema": "g31.planning_capture.v1",
+          "message_id": "planning-v3:B",
+          "source_owner": "B",
+          "target_owner": "A",
+          "publication_sequence": 1,
+          "captured_at": 0.5,
+          "valid_until": 2.0,
+          "static_contract_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "semantics": {
+            "queue_discipline": "fifo",
+            "resource_semantics": "receiving",
+            "event_semantics": "strict",
+            "scorer_mode": "S4_queue_aware_rule_only",
+            "merge_grant_rule": "M3",
+            "merge_grant_timing_mode": "jit_fair_aging_deadline",
+            "minimum_service_seconds": 0.001
+          },
+          "jobs": [],
+          "trays": [],
+          "nodes": [
+            {
+              "node": 1,
+              "occupancy": 1,
+              "actual_available": 0,
+              "unrepresented_occupancy": 1
+            }
+          ],
+          "known_faults": [],
+          "coverage": {
+            "scope": "source_waiting_or_locally_carried_released_jobs_and_local_trays",
+            "complete_for_declared_local_scope": true,
+            "local_node_ids": [
+              1
+            ],
+            "tray_ids": [],
+            "business_bag_ids": [],
+            "unrepresented_occupancy": 1,
+            "future_arrivals_included": false
+          }
+        },
+        "extension": {
+          "schema": "g31.planning_extension.v2",
+          "source_owner": "B",
+          "captured_at": 0.5,
+          "terminal_receipts": [],
+          "submitted_physical_actions": [],
+          "completion_coverage": {
+            "scope": "all_source_owned_destination_unload_completions_through_capture",
+            "complete_for_declared_scope": true,
+            "through": 0.5,
+            "source_owned_destination_nodes": [
+              1
+            ],
+            "future_events_included": false,
+            "completed_business_bag_ids": []
+          },
+          "action_coverage": {
+            "scope": "all_source_submitted_physical_operations_last_delivered_ack",
+            "through": 0.5,
+            "complete_for_declared_scope": true,
+            "includes_unsubmitted_python_plans": false,
+            "uses_hidden_execution_truth": false,
+            "submitted_request_ids": [],
+            "unresolved_request_ids": []
+          }
+        }
+      },
+      "extension": {
+        "schema": "g31.planning_inflight_receipts.v1",
+        "source_owner": "B",
+        "captured_at": 0.5,
+        "source_observed_inflight": [],
+        "coverage": {
+          "scope": "all_current_source_owned_committed_edges_with_matching_observed_entries",
+          "source_owned_inflight_tray_ids": [],
+          "capture_cutoff": 0.5,
+          "complete_for_declared_source_inflight": true,
+          "unmatched_tray_ids": [],
+          "uses_future_event_heap": false
+        }
+      }
+    }
+  ],
+  "capture_v2_sha256": [
+    "11688d4755d7c4dbdcfceb9a13a21a344c5e84db00a8abb3493f873b84866368",
+    "ff6d1a7365bd8e17c8fe650ee43d0d609fd64033444efd1d5122e11e539b5008"
+  ],
+  "capture_v3_sha256": [
+    "a41cc979b771899a676d4f549a8b425d9aac4abacb533b36fc42fcf568d446b3",
+    "d32a0e7ab58bb9fb22203d70d3119b553b460ddd59d16f2d98f3269ae228314a"
+  ],
+  "source_hashes": {
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\planning_capture_v3_contract.py": "89512a3c8e8f9cf8ce64317a5b7a5c49430ff5e0ebade0c582b69dd63e84aac5",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\tests\\test_g31_circulation_planning_capture_v3_contract.py": "8fdd8d1a7b3d12f56a38ca093f57855ea4e631494b02881fb126b2e1d1f71a26",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\docs\\g31_ics_circulation\\LT2_PLANNING_CAPTURE_V3_DRAFT_20261015.md": "ae4528077ddb0e5066d4796a3dfb3b1b466760427bf7d493d2a012a5a8a4f761"
+  },
+  "native_provenance": false
+}

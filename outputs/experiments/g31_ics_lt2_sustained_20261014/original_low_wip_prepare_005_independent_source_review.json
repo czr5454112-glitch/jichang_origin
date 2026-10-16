@@ -1,0 +1,68 @@
+{
+  "schema": "g31.low_wip_bounded_atomic_replace_independent_review.v1",
+  "status": "source_review_no_concrete_blocker",
+  "at_utc": "2026-10-15T04:38:07.954339+00:00",
+  "plan": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_low_wip_prepare_005\\preregistered_protocol.json",
+    "sha256": "71b278ac95c270fa18bde49a7da9f6f84031762b0da6ead494b39864cf7d7ece"
+  },
+  "prior_plan": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_low_wip_prepare_004\\preregistered_protocol.json",
+    "sha256": "13821803b1669bd9cfd79efdbde92fa6bbba941c29c7c8714c0cf5c406d0a433"
+  },
+  "source": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_original_low_wip.py",
+    "sha256": "729cbbdd03ecff3a85bd5324653db424bd601632a5fbecdc72c02bb83c3c7bc9"
+  },
+  "archived_prior_source": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_low_wip_prepare_004\\source_archive\\scripts\\experiments\\g31_ics_circulation\\research_original_low_wip.py",
+    "sha256": "157f4fd7eb333c4dccb9c63635cd548e91015eb1f2b0d9df5de5da65fb6fe96c"
+  },
+  "tests": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\tests\\test_g31_circulation_original_low_wip.py",
+    "sha256": "4e8c1604d7f8ae5e128e0ad78558b148430aab0c7b1026359e81879e66c6c594"
+  },
+  "saved_pure_xml": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_low_wip_pure_009.xml",
+    "sha256": "1ea793ed911db27fa090d17dd1162fdc82714bf92d8cec4f6c0974073a41cad7"
+  },
+  "saved_test_counts": {
+    "tests": 72,
+    "errors": 0,
+    "failures": 0,
+    "skipped": 0
+  },
+  "source_closure_count": 66,
+  "all_live_and_archived_source_hashes_match": true,
+  "changed_plan_keys": [
+    "execution_amendment",
+    "source_before"
+  ],
+  "changed_existing_functions": [
+    "write",
+    "prepare"
+  ],
+  "new_functions": [
+    "replace_with_retry"
+  ],
+  "unchanged_fields": {
+    "input_sha256": "d37118333de2aa60fb5e9b9d41bab53cccb7ddbab5842862b88a2818e08709a1",
+    "offered": 28506,
+    "trays": 22,
+    "horizon": 22200.0,
+    "parent_timeout_seconds": 600.0,
+    "original_r1_permission": false
+  },
+  "findings": [
+    "Only Path.replace PermissionError is retried, at most7 calls with6 requested delays totaling0.56s.",
+    "Exhaustion re-raises the original failure; old destination and new temp remain. Other I/O failures immediately propagate.",
+    "No required heartbeat is omitted; full physical policy, input, budgets and600s parent cap remain unchanged.",
+    "The requested sleep total is not a hard bound on OS wall time."
+  ],
+  "reviewer_native_runs": 0,
+  "reviewer_test_runs": 0,
+  "limitations": [
+    "Reviewer inspected source and saved72-test XML; did not independently rerun tests.",
+    "004 remains a failed/incomplete native attempt; its22 parking receipts do not establish business completion."
+  ]
+}

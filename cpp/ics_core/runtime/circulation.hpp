@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <cstddef>
 #include <cstdint>
 #include <map>
 #include <stdexcept>
@@ -78,7 +79,8 @@ struct CirculationInput {
   bool owner_notifications_enabled = false;
 };
 // Owner-local revision, never a global heap/event/traversal counter. Bits:
-// arrival=1, physical=2, demand=4, forecast=8, ACK=16, timeout=32, known fault=64.
+// arrival=1, physical=2, demand=4, forecast=8, ACK=16, timeout=32, known fault=64,
+// explicit planning snapshot delivery=128.
 struct CirculationOwnerNotification {
   std::uint64_t sequence = 0, change_mask = 0;
   double observed_at = -1;
@@ -162,7 +164,10 @@ struct CirculationDemandMessage {
   std::string message_id, source_owner, target_owner;
   std::uint64_t publication_sequence = 0;
   double observed_at = 0, delivered_at = 0;
-  std::vector<CirculationDemandItem> jobs;
+  // Source-time membership in immutable input.jobs, in original input order.
+  // Indices survive checkpoint/fork copies; never re-filter current state.
+  // Renderers and the canonical checkpoint still emit the original fields.
+  std::vector<std::size_t> jobs;
   bool delivered = false;
 };
 struct CirculationServiceForecast {
@@ -176,6 +181,69 @@ struct CirculationServiceForecast {
   std::string status = "conditional";
   std::string supersedes;
   bool delivered = false;
+};
+// Explicit research message: native source-time facts, never caller estimates.
+// Public traversal versions are local to each carrier; runtime IDs stay private.
+struct CirculationPlanningJob {
+  CirculationJob contract;
+  std::string status;
+  double loaded_at=-1,storage_entered_at=-1,storage_released_at=-1;
+};
+struct CirculationPlanningTray {
+  std::string tray_id,business_bag_id,mode,ready_kind="unknown";
+  int node=-1,edge_from=-1,edge_to=-1,reception_node=-1;
+  std::uint64_t generation=0,traversal_id=0;
+  double available_at=0,service_ready_at=-1,load_complete_at=-1;
+  bool service_ready_known=false;
+  std::vector<int> committed_prefix;
+};
+struct CirculationPlanningNode {
+  int node=-1,occupancy=0,actual_available=0,unrepresented_occupancy=0;
+};
+struct CirculationPlanningFault {
+  int from=-1,to=-1;
+  bool active=false;
+  double received_at=-1;
+};
+struct CirculationPlanningSnapshot {
+  std::string message_id,source_owner,target_owner,static_contract_sha256,payload_sha256;
+  std::uint64_t publication_sequence=0;
+  double captured_at=0,delivered_at=-1,valid_until=0;
+  bool delivered=false;
+  std::string queue_discipline,resource_semantics,event_semantics,scorer_mode,merge_grant_rule,merge_grant_timing_mode;
+  double minimum_service_seconds=0;
+  std::vector<CirculationPlanningJob> jobs;
+  std::vector<CirculationPlanningTray> trays;
+  std::vector<CirculationPlanningNode> nodes;
+  std::vector<CirculationPlanningFault> known_faults;
+};
+struct CirculationPlanningCompletion {
+  std::string receipt_id,source_owner,business_bag_id,tray_id;
+  std::uint64_t source_local_sequence=0;
+  int destination=-1;
+  double completed_at=-1;
+};
+struct CirculationPlanningAction {
+  std::string request_id,kind,source_owner,ack_status;
+  std::uint64_t ack_sequence=0;
+  double ack_delivered_at=-1;
+  bool has_delivered_ack=false,terminal=false;
+};
+struct CirculationPlanningSnapshotV2 : CirculationPlanningSnapshot {
+  std::vector<CirculationPlanningCompletion> terminal_receipts;
+  std::vector<CirculationPlanningAction> submitted_physical_actions;
+};
+struct CirculationPlanningInflight {
+  std::string source_owner,tray_id,business_bag_id;
+  std::uint64_t generation=0,traversal_id=0; // public per-tray version only
+  int edge_from=-1,edge_to=-1;
+  double entered_at=-1,static_edge_travel_seconds=0,derived_edge_exit_at=-1;
+};
+struct CirculationPlanningSnapshotV3 : CirculationPlanningSnapshotV2 {
+  std::vector<CirculationPlanningInflight> source_observed_inflight;
+  // Committed destinations without a matching already-observed entry remain
+  // in the denominator. They are not future-event estimates or usable rows.
+  std::vector<std::string> unmatched_inflight_tray_ids;
 };
 struct CirculationRecoveryIntent {
   std::string request_id, owner_id, tray_id;
@@ -257,6 +325,9 @@ struct CirculationState {
   std::vector<CirculationRouteIntent> route_intents;
   std::vector<CirculationDemandMessage> demand_messages;
   std::vector<CirculationServiceForecast> service_forecasts;
+  std::vector<CirculationPlanningSnapshot> planning_snapshots;
+  std::vector<CirculationPlanningSnapshotV2> planning_snapshots_v2;
+  std::vector<CirculationPlanningSnapshotV3> planning_snapshots_v3;
   std::vector<CirculationRecoveryIntent> recovery_intents;
   std::uint64_t next_control_id = 1;
   std::map<std::pair<std::string,std::string>,std::uint64_t> next_channel_message_id;

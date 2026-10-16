@@ -1,0 +1,42 @@
+{
+  "schema": "g31.planning_native_row_order_read_only_audit.v1",
+  "new_native_executions": 0,
+  "policy_or_native_source_edits_for_this_audit": 0,
+  "source_sha256": {
+    "scripts/experiments/g31_ics_circulation/native_preexisting_initial_adapter.py": "6165d2afcfd86dcf9b45200424a7b64ca100a24bc196a9d972e1edc384dd9ea1",
+    "scripts/experiments/g31_ics_circulation/native_preexisting_rolling_adapter.py": "3d1f47a543e3fb04693fc1b8d3bda2b17cebe8691b8c4964b0f9cd5df73d8c41",
+    "scripts/experiments/g31_ics_circulation/preexisting_v3_data_adapter.py": "ce21d2a8f81c7d6ee063f6e6ca5353d5b1e440e4c70310264ba7dae6cb96b5b7",
+    "scripts/experiments/g31_ics_circulation/public_preexisting_model.py": "2b8f2f7f633f48b3840dbc35137e0d153c442c635b51c0bc7a55332afeeeccc5",
+    "scripts/experiments/g31_ics_circulation/public_preexisting_v3_model.py": "522ec0a41193c9598e0c2b86f6c2f5abb7cb8928b9dfdbc365f6c923ece7240e",
+    "scripts/experiments/g31_ics_circulation/planning_capture_v2_contract.py": "a3e9ecc8246c717a21e033603b2cc4461aec40d46603ef5ea50301b4721e1114",
+    "scripts/experiments/g31_ics_circulation/planning_capture_v3_contract.py": "b6fc962ad5c3459981f423e4162874325a2c04778aa189e33e4baa450fb67962",
+    "cpp/ics_core/bindings/circulation_session_binding.hpp": "66cbba8a046c5ee863241a6b449731be430caae37c046ec9e392ac232d380f66",
+    "cpp/ics_core/runtime/circulation_planning_snapshot_impl.hpp": "ab9628ca2552b0d5d11532b4e637dec6baaab7f273e67d60b4bfab891b395942",
+    "tests/test_g31_circulation_planning_native_row_order.py": "3975e59d6116bbb7e19bdecc4fd498bbbd1b03aa540cde0b86425e00ab04ecb8"
+  },
+  "tests": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "11",
+    "time": "0.954",
+    "timestamp": "2026-10-15T12:22:28.044220+08:00",
+    "hostname": "LAPTOP-M3GASC4G"
+  },
+  "xml_sha256": "090ed89416e7d1ac59bfec80b0c72fd9dbcdac54cff4d10fff660df6414a429e",
+  "active025_source_drift": [],
+  "findings": {
+    "v1_job_tray_node_coverage": "Native coverage repeats respective captured vector order. Initial adapter corrected job/tray exact order and uniqueness; only derived model projection coverage is sorted.",
+    "later_v2_v3_job_tray_coverage": "Both adapters compare body row order exactly, reject duplicate/global membership conflicts; no lexicographic identity precondition.",
+    "v3_observed_entry_coverage": "All source moving IDs follow local/input tray order. Complete observed entry rows must match that order; unmatched nonempty remains unknown regardless its ordering.",
+    "v2_action_order": "Native explicitly sorts physical actions by (request_id,kind); validator sorted requirement is therefore correct.",
+    "v2_completion_order": "Completed IDs follow terminal receipt row order, not job lexical order.",
+    "generic_node_limitation": "v2 source_owned_destination_nodes and v3 same-timestamp occupancy reconciliation still assume ascending owned nodes. Current restricted native3tray5job contracts have ascending node rows; broader permuted node contract remains unknown. No active contract module edited."
+  },
+  "limits": [
+    "Pure supplied-data tests cannot authenticate delivery or physical protection.",
+    "Actual nine-gate/native business results are separate root-owned evidence.",
+    "All active02541 dependencies remain unchanged."
+  ]
+}

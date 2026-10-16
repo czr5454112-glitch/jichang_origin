@@ -1,0 +1,28 @@
+{
+  "schema": "g31.planning_v2.C_encoder.parent_log_recurrence.v1",
+  "status": "source_repair_and_synthetic_composition_only",
+  "references": {
+    "prior_delivered_peer_failed_external": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\delivered_peer_cost_prepare_003\\external_application_wall.json",
+      "sha256": "59d0d86c7a810f592977f807f299632b5e824c9c90661644b37b716647519d0f"
+    },
+    "encoder_build001_failure": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\planning_v2_C_encoder_build_001\\failure_readback_001.json",
+      "sha256": "a25945b56d586bac3bee114f935a4facb016d7f9545b83198e362dffc4b56779"
+    },
+    "new_composition_pure": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\planning_v2_C_encoder_parent_logs_pure_001\\receipt.json",
+      "sha256": "0e87ee399114da296f16bfb2fc78aaafbb4836493f011dc23cc594e974d6cff2"
+    }
+  },
+  "lesson": "Repeated integration gap: exclusive logfile ownership was tested in isolated stages but not their actual composition. Earlier delivered_peer prepare and execute shared stdout.log; encoder parent build and worker build also shared build.stdout.log. Different source paths, same namespace collision class.",
+  "prior_delivered_peer_failure_scope": "Parent reported FileExistsError before validator execution. Its external receipt has planned validator_calls=32, not observed completions; this appendix does not reinterpret that field as executed calls.",
+  "repair": "Only parent main two stdout/stderr filename expressions gain parent_. Original worker run() and every command-log reader remain unchanged; this supersedes the earlier unexecuted worker-prefix repair suggestion.",
+  "regression": "Actual original parent file opens + deterministic fake worker invoking original run() exclusive file opens for configure/build/dependents/imports/compiler_dependencies. Legacy build collision is reproduced; all three repaired parent modes complete the composed file sequence. No actual compiler/extension/native workload.",
+  "scope": "Does not prove a real encoder build will succeed; fresh build002 still requires root authorization. No old receipt or source overwritten.",
+  "budgets_unchanged": {
+    "prepare": 120,
+    "build": 120,
+    "functional": 120
+  }
+}

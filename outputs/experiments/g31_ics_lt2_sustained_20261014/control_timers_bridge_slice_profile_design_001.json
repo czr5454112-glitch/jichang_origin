@@ -1,0 +1,92 @@
+{
+  "schema": "g31.bridge.saved_slice.profile_source_design.v1",
+  "status": "source_design_only_not_implemented_or_authorized_to_execute",
+  "author": "control_timers; producer-author source analysis, not an independent acceptance",
+  "terminal_reference": {
+    "path": "control_timers_bcdm2_terminal_readback_002.json",
+    "sha256": "bed37a7c8f089d318c5a094903f5d3909ac465f5501f6872f3dbfa1b441d6f03",
+    "outer_sha256": "06bc6252a03b94219cd72a778557d88d7cc3a1a09e8f94681cd70f33ec19a0ae",
+    "whole_seconds": 600.0507775,
+    "last_row_checkpoint": 20224,
+    "whole_day_closed": false
+  },
+  "known_stage_wall_seconds": {
+    "entry_plan_source_artifact_runtime_checks": 12.9783507,
+    "C_entry_full_dependency_and_load_checks": 46.8434606,
+    "first_original_source_reference_check": 21.0545684,
+    "complete_raw_decode": 25.1016453,
+    "input_decode": 0.1389549,
+    "second_original_source_reference_check": 25.5073771,
+    "new_manifest_and_all_37270_compressed_hashes": 24.3688063,
+    "interpretation": "These are existing inclusive wall spans, not CPU and not additive when nested. The policy stage has no end record. A progress checkpoint precedes completion of the outer observer and current policy consumer. No direct/fallback count or digest-time attribution was saved."
+  },
+  "source_findings": [
+    {
+      "path": "scripts/experiments/g31_ics_circulation/planning_capture_v2_c_encoder.py",
+      "sha256": "fe63f97cce9d26d0220f25a29bc2a9a78d9b956bff982cef0762f6b0e2bc7574",
+      "functions": ["Candidate._verify", "implementation_identity", "_digest", "Candidate.capture_digest_v2"],
+      "finding": "Per-call _verify checks function/global/primitive and extension-entry identities. It does not call source_proof, inspect, ast.parse or rehash source. _digest calls the extension exactly once, calls the original writer only on NotImplemented, and otherwise hashes the returned bytes. Resource or ordinary exceptions do not trigger fallback."
+    },
+    {
+      "path": "scripts/experiments/g31_ics_circulation/research_original_low_wip.py",
+      "sha256": "729cbbdd03ecff3a85bd5324653db424bd601632a5fbecdc72c02bb83c3c7bc9",
+      "locations": ["delivered_peer:165-202", "Owner.activate:273-315", "ReplayTape:495-516"],
+      "finding": "Each delivered_peer invocation reaches at most one digest, after envelope schema/owner guards and before causality/status/expiry. Empty/duplicate/malformed envelopes may reach zero. Moving expiry before digest changes rejection/exception order and is forbidden. Owner.activate invokes delivered_peer once only after refresh and the quiet early return."
+    },
+    {
+      "path": "scripts/experiments/g31_ics_circulation/cooperative_bridge_policy.py",
+      "sha256": "4697a415538fae22cb7b6e472549178158f7f2de7f44faa4ae9a1341703cec90",
+      "locations": ["BridgeOwner.activate:266-333", "cap_relay_evidence:204-243", "run_policy:345-370"],
+      "finding": "Post-startup activation calls direct peer validation and latest own capture. If a new operation is selected, PossessionGate.consume validates own and peer again. The old base and post-startup paths are mutually exclusive in one activation: was_quiet false returns after super, and was_quiet true makes super only refresh. Thus at most four digest invocations per successful post-startup activation, versus at most one on the startup path; this is a source bound, not an observed count. Halt/cap/guard branches may use fewer. Final cap assessment calls are separate and must not be charged as activation calls."
+    },
+    {
+      "path": "scripts/experiments/g31_ics_circulation/research_original_low_wip_reuse.py",
+      "sha256": "e91ada16a9f6089ffb49ac79e06fff492be467e54ee8074bd46c3c47e1742a02",
+      "locations": ["latest_own_capture:73-106"],
+      "finding": "The selector scans and validates all available own publication ACKs, selects the latest revision before checking expiry, invokes delivered_peer at most once, then deepcopies the ACK and envelope. The full history scan and both copies remain in the actual bcdm2 policy. Their cost is not measured by a bare digest sample."
+    },
+    {
+      "path": "scripts/experiments/g31_ics_circulation/current_empty_possession_permit.py",
+      "sha256": "a97048354707269311bbde53a0a45501fe122b199de5d38f5ca2d218a4acca96",
+      "locations": ["PossessionGate.consume:51-125"],
+      "finding": "Own and peer validation, operation coverage and consumed watermark guards all remain. A successful consume mutates its watermark before submit; it cannot be independently invoked again on the live replay instance for timing or validation."
+    },
+    {
+      "path": "scripts/experiments/g31_ics_circulation/protocol_control.py",
+      "sha256": "3ff5770e11de5c20b203455546829986d8c3e22e6d4a4189bf0214f14fe1da2f",
+      "locations": ["ProtocolClient.refresh:118-144"],
+      "finding": "Refresh includes native-query replay, client_view deepcopy, returned-view deepcopy, ACK/retry/index updates. It has no direct typed-v2 digest call. Copies and evolving active/outbox history are separate candidate causes; no removal is proposed in this diagnostic."
+    }
+  ],
+  "recommended_next_diagnostic": {
+    "purpose": "Measure real call routing and inclusive/exclusive costs on a fixed actual replay prefix. This cannot explain late-history cost by itself or certify throughput/protection.",
+    "one_attempt": true,
+    "proposed_whole_seconds": 120,
+    "data": "Original bridge serialize-once saved manifest and its first 512 entries, ordinals 0..511; original plan and original input; same corresponding old prefix entries. Selection is fixed before decoding. No raw_final.json.gz or final owner state is read.",
+    "source_and_data_authority": "New independent diagnostic plan pins original plan/input and both complete manifest bytes, selected 512 compressed rows and old counterparts, original source/archive/C authority plus new instrumentation closure. Whole manifests establish selected membership; unselected row data is not read or claimed verified. Preserve original full audit plan unchanged.",
+    "bounded_tape": "Prepare a new derived prefix directory containing exact copied compressed bytes and exact first 512 manifest lines. The original ReplayTape initializer can then check file cardinality, ordinal names and every selected hash unchanged. A diagnostic endpoint wrapper stops before any attempted 513th read using a dedicated BaseException censor marker, outside the policy's ValueError/KeyError/TypeError failure catch. It must not fabricate a horizon result or completion. Validate prefix directory provenance separately.",
+    "fresh_state": "Construct the original two owner instances from physical time zero and run the original private policy code against the prefix tape. Never seed from final raw, a future query body, inferred opaque IDs, a hypothetical checkpoint or an isolated late outbox. The original actor second parse, observer ordered comparison, policy guard order and mutation semantics remain. This diagnostic runs the policy prefix, not verify_saved/full physical finalization.",
+    "censor_semantics": "Every completed activation and each interrupted activation are separate records. At the fixed row boundary, retain the last fully returned API/observer/policy counters independently. A mid-activation stop is an incomplete activation, not an ordinary rejection or successful activation. All finally scopes and the outer source/C exit checks must close within the same 120 seconds; if they cannot, the attempt remains unknown. No automatic budget increase.",
+    "cost_feasibility": "The actual bcdm2 C entry alone used 46.8434606 seconds. Original C authority full exit checks must remain. The 120-second diagnostic is a feasibility cap, not a completion promise. Omitting the 1.34GB raw and unselected row scans is legitimate only because this new contract is explicitly partial, not a weakened full audit. Do not launch without a reviewed cost plan and source gate.",
+    "late_scope_blocker": "There is no accepted late owner-state checkpoint in bcdm2. A late query body alone is enough to rerun delivered_peer with its actual public arguments, but not enough to reconstruct latest_own_capture, refresh, action watermark or whole activation history. Existing fixed 27212/27215 C32 only covers two absent peer inputs. Do not repeat it as if it answered full late-policy cost. Late full-policy attribution requires a separately justified bounded prefix reconstruction or a future run with a real checkpoint mechanism; neither is authorized here."
+  },
+  "instrumentation_design": {
+    "binding": "New private bundle only. Preserve complete defining globals/defaults/kwdefaults/closure/MRO and exact original functions. Clone _digest with timed _ORIGINAL and _SHA aliases and a timed try_bytes callback; preserve exact original dispatcher code. Call candidate._verify once before it. This records direct/fallback from the actual first extension result, never from a second probe. Source/AST identities are checked at setup/exit, not invented as per-call AST costs.",
+    "routing": "Use the reviewed bundle paths for base Owner.activate, BridgeOwner.activate, latest_own_capture, PossessionGate.consume and cap relay. Attach timing wrappers to exact private call sites, not global module monkeypatches. ProtocolClient private type/factory and observer/replay wrappers must be explicitly bound and tested; no broad replacement of unrelated consumers.",
+    "nested_scopes": ["complete activation", "base startup activation", "ProtocolClient.refresh", "endpoint replay including gzip/first decode/ordered old comparison/second actor parse", "outer observer", "delivered_peer", "latest_own_capture", "PossessionGate.consume", "received_barrier", "choose_action", "candidate identity check", "C try_typed_bytes", "original fallback writer", "SHA256 of C bytes"],
+    "conservation": "Use one synchronous stack with exact nonnegative integer perf_counter_ns. Inclusive spans are not summed across ancestry. Exclusive elapsed equals parent elapsed minus complete immediate-child elapsed, with explicit clock/recording and unclassified remainder. Store start/end order and interrupted status, verify containment and child disjointness. Report wall, not CPU. Policy waiting, filesystem and Python overhead remain charged.",
+    "records": "Fixed 16384 compact span records and 1024 digest records maximum for the 512-row prefix; overflow is sticky diagnostic failure and abort, never eviction. Store ordinal/owner/activation/path/outcome and scalar timings, not another copy of large ACK trees. Counters carry entered, returned, NotImplemented/fallback and raised separately. Counts are runtime facts, not source upper bounds.",
+    "errors": "Ordinary original rejection type/args and returned envelope identity remain; unsupported alone falls back once. MemoryError, codec errors, trace overflow and unexpected instrumentation errors remain unknown. Original exceptions stay primary; no retry of the underlying call to obtain a nicer measurement.",
+    "journal": "Only setup/exit stage boundaries and one aggregate progress record per 128 selected rows, bounded independently of raw call count. Record exactly whether it is before actor return, after observer return or after activation; never name all three completed. Journal overhead remains inside whole and parent spans."
+  },
+  "focused_source_gate_before_any_actual": [
+    "Inverse AST/code/global/default/closure/MRO checks for every substituted call site and actual observer factory.",
+    "Synthetic direct bytes, NotImplemented once-fallback, original rejection, resource error and logging-failure cases: exact call count/order and no second invocation.",
+    "Nested clocks: boolean/negative/nonmonotone/overlap/start-end straddle rejected; inclusive-exclusive conservation plus interrupted span accounting.",
+    "Prefix input identity, 512th/513th boundary, deliberate BaseException censor not swallowed by policy, no future data read and no H-complete rewrite.",
+    "Actor/observer no-alias and mutation/watermark behavior unchanged; client refresh calls and retry/index behavior unchanged.",
+    "Wrong source, archive, C environment or DLL identity fails before calls; actual entry/exit checks and typed whole budget both required."
+  ],
+  "method_scope": "This is evidence-cost diagnosis only. It neither changes decentralized empty-tray coordination nor improves business throughput. G31 method work must separately demonstrate legal local/delivered information, rolling prediction, real resource guards and normal per-job protection. No universal 39-job bound, all-day completion, 100ms result or paper-derived guarantee follows from this profile design.",
+  "execution": {"new_native": 0, "new_predictor": 0, "new_C_load": 0, "new_profile": 0, "tests_run_for_this_design": 0, "large_raw_reads": 0}
+}

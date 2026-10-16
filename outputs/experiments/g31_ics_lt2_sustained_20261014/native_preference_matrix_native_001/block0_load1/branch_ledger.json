@@ -1,0 +1,4148 @@
+{
+  "block0_load1/vector_00": {
+    "case": {
+      "case_id": "block0_load1",
+      "blocker_load": 0.2,
+      "receiver_load": 5.0
+    },
+    "vector": {
+      "initial_action": "native_default",
+      "empty_departure": 0.11,
+      "return_delay": 0.0,
+      "later_action": "native_default"
+    },
+    "method": "fixed_counterfactual",
+    "fault": null,
+    "status": "assessed",
+    "summary": {
+      "status": "assessed",
+      "completion": {
+        "loaded": 10.270999999999999,
+        "receiver": 8.469999999999999,
+        "reuse1": 15.720999999999995,
+        "reuse2": 21.131000000000004,
+        "blocker": 1.5000000000000002
+      },
+      "completion_sum": 57.093,
+      "business_complete": true,
+      "common_horizon_complete": true,
+      "required_transfer_lineages_received": true,
+      "all_routes_updated": true,
+      "chosen_routes_match_executed_edges": true,
+      "initial_actual_next": 1,
+      "first_reuse_actual_next": 3,
+      "blocker_actual_path1to9": true,
+      "same_L_two_returns_and_two_reloads": true,
+      "stock_preserved": true,
+      "audit": {
+        "status": "passed",
+        "completed_traversals": 16,
+        "open_traversals": 0,
+        "tray_count": 3,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "actual_later_choices": [
+        {
+          "job": "reuse1",
+          "selected_next": null,
+          "actual_next": 3
+        },
+        {
+          "job": "reuse2",
+          "selected_next": 3,
+          "actual_next": 3
+        }
+      ],
+      "supply_attempt_count": 2,
+      "recovered_rejection_count": 1,
+      "recovery_decisions_valid": true,
+      "transfer_acks": [
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 0.12,
+          "delivered_at": 0.13999999999999999,
+          "status": "rejected",
+          "reason": "receiving_full",
+          "received_at": -1.0
+        },
+        {
+          "sequence": 2,
+          "attempt": 2,
+          "observed_at": 1.1700000000000002,
+          "delivered_at": 1.1900000000000002,
+          "status": "received",
+          "reason": "",
+          "received_at": 1.07
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 12.650999999999996,
+          "delivered_at": 12.670999999999996,
+          "status": "received",
+          "reason": "",
+          "received_at": 12.620999999999997
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 18.37,
+          "delivered_at": 18.39,
+          "status": "received",
+          "reason": "",
+          "received_at": 18.030999999999995
+        }
+      ],
+      "route_acks": [
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 18.141,
+          "delivered_at": 18.160999999999998,
+          "executed_at": 18.141,
+          "completed_at": 18.141,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-1"
+        }
+      ],
+      "rolling_model_inputs_verified": true,
+      "rolling_fallback_count": 0,
+      "rolling_action_count": 1,
+      "all_required_inputs_verified": true,
+      "selected_actions_executed": true,
+      "conditional_stability_only": true,
+      "current_state_certified": false,
+      "native_model_protection_certified": false,
+      "online_model_claim": false
+    },
+    "raw_artifact": {
+      "path": "block0_load1/vector_00.json.gz",
+      "sha256": "ad1eaa16b2796126f62683c9c85e2b0ed8f62a4d8d6d0eb4af520655fadae16b",
+      "input_path": "inputs/block0_load1/vector_00.json",
+      "input_sha256": "16c98d62c6b98d0fa059f1d7c752d4fab82b57599b643dcc3b6560a333cb0237"
+    }
+  },
+  "block0_load1/vector_01": {
+    "case": {
+      "case_id": "block0_load1",
+      "blocker_load": 0.2,
+      "receiver_load": 5.0
+    },
+    "vector": {
+      "initial_action": "native_default",
+      "empty_departure": 0.11,
+      "return_delay": 0.0,
+      "later_action": "prefer_8"
+    },
+    "method": "fixed_counterfactual",
+    "fault": null,
+    "status": "assessed",
+    "summary": {
+      "status": "assessed",
+      "completion": {
+        "loaded": 10.270999999999999,
+        "receiver": 8.469999999999999,
+        "reuse1": 15.720999999999995,
+        "reuse2": 21.131000000000004,
+        "blocker": 1.5000000000000002
+      },
+      "completion_sum": 57.093,
+      "business_complete": true,
+      "common_horizon_complete": true,
+      "required_transfer_lineages_received": true,
+      "all_routes_updated": true,
+      "chosen_routes_match_executed_edges": true,
+      "initial_actual_next": 1,
+      "first_reuse_actual_next": 8,
+      "blocker_actual_path1to9": true,
+      "same_L_two_returns_and_two_reloads": true,
+      "stock_preserved": true,
+      "audit": {
+        "status": "passed",
+        "completed_traversals": 16,
+        "open_traversals": 0,
+        "tray_count": 3,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "actual_later_choices": [
+        {
+          "job": "reuse1",
+          "selected_next": 8,
+          "actual_next": 8
+        },
+        {
+          "job": "reuse2",
+          "selected_next": 3,
+          "actual_next": 3
+        }
+      ],
+      "supply_attempt_count": 2,
+      "recovered_rejection_count": 1,
+      "recovery_decisions_valid": true,
+      "transfer_acks": [
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 0.12,
+          "delivered_at": 0.13999999999999999,
+          "status": "rejected",
+          "reason": "receiving_full",
+          "received_at": -1.0
+        },
+        {
+          "sequence": 2,
+          "attempt": 2,
+          "observed_at": 1.1700000000000002,
+          "delivered_at": 1.1900000000000002,
+          "status": "received",
+          "reason": "",
+          "received_at": 1.07
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 12.650999999999996,
+          "delivered_at": 12.670999999999996,
+          "status": "received",
+          "reason": "",
+          "received_at": 12.620999999999997
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 18.37,
+          "delivered_at": 18.39,
+          "status": "received",
+          "reason": "",
+          "received_at": 18.030999999999995
+        }
+      ],
+      "route_acks": [
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 12.770999999999995,
+          "delivered_at": 12.790999999999995,
+          "executed_at": 12.770999999999995,
+          "completed_at": 12.770999999999995,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-0"
+        },
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 18.141,
+          "delivered_at": 18.160999999999998,
+          "executed_at": 18.141,
+          "completed_at": 18.141,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-1"
+        }
+      ],
+      "rolling_model_inputs_verified": true,
+      "rolling_fallback_count": 0,
+      "rolling_action_count": 2,
+      "all_required_inputs_verified": true,
+      "selected_actions_executed": true,
+      "conditional_stability_only": true,
+      "current_state_certified": false,
+      "native_model_protection_certified": false,
+      "online_model_claim": false
+    },
+    "raw_artifact": {
+      "path": "block0_load1/vector_01.json.gz",
+      "sha256": "6e39e89ba1bfd19798a8e7117a01b235dd064b633d75d9eec9de5ccf16db792f",
+      "input_path": "inputs/block0_load1/vector_01.json",
+      "input_sha256": "16c98d62c6b98d0fa059f1d7c752d4fab82b57599b643dcc3b6560a333cb0237"
+    }
+  },
+  "block0_load1/vector_02": {
+    "case": {
+      "case_id": "block0_load1",
+      "blocker_load": 0.2,
+      "receiver_load": 5.0
+    },
+    "vector": {
+      "initial_action": "native_default",
+      "empty_departure": 0.11,
+      "return_delay": 0.5,
+      "later_action": "native_default"
+    },
+    "method": "fixed_counterfactual",
+    "fault": null,
+    "status": "assessed",
+    "summary": {
+      "status": "assessed",
+      "completion": {
+        "loaded": 10.270999999999999,
+        "receiver": 8.469999999999999,
+        "reuse1": 16.211,
+        "reuse2": 21.621000000000013,
+        "blocker": 1.5000000000000002
+      },
+      "completion_sum": 58.07300000000001,
+      "business_complete": true,
+      "common_horizon_complete": true,
+      "required_transfer_lineages_received": true,
+      "all_routes_updated": true,
+      "chosen_routes_match_executed_edges": true,
+      "initial_actual_next": 1,
+      "first_reuse_actual_next": 3,
+      "blocker_actual_path1to9": true,
+      "same_L_two_returns_and_two_reloads": true,
+      "stock_preserved": true,
+      "audit": {
+        "status": "passed",
+        "completed_traversals": 16,
+        "open_traversals": 0,
+        "tray_count": 3,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "actual_later_choices": [
+        {
+          "job": "reuse1",
+          "selected_next": null,
+          "actual_next": 3
+        },
+        {
+          "job": "reuse2",
+          "selected_next": 3,
+          "actual_next": 3
+        }
+      ],
+      "supply_attempt_count": 2,
+      "recovered_rejection_count": 1,
+      "recovery_decisions_valid": true,
+      "transfer_acks": [
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 0.12,
+          "delivered_at": 0.13999999999999999,
+          "status": "rejected",
+          "reason": "receiving_full",
+          "received_at": -1.0
+        },
+        {
+          "sequence": 2,
+          "attempt": 2,
+          "observed_at": 1.1700000000000002,
+          "delivered_at": 1.1900000000000002,
+          "status": "received",
+          "reason": "",
+          "received_at": 1.07
+        },
+        {
+          "sequence": 7,
+          "attempt": 7,
+          "observed_at": 13.140999999999996,
+          "delivered_at": 13.160999999999996,
+          "status": "received",
+          "reason": "",
+          "received_at": 13.110999999999997
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 18.87,
+          "delivered_at": 18.89,
+          "status": "received",
+          "reason": "",
+          "received_at": 18.521000000000004
+        }
+      ],
+      "route_acks": [
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 18.631000000000007,
+          "delivered_at": 18.651000000000007,
+          "executed_at": 18.631000000000007,
+          "completed_at": 18.631000000000007,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-1"
+        }
+      ],
+      "rolling_model_inputs_verified": true,
+      "rolling_fallback_count": 0,
+      "rolling_action_count": 1,
+      "all_required_inputs_verified": true,
+      "selected_actions_executed": true,
+      "conditional_stability_only": true,
+      "current_state_certified": false,
+      "native_model_protection_certified": false,
+      "online_model_claim": false
+    },
+    "raw_artifact": {
+      "path": "block0_load1/vector_02.json.gz",
+      "sha256": "e72ea13dc841ba9149eb76d1092ed55d1f51e79f84755c05bc3949392bb69f86",
+      "input_path": "inputs/block0_load1/vector_02.json",
+      "input_sha256": "16c98d62c6b98d0fa059f1d7c752d4fab82b57599b643dcc3b6560a333cb0237"
+    }
+  },
+  "block0_load1/vector_03": {
+    "case": {
+      "case_id": "block0_load1",
+      "blocker_load": 0.2,
+      "receiver_load": 5.0
+    },
+    "vector": {
+      "initial_action": "native_default",
+      "empty_departure": 0.11,
+      "return_delay": 0.5,
+      "later_action": "prefer_8"
+    },
+    "method": "fixed_counterfactual",
+    "fault": null,
+    "status": "assessed",
+    "summary": {
+      "status": "assessed",
+      "completion": {
+        "loaded": 10.270999999999999,
+        "receiver": 8.469999999999999,
+        "reuse1": 16.211,
+        "reuse2": 21.621000000000013,
+        "blocker": 1.5000000000000002
+      },
+      "completion_sum": 58.07300000000001,
+      "business_complete": true,
+      "common_horizon_complete": true,
+      "required_transfer_lineages_received": true,
+      "all_routes_updated": true,
+      "chosen_routes_match_executed_edges": true,
+      "initial_actual_next": 1,
+      "first_reuse_actual_next": 8,
+      "blocker_actual_path1to9": true,
+      "same_L_two_returns_and_two_reloads": true,
+      "stock_preserved": true,
+      "audit": {
+        "status": "passed",
+        "completed_traversals": 16,
+        "open_traversals": 0,
+        "tray_count": 3,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "actual_later_choices": [
+        {
+          "job": "reuse1",
+          "selected_next": 8,
+          "actual_next": 8
+        },
+        {
+          "job": "reuse2",
+          "selected_next": 3,
+          "actual_next": 3
+        }
+      ],
+      "supply_attempt_count": 2,
+      "recovered_rejection_count": 1,
+      "recovery_decisions_valid": true,
+      "transfer_acks": [
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 0.12,
+          "delivered_at": 0.13999999999999999,
+          "status": "rejected",
+          "reason": "receiving_full",
+          "received_at": -1.0
+        },
+        {
+          "sequence": 2,
+          "attempt": 2,
+          "observed_at": 1.1700000000000002,
+          "delivered_at": 1.1900000000000002,
+          "status": "received",
+          "reason": "",
+          "received_at": 1.07
+        },
+        {
+          "sequence": 7,
+          "attempt": 7,
+          "observed_at": 13.140999999999996,
+          "delivered_at": 13.160999999999996,
+          "status": "received",
+          "reason": "",
+          "received_at": 13.110999999999997
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 18.87,
+          "delivered_at": 18.89,
+          "status": "received",
+          "reason": "",
+          "received_at": 18.521000000000004
+        }
+      ],
+      "route_acks": [
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 13.260999999999996,
+          "delivered_at": 13.280999999999995,
+          "executed_at": 13.260999999999996,
+          "completed_at": 13.260999999999996,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-0"
+        },
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 18.631000000000007,
+          "delivered_at": 18.651000000000007,
+          "executed_at": 18.631000000000007,
+          "completed_at": 18.631000000000007,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-1"
+        }
+      ],
+      "rolling_model_inputs_verified": true,
+      "rolling_fallback_count": 0,
+      "rolling_action_count": 2,
+      "all_required_inputs_verified": true,
+      "selected_actions_executed": true,
+      "conditional_stability_only": true,
+      "current_state_certified": false,
+      "native_model_protection_certified": false,
+      "online_model_claim": false
+    },
+    "raw_artifact": {
+      "path": "block0_load1/vector_03.json.gz",
+      "sha256": "9650c560f4af2d9d04119b7671e89b35a52014c6de27afb51e7898a5f7c24395",
+      "input_path": "inputs/block0_load1/vector_03.json",
+      "input_sha256": "16c98d62c6b98d0fa059f1d7c752d4fab82b57599b643dcc3b6560a333cb0237"
+    }
+  },
+  "block0_load1/vector_04": {
+    "case": {
+      "case_id": "block0_load1",
+      "blocker_load": 0.2,
+      "receiver_load": 5.0
+    },
+    "vector": {
+      "initial_action": "native_default",
+      "empty_departure": 0.30100000000000005,
+      "return_delay": 0.0,
+      "later_action": "native_default"
+    },
+    "method": "fixed_counterfactual",
+    "fault": null,
+    "status": "assessed",
+    "summary": {
+      "status": "assessed",
+      "completion": {
+        "loaded": 9.901999999999997,
+        "receiver": 8.100999999999999,
+        "reuse1": 15.351999999999993,
+        "reuse2": 20.762,
+        "blocker": 1.5000000000000002
+      },
+      "completion_sum": 55.61699999999999,
+      "business_complete": true,
+      "common_horizon_complete": true,
+      "required_transfer_lineages_received": true,
+      "all_routes_updated": true,
+      "chosen_routes_match_executed_edges": true,
+      "initial_actual_next": 1,
+      "first_reuse_actual_next": 3,
+      "blocker_actual_path1to9": true,
+      "same_L_two_returns_and_two_reloads": true,
+      "stock_preserved": true,
+      "audit": {
+        "status": "passed",
+        "completed_traversals": 16,
+        "open_traversals": 0,
+        "tray_count": 3,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "actual_later_choices": [
+        {
+          "job": "reuse1",
+          "selected_next": null,
+          "actual_next": 3
+        },
+        {
+          "job": "reuse2",
+          "selected_next": 3,
+          "actual_next": 3
+        }
+      ],
+      "supply_attempt_count": 1,
+      "recovered_rejection_count": 0,
+      "recovery_decisions_valid": true,
+      "transfer_acks": [
+        {
+          "sequence": 3,
+          "attempt": 3,
+          "observed_at": 1.12,
+          "delivered_at": 1.1400000000000001,
+          "status": "received",
+          "reason": "",
+          "received_at": 0.701
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 12.281999999999995,
+          "delivered_at": 12.301999999999994,
+          "status": "received",
+          "reason": "",
+          "received_at": 12.251999999999995
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 17.970000000000002,
+          "delivered_at": 17.990000000000002,
+          "status": "received",
+          "reason": "",
+          "received_at": 17.661999999999992
+        }
+      ],
+      "route_acks": [
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 17.771999999999995,
+          "delivered_at": 17.791999999999994,
+          "executed_at": 17.771999999999995,
+          "completed_at": 17.771999999999995,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-1"
+        }
+      ],
+      "rolling_model_inputs_verified": true,
+      "rolling_fallback_count": 0,
+      "rolling_action_count": 1,
+      "all_required_inputs_verified": true,
+      "selected_actions_executed": true,
+      "conditional_stability_only": true,
+      "current_state_certified": false,
+      "native_model_protection_certified": false,
+      "online_model_claim": false
+    },
+    "raw_artifact": {
+      "path": "block0_load1/vector_04.json.gz",
+      "sha256": "98969d9aa277f27c333ba1f24603b8f0283c6e370e92472318989bd8be10d45d",
+      "input_path": "inputs/block0_load1/vector_04.json",
+      "input_sha256": "16c98d62c6b98d0fa059f1d7c752d4fab82b57599b643dcc3b6560a333cb0237"
+    }
+  },
+  "block0_load1/vector_05": {
+    "case": {
+      "case_id": "block0_load1",
+      "blocker_load": 0.2,
+      "receiver_load": 5.0
+    },
+    "vector": {
+      "initial_action": "native_default",
+      "empty_departure": 0.30100000000000005,
+      "return_delay": 0.0,
+      "later_action": "prefer_8"
+    },
+    "method": "fixed_counterfactual",
+    "fault": null,
+    "status": "assessed",
+    "summary": {
+      "status": "assessed",
+      "completion": {
+        "loaded": 9.901999999999997,
+        "receiver": 8.100999999999999,
+        "reuse1": 15.351999999999993,
+        "reuse2": 20.762,
+        "blocker": 1.5000000000000002
+      },
+      "completion_sum": 55.61699999999999,
+      "business_complete": true,
+      "common_horizon_complete": true,
+      "required_transfer_lineages_received": true,
+      "all_routes_updated": true,
+      "chosen_routes_match_executed_edges": true,
+      "initial_actual_next": 1,
+      "first_reuse_actual_next": 8,
+      "blocker_actual_path1to9": true,
+      "same_L_two_returns_and_two_reloads": true,
+      "stock_preserved": true,
+      "audit": {
+        "status": "passed",
+        "completed_traversals": 16,
+        "open_traversals": 0,
+        "tray_count": 3,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "actual_later_choices": [
+        {
+          "job": "reuse1",
+          "selected_next": 8,
+          "actual_next": 8
+        },
+        {
+          "job": "reuse2",
+          "selected_next": 3,
+          "actual_next": 3
+        }
+      ],
+      "supply_attempt_count": 1,
+      "recovered_rejection_count": 0,
+      "recovery_decisions_valid": true,
+      "transfer_acks": [
+        {
+          "sequence": 3,
+          "attempt": 3,
+          "observed_at": 1.12,
+          "delivered_at": 1.1400000000000001,
+          "status": "received",
+          "reason": "",
+          "received_at": 0.701
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 12.281999999999995,
+          "delivered_at": 12.301999999999994,
+          "status": "received",
+          "reason": "",
+          "received_at": 12.251999999999995
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 17.970000000000002,
+          "delivered_at": 17.990000000000002,
+          "status": "received",
+          "reason": "",
+          "received_at": 17.661999999999992
+        }
+      ],
+      "route_acks": [
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 12.401999999999994,
+          "delivered_at": 12.421999999999993,
+          "executed_at": 12.401999999999994,
+          "completed_at": 12.401999999999994,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-0"
+        },
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 17.771999999999995,
+          "delivered_at": 17.791999999999994,
+          "executed_at": 17.771999999999995,
+          "completed_at": 17.771999999999995,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-1"
+        }
+      ],
+      "rolling_model_inputs_verified": true,
+      "rolling_fallback_count": 0,
+      "rolling_action_count": 2,
+      "all_required_inputs_verified": true,
+      "selected_actions_executed": true,
+      "conditional_stability_only": true,
+      "current_state_certified": false,
+      "native_model_protection_certified": false,
+      "online_model_claim": false
+    },
+    "raw_artifact": {
+      "path": "block0_load1/vector_05.json.gz",
+      "sha256": "0046ee85ebc765d3d32fd22d1da463d17b3f0224f3de1afeae931c66a0e8e43a",
+      "input_path": "inputs/block0_load1/vector_05.json",
+      "input_sha256": "16c98d62c6b98d0fa059f1d7c752d4fab82b57599b643dcc3b6560a333cb0237"
+    }
+  },
+  "block0_load1/vector_06": {
+    "case": {
+      "case_id": "block0_load1",
+      "blocker_load": 0.2,
+      "receiver_load": 5.0
+    },
+    "vector": {
+      "initial_action": "native_default",
+      "empty_departure": 0.30100000000000005,
+      "return_delay": 0.5,
+      "later_action": "native_default"
+    },
+    "method": "fixed_counterfactual",
+    "fault": null,
+    "status": "assessed",
+    "summary": {
+      "status": "assessed",
+      "completion": {
+        "loaded": 9.901999999999997,
+        "receiver": 8.100999999999999,
+        "reuse1": 15.841999999999993,
+        "reuse2": 21.252000000000002,
+        "blocker": 1.5000000000000002
+      },
+      "completion_sum": 56.596999999999994,
+      "business_complete": true,
+      "common_horizon_complete": true,
+      "required_transfer_lineages_received": true,
+      "all_routes_updated": true,
+      "chosen_routes_match_executed_edges": true,
+      "initial_actual_next": 1,
+      "first_reuse_actual_next": 3,
+      "blocker_actual_path1to9": true,
+      "same_L_two_returns_and_two_reloads": true,
+      "stock_preserved": true,
+      "audit": {
+        "status": "passed",
+        "completed_traversals": 16,
+        "open_traversals": 0,
+        "tray_count": 3,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "actual_later_choices": [
+        {
+          "job": "reuse1",
+          "selected_next": null,
+          "actual_next": 3
+        },
+        {
+          "job": "reuse2",
+          "selected_next": 3,
+          "actual_next": 3
+        }
+      ],
+      "supply_attempt_count": 1,
+      "recovered_rejection_count": 0,
+      "recovery_decisions_valid": true,
+      "transfer_acks": [
+        {
+          "sequence": 3,
+          "attempt": 3,
+          "observed_at": 1.12,
+          "delivered_at": 1.1400000000000001,
+          "status": "received",
+          "reason": "",
+          "received_at": 0.701
+        },
+        {
+          "sequence": 7,
+          "attempt": 7,
+          "observed_at": 12.771999999999995,
+          "delivered_at": 12.791999999999994,
+          "status": "received",
+          "reason": "",
+          "received_at": 12.741999999999996
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 18.470000000000002,
+          "delivered_at": 18.490000000000002,
+          "status": "received",
+          "reason": "",
+          "received_at": 18.151999999999994
+        }
+      ],
+      "route_acks": [
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 18.261999999999997,
+          "delivered_at": 18.281999999999996,
+          "executed_at": 18.261999999999997,
+          "completed_at": 18.261999999999997,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-1"
+        }
+      ],
+      "rolling_model_inputs_verified": true,
+      "rolling_fallback_count": 0,
+      "rolling_action_count": 1,
+      "all_required_inputs_verified": true,
+      "selected_actions_executed": true,
+      "conditional_stability_only": true,
+      "current_state_certified": false,
+      "native_model_protection_certified": false,
+      "online_model_claim": false
+    },
+    "raw_artifact": {
+      "path": "block0_load1/vector_06.json.gz",
+      "sha256": "764b2c86ada1b64c4b0d58f7aa7f3ac9e3185b1c46c26b96bf081f81e5d0b8c6",
+      "input_path": "inputs/block0_load1/vector_06.json",
+      "input_sha256": "16c98d62c6b98d0fa059f1d7c752d4fab82b57599b643dcc3b6560a333cb0237"
+    }
+  },
+  "block0_load1/vector_07": {
+    "case": {
+      "case_id": "block0_load1",
+      "blocker_load": 0.2,
+      "receiver_load": 5.0
+    },
+    "vector": {
+      "initial_action": "native_default",
+      "empty_departure": 0.30100000000000005,
+      "return_delay": 0.5,
+      "later_action": "prefer_8"
+    },
+    "method": "fixed_counterfactual",
+    "fault": null,
+    "status": "assessed",
+    "summary": {
+      "status": "assessed",
+      "completion": {
+        "loaded": 9.901999999999997,
+        "receiver": 8.100999999999999,
+        "reuse1": 15.841999999999993,
+        "reuse2": 21.252000000000002,
+        "blocker": 1.5000000000000002
+      },
+      "completion_sum": 56.596999999999994,
+      "business_complete": true,
+      "common_horizon_complete": true,
+      "required_transfer_lineages_received": true,
+      "all_routes_updated": true,
+      "chosen_routes_match_executed_edges": true,
+      "initial_actual_next": 1,
+      "first_reuse_actual_next": 8,
+      "blocker_actual_path1to9": true,
+      "same_L_two_returns_and_two_reloads": true,
+      "stock_preserved": true,
+      "audit": {
+        "status": "passed",
+        "completed_traversals": 16,
+        "open_traversals": 0,
+        "tray_count": 3,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "actual_later_choices": [
+        {
+          "job": "reuse1",
+          "selected_next": 8,
+          "actual_next": 8
+        },
+        {
+          "job": "reuse2",
+          "selected_next": 3,
+          "actual_next": 3
+        }
+      ],
+      "supply_attempt_count": 1,
+      "recovered_rejection_count": 0,
+      "recovery_decisions_valid": true,
+      "transfer_acks": [
+        {
+          "sequence": 3,
+          "attempt": 3,
+          "observed_at": 1.12,
+          "delivered_at": 1.1400000000000001,
+          "status": "received",
+          "reason": "",
+          "received_at": 0.701
+        },
+        {
+          "sequence": 7,
+          "attempt": 7,
+          "observed_at": 12.771999999999995,
+          "delivered_at": 12.791999999999994,
+          "status": "received",
+          "reason": "",
+          "received_at": 12.741999999999996
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 18.470000000000002,
+          "delivered_at": 18.490000000000002,
+          "status": "received",
+          "reason": "",
+          "received_at": 18.151999999999994
+        }
+      ],
+      "route_acks": [
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 12.891999999999994,
+          "delivered_at": 12.911999999999994,
+          "executed_at": 12.891999999999994,
+          "completed_at": 12.891999999999994,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-0"
+        },
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 18.261999999999997,
+          "delivered_at": 18.281999999999996,
+          "executed_at": 18.261999999999997,
+          "completed_at": 18.261999999999997,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-1"
+        }
+      ],
+      "rolling_model_inputs_verified": true,
+      "rolling_fallback_count": 0,
+      "rolling_action_count": 2,
+      "all_required_inputs_verified": true,
+      "selected_actions_executed": true,
+      "conditional_stability_only": true,
+      "current_state_certified": false,
+      "native_model_protection_certified": false,
+      "online_model_claim": false
+    },
+    "raw_artifact": {
+      "path": "block0_load1/vector_07.json.gz",
+      "sha256": "470dc004d9c4170a581c8f3251729e7e9e09a8322c021c7160f2c1a1dffdaade",
+      "input_path": "inputs/block0_load1/vector_07.json",
+      "input_sha256": "16c98d62c6b98d0fa059f1d7c752d4fab82b57599b643dcc3b6560a333cb0237"
+    }
+  },
+  "block0_load1/vector_08": {
+    "case": {
+      "case_id": "block0_load1",
+      "blocker_load": 0.2,
+      "receiver_load": 5.0
+    },
+    "vector": {
+      "initial_action": "native_default",
+      "empty_departure": 2.201,
+      "return_delay": 0.0,
+      "later_action": "native_default"
+    },
+    "method": "fixed_counterfactual",
+    "fault": null,
+    "status": "unknown_missing_input_or_unexecuted_counterfactual",
+    "summary": {
+      "status": "unknown_missing_input_or_unexecuted_counterfactual",
+      "completion": {
+        "loaded": 5.199999999999999,
+        "receiver": 10.001,
+        "reuse1": 10.649999999999995,
+        "reuse2": 16.05999999999999,
+        "blocker": 1.5000000000000002
+      },
+      "completion_sum": 43.41099999999999,
+      "business_complete": true,
+      "common_horizon_complete": true,
+      "required_transfer_lineages_received": true,
+      "all_routes_updated": true,
+      "chosen_routes_match_executed_edges": true,
+      "initial_actual_next": 1,
+      "first_reuse_actual_next": 8,
+      "blocker_actual_path1to9": true,
+      "same_L_two_returns_and_two_reloads": true,
+      "stock_preserved": true,
+      "audit": {
+        "status": "passed",
+        "completed_traversals": 16,
+        "open_traversals": 0,
+        "tray_count": 3,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "actual_later_choices": [
+        {
+          "job": "reuse1",
+          "selected_next": null,
+          "actual_next": 8
+        },
+        {
+          "job": "reuse2",
+          "selected_next": 3,
+          "actual_next": 3
+        }
+      ],
+      "supply_attempt_count": 1,
+      "recovered_rejection_count": 0,
+      "recovery_decisions_valid": true,
+      "transfer_acks": [
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 2.67,
+          "delivered_at": 2.69,
+          "status": "received",
+          "reason": "",
+          "received_at": 2.6010000000000004
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 7.5799999999999965,
+          "delivered_at": 7.599999999999996,
+          "status": "received",
+          "reason": "",
+          "received_at": 7.549999999999997
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 13.27,
+          "delivered_at": 13.29,
+          "status": "received",
+          "reason": "",
+          "received_at": 12.959999999999994
+        }
+      ],
+      "route_acks": [
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 13.069999999999993,
+          "delivered_at": 13.089999999999993,
+          "executed_at": 13.069999999999993,
+          "completed_at": 13.069999999999993,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-1"
+        }
+      ],
+      "rolling_model_inputs_verified": false,
+      "rolling_fallback_count": 1,
+      "rolling_action_count": 1,
+      "all_required_inputs_verified": false,
+      "selected_actions_executed": false,
+      "conditional_stability_only": true,
+      "current_state_certified": false,
+      "native_model_protection_certified": false,
+      "online_model_claim": false
+    },
+    "raw_artifact": {
+      "path": "block0_load1/vector_08.json.gz",
+      "sha256": "6af4465a529786c2227dc22db62f7150c323b79475aff1689bd3a6f40b91e1f3",
+      "input_path": "inputs/block0_load1/vector_08.json",
+      "input_sha256": "16c98d62c6b98d0fa059f1d7c752d4fab82b57599b643dcc3b6560a333cb0237"
+    }
+  },
+  "block0_load1/vector_09": {
+    "case": {
+      "case_id": "block0_load1",
+      "blocker_load": 0.2,
+      "receiver_load": 5.0
+    },
+    "vector": {
+      "initial_action": "native_default",
+      "empty_departure": 2.201,
+      "return_delay": 0.0,
+      "later_action": "prefer_8"
+    },
+    "method": "fixed_counterfactual",
+    "fault": null,
+    "status": "unknown_missing_input_or_unexecuted_counterfactual",
+    "summary": {
+      "status": "unknown_missing_input_or_unexecuted_counterfactual",
+      "completion": {
+        "loaded": 5.199999999999999,
+        "receiver": 10.001,
+        "reuse1": 10.649999999999995,
+        "reuse2": 16.05999999999999,
+        "blocker": 1.5000000000000002
+      },
+      "completion_sum": 43.41099999999999,
+      "business_complete": true,
+      "common_horizon_complete": true,
+      "required_transfer_lineages_received": true,
+      "all_routes_updated": true,
+      "chosen_routes_match_executed_edges": false,
+      "initial_actual_next": 1,
+      "first_reuse_actual_next": 8,
+      "blocker_actual_path1to9": true,
+      "same_L_two_returns_and_two_reloads": true,
+      "stock_preserved": true,
+      "audit": {
+        "status": "passed",
+        "completed_traversals": 16,
+        "open_traversals": 0,
+        "tray_count": 3,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "actual_later_choices": [
+        {
+          "job": "reuse1",
+          "selected_next": null,
+          "actual_next": 8
+        },
+        {
+          "job": "reuse2",
+          "selected_next": 3,
+          "actual_next": 3
+        }
+      ],
+      "supply_attempt_count": 1,
+      "recovered_rejection_count": 0,
+      "recovery_decisions_valid": true,
+      "transfer_acks": [
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 2.67,
+          "delivered_at": 2.69,
+          "status": "received",
+          "reason": "",
+          "received_at": 2.6010000000000004
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 7.5799999999999965,
+          "delivered_at": 7.599999999999996,
+          "status": "received",
+          "reason": "",
+          "received_at": 7.549999999999997
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 13.27,
+          "delivered_at": 13.29,
+          "status": "received",
+          "reason": "",
+          "received_at": 12.959999999999994
+        }
+      ],
+      "route_acks": [
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 13.069999999999993,
+          "delivered_at": 13.089999999999993,
+          "executed_at": 13.069999999999993,
+          "completed_at": 13.069999999999993,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-1"
+        }
+      ],
+      "rolling_model_inputs_verified": false,
+      "rolling_fallback_count": 1,
+      "rolling_action_count": 1,
+      "all_required_inputs_verified": false,
+      "selected_actions_executed": false,
+      "conditional_stability_only": true,
+      "current_state_certified": false,
+      "native_model_protection_certified": false,
+      "online_model_claim": false
+    },
+    "raw_artifact": {
+      "path": "block0_load1/vector_09.json.gz",
+      "sha256": "ca5ec13923499318f156d68ea938ef88907f56017dde8ea18c76cefa53600d98",
+      "input_path": "inputs/block0_load1/vector_09.json",
+      "input_sha256": "16c98d62c6b98d0fa059f1d7c752d4fab82b57599b643dcc3b6560a333cb0237"
+    }
+  },
+  "block0_load1/vector_10": {
+    "case": {
+      "case_id": "block0_load1",
+      "blocker_load": 0.2,
+      "receiver_load": 5.0
+    },
+    "vector": {
+      "initial_action": "native_default",
+      "empty_departure": 2.201,
+      "return_delay": 0.5,
+      "later_action": "native_default"
+    },
+    "method": "fixed_counterfactual",
+    "fault": null,
+    "status": "assessed",
+    "summary": {
+      "status": "assessed",
+      "completion": {
+        "loaded": 5.199999999999999,
+        "receiver": 10.001,
+        "reuse1": 11.139999999999995,
+        "reuse2": 16.549999999999997,
+        "blocker": 1.5000000000000002
+      },
+      "completion_sum": 44.39099999999999,
+      "business_complete": true,
+      "common_horizon_complete": true,
+      "required_transfer_lineages_received": true,
+      "all_routes_updated": true,
+      "chosen_routes_match_executed_edges": true,
+      "initial_actual_next": 1,
+      "first_reuse_actual_next": 8,
+      "blocker_actual_path1to9": true,
+      "same_L_two_returns_and_two_reloads": true,
+      "stock_preserved": true,
+      "audit": {
+        "status": "passed",
+        "completed_traversals": 16,
+        "open_traversals": 0,
+        "tray_count": 3,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "actual_later_choices": [
+        {
+          "job": "reuse1",
+          "selected_next": null,
+          "actual_next": 8
+        },
+        {
+          "job": "reuse2",
+          "selected_next": 3,
+          "actual_next": 3
+        }
+      ],
+      "supply_attempt_count": 1,
+      "recovered_rejection_count": 0,
+      "recovery_decisions_valid": true,
+      "transfer_acks": [
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 2.67,
+          "delivered_at": 2.69,
+          "status": "received",
+          "reason": "",
+          "received_at": 2.6010000000000004
+        },
+        {
+          "sequence": 7,
+          "attempt": 7,
+          "observed_at": 8.069999999999997,
+          "delivered_at": 8.089999999999996,
+          "status": "received",
+          "reason": "",
+          "received_at": 8.039999999999997
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 13.77,
+          "delivered_at": 13.79,
+          "status": "received",
+          "reason": "",
+          "received_at": 13.449999999999994
+        }
+      ],
+      "route_acks": [
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 13.559999999999993,
+          "delivered_at": 13.579999999999993,
+          "executed_at": 13.559999999999993,
+          "completed_at": 13.559999999999993,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-1"
+        }
+      ],
+      "rolling_model_inputs_verified": true,
+      "rolling_fallback_count": 0,
+      "rolling_action_count": 1,
+      "all_required_inputs_verified": true,
+      "selected_actions_executed": true,
+      "conditional_stability_only": true,
+      "current_state_certified": false,
+      "native_model_protection_certified": false,
+      "online_model_claim": false
+    },
+    "raw_artifact": {
+      "path": "block0_load1/vector_10.json.gz",
+      "sha256": "29426fda90710da8da841880733ab5b506a13f18204ce7faa1984c6ff9783ce0",
+      "input_path": "inputs/block0_load1/vector_10.json",
+      "input_sha256": "16c98d62c6b98d0fa059f1d7c752d4fab82b57599b643dcc3b6560a333cb0237"
+    }
+  },
+  "block0_load1/vector_11": {
+    "case": {
+      "case_id": "block0_load1",
+      "blocker_load": 0.2,
+      "receiver_load": 5.0
+    },
+    "vector": {
+      "initial_action": "native_default",
+      "empty_departure": 2.201,
+      "return_delay": 0.5,
+      "later_action": "prefer_8"
+    },
+    "method": "fixed_counterfactual",
+    "fault": null,
+    "status": "assessed",
+    "summary": {
+      "status": "assessed",
+      "completion": {
+        "loaded": 5.199999999999999,
+        "receiver": 10.001,
+        "reuse1": 11.139999999999995,
+        "reuse2": 16.549999999999997,
+        "blocker": 1.5000000000000002
+      },
+      "completion_sum": 44.39099999999999,
+      "business_complete": true,
+      "common_horizon_complete": true,
+      "required_transfer_lineages_received": true,
+      "all_routes_updated": true,
+      "chosen_routes_match_executed_edges": true,
+      "initial_actual_next": 1,
+      "first_reuse_actual_next": 8,
+      "blocker_actual_path1to9": true,
+      "same_L_two_returns_and_two_reloads": true,
+      "stock_preserved": true,
+      "audit": {
+        "status": "passed",
+        "completed_traversals": 16,
+        "open_traversals": 0,
+        "tray_count": 3,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "actual_later_choices": [
+        {
+          "job": "reuse1",
+          "selected_next": 8,
+          "actual_next": 8
+        },
+        {
+          "job": "reuse2",
+          "selected_next": 3,
+          "actual_next": 3
+        }
+      ],
+      "supply_attempt_count": 1,
+      "recovered_rejection_count": 0,
+      "recovery_decisions_valid": true,
+      "transfer_acks": [
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 2.67,
+          "delivered_at": 2.69,
+          "status": "received",
+          "reason": "",
+          "received_at": 2.6010000000000004
+        },
+        {
+          "sequence": 7,
+          "attempt": 7,
+          "observed_at": 8.069999999999997,
+          "delivered_at": 8.089999999999996,
+          "status": "received",
+          "reason": "",
+          "received_at": 8.039999999999997
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 13.77,
+          "delivered_at": 13.79,
+          "status": "received",
+          "reason": "",
+          "received_at": 13.449999999999994
+        }
+      ],
+      "route_acks": [
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 8.189999999999996,
+          "delivered_at": 8.209999999999996,
+          "executed_at": 8.189999999999996,
+          "completed_at": 8.189999999999996,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-0"
+        },
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 13.559999999999993,
+          "delivered_at": 13.579999999999993,
+          "executed_at": 13.559999999999993,
+          "completed_at": 13.559999999999993,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-1"
+        }
+      ],
+      "rolling_model_inputs_verified": true,
+      "rolling_fallback_count": 0,
+      "rolling_action_count": 2,
+      "all_required_inputs_verified": true,
+      "selected_actions_executed": true,
+      "conditional_stability_only": true,
+      "current_state_certified": false,
+      "native_model_protection_certified": false,
+      "online_model_claim": false
+    },
+    "raw_artifact": {
+      "path": "block0_load1/vector_11.json.gz",
+      "sha256": "0271d05a61a3820fe3d0f25732753a044c5991577c1ca102a6b5324198f6c790",
+      "input_path": "inputs/block0_load1/vector_11.json",
+      "input_sha256": "16c98d62c6b98d0fa059f1d7c752d4fab82b57599b643dcc3b6560a333cb0237"
+    }
+  },
+  "block0_load1/vector_12": {
+    "case": {
+      "case_id": "block0_load1",
+      "blocker_load": 0.2,
+      "receiver_load": 5.0
+    },
+    "vector": {
+      "initial_action": "native_default",
+      "empty_departure": 2.2100000000000004,
+      "return_delay": 0.0,
+      "later_action": "native_default"
+    },
+    "method": "fixed_counterfactual",
+    "fault": null,
+    "status": "unknown_missing_input_or_unexecuted_counterfactual",
+    "summary": {
+      "status": "unknown_missing_input_or_unexecuted_counterfactual",
+      "completion": {
+        "loaded": 5.199999999999999,
+        "receiver": 10.01,
+        "reuse1": 10.649999999999995,
+        "reuse2": 16.05999999999999,
+        "blocker": 1.5000000000000002
+      },
+      "completion_sum": 43.41999999999999,
+      "business_complete": true,
+      "common_horizon_complete": true,
+      "required_transfer_lineages_received": true,
+      "all_routes_updated": true,
+      "chosen_routes_match_executed_edges": true,
+      "initial_actual_next": 1,
+      "first_reuse_actual_next": 8,
+      "blocker_actual_path1to9": true,
+      "same_L_two_returns_and_two_reloads": true,
+      "stock_preserved": true,
+      "audit": {
+        "status": "passed",
+        "completed_traversals": 16,
+        "open_traversals": 0,
+        "tray_count": 3,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "actual_later_choices": [
+        {
+          "job": "reuse1",
+          "selected_next": null,
+          "actual_next": 8
+        },
+        {
+          "job": "reuse2",
+          "selected_next": 3,
+          "actual_next": 3
+        }
+      ],
+      "supply_attempt_count": 1,
+      "recovered_rejection_count": 0,
+      "recovery_decisions_valid": true,
+      "transfer_acks": [
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 2.67,
+          "delivered_at": 2.69,
+          "status": "received",
+          "reason": "",
+          "received_at": 2.6100000000000008
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 7.5799999999999965,
+          "delivered_at": 7.599999999999996,
+          "status": "received",
+          "reason": "",
+          "received_at": 7.549999999999997
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 13.27,
+          "delivered_at": 13.29,
+          "status": "received",
+          "reason": "",
+          "received_at": 12.959999999999994
+        }
+      ],
+      "route_acks": [
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 13.069999999999993,
+          "delivered_at": 13.089999999999993,
+          "executed_at": 13.069999999999993,
+          "completed_at": 13.069999999999993,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-1"
+        }
+      ],
+      "rolling_model_inputs_verified": false,
+      "rolling_fallback_count": 1,
+      "rolling_action_count": 1,
+      "all_required_inputs_verified": false,
+      "selected_actions_executed": false,
+      "conditional_stability_only": true,
+      "current_state_certified": false,
+      "native_model_protection_certified": false,
+      "online_model_claim": false
+    },
+    "raw_artifact": {
+      "path": "block0_load1/vector_12.json.gz",
+      "sha256": "0843d45573d4b2382fd6d7dbe6710c4645000b346a6fed8a0947cde9f9bc12e3",
+      "input_path": "inputs/block0_load1/vector_12.json",
+      "input_sha256": "16c98d62c6b98d0fa059f1d7c752d4fab82b57599b643dcc3b6560a333cb0237"
+    }
+  },
+  "block0_load1/vector_13": {
+    "case": {
+      "case_id": "block0_load1",
+      "blocker_load": 0.2,
+      "receiver_load": 5.0
+    },
+    "vector": {
+      "initial_action": "native_default",
+      "empty_departure": 2.2100000000000004,
+      "return_delay": 0.0,
+      "later_action": "prefer_8"
+    },
+    "method": "fixed_counterfactual",
+    "fault": null,
+    "status": "unknown_missing_input_or_unexecuted_counterfactual",
+    "summary": {
+      "status": "unknown_missing_input_or_unexecuted_counterfactual",
+      "completion": {
+        "loaded": 5.199999999999999,
+        "receiver": 10.01,
+        "reuse1": 10.649999999999995,
+        "reuse2": 16.05999999999999,
+        "blocker": 1.5000000000000002
+      },
+      "completion_sum": 43.41999999999999,
+      "business_complete": true,
+      "common_horizon_complete": true,
+      "required_transfer_lineages_received": true,
+      "all_routes_updated": true,
+      "chosen_routes_match_executed_edges": false,
+      "initial_actual_next": 1,
+      "first_reuse_actual_next": 8,
+      "blocker_actual_path1to9": true,
+      "same_L_two_returns_and_two_reloads": true,
+      "stock_preserved": true,
+      "audit": {
+        "status": "passed",
+        "completed_traversals": 16,
+        "open_traversals": 0,
+        "tray_count": 3,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "actual_later_choices": [
+        {
+          "job": "reuse1",
+          "selected_next": null,
+          "actual_next": 8
+        },
+        {
+          "job": "reuse2",
+          "selected_next": 3,
+          "actual_next": 3
+        }
+      ],
+      "supply_attempt_count": 1,
+      "recovered_rejection_count": 0,
+      "recovery_decisions_valid": true,
+      "transfer_acks": [
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 2.67,
+          "delivered_at": 2.69,
+          "status": "received",
+          "reason": "",
+          "received_at": 2.6100000000000008
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 7.5799999999999965,
+          "delivered_at": 7.599999999999996,
+          "status": "received",
+          "reason": "",
+          "received_at": 7.549999999999997
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 13.27,
+          "delivered_at": 13.29,
+          "status": "received",
+          "reason": "",
+          "received_at": 12.959999999999994
+        }
+      ],
+      "route_acks": [
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 13.069999999999993,
+          "delivered_at": 13.089999999999993,
+          "executed_at": 13.069999999999993,
+          "completed_at": 13.069999999999993,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-1"
+        }
+      ],
+      "rolling_model_inputs_verified": false,
+      "rolling_fallback_count": 1,
+      "rolling_action_count": 1,
+      "all_required_inputs_verified": false,
+      "selected_actions_executed": false,
+      "conditional_stability_only": true,
+      "current_state_certified": false,
+      "native_model_protection_certified": false,
+      "online_model_claim": false
+    },
+    "raw_artifact": {
+      "path": "block0_load1/vector_13.json.gz",
+      "sha256": "052cb1b1e4d353f347858cfd25af73cc577d8ac822298c3b37c02cc707530e0a",
+      "input_path": "inputs/block0_load1/vector_13.json",
+      "input_sha256": "16c98d62c6b98d0fa059f1d7c752d4fab82b57599b643dcc3b6560a333cb0237"
+    }
+  },
+  "block0_load1/vector_14": {
+    "case": {
+      "case_id": "block0_load1",
+      "blocker_load": 0.2,
+      "receiver_load": 5.0
+    },
+    "vector": {
+      "initial_action": "native_default",
+      "empty_departure": 2.2100000000000004,
+      "return_delay": 0.5,
+      "later_action": "native_default"
+    },
+    "method": "fixed_counterfactual",
+    "fault": null,
+    "status": "assessed",
+    "summary": {
+      "status": "assessed",
+      "completion": {
+        "loaded": 5.199999999999999,
+        "receiver": 10.01,
+        "reuse1": 11.139999999999995,
+        "reuse2": 16.549999999999997,
+        "blocker": 1.5000000000000002
+      },
+      "completion_sum": 44.39999999999999,
+      "business_complete": true,
+      "common_horizon_complete": true,
+      "required_transfer_lineages_received": true,
+      "all_routes_updated": true,
+      "chosen_routes_match_executed_edges": true,
+      "initial_actual_next": 1,
+      "first_reuse_actual_next": 8,
+      "blocker_actual_path1to9": true,
+      "same_L_two_returns_and_two_reloads": true,
+      "stock_preserved": true,
+      "audit": {
+        "status": "passed",
+        "completed_traversals": 16,
+        "open_traversals": 0,
+        "tray_count": 3,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "actual_later_choices": [
+        {
+          "job": "reuse1",
+          "selected_next": null,
+          "actual_next": 8
+        },
+        {
+          "job": "reuse2",
+          "selected_next": 3,
+          "actual_next": 3
+        }
+      ],
+      "supply_attempt_count": 1,
+      "recovered_rejection_count": 0,
+      "recovery_decisions_valid": true,
+      "transfer_acks": [
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 2.67,
+          "delivered_at": 2.69,
+          "status": "received",
+          "reason": "",
+          "received_at": 2.6100000000000008
+        },
+        {
+          "sequence": 7,
+          "attempt": 7,
+          "observed_at": 8.069999999999997,
+          "delivered_at": 8.089999999999996,
+          "status": "received",
+          "reason": "",
+          "received_at": 8.039999999999997
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 13.77,
+          "delivered_at": 13.79,
+          "status": "received",
+          "reason": "",
+          "received_at": 13.449999999999994
+        }
+      ],
+      "route_acks": [
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 13.559999999999993,
+          "delivered_at": 13.579999999999993,
+          "executed_at": 13.559999999999993,
+          "completed_at": 13.559999999999993,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-1"
+        }
+      ],
+      "rolling_model_inputs_verified": true,
+      "rolling_fallback_count": 0,
+      "rolling_action_count": 1,
+      "all_required_inputs_verified": true,
+      "selected_actions_executed": true,
+      "conditional_stability_only": true,
+      "current_state_certified": false,
+      "native_model_protection_certified": false,
+      "online_model_claim": false
+    },
+    "raw_artifact": {
+      "path": "block0_load1/vector_14.json.gz",
+      "sha256": "2edc106f4ed0ef950487c742373fb1de64093c90dd08d78958ced4cab8c8362e",
+      "input_path": "inputs/block0_load1/vector_14.json",
+      "input_sha256": "16c98d62c6b98d0fa059f1d7c752d4fab82b57599b643dcc3b6560a333cb0237"
+    }
+  },
+  "block0_load1/vector_15": {
+    "case": {
+      "case_id": "block0_load1",
+      "blocker_load": 0.2,
+      "receiver_load": 5.0
+    },
+    "vector": {
+      "initial_action": "native_default",
+      "empty_departure": 2.2100000000000004,
+      "return_delay": 0.5,
+      "later_action": "prefer_8"
+    },
+    "method": "fixed_counterfactual",
+    "fault": null,
+    "status": "assessed",
+    "summary": {
+      "status": "assessed",
+      "completion": {
+        "loaded": 5.199999999999999,
+        "receiver": 10.01,
+        "reuse1": 11.139999999999995,
+        "reuse2": 16.549999999999997,
+        "blocker": 1.5000000000000002
+      },
+      "completion_sum": 44.39999999999999,
+      "business_complete": true,
+      "common_horizon_complete": true,
+      "required_transfer_lineages_received": true,
+      "all_routes_updated": true,
+      "chosen_routes_match_executed_edges": true,
+      "initial_actual_next": 1,
+      "first_reuse_actual_next": 8,
+      "blocker_actual_path1to9": true,
+      "same_L_two_returns_and_two_reloads": true,
+      "stock_preserved": true,
+      "audit": {
+        "status": "passed",
+        "completed_traversals": 16,
+        "open_traversals": 0,
+        "tray_count": 3,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "actual_later_choices": [
+        {
+          "job": "reuse1",
+          "selected_next": 8,
+          "actual_next": 8
+        },
+        {
+          "job": "reuse2",
+          "selected_next": 3,
+          "actual_next": 3
+        }
+      ],
+      "supply_attempt_count": 1,
+      "recovered_rejection_count": 0,
+      "recovery_decisions_valid": true,
+      "transfer_acks": [
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 2.67,
+          "delivered_at": 2.69,
+          "status": "received",
+          "reason": "",
+          "received_at": 2.6100000000000008
+        },
+        {
+          "sequence": 7,
+          "attempt": 7,
+          "observed_at": 8.069999999999997,
+          "delivered_at": 8.089999999999996,
+          "status": "received",
+          "reason": "",
+          "received_at": 8.039999999999997
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 13.77,
+          "delivered_at": 13.79,
+          "status": "received",
+          "reason": "",
+          "received_at": 13.449999999999994
+        }
+      ],
+      "route_acks": [
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 8.189999999999996,
+          "delivered_at": 8.209999999999996,
+          "executed_at": 8.189999999999996,
+          "completed_at": 8.189999999999996,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-0"
+        },
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 13.559999999999993,
+          "delivered_at": 13.579999999999993,
+          "executed_at": 13.559999999999993,
+          "completed_at": 13.559999999999993,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-1"
+        }
+      ],
+      "rolling_model_inputs_verified": true,
+      "rolling_fallback_count": 0,
+      "rolling_action_count": 2,
+      "all_required_inputs_verified": true,
+      "selected_actions_executed": true,
+      "conditional_stability_only": true,
+      "current_state_certified": false,
+      "native_model_protection_certified": false,
+      "online_model_claim": false
+    },
+    "raw_artifact": {
+      "path": "block0_load1/vector_15.json.gz",
+      "sha256": "01cd8bc85b4d2eabe46d45237ae17646c873456db0d5615cbe83ce2074ea8019",
+      "input_path": "inputs/block0_load1/vector_15.json",
+      "input_sha256": "16c98d62c6b98d0fa059f1d7c752d4fab82b57599b643dcc3b6560a333cb0237"
+    }
+  },
+  "block0_load1/vector_16": {
+    "case": {
+      "case_id": "block0_load1",
+      "blocker_load": 0.2,
+      "receiver_load": 5.0
+    },
+    "vector": {
+      "initial_action": "prefer_2",
+      "empty_departure": 0.11,
+      "return_delay": 0.0,
+      "later_action": "native_default"
+    },
+    "method": "fixed_counterfactual",
+    "fault": null,
+    "status": "assessed",
+    "summary": {
+      "status": "assessed",
+      "completion": {
+        "loaded": 6.199999999999998,
+        "receiver": 8.469999999999999,
+        "reuse1": 11.649999999999993,
+        "reuse2": 17.059999999999995,
+        "blocker": 1.5000000000000002
+      },
+      "completion_sum": 44.87999999999999,
+      "business_complete": true,
+      "common_horizon_complete": true,
+      "required_transfer_lineages_received": true,
+      "all_routes_updated": true,
+      "chosen_routes_match_executed_edges": true,
+      "initial_actual_next": 2,
+      "first_reuse_actual_next": 3,
+      "blocker_actual_path1to9": true,
+      "same_L_two_returns_and_two_reloads": true,
+      "stock_preserved": true,
+      "audit": {
+        "status": "passed",
+        "completed_traversals": 16,
+        "open_traversals": 0,
+        "tray_count": 3,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "actual_later_choices": [
+        {
+          "job": "reuse1",
+          "selected_next": null,
+          "actual_next": 3
+        },
+        {
+          "job": "reuse2",
+          "selected_next": 3,
+          "actual_next": 3
+        }
+      ],
+      "supply_attempt_count": 2,
+      "recovered_rejection_count": 1,
+      "recovery_decisions_valid": true,
+      "transfer_acks": [
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 0.12,
+          "delivered_at": 0.13999999999999999,
+          "status": "rejected",
+          "reason": "receiving_full",
+          "received_at": -1.0
+        },
+        {
+          "sequence": 2,
+          "attempt": 2,
+          "observed_at": 1.1700000000000002,
+          "delivered_at": 1.1900000000000002,
+          "status": "received",
+          "reason": "",
+          "received_at": 1.07
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 8.579999999999995,
+          "delivered_at": 8.599999999999994,
+          "status": "received",
+          "reason": "",
+          "received_at": 8.549999999999995
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 14.27,
+          "delivered_at": 14.29,
+          "status": "received",
+          "reason": "",
+          "received_at": 13.959999999999992
+        }
+      ],
+      "route_acks": [
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 0.12,
+          "delivered_at": 0.13999999999999999,
+          "executed_at": 0.12,
+          "completed_at": 0.12,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:A:initial-route"
+        },
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 14.069999999999991,
+          "delivered_at": 14.089999999999991,
+          "executed_at": 14.069999999999991,
+          "completed_at": 14.069999999999991,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-1"
+        }
+      ],
+      "rolling_model_inputs_verified": true,
+      "rolling_fallback_count": 0,
+      "rolling_action_count": 1,
+      "all_required_inputs_verified": true,
+      "selected_actions_executed": true,
+      "conditional_stability_only": true,
+      "current_state_certified": false,
+      "native_model_protection_certified": false,
+      "online_model_claim": false
+    },
+    "raw_artifact": {
+      "path": "block0_load1/vector_16.json.gz",
+      "sha256": "9089e266f517971159b3121598f3406a9e9a6b934afe4ddca7094148cf7bd853",
+      "input_path": "inputs/block0_load1/vector_16.json",
+      "input_sha256": "16c98d62c6b98d0fa059f1d7c752d4fab82b57599b643dcc3b6560a333cb0237"
+    }
+  },
+  "block0_load1/vector_17": {
+    "case": {
+      "case_id": "block0_load1",
+      "blocker_load": 0.2,
+      "receiver_load": 5.0
+    },
+    "vector": {
+      "initial_action": "prefer_2",
+      "empty_departure": 0.11,
+      "return_delay": 0.0,
+      "later_action": "prefer_8"
+    },
+    "method": "fixed_counterfactual",
+    "fault": null,
+    "status": "assessed",
+    "summary": {
+      "status": "assessed",
+      "completion": {
+        "loaded": 6.199999999999998,
+        "receiver": 8.469999999999999,
+        "reuse1": 11.649999999999993,
+        "reuse2": 17.059999999999995,
+        "blocker": 1.5000000000000002
+      },
+      "completion_sum": 44.87999999999999,
+      "business_complete": true,
+      "common_horizon_complete": true,
+      "required_transfer_lineages_received": true,
+      "all_routes_updated": true,
+      "chosen_routes_match_executed_edges": true,
+      "initial_actual_next": 2,
+      "first_reuse_actual_next": 8,
+      "blocker_actual_path1to9": true,
+      "same_L_two_returns_and_two_reloads": true,
+      "stock_preserved": true,
+      "audit": {
+        "status": "passed",
+        "completed_traversals": 16,
+        "open_traversals": 0,
+        "tray_count": 3,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "actual_later_choices": [
+        {
+          "job": "reuse1",
+          "selected_next": 8,
+          "actual_next": 8
+        },
+        {
+          "job": "reuse2",
+          "selected_next": 3,
+          "actual_next": 3
+        }
+      ],
+      "supply_attempt_count": 2,
+      "recovered_rejection_count": 1,
+      "recovery_decisions_valid": true,
+      "transfer_acks": [
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 0.12,
+          "delivered_at": 0.13999999999999999,
+          "status": "rejected",
+          "reason": "receiving_full",
+          "received_at": -1.0
+        },
+        {
+          "sequence": 2,
+          "attempt": 2,
+          "observed_at": 1.1700000000000002,
+          "delivered_at": 1.1900000000000002,
+          "status": "received",
+          "reason": "",
+          "received_at": 1.07
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 8.579999999999995,
+          "delivered_at": 8.599999999999994,
+          "status": "received",
+          "reason": "",
+          "received_at": 8.549999999999995
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 14.27,
+          "delivered_at": 14.29,
+          "status": "received",
+          "reason": "",
+          "received_at": 13.959999999999992
+        }
+      ],
+      "route_acks": [
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 0.12,
+          "delivered_at": 0.13999999999999999,
+          "executed_at": 0.12,
+          "completed_at": 0.12,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:A:initial-route"
+        },
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 8.699999999999994,
+          "delivered_at": 8.719999999999994,
+          "executed_at": 8.699999999999994,
+          "completed_at": 8.699999999999994,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-0"
+        },
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 14.069999999999991,
+          "delivered_at": 14.089999999999991,
+          "executed_at": 14.069999999999991,
+          "completed_at": 14.069999999999991,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-1"
+        }
+      ],
+      "rolling_model_inputs_verified": true,
+      "rolling_fallback_count": 0,
+      "rolling_action_count": 2,
+      "all_required_inputs_verified": true,
+      "selected_actions_executed": true,
+      "conditional_stability_only": true,
+      "current_state_certified": false,
+      "native_model_protection_certified": false,
+      "online_model_claim": false
+    },
+    "raw_artifact": {
+      "path": "block0_load1/vector_17.json.gz",
+      "sha256": "92db1670847e2a0464b3fe6827e092a8dc2c348580842f5bf21dec444e8be1e6",
+      "input_path": "inputs/block0_load1/vector_17.json",
+      "input_sha256": "16c98d62c6b98d0fa059f1d7c752d4fab82b57599b643dcc3b6560a333cb0237"
+    }
+  },
+  "block0_load1/vector_18": {
+    "case": {
+      "case_id": "block0_load1",
+      "blocker_load": 0.2,
+      "receiver_load": 5.0
+    },
+    "vector": {
+      "initial_action": "prefer_2",
+      "empty_departure": 0.11,
+      "return_delay": 0.5,
+      "later_action": "native_default"
+    },
+    "method": "fixed_counterfactual",
+    "fault": null,
+    "status": "assessed",
+    "summary": {
+      "status": "assessed",
+      "completion": {
+        "loaded": 6.199999999999998,
+        "receiver": 8.469999999999999,
+        "reuse1": 12.139999999999995,
+        "reuse2": 17.549999999999997,
+        "blocker": 1.5000000000000002
+      },
+      "completion_sum": 45.85999999999999,
+      "business_complete": true,
+      "common_horizon_complete": true,
+      "required_transfer_lineages_received": true,
+      "all_routes_updated": true,
+      "chosen_routes_match_executed_edges": true,
+      "initial_actual_next": 2,
+      "first_reuse_actual_next": 3,
+      "blocker_actual_path1to9": true,
+      "same_L_two_returns_and_two_reloads": true,
+      "stock_preserved": true,
+      "audit": {
+        "status": "passed",
+        "completed_traversals": 16,
+        "open_traversals": 0,
+        "tray_count": 3,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "actual_later_choices": [
+        {
+          "job": "reuse1",
+          "selected_next": null,
+          "actual_next": 3
+        },
+        {
+          "job": "reuse2",
+          "selected_next": 3,
+          "actual_next": 3
+        }
+      ],
+      "supply_attempt_count": 2,
+      "recovered_rejection_count": 1,
+      "recovery_decisions_valid": true,
+      "transfer_acks": [
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 0.12,
+          "delivered_at": 0.13999999999999999,
+          "status": "rejected",
+          "reason": "receiving_full",
+          "received_at": -1.0
+        },
+        {
+          "sequence": 2,
+          "attempt": 2,
+          "observed_at": 1.1700000000000002,
+          "delivered_at": 1.1900000000000002,
+          "status": "received",
+          "reason": "",
+          "received_at": 1.07
+        },
+        {
+          "sequence": 7,
+          "attempt": 7,
+          "observed_at": 9.069999999999997,
+          "delivered_at": 9.089999999999996,
+          "status": "received",
+          "reason": "",
+          "received_at": 9.039999999999997
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 14.77,
+          "delivered_at": 14.79,
+          "status": "received",
+          "reason": "",
+          "received_at": 14.449999999999994
+        }
+      ],
+      "route_acks": [
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 0.12,
+          "delivered_at": 0.13999999999999999,
+          "executed_at": 0.12,
+          "completed_at": 0.12,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:A:initial-route"
+        },
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 14.559999999999993,
+          "delivered_at": 14.579999999999993,
+          "executed_at": 14.559999999999993,
+          "completed_at": 14.559999999999993,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-1"
+        }
+      ],
+      "rolling_model_inputs_verified": true,
+      "rolling_fallback_count": 0,
+      "rolling_action_count": 1,
+      "all_required_inputs_verified": true,
+      "selected_actions_executed": true,
+      "conditional_stability_only": true,
+      "current_state_certified": false,
+      "native_model_protection_certified": false,
+      "online_model_claim": false
+    },
+    "raw_artifact": {
+      "path": "block0_load1/vector_18.json.gz",
+      "sha256": "ec8909fc728132af403311c0a2de332757239f773cce864307b57badcb1f6210",
+      "input_path": "inputs/block0_load1/vector_18.json",
+      "input_sha256": "16c98d62c6b98d0fa059f1d7c752d4fab82b57599b643dcc3b6560a333cb0237"
+    }
+  },
+  "block0_load1/vector_19": {
+    "case": {
+      "case_id": "block0_load1",
+      "blocker_load": 0.2,
+      "receiver_load": 5.0
+    },
+    "vector": {
+      "initial_action": "prefer_2",
+      "empty_departure": 0.11,
+      "return_delay": 0.5,
+      "later_action": "prefer_8"
+    },
+    "method": "fixed_counterfactual",
+    "fault": null,
+    "status": "assessed",
+    "summary": {
+      "status": "assessed",
+      "completion": {
+        "loaded": 6.199999999999998,
+        "receiver": 8.469999999999999,
+        "reuse1": 12.139999999999995,
+        "reuse2": 17.549999999999997,
+        "blocker": 1.5000000000000002
+      },
+      "completion_sum": 45.85999999999999,
+      "business_complete": true,
+      "common_horizon_complete": true,
+      "required_transfer_lineages_received": true,
+      "all_routes_updated": true,
+      "chosen_routes_match_executed_edges": true,
+      "initial_actual_next": 2,
+      "first_reuse_actual_next": 8,
+      "blocker_actual_path1to9": true,
+      "same_L_two_returns_and_two_reloads": true,
+      "stock_preserved": true,
+      "audit": {
+        "status": "passed",
+        "completed_traversals": 16,
+        "open_traversals": 0,
+        "tray_count": 3,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "actual_later_choices": [
+        {
+          "job": "reuse1",
+          "selected_next": 8,
+          "actual_next": 8
+        },
+        {
+          "job": "reuse2",
+          "selected_next": 3,
+          "actual_next": 3
+        }
+      ],
+      "supply_attempt_count": 2,
+      "recovered_rejection_count": 1,
+      "recovery_decisions_valid": true,
+      "transfer_acks": [
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 0.12,
+          "delivered_at": 0.13999999999999999,
+          "status": "rejected",
+          "reason": "receiving_full",
+          "received_at": -1.0
+        },
+        {
+          "sequence": 2,
+          "attempt": 2,
+          "observed_at": 1.1700000000000002,
+          "delivered_at": 1.1900000000000002,
+          "status": "received",
+          "reason": "",
+          "received_at": 1.07
+        },
+        {
+          "sequence": 7,
+          "attempt": 7,
+          "observed_at": 9.069999999999997,
+          "delivered_at": 9.089999999999996,
+          "status": "received",
+          "reason": "",
+          "received_at": 9.039999999999997
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 14.77,
+          "delivered_at": 14.79,
+          "status": "received",
+          "reason": "",
+          "received_at": 14.449999999999994
+        }
+      ],
+      "route_acks": [
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 0.12,
+          "delivered_at": 0.13999999999999999,
+          "executed_at": 0.12,
+          "completed_at": 0.12,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:A:initial-route"
+        },
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 9.189999999999996,
+          "delivered_at": 9.209999999999996,
+          "executed_at": 9.189999999999996,
+          "completed_at": 9.189999999999996,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-0"
+        },
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 14.559999999999993,
+          "delivered_at": 14.579999999999993,
+          "executed_at": 14.559999999999993,
+          "completed_at": 14.559999999999993,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-1"
+        }
+      ],
+      "rolling_model_inputs_verified": true,
+      "rolling_fallback_count": 0,
+      "rolling_action_count": 2,
+      "all_required_inputs_verified": true,
+      "selected_actions_executed": true,
+      "conditional_stability_only": true,
+      "current_state_certified": false,
+      "native_model_protection_certified": false,
+      "online_model_claim": false
+    },
+    "raw_artifact": {
+      "path": "block0_load1/vector_19.json.gz",
+      "sha256": "c3089a8195291d8133cc136b90eab54e101689b9ddaaa1bccfae45008727443a",
+      "input_path": "inputs/block0_load1/vector_19.json",
+      "input_sha256": "16c98d62c6b98d0fa059f1d7c752d4fab82b57599b643dcc3b6560a333cb0237"
+    }
+  },
+  "block0_load1/vector_20": {
+    "case": {
+      "case_id": "block0_load1",
+      "blocker_load": 0.2,
+      "receiver_load": 5.0
+    },
+    "vector": {
+      "initial_action": "prefer_2",
+      "empty_departure": 0.30100000000000005,
+      "return_delay": 0.0,
+      "later_action": "native_default"
+    },
+    "method": "fixed_counterfactual",
+    "fault": null,
+    "status": "assessed",
+    "summary": {
+      "status": "assessed",
+      "completion": {
+        "loaded": 6.199999999999998,
+        "receiver": 8.100999999999999,
+        "reuse1": 11.649999999999993,
+        "reuse2": 17.059999999999995,
+        "blocker": 1.5000000000000002
+      },
+      "completion_sum": 44.51099999999999,
+      "business_complete": true,
+      "common_horizon_complete": true,
+      "required_transfer_lineages_received": true,
+      "all_routes_updated": true,
+      "chosen_routes_match_executed_edges": true,
+      "initial_actual_next": 2,
+      "first_reuse_actual_next": 3,
+      "blocker_actual_path1to9": true,
+      "same_L_two_returns_and_two_reloads": true,
+      "stock_preserved": true,
+      "audit": {
+        "status": "passed",
+        "completed_traversals": 16,
+        "open_traversals": 0,
+        "tray_count": 3,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "actual_later_choices": [
+        {
+          "job": "reuse1",
+          "selected_next": null,
+          "actual_next": 3
+        },
+        {
+          "job": "reuse2",
+          "selected_next": 3,
+          "actual_next": 3
+        }
+      ],
+      "supply_attempt_count": 1,
+      "recovered_rejection_count": 0,
+      "recovery_decisions_valid": true,
+      "transfer_acks": [
+        {
+          "sequence": 3,
+          "attempt": 3,
+          "observed_at": 1.12,
+          "delivered_at": 1.1400000000000001,
+          "status": "received",
+          "reason": "",
+          "received_at": 0.701
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 8.579999999999995,
+          "delivered_at": 8.599999999999994,
+          "status": "received",
+          "reason": "",
+          "received_at": 8.549999999999995
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 14.27,
+          "delivered_at": 14.29,
+          "status": "received",
+          "reason": "",
+          "received_at": 13.959999999999992
+        }
+      ],
+      "route_acks": [
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 0.12,
+          "delivered_at": 0.13999999999999999,
+          "executed_at": 0.12,
+          "completed_at": 0.12,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:A:initial-route"
+        },
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 14.069999999999991,
+          "delivered_at": 14.089999999999991,
+          "executed_at": 14.069999999999991,
+          "completed_at": 14.069999999999991,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-1"
+        }
+      ],
+      "rolling_model_inputs_verified": true,
+      "rolling_fallback_count": 0,
+      "rolling_action_count": 1,
+      "all_required_inputs_verified": true,
+      "selected_actions_executed": true,
+      "conditional_stability_only": true,
+      "current_state_certified": false,
+      "native_model_protection_certified": false,
+      "online_model_claim": false
+    },
+    "raw_artifact": {
+      "path": "block0_load1/vector_20.json.gz",
+      "sha256": "1bba173fd9c2afe4fe60abd3e59e1a66c3af31235ef29dd88fb9c0be86ad98ba",
+      "input_path": "inputs/block0_load1/vector_20.json",
+      "input_sha256": "16c98d62c6b98d0fa059f1d7c752d4fab82b57599b643dcc3b6560a333cb0237"
+    }
+  },
+  "block0_load1/vector_21": {
+    "case": {
+      "case_id": "block0_load1",
+      "blocker_load": 0.2,
+      "receiver_load": 5.0
+    },
+    "vector": {
+      "initial_action": "prefer_2",
+      "empty_departure": 0.30100000000000005,
+      "return_delay": 0.0,
+      "later_action": "prefer_8"
+    },
+    "method": "fixed_counterfactual",
+    "fault": null,
+    "status": "assessed",
+    "summary": {
+      "status": "assessed",
+      "completion": {
+        "loaded": 6.199999999999998,
+        "receiver": 8.100999999999999,
+        "reuse1": 11.649999999999993,
+        "reuse2": 17.059999999999995,
+        "blocker": 1.5000000000000002
+      },
+      "completion_sum": 44.51099999999999,
+      "business_complete": true,
+      "common_horizon_complete": true,
+      "required_transfer_lineages_received": true,
+      "all_routes_updated": true,
+      "chosen_routes_match_executed_edges": true,
+      "initial_actual_next": 2,
+      "first_reuse_actual_next": 8,
+      "blocker_actual_path1to9": true,
+      "same_L_two_returns_and_two_reloads": true,
+      "stock_preserved": true,
+      "audit": {
+        "status": "passed",
+        "completed_traversals": 16,
+        "open_traversals": 0,
+        "tray_count": 3,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "actual_later_choices": [
+        {
+          "job": "reuse1",
+          "selected_next": 8,
+          "actual_next": 8
+        },
+        {
+          "job": "reuse2",
+          "selected_next": 3,
+          "actual_next": 3
+        }
+      ],
+      "supply_attempt_count": 1,
+      "recovered_rejection_count": 0,
+      "recovery_decisions_valid": true,
+      "transfer_acks": [
+        {
+          "sequence": 3,
+          "attempt": 3,
+          "observed_at": 1.12,
+          "delivered_at": 1.1400000000000001,
+          "status": "received",
+          "reason": "",
+          "received_at": 0.701
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 8.579999999999995,
+          "delivered_at": 8.599999999999994,
+          "status": "received",
+          "reason": "",
+          "received_at": 8.549999999999995
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 14.27,
+          "delivered_at": 14.29,
+          "status": "received",
+          "reason": "",
+          "received_at": 13.959999999999992
+        }
+      ],
+      "route_acks": [
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 0.12,
+          "delivered_at": 0.13999999999999999,
+          "executed_at": 0.12,
+          "completed_at": 0.12,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:A:initial-route"
+        },
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 8.699999999999994,
+          "delivered_at": 8.719999999999994,
+          "executed_at": 8.699999999999994,
+          "completed_at": 8.699999999999994,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-0"
+        },
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 14.069999999999991,
+          "delivered_at": 14.089999999999991,
+          "executed_at": 14.069999999999991,
+          "completed_at": 14.069999999999991,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-1"
+        }
+      ],
+      "rolling_model_inputs_verified": true,
+      "rolling_fallback_count": 0,
+      "rolling_action_count": 2,
+      "all_required_inputs_verified": true,
+      "selected_actions_executed": true,
+      "conditional_stability_only": true,
+      "current_state_certified": false,
+      "native_model_protection_certified": false,
+      "online_model_claim": false
+    },
+    "raw_artifact": {
+      "path": "block0_load1/vector_21.json.gz",
+      "sha256": "5e67971a63f6516f39edc961fcde46fabdbf3a613227c9e7cf0964248cb109ee",
+      "input_path": "inputs/block0_load1/vector_21.json",
+      "input_sha256": "16c98d62c6b98d0fa059f1d7c752d4fab82b57599b643dcc3b6560a333cb0237"
+    }
+  },
+  "block0_load1/vector_22": {
+    "case": {
+      "case_id": "block0_load1",
+      "blocker_load": 0.2,
+      "receiver_load": 5.0
+    },
+    "vector": {
+      "initial_action": "prefer_2",
+      "empty_departure": 0.30100000000000005,
+      "return_delay": 0.5,
+      "later_action": "native_default"
+    },
+    "method": "fixed_counterfactual",
+    "fault": null,
+    "status": "assessed",
+    "summary": {
+      "status": "assessed",
+      "completion": {
+        "loaded": 6.199999999999998,
+        "receiver": 8.100999999999999,
+        "reuse1": 12.139999999999995,
+        "reuse2": 17.549999999999997,
+        "blocker": 1.5000000000000002
+      },
+      "completion_sum": 45.49099999999999,
+      "business_complete": true,
+      "common_horizon_complete": true,
+      "required_transfer_lineages_received": true,
+      "all_routes_updated": true,
+      "chosen_routes_match_executed_edges": true,
+      "initial_actual_next": 2,
+      "first_reuse_actual_next": 3,
+      "blocker_actual_path1to9": true,
+      "same_L_two_returns_and_two_reloads": true,
+      "stock_preserved": true,
+      "audit": {
+        "status": "passed",
+        "completed_traversals": 16,
+        "open_traversals": 0,
+        "tray_count": 3,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "actual_later_choices": [
+        {
+          "job": "reuse1",
+          "selected_next": null,
+          "actual_next": 3
+        },
+        {
+          "job": "reuse2",
+          "selected_next": 3,
+          "actual_next": 3
+        }
+      ],
+      "supply_attempt_count": 1,
+      "recovered_rejection_count": 0,
+      "recovery_decisions_valid": true,
+      "transfer_acks": [
+        {
+          "sequence": 3,
+          "attempt": 3,
+          "observed_at": 1.12,
+          "delivered_at": 1.1400000000000001,
+          "status": "received",
+          "reason": "",
+          "received_at": 0.701
+        },
+        {
+          "sequence": 7,
+          "attempt": 7,
+          "observed_at": 9.069999999999997,
+          "delivered_at": 9.089999999999996,
+          "status": "received",
+          "reason": "",
+          "received_at": 9.039999999999997
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 14.77,
+          "delivered_at": 14.79,
+          "status": "received",
+          "reason": "",
+          "received_at": 14.449999999999994
+        }
+      ],
+      "route_acks": [
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 0.12,
+          "delivered_at": 0.13999999999999999,
+          "executed_at": 0.12,
+          "completed_at": 0.12,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:A:initial-route"
+        },
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 14.559999999999993,
+          "delivered_at": 14.579999999999993,
+          "executed_at": 14.559999999999993,
+          "completed_at": 14.559999999999993,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-1"
+        }
+      ],
+      "rolling_model_inputs_verified": true,
+      "rolling_fallback_count": 0,
+      "rolling_action_count": 1,
+      "all_required_inputs_verified": true,
+      "selected_actions_executed": true,
+      "conditional_stability_only": true,
+      "current_state_certified": false,
+      "native_model_protection_certified": false,
+      "online_model_claim": false
+    },
+    "raw_artifact": {
+      "path": "block0_load1/vector_22.json.gz",
+      "sha256": "9f0a0e45c3ac33e15021364f1263eef09f987ab8a8693fc26baa9ef87e7cc2e2",
+      "input_path": "inputs/block0_load1/vector_22.json",
+      "input_sha256": "16c98d62c6b98d0fa059f1d7c752d4fab82b57599b643dcc3b6560a333cb0237"
+    }
+  },
+  "block0_load1/vector_23": {
+    "case": {
+      "case_id": "block0_load1",
+      "blocker_load": 0.2,
+      "receiver_load": 5.0
+    },
+    "vector": {
+      "initial_action": "prefer_2",
+      "empty_departure": 0.30100000000000005,
+      "return_delay": 0.5,
+      "later_action": "prefer_8"
+    },
+    "method": "fixed_counterfactual",
+    "fault": null,
+    "status": "assessed",
+    "summary": {
+      "status": "assessed",
+      "completion": {
+        "loaded": 6.199999999999998,
+        "receiver": 8.100999999999999,
+        "reuse1": 12.139999999999995,
+        "reuse2": 17.549999999999997,
+        "blocker": 1.5000000000000002
+      },
+      "completion_sum": 45.49099999999999,
+      "business_complete": true,
+      "common_horizon_complete": true,
+      "required_transfer_lineages_received": true,
+      "all_routes_updated": true,
+      "chosen_routes_match_executed_edges": true,
+      "initial_actual_next": 2,
+      "first_reuse_actual_next": 8,
+      "blocker_actual_path1to9": true,
+      "same_L_two_returns_and_two_reloads": true,
+      "stock_preserved": true,
+      "audit": {
+        "status": "passed",
+        "completed_traversals": 16,
+        "open_traversals": 0,
+        "tray_count": 3,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "actual_later_choices": [
+        {
+          "job": "reuse1",
+          "selected_next": 8,
+          "actual_next": 8
+        },
+        {
+          "job": "reuse2",
+          "selected_next": 3,
+          "actual_next": 3
+        }
+      ],
+      "supply_attempt_count": 1,
+      "recovered_rejection_count": 0,
+      "recovery_decisions_valid": true,
+      "transfer_acks": [
+        {
+          "sequence": 3,
+          "attempt": 3,
+          "observed_at": 1.12,
+          "delivered_at": 1.1400000000000001,
+          "status": "received",
+          "reason": "",
+          "received_at": 0.701
+        },
+        {
+          "sequence": 7,
+          "attempt": 7,
+          "observed_at": 9.069999999999997,
+          "delivered_at": 9.089999999999996,
+          "status": "received",
+          "reason": "",
+          "received_at": 9.039999999999997
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 14.77,
+          "delivered_at": 14.79,
+          "status": "received",
+          "reason": "",
+          "received_at": 14.449999999999994
+        }
+      ],
+      "route_acks": [
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 0.12,
+          "delivered_at": 0.13999999999999999,
+          "executed_at": 0.12,
+          "completed_at": 0.12,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:A:initial-route"
+        },
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 9.189999999999996,
+          "delivered_at": 9.209999999999996,
+          "executed_at": 9.189999999999996,
+          "completed_at": 9.189999999999996,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-0"
+        },
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 14.559999999999993,
+          "delivered_at": 14.579999999999993,
+          "executed_at": 14.559999999999993,
+          "completed_at": 14.559999999999993,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-1"
+        }
+      ],
+      "rolling_model_inputs_verified": true,
+      "rolling_fallback_count": 0,
+      "rolling_action_count": 2,
+      "all_required_inputs_verified": true,
+      "selected_actions_executed": true,
+      "conditional_stability_only": true,
+      "current_state_certified": false,
+      "native_model_protection_certified": false,
+      "online_model_claim": false
+    },
+    "raw_artifact": {
+      "path": "block0_load1/vector_23.json.gz",
+      "sha256": "de04a137d525b6af89825bf5495ca87644a44158d279d60b4a889c5575d79140",
+      "input_path": "inputs/block0_load1/vector_23.json",
+      "input_sha256": "16c98d62c6b98d0fa059f1d7c752d4fab82b57599b643dcc3b6560a333cb0237"
+    }
+  },
+  "block0_load1/vector_24": {
+    "case": {
+      "case_id": "block0_load1",
+      "blocker_load": 0.2,
+      "receiver_load": 5.0
+    },
+    "vector": {
+      "initial_action": "prefer_2",
+      "empty_departure": 2.201,
+      "return_delay": 0.0,
+      "later_action": "native_default"
+    },
+    "method": "fixed_counterfactual",
+    "fault": null,
+    "status": "assessed",
+    "summary": {
+      "status": "assessed",
+      "completion": {
+        "loaded": 6.199999999999998,
+        "receiver": 10.001,
+        "reuse1": 11.649999999999993,
+        "reuse2": 17.059999999999995,
+        "blocker": 1.5000000000000002
+      },
+      "completion_sum": 46.41099999999999,
+      "business_complete": true,
+      "common_horizon_complete": true,
+      "required_transfer_lineages_received": true,
+      "all_routes_updated": true,
+      "chosen_routes_match_executed_edges": true,
+      "initial_actual_next": 2,
+      "first_reuse_actual_next": 8,
+      "blocker_actual_path1to9": true,
+      "same_L_two_returns_and_two_reloads": true,
+      "stock_preserved": true,
+      "audit": {
+        "status": "passed",
+        "completed_traversals": 16,
+        "open_traversals": 0,
+        "tray_count": 3,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "actual_later_choices": [
+        {
+          "job": "reuse1",
+          "selected_next": null,
+          "actual_next": 8
+        },
+        {
+          "job": "reuse2",
+          "selected_next": 3,
+          "actual_next": 3
+        }
+      ],
+      "supply_attempt_count": 1,
+      "recovered_rejection_count": 0,
+      "recovery_decisions_valid": true,
+      "transfer_acks": [
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 2.67,
+          "delivered_at": 2.69,
+          "status": "received",
+          "reason": "",
+          "received_at": 2.6010000000000004
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 8.579999999999995,
+          "delivered_at": 8.599999999999994,
+          "status": "received",
+          "reason": "",
+          "received_at": 8.549999999999995
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 14.27,
+          "delivered_at": 14.29,
+          "status": "received",
+          "reason": "",
+          "received_at": 13.959999999999992
+        }
+      ],
+      "route_acks": [
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 0.12,
+          "delivered_at": 0.13999999999999999,
+          "executed_at": 0.12,
+          "completed_at": 0.12,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:A:initial-route"
+        },
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 14.069999999999991,
+          "delivered_at": 14.089999999999991,
+          "executed_at": 14.069999999999991,
+          "completed_at": 14.069999999999991,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-1"
+        }
+      ],
+      "rolling_model_inputs_verified": true,
+      "rolling_fallback_count": 0,
+      "rolling_action_count": 1,
+      "all_required_inputs_verified": true,
+      "selected_actions_executed": true,
+      "conditional_stability_only": true,
+      "current_state_certified": false,
+      "native_model_protection_certified": false,
+      "online_model_claim": false
+    },
+    "raw_artifact": {
+      "path": "block0_load1/vector_24.json.gz",
+      "sha256": "2bf96180998cd4e62b9c9b147f5d85727571d21fa76c6dce5c71a6215b061492",
+      "input_path": "inputs/block0_load1/vector_24.json",
+      "input_sha256": "16c98d62c6b98d0fa059f1d7c752d4fab82b57599b643dcc3b6560a333cb0237"
+    }
+  },
+  "block0_load1/vector_25": {
+    "case": {
+      "case_id": "block0_load1",
+      "blocker_load": 0.2,
+      "receiver_load": 5.0
+    },
+    "vector": {
+      "initial_action": "prefer_2",
+      "empty_departure": 2.201,
+      "return_delay": 0.0,
+      "later_action": "prefer_8"
+    },
+    "method": "fixed_counterfactual",
+    "fault": null,
+    "status": "assessed",
+    "summary": {
+      "status": "assessed",
+      "completion": {
+        "loaded": 6.199999999999998,
+        "receiver": 10.001,
+        "reuse1": 11.649999999999993,
+        "reuse2": 17.059999999999995,
+        "blocker": 1.5000000000000002
+      },
+      "completion_sum": 46.41099999999999,
+      "business_complete": true,
+      "common_horizon_complete": true,
+      "required_transfer_lineages_received": true,
+      "all_routes_updated": true,
+      "chosen_routes_match_executed_edges": true,
+      "initial_actual_next": 2,
+      "first_reuse_actual_next": 8,
+      "blocker_actual_path1to9": true,
+      "same_L_two_returns_and_two_reloads": true,
+      "stock_preserved": true,
+      "audit": {
+        "status": "passed",
+        "completed_traversals": 16,
+        "open_traversals": 0,
+        "tray_count": 3,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "actual_later_choices": [
+        {
+          "job": "reuse1",
+          "selected_next": 8,
+          "actual_next": 8
+        },
+        {
+          "job": "reuse2",
+          "selected_next": 3,
+          "actual_next": 3
+        }
+      ],
+      "supply_attempt_count": 1,
+      "recovered_rejection_count": 0,
+      "recovery_decisions_valid": true,
+      "transfer_acks": [
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 2.67,
+          "delivered_at": 2.69,
+          "status": "received",
+          "reason": "",
+          "received_at": 2.6010000000000004
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 8.579999999999995,
+          "delivered_at": 8.599999999999994,
+          "status": "received",
+          "reason": "",
+          "received_at": 8.549999999999995
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 14.27,
+          "delivered_at": 14.29,
+          "status": "received",
+          "reason": "",
+          "received_at": 13.959999999999992
+        }
+      ],
+      "route_acks": [
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 0.12,
+          "delivered_at": 0.13999999999999999,
+          "executed_at": 0.12,
+          "completed_at": 0.12,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:A:initial-route"
+        },
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 8.699999999999994,
+          "delivered_at": 8.719999999999994,
+          "executed_at": 8.699999999999994,
+          "completed_at": 8.699999999999994,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-0"
+        },
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 14.069999999999991,
+          "delivered_at": 14.089999999999991,
+          "executed_at": 14.069999999999991,
+          "completed_at": 14.069999999999991,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-1"
+        }
+      ],
+      "rolling_model_inputs_verified": true,
+      "rolling_fallback_count": 0,
+      "rolling_action_count": 2,
+      "all_required_inputs_verified": true,
+      "selected_actions_executed": true,
+      "conditional_stability_only": true,
+      "current_state_certified": false,
+      "native_model_protection_certified": false,
+      "online_model_claim": false
+    },
+    "raw_artifact": {
+      "path": "block0_load1/vector_25.json.gz",
+      "sha256": "1af31d451ddf6331229c82f9e39acca4345b1d65c5531a5d736908c8db60a5ec",
+      "input_path": "inputs/block0_load1/vector_25.json",
+      "input_sha256": "16c98d62c6b98d0fa059f1d7c752d4fab82b57599b643dcc3b6560a333cb0237"
+    }
+  },
+  "block0_load1/vector_26": {
+    "case": {
+      "case_id": "block0_load1",
+      "blocker_load": 0.2,
+      "receiver_load": 5.0
+    },
+    "vector": {
+      "initial_action": "prefer_2",
+      "empty_departure": 2.201,
+      "return_delay": 0.5,
+      "later_action": "native_default"
+    },
+    "method": "fixed_counterfactual",
+    "fault": null,
+    "status": "assessed",
+    "summary": {
+      "status": "assessed",
+      "completion": {
+        "loaded": 6.199999999999998,
+        "receiver": 10.001,
+        "reuse1": 12.139999999999995,
+        "reuse2": 17.549999999999997,
+        "blocker": 1.5000000000000002
+      },
+      "completion_sum": 47.39099999999999,
+      "business_complete": true,
+      "common_horizon_complete": true,
+      "required_transfer_lineages_received": true,
+      "all_routes_updated": true,
+      "chosen_routes_match_executed_edges": true,
+      "initial_actual_next": 2,
+      "first_reuse_actual_next": 3,
+      "blocker_actual_path1to9": true,
+      "same_L_two_returns_and_two_reloads": true,
+      "stock_preserved": true,
+      "audit": {
+        "status": "passed",
+        "completed_traversals": 16,
+        "open_traversals": 0,
+        "tray_count": 3,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "actual_later_choices": [
+        {
+          "job": "reuse1",
+          "selected_next": null,
+          "actual_next": 3
+        },
+        {
+          "job": "reuse2",
+          "selected_next": 3,
+          "actual_next": 3
+        }
+      ],
+      "supply_attempt_count": 1,
+      "recovered_rejection_count": 0,
+      "recovery_decisions_valid": true,
+      "transfer_acks": [
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 2.67,
+          "delivered_at": 2.69,
+          "status": "received",
+          "reason": "",
+          "received_at": 2.6010000000000004
+        },
+        {
+          "sequence": 7,
+          "attempt": 7,
+          "observed_at": 9.069999999999997,
+          "delivered_at": 9.089999999999996,
+          "status": "received",
+          "reason": "",
+          "received_at": 9.039999999999997
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 14.77,
+          "delivered_at": 14.79,
+          "status": "received",
+          "reason": "",
+          "received_at": 14.449999999999994
+        }
+      ],
+      "route_acks": [
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 0.12,
+          "delivered_at": 0.13999999999999999,
+          "executed_at": 0.12,
+          "completed_at": 0.12,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:A:initial-route"
+        },
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 14.559999999999993,
+          "delivered_at": 14.579999999999993,
+          "executed_at": 14.559999999999993,
+          "completed_at": 14.559999999999993,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-1"
+        }
+      ],
+      "rolling_model_inputs_verified": true,
+      "rolling_fallback_count": 0,
+      "rolling_action_count": 1,
+      "all_required_inputs_verified": true,
+      "selected_actions_executed": true,
+      "conditional_stability_only": true,
+      "current_state_certified": false,
+      "native_model_protection_certified": false,
+      "online_model_claim": false
+    },
+    "raw_artifact": {
+      "path": "block0_load1/vector_26.json.gz",
+      "sha256": "4150c7535aa77f7fed964325b4994fe6a1e562ea89ad5844072d2992eba71798",
+      "input_path": "inputs/block0_load1/vector_26.json",
+      "input_sha256": "16c98d62c6b98d0fa059f1d7c752d4fab82b57599b643dcc3b6560a333cb0237"
+    }
+  },
+  "block0_load1/vector_27": {
+    "case": {
+      "case_id": "block0_load1",
+      "blocker_load": 0.2,
+      "receiver_load": 5.0
+    },
+    "vector": {
+      "initial_action": "prefer_2",
+      "empty_departure": 2.201,
+      "return_delay": 0.5,
+      "later_action": "prefer_8"
+    },
+    "method": "fixed_counterfactual",
+    "fault": null,
+    "status": "assessed",
+    "summary": {
+      "status": "assessed",
+      "completion": {
+        "loaded": 6.199999999999998,
+        "receiver": 10.001,
+        "reuse1": 12.139999999999995,
+        "reuse2": 17.549999999999997,
+        "blocker": 1.5000000000000002
+      },
+      "completion_sum": 47.39099999999999,
+      "business_complete": true,
+      "common_horizon_complete": true,
+      "required_transfer_lineages_received": true,
+      "all_routes_updated": true,
+      "chosen_routes_match_executed_edges": true,
+      "initial_actual_next": 2,
+      "first_reuse_actual_next": 8,
+      "blocker_actual_path1to9": true,
+      "same_L_two_returns_and_two_reloads": true,
+      "stock_preserved": true,
+      "audit": {
+        "status": "passed",
+        "completed_traversals": 16,
+        "open_traversals": 0,
+        "tray_count": 3,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "actual_later_choices": [
+        {
+          "job": "reuse1",
+          "selected_next": 8,
+          "actual_next": 8
+        },
+        {
+          "job": "reuse2",
+          "selected_next": 3,
+          "actual_next": 3
+        }
+      ],
+      "supply_attempt_count": 1,
+      "recovered_rejection_count": 0,
+      "recovery_decisions_valid": true,
+      "transfer_acks": [
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 2.67,
+          "delivered_at": 2.69,
+          "status": "received",
+          "reason": "",
+          "received_at": 2.6010000000000004
+        },
+        {
+          "sequence": 7,
+          "attempt": 7,
+          "observed_at": 9.069999999999997,
+          "delivered_at": 9.089999999999996,
+          "status": "received",
+          "reason": "",
+          "received_at": 9.039999999999997
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 14.77,
+          "delivered_at": 14.79,
+          "status": "received",
+          "reason": "",
+          "received_at": 14.449999999999994
+        }
+      ],
+      "route_acks": [
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 0.12,
+          "delivered_at": 0.13999999999999999,
+          "executed_at": 0.12,
+          "completed_at": 0.12,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:A:initial-route"
+        },
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 9.189999999999996,
+          "delivered_at": 9.209999999999996,
+          "executed_at": 9.189999999999996,
+          "completed_at": 9.189999999999996,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-0"
+        },
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 14.559999999999993,
+          "delivered_at": 14.579999999999993,
+          "executed_at": 14.559999999999993,
+          "completed_at": 14.559999999999993,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-1"
+        }
+      ],
+      "rolling_model_inputs_verified": true,
+      "rolling_fallback_count": 0,
+      "rolling_action_count": 2,
+      "all_required_inputs_verified": true,
+      "selected_actions_executed": true,
+      "conditional_stability_only": true,
+      "current_state_certified": false,
+      "native_model_protection_certified": false,
+      "online_model_claim": false
+    },
+    "raw_artifact": {
+      "path": "block0_load1/vector_27.json.gz",
+      "sha256": "4e4c4d8dc24cf67d62bb9e0404dcff073305395d52da1cbfd830998c5fe810d6",
+      "input_path": "inputs/block0_load1/vector_27.json",
+      "input_sha256": "16c98d62c6b98d0fa059f1d7c752d4fab82b57599b643dcc3b6560a333cb0237"
+    }
+  },
+  "block0_load1/vector_28": {
+    "case": {
+      "case_id": "block0_load1",
+      "blocker_load": 0.2,
+      "receiver_load": 5.0
+    },
+    "vector": {
+      "initial_action": "prefer_2",
+      "empty_departure": 2.2100000000000004,
+      "return_delay": 0.0,
+      "later_action": "native_default"
+    },
+    "method": "fixed_counterfactual",
+    "fault": null,
+    "status": "assessed",
+    "summary": {
+      "status": "assessed",
+      "completion": {
+        "loaded": 6.199999999999998,
+        "receiver": 10.01,
+        "reuse1": 11.649999999999993,
+        "reuse2": 17.059999999999995,
+        "blocker": 1.5000000000000002
+      },
+      "completion_sum": 46.41999999999999,
+      "business_complete": true,
+      "common_horizon_complete": true,
+      "required_transfer_lineages_received": true,
+      "all_routes_updated": true,
+      "chosen_routes_match_executed_edges": true,
+      "initial_actual_next": 2,
+      "first_reuse_actual_next": 8,
+      "blocker_actual_path1to9": true,
+      "same_L_two_returns_and_two_reloads": true,
+      "stock_preserved": true,
+      "audit": {
+        "status": "passed",
+        "completed_traversals": 16,
+        "open_traversals": 0,
+        "tray_count": 3,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "actual_later_choices": [
+        {
+          "job": "reuse1",
+          "selected_next": null,
+          "actual_next": 8
+        },
+        {
+          "job": "reuse2",
+          "selected_next": 3,
+          "actual_next": 3
+        }
+      ],
+      "supply_attempt_count": 1,
+      "recovered_rejection_count": 0,
+      "recovery_decisions_valid": true,
+      "transfer_acks": [
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 2.67,
+          "delivered_at": 2.69,
+          "status": "received",
+          "reason": "",
+          "received_at": 2.6100000000000008
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 8.579999999999995,
+          "delivered_at": 8.599999999999994,
+          "status": "received",
+          "reason": "",
+          "received_at": 8.549999999999995
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 14.27,
+          "delivered_at": 14.29,
+          "status": "received",
+          "reason": "",
+          "received_at": 13.959999999999992
+        }
+      ],
+      "route_acks": [
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 0.12,
+          "delivered_at": 0.13999999999999999,
+          "executed_at": 0.12,
+          "completed_at": 0.12,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:A:initial-route"
+        },
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 14.069999999999991,
+          "delivered_at": 14.089999999999991,
+          "executed_at": 14.069999999999991,
+          "completed_at": 14.069999999999991,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-1"
+        }
+      ],
+      "rolling_model_inputs_verified": true,
+      "rolling_fallback_count": 0,
+      "rolling_action_count": 1,
+      "all_required_inputs_verified": true,
+      "selected_actions_executed": true,
+      "conditional_stability_only": true,
+      "current_state_certified": false,
+      "native_model_protection_certified": false,
+      "online_model_claim": false
+    },
+    "raw_artifact": {
+      "path": "block0_load1/vector_28.json.gz",
+      "sha256": "fe1cfe7b65c2ea52d88dc948e8e6078ae7067556aa4d23a076b7ec7f34594341",
+      "input_path": "inputs/block0_load1/vector_28.json",
+      "input_sha256": "16c98d62c6b98d0fa059f1d7c752d4fab82b57599b643dcc3b6560a333cb0237"
+    }
+  },
+  "block0_load1/vector_29": {
+    "case": {
+      "case_id": "block0_load1",
+      "blocker_load": 0.2,
+      "receiver_load": 5.0
+    },
+    "vector": {
+      "initial_action": "prefer_2",
+      "empty_departure": 2.2100000000000004,
+      "return_delay": 0.0,
+      "later_action": "prefer_8"
+    },
+    "method": "fixed_counterfactual",
+    "fault": null,
+    "status": "assessed",
+    "summary": {
+      "status": "assessed",
+      "completion": {
+        "loaded": 6.199999999999998,
+        "receiver": 10.01,
+        "reuse1": 11.649999999999993,
+        "reuse2": 17.059999999999995,
+        "blocker": 1.5000000000000002
+      },
+      "completion_sum": 46.41999999999999,
+      "business_complete": true,
+      "common_horizon_complete": true,
+      "required_transfer_lineages_received": true,
+      "all_routes_updated": true,
+      "chosen_routes_match_executed_edges": true,
+      "initial_actual_next": 2,
+      "first_reuse_actual_next": 8,
+      "blocker_actual_path1to9": true,
+      "same_L_two_returns_and_two_reloads": true,
+      "stock_preserved": true,
+      "audit": {
+        "status": "passed",
+        "completed_traversals": 16,
+        "open_traversals": 0,
+        "tray_count": 3,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "actual_later_choices": [
+        {
+          "job": "reuse1",
+          "selected_next": 8,
+          "actual_next": 8
+        },
+        {
+          "job": "reuse2",
+          "selected_next": 3,
+          "actual_next": 3
+        }
+      ],
+      "supply_attempt_count": 1,
+      "recovered_rejection_count": 0,
+      "recovery_decisions_valid": true,
+      "transfer_acks": [
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 2.67,
+          "delivered_at": 2.69,
+          "status": "received",
+          "reason": "",
+          "received_at": 2.6100000000000008
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 8.579999999999995,
+          "delivered_at": 8.599999999999994,
+          "status": "received",
+          "reason": "",
+          "received_at": 8.549999999999995
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 14.27,
+          "delivered_at": 14.29,
+          "status": "received",
+          "reason": "",
+          "received_at": 13.959999999999992
+        }
+      ],
+      "route_acks": [
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 0.12,
+          "delivered_at": 0.13999999999999999,
+          "executed_at": 0.12,
+          "completed_at": 0.12,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:A:initial-route"
+        },
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 8.699999999999994,
+          "delivered_at": 8.719999999999994,
+          "executed_at": 8.699999999999994,
+          "completed_at": 8.699999999999994,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-0"
+        },
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 14.069999999999991,
+          "delivered_at": 14.089999999999991,
+          "executed_at": 14.069999999999991,
+          "completed_at": 14.069999999999991,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-1"
+        }
+      ],
+      "rolling_model_inputs_verified": true,
+      "rolling_fallback_count": 0,
+      "rolling_action_count": 2,
+      "all_required_inputs_verified": true,
+      "selected_actions_executed": true,
+      "conditional_stability_only": true,
+      "current_state_certified": false,
+      "native_model_protection_certified": false,
+      "online_model_claim": false
+    },
+    "raw_artifact": {
+      "path": "block0_load1/vector_29.json.gz",
+      "sha256": "38732e3f25f31261704c9cff7db1ca7f81b188afe5be300aec6cab6de8b67524",
+      "input_path": "inputs/block0_load1/vector_29.json",
+      "input_sha256": "16c98d62c6b98d0fa059f1d7c752d4fab82b57599b643dcc3b6560a333cb0237"
+    }
+  },
+  "block0_load1/vector_30": {
+    "case": {
+      "case_id": "block0_load1",
+      "blocker_load": 0.2,
+      "receiver_load": 5.0
+    },
+    "vector": {
+      "initial_action": "prefer_2",
+      "empty_departure": 2.2100000000000004,
+      "return_delay": 0.5,
+      "later_action": "native_default"
+    },
+    "method": "fixed_counterfactual",
+    "fault": null,
+    "status": "assessed",
+    "summary": {
+      "status": "assessed",
+      "completion": {
+        "loaded": 6.199999999999998,
+        "receiver": 10.01,
+        "reuse1": 12.139999999999995,
+        "reuse2": 17.549999999999997,
+        "blocker": 1.5000000000000002
+      },
+      "completion_sum": 47.39999999999999,
+      "business_complete": true,
+      "common_horizon_complete": true,
+      "required_transfer_lineages_received": true,
+      "all_routes_updated": true,
+      "chosen_routes_match_executed_edges": true,
+      "initial_actual_next": 2,
+      "first_reuse_actual_next": 3,
+      "blocker_actual_path1to9": true,
+      "same_L_two_returns_and_two_reloads": true,
+      "stock_preserved": true,
+      "audit": {
+        "status": "passed",
+        "completed_traversals": 16,
+        "open_traversals": 0,
+        "tray_count": 3,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "actual_later_choices": [
+        {
+          "job": "reuse1",
+          "selected_next": null,
+          "actual_next": 3
+        },
+        {
+          "job": "reuse2",
+          "selected_next": 3,
+          "actual_next": 3
+        }
+      ],
+      "supply_attempt_count": 1,
+      "recovered_rejection_count": 0,
+      "recovery_decisions_valid": true,
+      "transfer_acks": [
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 2.67,
+          "delivered_at": 2.69,
+          "status": "received",
+          "reason": "",
+          "received_at": 2.6100000000000008
+        },
+        {
+          "sequence": 7,
+          "attempt": 7,
+          "observed_at": 9.069999999999997,
+          "delivered_at": 9.089999999999996,
+          "status": "received",
+          "reason": "",
+          "received_at": 9.039999999999997
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 14.77,
+          "delivered_at": 14.79,
+          "status": "received",
+          "reason": "",
+          "received_at": 14.449999999999994
+        }
+      ],
+      "route_acks": [
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 0.12,
+          "delivered_at": 0.13999999999999999,
+          "executed_at": 0.12,
+          "completed_at": 0.12,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:A:initial-route"
+        },
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 14.559999999999993,
+          "delivered_at": 14.579999999999993,
+          "executed_at": 14.559999999999993,
+          "completed_at": 14.559999999999993,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-1"
+        }
+      ],
+      "rolling_model_inputs_verified": true,
+      "rolling_fallback_count": 0,
+      "rolling_action_count": 1,
+      "all_required_inputs_verified": true,
+      "selected_actions_executed": true,
+      "conditional_stability_only": true,
+      "current_state_certified": false,
+      "native_model_protection_certified": false,
+      "online_model_claim": false
+    },
+    "raw_artifact": {
+      "path": "block0_load1/vector_30.json.gz",
+      "sha256": "d9717170f9afe815f80121f6627da9774c579f2bcceab354756ac7aff89b1537",
+      "input_path": "inputs/block0_load1/vector_30.json",
+      "input_sha256": "16c98d62c6b98d0fa059f1d7c752d4fab82b57599b643dcc3b6560a333cb0237"
+    }
+  },
+  "block0_load1/vector_31": {
+    "case": {
+      "case_id": "block0_load1",
+      "blocker_load": 0.2,
+      "receiver_load": 5.0
+    },
+    "vector": {
+      "initial_action": "prefer_2",
+      "empty_departure": 2.2100000000000004,
+      "return_delay": 0.5,
+      "later_action": "prefer_8"
+    },
+    "method": "fixed_counterfactual",
+    "fault": null,
+    "status": "assessed",
+    "summary": {
+      "status": "assessed",
+      "completion": {
+        "loaded": 6.199999999999998,
+        "receiver": 10.01,
+        "reuse1": 12.139999999999995,
+        "reuse2": 17.549999999999997,
+        "blocker": 1.5000000000000002
+      },
+      "completion_sum": 47.39999999999999,
+      "business_complete": true,
+      "common_horizon_complete": true,
+      "required_transfer_lineages_received": true,
+      "all_routes_updated": true,
+      "chosen_routes_match_executed_edges": true,
+      "initial_actual_next": 2,
+      "first_reuse_actual_next": 8,
+      "blocker_actual_path1to9": true,
+      "same_L_two_returns_and_two_reloads": true,
+      "stock_preserved": true,
+      "audit": {
+        "status": "passed",
+        "completed_traversals": 16,
+        "open_traversals": 0,
+        "tray_count": 3,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "actual_later_choices": [
+        {
+          "job": "reuse1",
+          "selected_next": 8,
+          "actual_next": 8
+        },
+        {
+          "job": "reuse2",
+          "selected_next": 3,
+          "actual_next": 3
+        }
+      ],
+      "supply_attempt_count": 1,
+      "recovered_rejection_count": 0,
+      "recovery_decisions_valid": true,
+      "transfer_acks": [
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 2.67,
+          "delivered_at": 2.69,
+          "status": "received",
+          "reason": "",
+          "received_at": 2.6100000000000008
+        },
+        {
+          "sequence": 7,
+          "attempt": 7,
+          "observed_at": 9.069999999999997,
+          "delivered_at": 9.089999999999996,
+          "status": "received",
+          "reason": "",
+          "received_at": 9.039999999999997
+        },
+        {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 14.77,
+          "delivered_at": 14.79,
+          "status": "received",
+          "reason": "",
+          "received_at": 14.449999999999994
+        }
+      ],
+      "route_acks": [
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 0.12,
+          "delivered_at": 0.13999999999999999,
+          "executed_at": 0.12,
+          "completed_at": 0.12,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:A:initial-route"
+        },
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 9.189999999999996,
+          "delivered_at": 9.209999999999996,
+          "executed_at": 9.189999999999996,
+          "completed_at": 9.189999999999996,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-0"
+        },
+        {
+          "sequence": 1,
+          "attempt": 1,
+          "observed_at": 14.559999999999993,
+          "delivered_at": 14.579999999999993,
+          "executed_at": 14.559999999999993,
+          "completed_at": 14.559999999999993,
+          "status": "updated",
+          "reason": "allowed",
+          "result_id": "live:1:B:later-route-1"
+        }
+      ],
+      "rolling_model_inputs_verified": true,
+      "rolling_fallback_count": 0,
+      "rolling_action_count": 2,
+      "all_required_inputs_verified": true,
+      "selected_actions_executed": true,
+      "conditional_stability_only": true,
+      "current_state_certified": false,
+      "native_model_protection_certified": false,
+      "online_model_claim": false
+    },
+    "raw_artifact": {
+      "path": "block0_load1/vector_31.json.gz",
+      "sha256": "d888705ccb3df000b214acd9179348a43620b9b74b688cef48b635f0e4c5d7b6",
+      "input_path": "inputs/block0_load1/vector_31.json",
+      "input_sha256": "16c98d62c6b98d0fa059f1d7c752d4fab82b57599b643dcc3b6560a333cb0237"
+    }
+  }
+}

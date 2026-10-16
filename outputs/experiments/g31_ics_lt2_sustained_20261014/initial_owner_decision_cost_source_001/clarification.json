@@ -1,0 +1,110 @@
+{
+  "schema": "g31.initial_owner_decision_cost_clarification.v1",
+  "status": "source_and_existing_small_report_readback_only",
+  "scope": {
+    "new_native_calls": 0,
+    "new_predictor_calls": 0,
+    "new_profiles_or_benchmarks": 0,
+    "raw_gzip_files_read": 0,
+    "frozen_sources_changed": false,
+    "existing_report_hash_recomputed_in_this_review": false,
+    "source_byte_hashes_recomputed_in_this_review": false,
+    "hash_basis": "The report SHA below is read from its existing bounded_execution.json. Source references were lightly reread, without a new closure/hash scan during the exclusive timing window."
+  },
+  "evidence": {
+    "report": {
+      "path": "outputs/experiments/g31_ics_lt2_sustained_20261014/initial_owner_route_entry_independent_actual_review_001/report.json",
+      "sha256_from_existing_bounded_receipt": "4f552bfddaaaa8e9f981438e63e9a9a84f1971c45e6e7389d60ab27084325792"
+    },
+    "bounded_receipt": "outputs/experiments/g31_ics_lt2_sustained_20261014/initial_owner_route_entry_independent_actual_review_001/bounded_execution.json",
+    "original_saved_reviewer": {
+      "path": "scripts/experiments/g31_ics_circulation/review_initial_owner_route_entry_saved_v2.py",
+      "sha256_from_existing_bounded_receipt": "0ad1805a91fb61bd73425ee1a8a06f10b7a3b4b90ebe488115f5866003673e31"
+    }
+  },
+  "fixed_limits_ms": {
+    "decision_cutoff_from_root_admission": 60,
+    "complete_request_target": 100
+  },
+  "correction": {
+    "invalid_interpretation": "admission_through_A_collection + collection_through_final_local_check is all pre-decision work",
+    "correct_interpretation": "The second interval crosses the RPC, decision check and subsequent fresh source/receiver revalidation. Its whole duration cannot be attributed to work before the decision cutoff.",
+    "decision_return_lower_bound_formula": "admission_through_A_collection + RPC.caller_body_ms",
+    "lower_bound_reason": "The actual_A_collection event samples wall_ns before its value deepcopy. Predictor.predict begins later. Its caller body ends before the return tail and the parent reply-binding checks. These nonnegative omitted intervals cannot make the eventual decision check earlier than the reported sum.",
+    "reported_precision": "All numerical derivations here use the existing report's four-decimal millisecond values; no new per-function spans are inferred."
+  },
+  "rows": [
+    {
+      "report_row": "normal/block0_load1/budget_two",
+      "admission_through_A_collection_ms": 28.4505,
+      "collection_through_final_local_check_ms": 64.5614,
+      "admission_through_final_local_check_ms": 93.0119,
+      "RPC_caller_body_ms": 33.8689,
+      "RPC_worker_compute_wall_ms": 21.2393,
+      "decision_return_lower_bound_ms": 62.3194,
+      "lower_bound_excess_over_60ms": 2.3194,
+      "RPC_caller_minus_worker_composite_ms": 12.6296,
+      "worker_atomic_overrun": false,
+      "worker_choice": "prefer_2",
+      "candidate_eligible": true,
+      "complete_baseline_calls": 1,
+      "additional_candidate_calls": 1,
+      "actual_choice": "native_default",
+      "actual_command_id": null,
+      "actual_override": "decision_return_overrun_default_incumbent",
+      "complete_root_warm_ms": 1056.4419,
+      "complete_root_observed_within_100ms": false,
+      "raw_sha256_reference_only": "5997dbaf28d9e7fc7bb66529e93810b346ea930c595a1a8dca0dfb3932dd29ca"
+    },
+    {
+      "report_row": "normal/block1_load0/budget_two",
+      "admission_through_A_collection_ms": 31.4153,
+      "collection_through_final_local_check_ms": 67.2299,
+      "admission_through_final_local_check_ms": 98.6452,
+      "RPC_caller_body_ms": 40.2674,
+      "RPC_worker_compute_wall_ms": 25.8999,
+      "decision_return_lower_bound_ms": 71.6827,
+      "lower_bound_excess_over_60ms": 11.6827,
+      "RPC_caller_minus_worker_composite_ms": 14.3675,
+      "worker_atomic_overrun": false,
+      "worker_choice": "prefer_2",
+      "candidate_eligible": true,
+      "complete_baseline_calls": 1,
+      "additional_candidate_calls": 1,
+      "actual_choice": "native_default",
+      "actual_command_id": null,
+      "actual_override": "decision_return_overrun_default_incumbent",
+      "complete_root_warm_ms": 714.0893,
+      "complete_root_observed_within_100ms": false,
+      "raw_sha256_reference_only": "8d8c139f99d9559bf00bd4cc35b5e5729d1b46c1d8545350ca2f823adc9c11e1"
+    }
+  ],
+  "source_record_locations": [
+    {
+      "path": "scripts/experiments/g31_ics_circulation/initial_owner_route_request.py",
+      "lines": [102, 103, 104, 125, 126, 127],
+      "fact": "_record samples wall_ns before deepcopy(value); actual_A_collection is recorded after the actual collector returns."
+    },
+    {
+      "path": "scripts/experiments/g31_ics_circulation/initial_owner_route_request.py",
+      "lines": [133, 136, 138, 140, 145, 151, 152, 153, 154],
+      "fact": "RPC return precedes snapshot/contract/budget reply binding and the real 60ms cutoff check. The two_choice_reply event is recorded after that cutoff check."
+    },
+    {
+      "path": "scripts/experiments/g31_ics_circulation/initial_owner_route_request.py",
+      "lines": [157, 162, 163, 165, 169, 170],
+      "fact": "final_local_and_receiver_check follows a new actual collection, own view and fresh validation after choose; it is not a decision-return timestamp."
+    },
+    {
+      "path": "scripts/experiments/g31_ics_circulation/json_prediction_client.py",
+      "lines": [99, 101, 107, 108, 109, 110, 116, 119, 120, 121, 122, 125, 127],
+      "fact": "Caller body includes request encode, pipe write/flush, response wait/decode, identity checks, decoding the saved outgoing request and ledger append. Its sampled end precedes final sample-field writes and function return."
+    }
+  ],
+  "attribution_limits": [
+    "RPC caller minus worker wall is a composite containing codec, transport, scheduling/wait, ledger and other overhead. It is not an independently isolated copy, IPC, or pure Python cost and cannot be subtracted as one.",
+    "No collection substage, binary hashing, endpoint-query or individual deepcopy duration is isolated by this report.",
+    "The two saved candidate outcomes are eligible worker predictions, but the actual caller correctly retained the default after the unchanged decision cutoff.",
+    "This clarification makes no speedup, cold-start, full32 or complete-request 100ms claim."
+  ]
+}

@@ -1,0 +1,76 @@
+{
+  "schema": "g31.bridge.saved_private_C_digest.design.v1",
+  "status": "source_design_only_not_implemented_or_executed",
+  "author_review": "Producer-author read of frozen policy, replay binders and accepted C wrapper. Not a full saved-audit certificate.",
+  "fixed_scope": {
+    "new_rows": 37270,
+    "old_complete_prefix_rows": 27218,
+    "offered_jobs": 28506,
+    "trays": 22,
+    "horizon": 86400,
+    "future_shared_seconds": 600,
+    "native_simulation_calls": 0,
+    "policy_change": false,
+    "full_audit_accepted": false,
+    "existing_failures_remain_immutable": true
+  },
+  "measured_motivation": {
+    "package": "dpc_prepare_001",
+    "result_sha256": "729c3a240538c8ef8aa8d0714402840d133ee36ad50b0a52e64c0b36d33632d1",
+    "external_sha256": "93bb690984a194d8a89770791515ad9e5263fed1f602bfbb928ba8d6a627ec59",
+    "small_readback_sha256": "3369b7c17e5db0ab78bbe716857cdd2149b4dd2ddd81aa1f327ea110099709a4",
+    "calls": 32,
+    "all_absent": true,
+    "direct_C_validator_calls": 16,
+    "fallback_validator_calls": 0,
+    "full_byte_oracles": 2,
+    "median_ms": {"27212": {"A": 33.2986, "B": 8.40715}, "27215": {"A": 56.4458, "B": 12.7397}},
+    "whole_python_seconds": 111.8239422,
+    "C_load_and_dependency_entry_seconds": 46.2123891,
+    "dependency_exit_seconds": 50.0233258,
+    "limitation": "These late inputs exercise absent outcomes after the digest. They do not establish accepted-path equivalence/frequency throughout the full stream or predict that600 will finish. The complete source/runtime/toolchain entry-exit cost remains charged. Percentages from copy/compare/digest microstudies must not be added."
+  },
+  "static_call_graph": [
+    {"site": "research_original_low_wip.Owner.activate:273-279", "chain": "direct global delivered_peer -> capture_digest_v2", "binding": "Clone activate with only delivered_peer global replaced. New private BaseOwner subclass owns this method."},
+    {"site": "cooperative_bridge_policy.BridgeOwner.activate:266-323", "chain": "super().activate; base.delivered_peer; reuse.latest_own_capture; self.possession.consume", "binding": "Clone activate with private base/reuse/PossessionGate references; keep exact original __class__ closure."},
+    {"site": "research_original_low_wip_reuse.latest_own_capture:73-105", "chain": "base.delivered_peer for newest actual ACK-delivered self-copy", "binding": "Clone only base facade. Keep newest selection, expiry ordering and both deepcopies unchanged."},
+    {"site": "current_empty_possession_permit.PossessionGate.consume:51-119", "chain": "reuse.latest_own_capture + base.delivered_peer", "binding": "Private PossessionGate subclass overrides consume with exact original code, private base/reuse. Original constructor/checkpoint/_received and returned copies remain."},
+    {"site": "cooperative_bridge_policy.BridgeOwner.__init__:248-256", "chain": "constructs PossessionGate; zero-argument super initializes original005 state", "binding": "Clone only PossessionGate global, preserve original __class__ cell and defaults/kwdefaults."},
+    {"site": "cooperative_bridge_policy.cap_relay_evidence:198-234", "chain": "base.delivered_peer checks actual historical relay capture", "binding": "Clone base facade; do not bypass digest on expired-at-final-H history or change historical verification time."},
+    {"site": "research_original_cooperative_bridge.assess:95-104", "chain": "policy.cap_relay_evidence for each saved owner", "binding": "Runner-private namespace policy must be replaced too, so both inner verify_saved assessment and final outer assessment use the private helper."},
+    {"site": "verify_original_cooperative_bridge.verify_case:188-211,225", "chain": "ObservedOwner(policy.BridgeOwner); clone policy.run_policy; direct policy.cap_relay_evidence; r.assess", "binding": "Checker's private policy facade plus runner-private namespace must both reference the same policy bundle. Keep every physical/frame/ACK/clock check."}
+  ],
+  "call_count_scope": {
+    "startup_activation": "At most one delivered_peer digest opportunity, after nonempty envelope/schema/owner checks. Bridge post-startup block is excluded by not-was_quiet return.",
+    "post_startup_activation": "With was_quiet true the original base immediately returns after refresh. The direct peer and own-selfcopy paths contribute at most2 opportunities; a later PossessionGate.consume contributes at most2 more. Actual early returns, empty envelopes and pre-digest guard failures reduce this. This is a static branch upper bound, not a measured count.",
+    "halt_or_already_cap": "Refresh/ACK/retry and preceding original checks remain; no new digest is forced. No expiry check moves before digest.",
+    "post_replay": "The two-owner cap helper can be called during inner assessment, direct outer relay verification, and final assessment. All invocations remain; exact dynamic count is not inferred from the source upper bound.",
+    "unrelated_repeat_cap_module": "repeat_cap_barrier_relay.RepeatOwner belongs to the separate cap8 policy, not BridgeOwner's MRO in this saved campaign. The actual bridge cap relay uses cooperative_bridge_policy.cap_relay_evidence. Unrelated frozen modules are not patched."
+  },
+  "minimal_private_bundle": [
+    "Construct one accepted encoder.Candidate only after the exact build/functional authority, actual extension path/spec/loader/DLL checks and full dependency entry checks. Use its original capture_digest_v2 method, including per-call _verify and original _digest fallback. No Python preflight, cache, second fallback, expiry movement or per-call source inventory is added.",
+    "Clone base.delivered_peer from its own complete __globals__, changing only capture_digest_v2. Preserve __code__, __defaults__, __kwdefaults__, __closure__. Create a private base facade containing this function.",
+    "Clone base.Owner.activate with direct delivered_peer replacement; put it on PrivateBaseOwner(base.Owner). Clone reuse.latest_own_capture using the base facade and put it in a private reuse facade. Do not install the unrelated borrowed-return or discard-refresh variants.",
+    "Clone PossessionGate.consume using private base/reuse; install on PrivatePossessionGate(original.PossessionGate). Clone original BridgeOwner.__init__ and activate using the needed private globals. Create PrivateBridgeOwner(original.BridgeOwner, PrivateBaseOwner). Its MRO must be [PrivateBridgeOwner, original.BridgeOwner, PrivateBaseOwner, original base.Owner, object]; the original BridgeOwner __class__ cell makes super reach PrivateBaseOwner.activate.",
+    "Construct private policy facade with PrivateBridgeOwner, exact-code run_policy bound to it, and private cap_relay_evidence. No module globals are mutated. Publish/summary and all non-digest selectors/guards retain original methods unless a proof shows an additional actual digest callsite.",
+    "Wrap r.runner_namespace() by modifying only its returned fresh dictionary: policy=private policy. Its existing cloned functions share that dictionary, so isolated_base/assess close over the new policy without copying globals from another module. Do not replace vars(original) with a facade and rely on its function-owner identity filter.",
+    "Clone the original full.verify_case with private policy in its own full globals. Feed a full facade carrying this clone, and an r facade carrying the runner_namespace wrapper, to a new private clone of the existing same-text actor binder. Retain the existing two-expression observer/comparison transforms and identical-text actor replay, original prefix checks, shared-read scope,1024 progress/256 cadence and sole derived-output redirect.",
+    "New driver/plan freezes the explicit union of original producer/audit/source archives, all accepted C gate16 sources, every new private-binder/driver/test helper and defining stdlib/runtime files. Old live/archive026/input/binary/reference checks remain mandatory; actual C origin is separately proved, not inferred from sys.modules. Whole startup/C load/7779+3082 entry-exit/replay/physical verification/export remains inside the new600 limit."
+  ],
+  "required_focused_gates_before_prepare": [
+    "Exact clone code/defaults/kwdefaults/closure identity and full globals-domain equality, with per-function explicit replacement allowlists. Original modules/functions/classes and globals stay unchanged before/after.",
+    "Actual private class construction and ObservedOwner super dispatch reach both private activation methods; init constructs exactly the private PossessionGate. Test the real nested checker class factory, not merely exported class pointers.",
+    "A distinguishable injected digest covers base startup, direct bridge peer, direct selfcopy, both consume paths, direct cap helper, inner assess and final assess. Negative bindings missing any path must fail wiring checks. All guards still run at the same calls; no fabricated envelope or opaque-ID inference.",
+    "Focused synthetic absent/accepted/rejected/expired/malformed and resource-failure cases compare values/order/exceptions/side effects to original Python paths. Preserve original return identity and tuple/list/copy ownership. Accepted C159 synthetic/full-byte evidence is referenced without presenting it as full-stream coverage.",
+    "C Unsupported uses the original writer exactly once; unexpected/resource errors escape to unknown and are not retried or converted to success. Added allocation/load failures and changed resource-failure timing are explicitly not exception-equivalent.",
+    "Prepare/execute/pure log-domain composition, full closed source union, exact owned600 process and external integer tick budget, output redirection and before/after pins. No actual full-day run until root reviews frozen source/pure/plan."
+  ],
+  "preserved_acceptance": [
+    "Every new37270 and old27218 compressed hash and ordered API comparison; actual arguments and physical times; original bounded wall_seconds normalization only.",
+    "Entire original policy replay and all owner/FIFO/storage/ACK/received barrier/current possession/cap relay checks. No skipping failed/unknown roots or jobs.",
+    "All28506 offered jobs,22 trays, original native026 evidence and full physical accounting, same final horizon/seal evidence and independent all_job_states export.",
+    "Progress completedN means ReplayTape row validation/prefix comparison/actor construction reached N, not outer observer/policy consumption completed or a full certificate.",
+    "Prior2400 and600 failures remain failed/unknown, untouched. No full-day or protected-business completion claim before full saved verification actually closes."
+  ],
+  "scope_not_yet_implemented": "This file is a source-bound design only. No new binder, synthetic execution, C load, native operation, benchmark or600 audit was run for this design."
+}

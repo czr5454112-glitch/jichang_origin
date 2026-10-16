@@ -1,0 +1,84 @@
+{
+  "schema": "g31.native027.independent_source_review.v1",
+  "reviewer": "r1_research",
+  "reviewed_at_utc": "2026-10-15T03:12:55.396441+00:00",
+  "status": "no_concrete_source_defect_found_runtime_acceptance_pending",
+  "scope": "Read-only comparison of the eight v3 files to archived native026. Build success is reported separately by control_timers; this reviewer ran no native tests or compiler.",
+  "source_rows": [
+    {
+      "path": "cpp/ics_core/runtime/circulation.hpp",
+      "sha256": "b3b4fe56f82bcd103afbc546528d0f083b31c133d96f6ab963f10787b643bbff",
+      "native027_archive_sha256": "b3b4fe56f82bcd103afbc546528d0f083b31c133d96f6ab963f10787b643bbff",
+      "native026_archive_sha256": "7d80d87159a3c43771b35d8d7483aa9f4f142e136533b90584c31ae05c4de518",
+      "live_matches_built_archive": true
+    },
+    {
+      "path": "cpp/ics_core/runtime/circulation_checkpoint.hpp",
+      "sha256": "c6e4cc3d5a655103ed185028ded73e16cacbe74d30b110f77d34c81934abb8d5",
+      "native027_archive_sha256": "c6e4cc3d5a655103ed185028ded73e16cacbe74d30b110f77d34c81934abb8d5",
+      "native026_archive_sha256": "7d898014779212c804be1c591def4e78d62da3a1ba602845da0478c9c9a3dc34",
+      "live_matches_built_archive": true
+    },
+    {
+      "path": "cpp/ics_core/runtime/circulation_planning_snapshot_impl.hpp",
+      "sha256": "ab9628ca2552b0d5d11532b4e637dec6baaab7f273e67d60b4bfab891b395942",
+      "native027_archive_sha256": "ab9628ca2552b0d5d11532b4e637dec6baaab7f273e67d60b4bfab891b395942",
+      "native026_archive_sha256": "6fcd5ee8520e4f4228ad6791d66275bc0d8294b6a54833b695ab36d40d9c1337",
+      "live_matches_built_archive": true
+    },
+    {
+      "path": "cpp/ics_core/runtime/circulation_protocol_commands_impl.hpp",
+      "sha256": "0fed036550e54264e3bc750df8deb663e572b049b785bb98ca813ef3360045af",
+      "native027_archive_sha256": "0fed036550e54264e3bc750df8deb663e572b049b785bb98ca813ef3360045af",
+      "native026_archive_sha256": "3f54018b294fb190848173b495bf82edef1b682aef54964b8998853728410e99",
+      "live_matches_built_archive": true
+    },
+    {
+      "path": "cpp/ics_core/runtime/circulation_runtime_impl.hpp",
+      "sha256": "3af08de9a344698fb70dc1c718abc94fd6c6a9429427848f4c3d06a246154edc",
+      "native027_archive_sha256": "3af08de9a344698fb70dc1c718abc94fd6c6a9429427848f4c3d06a246154edc",
+      "native026_archive_sha256": "afea5bfa04c640f9a0814a1e7610b6d0714fdea10c21468d3b608a6f5c49f745",
+      "live_matches_built_archive": true
+    },
+    {
+      "path": "cpp/ics_core/runtime/event_driven_junction.hpp",
+      "sha256": "eaedef7532950bb054aaf3e179fd839780ec5306f6182088c16d7e3b9ee54947",
+      "native027_archive_sha256": "eaedef7532950bb054aaf3e179fd839780ec5306f6182088c16d7e3b9ee54947",
+      "native026_archive_sha256": "adb709c1461da33f353030251299ecee512954e7abd73fb3a8448407abb652bf",
+      "live_matches_built_archive": true
+    },
+    {
+      "path": "cpp/ics_core/bindings/circulation_session_binding.hpp",
+      "sha256": "66cbba8a046c5ee863241a6b449731be430caae37c046ec9e392ac232d380f66",
+      "native027_archive_sha256": "66cbba8a046c5ee863241a6b449731be430caae37c046ec9e392ac232d380f66",
+      "native026_archive_sha256": "dd7dd9ddad84582883f3327ab43aec9cd8a74b997f0ee85d232bf5281589dca4",
+      "live_matches_built_archive": true
+    },
+    {
+      "path": "cpp/ics_core/runtime/request_timing_recorder.hpp",
+      "sha256": "e9df1c4e82560deb4f3e7b3993a404f7f5393640d4faf55bf41eb600b9f8c3fd",
+      "native027_archive_sha256": "e9df1c4e82560deb4f3e7b3993a404f7f5393640d4faf55bf41eb600b9f8c3fd",
+      "native026_archive_sha256": "158eba70d80931e7e8ba93a156a383b6402a5a4a7b94fdaae3f941a995fc70a0",
+      "live_matches_built_archive": true
+    }
+  ],
+  "build_receipt_sha256": "3f8ac38c53f2b29d1bae7dd204c26324f6674937bef9eb0ad285c853b58f296d",
+  "checks": [
+    "Current source ownership and edge_entry_observed gate before any entry fact",
+    "Exact current private active leg, tray/job, edge and private traversal receipt match; public per-tray traversal only exported",
+    "Reservation without matching actual EDGE_ENTER remains unmatched coverage",
+    "Derived exit uses static travel and observed entry, not future heap reads",
+    "V3 typed digest nests computed unchanged v2 digest string",
+    "Actual recipient delivery, final ACK self-copy, and latest-before-expiry tombstone logic",
+    "No-v3 checkpoint extension omitted when vector empty; old branches preserved in source",
+    "Timing identity11 appended; older numeric identities unchanged"
+  ],
+  "required_runtime_gates": [
+    "Exact independent typed digest agreement",
+    "Reservation-before-entry, tray reuse, source handoff and fault/expiry/retry tests",
+    "V1/v2 and no-v3 ordered view/checkpoint/seal equivalence",
+    "New endpoint/timing identity accepted only in a versioned ABI contract"
+  ],
+  "native_worker_count": 0,
+  "runtime_acceptance_certified": false
+}

@@ -1,0 +1,130 @@
+{
+  "schema": "g31.preexisting_executable_preference_design.v1",
+  "status": "new_partial_interface_and_design_no_native_campaign",
+  "evidence_sha256": {
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\native_preexisting_business_003_failure_diagnosis.json": "736f519a5440dd6fb06f5d124f57a18d7572345a9fbc528106ce6d7aa13336e5",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\native_preexisting_v3_run_business_001_failure_diagnosis.json": "0718bb358b190fd7c7ebd741e6f8c23768c3ecef708685f7901a90f40802ab22",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\native_preexisting_v3_run_business_001_endpoint_diagnosis_002.json": "c7e6383dd235f1857484d7bcabf8e1543fc1e7bd383670605c617736ef72ccd1",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\preexisting_preference_semantics_design_001.json": "b8e12b08d6555a0be7022616a6596882a48cc79f9350a13b3effeca8a5f91ca3",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\reuse_v2_002\\receipt.json": "e677a88406d68b0a242f1d4d9409f591d4aa88ee86d040d46dc34b66ee52ce4a",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\executable_preference_pure_001.xml": "ded4feda27414abae3ddd679457c2244671f0de93fac63c3b8a35bb409301d52",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_route_preference_model.py": "8b5bf70f10c061f1f45a517e8c599fe9d410c81af23c0e75169cf46bcf5f136d",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_executable_preference_actions.py": "936c5f1484155687703faa8e7f486fd3894475bd3fbd589edd4bb47751c6bc04"
+  },
+  "historical_correction": {
+    "old025_unknown": 50,
+    "actual027_unknown": 50,
+    "each_45_initial_rejections_and_5_later_rejections": true,
+    "each_14_later_edge_mismatches": {
+      "updated_preference": 9,
+      "rejected_preference": 5
+    },
+    "old60_business_verdicts_unchanged": true,
+    "completion_vectors_equal_across025_and027": 58,
+    "changed_vectors": [
+      {
+        "branch": "block1_load1/fixed_window_0",
+        "old025_completion": {
+          "loaded": 7.1999999999999975,
+          "receiver": 12.319999999999999,
+          "reuse1": 12.649999999999993,
+          "reuse2": 18.059999999999995,
+          "blocker": 4.299999999999999
+        },
+        "actual027_fallback_completion": {
+          "loaded": 7.1999999999999975,
+          "receiver": 13.150999999999993,
+          "reuse1": 12.649999999999993,
+          "reuse2": 18.059999999999995,
+          "blocker": 4.299999999999999
+        },
+        "both_actual_status": "unknown_incomplete_or_unexecuted",
+        "business_protection_not_inferred": true
+      },
+      {
+        "branch": "block1_load1/fixed_window_1",
+        "old025_completion": {
+          "loaded": 7.1999999999999975,
+          "receiver": 12.119999999999997,
+          "reuse1": 12.649999999999993,
+          "reuse2": 18.059999999999995,
+          "blocker": 4.299999999999999
+        },
+        "actual027_fallback_completion": {
+          "loaded": 7.1999999999999975,
+          "receiver": 13.150999999999993,
+          "reuse1": 12.649999999999993,
+          "reuse2": 18.059999999999995,
+          "blocker": 4.299999999999999
+        },
+        "both_actual_status": "unknown_incomplete_or_unexecuted",
+        "business_protection_not_inferred": true
+      }
+    ]
+  },
+  "actual027_information": {
+    "all120_old_results_unknown_due_request_vs_generated_message_id": true,
+    "new_binding_on_frozen_raw_only": {
+      "A_conditional": 60,
+      "B_conditional": 50,
+      "B_stationary_loaded_unsupported": 10
+    },
+    "new_policy_not_executed_in_offline_replay": true
+  },
+  "new_action_semantics": {
+    "initial": [
+      "native_default",
+      "prefer_2"
+    ],
+    "later": [
+      "native_default",
+      "prefer_8"
+    ],
+    "native_default": "No command submitted. It declares no physical next edge and no executed R1 update. The native scorer/shield determines actual next and it must be retained. This is a NEW policy, never reclassification of a rejected prior command.",
+    "preferences": "Actual fresh source-local native route command; projected wire acceptance and later shield/ranking are separate. Delivered updated ACK does not reserve receiving capacity; actual edge remains mandatory."
+  },
+  "finite_domain": {
+    "same_six_existing_synthetic_cases": true,
+    "same_three_trays_five_jobs": true,
+    "same_topology_capacity_fifo_headway_protocol": true,
+    "empty_windows": "all four original public-duration windows, unchanged and supplied to both initial families",
+    "return_delay": [
+      0.0,
+      0.5
+    ],
+    "actions_per_case": 32,
+    "methods": [
+      "coordinate_strict",
+      "coordinate_plateau",
+      "resource_pair_repair",
+      "finite_horizon_enumeration"
+    ],
+    "same_method_information_and_budget": 32,
+    "fixed_initial_reference": "both native_default and prefer_2 families retain all four E windows and the same future rolling action domain/information; a reference may not be silently constrained to one window or old forced-next semantics",
+    "native_branch_budget": "not admitted; freeze only after corrected full public projection and independent review"
+  },
+  "implemented_scope": {
+    "public_route_preference_model": "conditional command execution, shield-gated preference ranking and bounded submission guard; supplied base S4 scores/calendar fields required",
+    "public_executable_preference_actions": "32-candidate action vocabulary and explicit current-prefix command/no-command materialization; supplied public interval provenance required",
+    "tests_passed": 32,
+    "complete_five_job_projection": false,
+    "online_adapter_for_new_action_domain": false,
+    "native_execution": false
+  },
+  "next_derivation": {
+    "initial_prefer2": "At loaded L node0 public load_complete + source service gives earliest dispatch bound; target2 has only incoming0, all other declared finite jobs cannot reach0/2 before their goals, and current full occupancy must be0. Need explicit known initial/no-prior-edge proof for headway/calendar before using this as interval bound. Wire time must be strictly before dispatch; preserve native 0.01 rather than shorten it.",
+    "later_prefer8": "At first-reuse L node7, target8 has only incoming7; E terminates at4 and P at9, with export disabled there, so no other allowed finite policy tray can use7to8. Need actual five-job state/terminal receipts, no prior reuse1 edge, no unresolved actions, current occupancy and public service timing. Return a conditional bound, never infer actual future truth.",
+    "native_default": "Full S4 base score includes static service-aware potential, corridor/target calendar wait, pressure, history and tie ordering. Must reproduce this public model before evaluating default. Do not substitute best-allowed or old forced-wait code.",
+    "evidence_validation": "Apply corrected model to the entire frozen saved domain/120 endpoint inputs, not only successful routes; record prediction error and unknowns before any new native campaign."
+  },
+  "falsifiable_tests": [
+    "If own current prefix already committed, no command may be submitted against it.",
+    "If a target occupancy or entry-headway/calendar bound is unknown, preference remains unknown, not default-success.",
+    "If a competitor can reserve the target between wire execution and dispatch, the primitive must allow updated ACK plus different actual next.",
+    "Full five-job zero-regression must be assessed on completed native outcomes against every declared fixed-initial reference; unfinished remains unknown."
+  ],
+  "native_executions": 0,
+  "strict_business_protection_certified": false,
+  "method_novelty_claim": false,
+  "full_request_100ms_claim": false
+}

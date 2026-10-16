@@ -1,0 +1,47 @@
+$ErrorActionPreference='Stop'
+$taskRoot=[IO.Path]::GetFullPath((Join-Path $PSScriptRoot '../../../..'))
+Set-Location -LiteralPath $taskRoot
+$env:PYTHONPATH='src;.;tests'
+$env:PYTHONIOENCODING='utf-8'
+$env:PYTEST_DISABLE_PLUGIN_AUTOLOAD='1'
+$taskFolder=Join-Path (Split-Path -Parent $PSScriptRoot) 'preference_protection_context_pair_001'
+$taskPlan=Join-Path $taskFolder 'preregistered_protocol.json'
+$taskModule=Join-Path $taskRoot 'scripts/experiments/g31_ics_circulation/measure_preference_protection_request_context.py'
+$taskPlanSha='3f29244efa0524732a21c8872ce884ccf039ace6ab0a82c0810a313ba0827441'
+$taskModuleSha='497a154f33e2bca1288e95daab6912cff96ace0f94a3f219b104fe08ecc8d449'
+if ((Get-FileHash -LiteralPath $taskPlan -Algorithm SHA256).Hash.ToLowerInvariant() -ne $taskPlanSha) {throw 'Prepared plan changed'}
+if ((Get-FileHash -LiteralPath $taskModule -Algorithm SHA256).Hash.ToLowerInvariant() -ne $taskModuleSha) {throw 'Prepared module changed'}
+$taskDestination=Join-Path $taskFolder 'external_application_wall.json'
+if (Test-Path -LiteralPath $taskDestination) {throw 'Preserve prior external measurement'}
+$taskWrapperSha=(Get-FileHash -LiteralPath $PSCommandPath -Algorithm SHA256).Hash.ToLowerInvariant()
+$taskPython='C:/PROGRAMING/python3.11.9/python.exe'
+$taskPythonSha=(Get-FileHash -LiteralPath $taskPython -Algorithm SHA256).Hash.ToLowerInvariant()
+if ($taskPythonSha -ne '5f7b89a612c9b8af1d6456cdfcd1dbe5ca630849e79aebced9bee9a6694952ec') {throw 'Prepared interpreter changed'}
+$taskStarted=[DateTime]::UtcNow.ToString('o')
+$taskStamp=[Diagnostics.Stopwatch]::GetTimestamp()
+$taskCode=$null
+$taskError=$null
+try {
+    & $taskPython -m scripts.experiments.g31_ics_circulation.measure_preference_protection_request_context --launch --output $taskFolder --plan-sha256 $taskPlanSha
+    $taskCode=$LASTEXITCODE
+} catch {$taskError=$_.Exception.Message}
+$taskEnd=[Diagnostics.Stopwatch]::GetTimestamp()
+$taskUnchanged=((Get-FileHash -LiteralPath $taskPlan -Algorithm SHA256).Hash.ToLowerInvariant() -eq $taskPlanSha -and (Get-FileHash -LiteralPath $taskModule -Algorithm SHA256).Hash.ToLowerInvariant() -eq $taskModuleSha -and (Get-FileHash -LiteralPath $PSCommandPath -Algorithm SHA256).Hash.ToLowerInvariant() -eq $taskWrapperSha -and (Get-FileHash -LiteralPath $taskPython -Algorithm SHA256).Hash.ToLowerInvariant() -eq $taskPythonSha)
+$taskRecord=[ordered]@{
+    schema='g31.protection_context_pair.external_application_wall.v1'
+    status=$(if ($taskCode -eq 0 -and $null -eq $taskError -and $taskUnchanged) {'application_exited_zero'} else {'application_failed_or_unknown'})
+    started_utc=$taskStarted;ended_utc=[DateTime]::UtcNow.ToString('o')
+    whole_python_application_seconds=($taskEnd-$taskStamp)/[double][Diagnostics.Stopwatch]::Frequency
+    plan_sha256=$taskPlanSha;module_sha256=$taskModuleSha;wrapper_sha256=$taskWrapperSha;python_sha256=$taskPythonSha
+    evidence_unchanged=$taskUnchanged;exit_code=$taskCode;error=$taskError
+    child_job_budget_seconds=120;native_executions=0;complete_100ms_certified=$false
+    scope='Full Python parent startup/import/source verification, owned worker startup/paired measurements/all raw verification/export, parent final receipt and exit. Every batch includes context, full baseline, all32 queries and JSON encoding.'
+    exclusions='PowerShell/tool startup, prelaunch digest and post-exit digest/this receipt export. These are declared harness work; no platform cold-start or complete business-request certificate.'
+}
+$taskBytes=[Text.UTF8Encoding]::new($false).GetBytes(($taskRecord | ConvertTo-Json -Depth 6))
+$taskStream=[IO.File]::Open($taskDestination,[IO.FileMode]::CreateNew,[IO.FileAccess]::Write)
+try {$taskStream.Write($taskBytes,0,$taskBytes.Length)} finally {$taskStream.Dispose()}
+[ordered]@{status=$taskRecord.status;whole_python_application_seconds=$taskRecord.whole_python_application_seconds;sha256=(Get-FileHash -LiteralPath $taskDestination -Algorithm SHA256).Hash.ToLowerInvariant()} | ConvertTo-Json -Compress
+if ($null -ne $taskError) {throw $taskError}
+if (-not $taskUnchanged) {throw 'Measurement identities changed'}
+if ($taskCode -ne 0) {exit $taskCode}

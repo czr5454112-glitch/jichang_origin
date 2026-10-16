@@ -32,10 +32,25 @@ class ReleaseForecast:
     latest: float | None = None
 
 
+_FORECAST_FIELDS = tuple(ReleaseForecast.__dataclass_fields__)
+_SCALAR_TYPES = {str, int, float, bool, type(None)}
+
+
+def _scalar_forecast_dict(forecast: ReleaseForecast) -> dict[str, Any]:
+    # Native forecasts contain only immutable scalar fields. Each caller still
+    # receives its own dictionary; unusual/subclass values retain asdict's
+    # original recursive-copy behavior rather than acquiring shallow aliases.
+    values = vars(forecast)
+    if (type(forecast) is ReleaseForecast and tuple(values) == _FORECAST_FIELDS
+            and all(type(value) in _SCALAR_TYPES for value in values.values())):
+        return values.copy()
+    return asdict(forecast)
+
+
 class PublicTravel:
     """Static service-aware paths, with only notified closures removed."""
 
-    def __init__(self, observation: dict[str, Any]):
+    def __init__(self, observation: dict[str, Any], *, _reuse_source_searches: bool = True):
         self.service = {int(r[0]): max(float(r[2]), .001)
                         for r in observation["node_records"]}
         self.adj: dict[int, list[tuple[int, float]]] = defaultdict(list)
@@ -51,11 +66,15 @@ class PublicTravel:
             if (int(u), int(v)) not in closed:
                 self.adj[int(u)].append((int(v), max(float(length) / float(speed), .001)))
         self.cache: dict[tuple[int, int], tuple[float, tuple[int, ...]]] = {}
+        self._reuse_source_searches = _reuse_source_searches
+        self._source_searches: dict[int, list] = {}
 
     def path(self, source: int, target: int) -> tuple[float, tuple[int, ...]]:
         key = source, target
         if key in self.cache:
             return self.cache[key]
+        if self._reuse_source_searches:
+            return self._continued_path(source, target)
         queue = [(0.0, (source,), source)]
         best = {source: 0.0}
         while queue:
@@ -72,6 +91,42 @@ class PublicTravel:
                     heapq.heappush(queue, (proposed, path + (dest,), dest))
         self.cache[key] = math.inf, ()
         return self.cache[key]
+
+    def _continued_path(self, source: int, target: int) -> tuple[float, tuple[int, ...]]:
+        # A positive-weight Dijkstra run has the same settled prefix for every
+        # target. Resume its exact heap/strict-improvement arithmetic, including
+        # the unexpanded previous target, instead of restarting for each pair.
+        # This object belongs to one observation/candidate call only. Keep the
+        # public pair cache limited to explicitly queried pairs as before.
+        state = self._source_searches.get(source)
+        if state is None:
+            state = [[(0.0, (source,), source)], {source: 0.0}, {}, None]
+            self._source_searches[source] = state
+        queue, best, settled, pending = state
+        if target not in settled:
+            if pending is not None:
+                cost, path, node = pending
+                for dest, travel in self.adj[node]:
+                    proposed = cost + self.service[node] + travel
+                    if proposed < best.get(dest, math.inf):
+                        best[dest] = proposed
+                        heapq.heappush(queue, (proposed, path + (dest,), dest))
+                state[3] = None
+            while queue:
+                cost, path, node = heapq.heappop(queue)
+                if cost > best[node]:
+                    continue
+                settled[node] = cost, path
+                if node == target:
+                    state[3] = cost, path, node
+                    break
+                for dest, travel in self.adj[node]:
+                    proposed = cost + self.service[node] + travel
+                    if proposed < best.get(dest, math.inf):
+                        best[dest] = proposed
+                        heapq.heappush(queue, (proposed, path + (dest,), dest))
+        self.cache[source, target] = settled.get(target, (math.inf, ()))
+        return self.cache[source, target]
 
     def complete(self, source: int, target: int) -> float:
         return self.path(source, target)[0] + self.service[target]
@@ -199,7 +254,8 @@ def conditional_service_windows(observation: dict[str, Any]) -> list[dict[str, A
 
 
 def departure_avoiding_published_windows(observation: dict[str, Any], supply: ReleaseForecast,
-                                        destination: int, travel: PublicTravel, message_delay: float) -> dict[str, Any]:
+                                        destination: int, travel: PublicTravel, message_delay: float,
+                                        *, _windows: list[dict[str, Any]] | None = None) -> dict[str, Any]:
     """Ordinary point-estimate time-window baseline; never a hard certificate.
 
     Only transit-node occupancy windows are shifted. Terminal/remote receiving
@@ -215,7 +271,7 @@ def departure_avoiding_published_windows(observation: dict[str, Any], supply: Re
         if v != destination:
             offsets.append((v, entered, arrived + travel.service[v]))
         elapsed = arrived
-    windows = conditional_service_windows(observation)
+    windows = conditional_service_windows(observation) if _windows is None else _windows
     relevant = [(window, start, end) for node, start, end in offsets for window in windows
                 if window["next"] == node and window["tray_id"] != supply.tray_id]
     if not relevant:
@@ -399,7 +455,8 @@ def transfer_candidates(observation: dict[str, Any], *, predictive: bool,
                         message_delay: float = 0, expiry_slack: float = 60,
                         request_prefix: str = "analytic", terminal_clearing: bool = True,
                         respect_service_forecasts: bool = False,
-                        compress_equivalent_demands: bool = True) -> dict[str, Any]:
+                        compress_equivalent_demands: bool = True,
+                        _reuse_observation_work: bool = True) -> dict[str, Any]:
     """Build a common feasible-intent pool and solve its analytical assignment.
 
     Local FIFO demand is protected before cross-zone export. Existing pending
@@ -424,7 +481,7 @@ def transfer_candidates(observation: dict[str, Any], *, predictive: bool,
     contracts = {int(n["node"]): n for n in observation["node_contracts"]}
     needs_future_travel = predictive and any(t["mode"] in ("loading", "loaded", "storage", "empty_transit")
                                              for t in observation.get("trays", []))
-    travel = PublicTravel(observation) if needs_future_travel else None
+    travel = PublicTravel(observation, _reuse_source_searches=_reuse_observation_work) if needs_future_travel else None
     all_forecasts = release_forecasts(observation, include_future=predictive, travel=travel)
     active = [t for t in observation.get("transfers", [])
               if t["status"] in ("pending", "granted", "in_transit", "requested", "delivered",
@@ -476,7 +533,7 @@ def transfer_candidates(observation: dict[str, Any], *, predictive: bool,
         elif contracts[node].get("allow_receive", True):
             demand.append(dict(job, demand_kind="observed_source_queue"))
     if supplies and travel is None:
-        travel = PublicTravel(observation)
+        travel = PublicTravel(observation, _reuse_source_searches=_reuse_observation_work)
     clearing_pressure_without_supply = 0
     if terminal_clearing:
         # A reasonable reactive baseline must also free a full terminal for a
@@ -518,12 +575,18 @@ def transfer_candidates(observation: dict[str, Any], *, predictive: bool,
     pool: list[dict[str, Any]] = []
     representatives = (_assignment_representatives(demand, len(supplies)) if compress_equivalent_demands
                        else list(enumerate(demand)))
+    windows = None
     for i, supply in enumerate(supplies):
         row = []
         for j, job in representatives:
             destination = int(job["origin"])
             eta = max(now + message_delay, supply.estimate) + travel.complete(supply.node, destination)
-            window = departure_avoiding_published_windows(observation, supply, destination, travel, message_delay) if respect_service_forecasts else None
+            if respect_service_forecasts and _reuse_observation_work and windows is None:
+                # Validate/select revisions only if a pair is evaluated, just
+                # as the original lazy path. No snapshot survives this call.
+                windows = conditional_service_windows(observation)
+            window = departure_avoiding_published_windows(observation, supply, destination, travel,
+                message_delay, _windows=windows) if respect_service_forecasts else None
             if window:
                 eta = max(eta, window["earliest_departure"] + travel.complete(supply.node, destination))
             same_zone = contracts[supply.node]["zone"] == contracts[destination]["zone"]
@@ -558,10 +621,11 @@ def transfer_candidates(observation: dict[str, Any], *, predictive: bool,
                         "service_window": choice["service_window"],
                         "owner_id": contracts[supply.node].get("resource_owner", contracts[supply.node]["zone"]),
                         "expected_version": observation.get("version", 0)})
+    serialize_forecast = _scalar_forecast_dict if _reuse_observation_work else asdict
     return {"policy": "analytic_predictive_matching" if predictive else "reactive_matching",
             "now": now, "version": observation.get("version", 0),
-            "forecasts": [asdict(f) for f in all_forecasts], "pool": pool,
-            "supplies": [asdict(s) for s in supplies], "demands": demand,
+            "forecasts": [serialize_forecast(f) for f in all_forecasts], "pool": pool,
+            "supplies": [serialize_forecast(s) for s in supplies], "demands": demand,
             "exact_waiting_count": sum(local_demand.values()), "exact_demand_count": exact_demand_count,
             "demand_identity_scope": "bounded_fifo_representatives" if compact else "all_visible_uncovered",
             "assignment_demand_count": len(representatives),

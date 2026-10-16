@@ -1,0 +1,175 @@
+{
+  "schema": "g31.live_obligation.conditional_continuation_design.v1",
+  "status": "source_only_design_not_implemented",
+  "native_calls": 0,
+  "model_calls": 0,
+  "tests_run": 0,
+  "existing_passive_points_remain_resumable": false,
+  "main_finding": "The current passive graph omits the active Python stack, including the already-popped event, loop count and the tick owner cursor. Calling run, tick, activate or decide again from its entry is not an exact continuation. A new explicit four-frame conditional-model driver is required; existing passive points cannot be retroactively upgraded.",
+  "source_basis": [
+    {
+      "path": "scripts/experiments/g31_ics_circulation/public_native_preference_projection.py",
+      "locations": ["Projection.run:330-429", "Projection.schedule:65-84", "Projection.notify_owner:86-90"],
+      "facts": "run initializes legs, empty supply, optional route and every START+i*PERIOD tick before count=0; it then pops, sets self.time, checks horizon, increments count, checks20000 and handles one event. The final result includes count. The event-budget early return is separate from the final return."
+    },
+    {
+      "path": "scripts/experiments/g31_ics_circulation/public_live_obligation_communication_projection.py",
+      "sha256": "0c77f130e31f2727d0f6b7f6e6425ae073e3bf5b97515843cf1d03cced5c56ea",
+      "locations": ["Projection.decide:211-255", "Projection.tick:257-258", "Projection.activate:260-302", "make_run:358-385"],
+      "facts": "make_run wraps each handler with before_event, protocol_event and after_event, and wraps only the final return in finish. tick runs A then B or the one supplied owner. activate marks the boundary, retries immutable requests, publishes demand, exchanges messages and resolves deferred reply before calling decide."
+    },
+    {
+      "path": "scripts/experiments/g31_ics_circulation/public_live_obligation_lazy_communication_projection.py",
+      "sha256": "980f245dc3b3563968015a626ed5e127fd94efb70044eb24b67d9d948835f86f",
+      "facts": "The accepted activate implementation is a privately compiled AST. Its remaining tail must retain the two lazy L-view reads, not restore the earlier eager view. inspect.getsource on its generated function is not a sufficient implementation source."
+    },
+    {
+      "path": "scripts/experiments/g31_ics_circulation/public_live_obligation_phase_b_pause.py",
+      "sha256": "cf7f419ffc56527945a8e85b82506d597801eaf126555ac66f7780897e84685b",
+      "facts": "The passive point has an engine graph and just-collected values but no run/tick/activate continuation frames. It deliberately remains resumable=False."
+    }
+  ],
+  "exact_active_call_chain": [
+    "run: current event already popped; self.time set; count incremented and budget checked; before_event executed; protocol_event returned False for tick/owner_activation",
+    "physical handler: tick calls tick(None); owner_activation has already appended its activation_trace row and calls tick(args[0])",
+    "tick: owner tuple and current index selected; for an ordinary tick the order is ('A','B')",
+    "activate: current owner identity added to activated_boundaries; immutable retry/demand/exchange/deferred-reply prelude already executed",
+    "decide: pending/quiet/ACK/deadline admission passed; s and p bound; collect returned information, retry screen and view",
+    "only supported suspension: after collect, before record creation, retry publication, final local guard or physical preference/transfer"
+  ],
+  "minimal_new_continuation_record": {
+    "source_and_domain": [
+      "exact frozen physical/lazy/communication code identities, contract and initial lawful context identity",
+      "conditional model provenance only; no native session, checkpoint, actual hidden state or authority token",
+      "initialization_done=True; START/PERIOD/HORIZON and selected action retained unchanged"
+    ],
+    "model_graph": [
+      "entire engine __dict__, including heaps, calendars, headways, FIFO/waiters, last_arbitration, readiness and dispatch commitments",
+      "requests/client_rows/physical_request/event arguments in one alias-preserving graph; no separately decoded copies of the same request",
+      "world.e back-reference; observed projected entries, prefixes, lifecycle clocks and completion facts",
+      "owner_state pending/quiet/seen/started/reply_budget/deferred reply, demand/inbox/channel state and all monotone sequences",
+      "owner_boundaries and activated_boundaries are distinct deduplication sets and both remain unchanged",
+      "all existing logs, completed jobs, used action history and unknown phases"
+    ],
+    "run_frame": {
+      "program_counter": "inside_current_physical_owner_handler",
+      "count": "logical event count INCLUDING the current popped event; budget check already passed",
+      "current_event": "the exact tuple (time, priority, sequence, kind, args), with args aliased into the same model graph; never reinsert it",
+      "before_event_done": true,
+      "protocol_dispatch_done": true,
+      "protocol_dispatch_result": false,
+      "physical_handler_started": true,
+      "after_event_pending": true,
+      "activation_trace_already_appended": "true only when current_event.kind is owner_activation",
+      "termination": "not_terminal; horizon and count guards for this event already checked"
+    },
+    "tick_frame": {
+      "owners": "exact tuple ('A','B') for tick or (event.args[0],) for owner_activation",
+      "owner_index": "current owner index, not the next owner",
+      "return_point": "after current activate returns, increment index and invoke remaining owners before returning to run"
+    },
+    "activate_frame": {
+      "owner": "the owner selected by tick",
+      "s": "alias of engine.owner_state[owner]",
+      "program_counter": "resume AFTER self.decide(owner) returns",
+      "prelude_completed": "dedup marker, retry loop, demand publication, exchange and deferred reply are not repeated",
+      "tail": "original lazy activate tail, including pending/quiet early return and current local L/E checks"
+    },
+    "decide_frame": {
+      "program_counter": "after_collect_before_record_and_action",
+      "owner_s_p": "owner plus exact aliases s=owner_state[owner] and p=s['pending']; p can later become an old row when the remainder replaces s['pending']",
+      "collected_values": "information, retry screen and view returned by this collection, copied with the engine and all frame aliases in ONE graph operation",
+      "not_required_locals": "ack is dead after the collect site; record/known/tray/try-body locals do not exist yet",
+      "remainder": "the exact original record creation through final pending=None or retry return; no recollection or replacement of collected values on resume"
+    }
+  },
+  "proposed_minimal_interface": {
+    "new_modules_only": true,
+    "start": "start_conditional(supplied_initial_context, fixed_action) performs the unchanged initialization once and enters an explicit-frame loop.",
+    "advance": "advance_to_collection_or_terminal(state) executes original event statements until the supported post-collect program counter or the exact original terminal return.",
+    "fork": "fork_conditional(continuation) clones the model plus ALL frames and collected values together; external recorders are not retained.",
+    "resume_first_gate": "resume_same_action(continuation) completes decide remainder -> activate tail -> tick remaining owners -> run.after_event -> next heap pop. It does not change action or read actual data.",
+    "counterfactual_gate_deferred": "Only after exact same-action continuation passes may a separate reviewed suffix API change a field proved unused in the executed prefix. Phase B cannot revise the first return or initial route/supply action.",
+    "single_use": "A continuation instance has explicit consumed/terminal state. A fork is made before consumption. Reusing a consumed instance is rejected rather than scheduling duplicate work.",
+    "yield_semantics": "A yield is a model control-flow event outside physical time; it does not enqueue an event, increment sequence/count, drain the heap or advance the clock."
+  },
+  "implementation_proof_requirements": [
+    "AST-split the frozen decide exactly at its unique collect statement; concatenating prefix and remainder restores the original normalized AST.",
+    "Derive the accepted lazy activate AST from the frozen original transformation and bind its recursive code signature; then split immediately after self.decide. Do not silently use the old eager activate.",
+    "Lower only tick's owner cursor and run's dispatch control into explicit frames. All physical handler statements, before/after hooks and arithmetic expressions remain byte/AST bound to the frozen source.",
+    "Preserve the original generated run wrapper: before_event once, protocol_event once, physical handler once when False, after_event once. The event-budget early return must still bypass finish as the old function does.",
+    "Keep logical event count inherited across clones and resumes. Compute accounting charges initialization, validation, copied graphs and every actual continuation evaluation; candidate budgets32/4 and unknown status do not change.",
+    "The first executable gate should only compare same-action continuation output, chronology and internal framed state against uninterrupted execution. No optimizer or actual-state filter is installed in that gate."
+  ],
+  "source_derived_counterexamples": [
+    {
+      "shortcut": "Call run() on a passive engine clone.",
+      "failure": "Reissues initial E supply and optional route, starts legs and all periodic ticks again, resets local count to0 and changes IDs/order/budget."
+    },
+    {
+      "shortcut": "Resume by popping the next heap event.",
+      "failure": "The current owner event has already left the heap. Its decision remainder, activation tail, possible second owner and after_event are lost."
+    },
+    {
+      "shortcut": "Reinsert the current event then process it again.",
+      "failure": "Duplicates count, activation_trace and hooks. Boundary dedup may then suppress the still-unexecuted decision rather than repair it."
+    },
+    {
+      "shortcut": "Call activate(owner) from the top.",
+      "failure": "activated_boundaries already contains (time,owner), so it returns immediately. Removing that marker instead repeats immutable retries/demand/exchange/reply work and can create new request/message sequences."
+    },
+    {
+      "shortcut": "Call decide(owner) from the top.",
+      "failure": "Re-reads ACK/deadline and repeats collect and its validation/cost. It is not the continuation of the already-returned information/screen/view and obscures future action-change semantics."
+    },
+    {
+      "shortcut": "At an A pause inside tick, return to the heap before B.",
+      "failure": "tick executes A then B inside one handler. B must run before the next heap event, even if another same-timestamp owner event is queued."
+    },
+    {
+      "shortcut": "At a B pause, restart tick from A.",
+      "failure": "A's earlier work is repeated or suppressed by dedup; B's current unfinished remainder is not restored by either outcome."
+    },
+    {
+      "shortcut": "Re-sort or regenerate same-timestamp work using owner names.",
+      "failure": "tick and A activation have priority99, B activation100, and existing sequence breaks ties. Original tick scheduling and owner notification history must remain exact."
+    },
+    {
+      "shortcut": "Reset count or recount only heap entries at resume.",
+      "failure": "At count20000 the current handler is allowed; the next in-horizon pop returns unknown at20001 before its handler and without finish. Resetting count grants extra work."
+    },
+    {
+      "shortcut": "Leave an event beyond HORIZON on the heap or increment count for it.",
+      "failure": "Original run pops it and sets self.time first, then breaks before count increment and before_event. A terminal state must retain this exact stop behavior."
+    },
+    {
+      "shortcut": "Use the old pending row as a live alias after retry replacement.",
+      "failure": "The decide retry remainder publishes once, increments sequences and assigns a new pending dict. The old p and owner_state pending now differ by design; both frame lifetimes must be correct."
+    },
+    {
+      "shortcut": "Rebuild request/event args independently from JSON.",
+      "failure": "ACK and retry handlers mutate shared request/client rows; equal-valued detached objects can change future terminal flags, retries and notifications."
+    }
+  ],
+  "necessary_small_pure_checklist_not_run": [
+    "Inverse AST/code identities for initialization/run dispatcher, tick cursor, lazy activate split and decide split.",
+    "Fake A pause inside tick: resume exact remainder then B once, then after_event once; no new pop before B.",
+    "Fake B pause inside tick: A prelude not repeated and B action not omitted by existing activated boundary.",
+    "Single-owner owner_activation pause: activation_trace already appended exactly once; later same-timestamp tick dedup preserved.",
+    "Two equal-time events with different sequence/priority: current event not reinserted and remaining heap order unchanged.",
+    "Unknown first read -> one fresh publication -> pending replacement -> later collection, with exact message IDs/sequence and no extra retry.",
+    "Known A immediate/not-before and B default/prefer8 remainders, retaining all current/wire/occupancy guards and finally behavior.",
+    "Count19999/20000/20001 boundaries, empty heap, exactly HORIZON and first event beyond HORIZON; final finish versus early-return behavior.",
+    "One-graph alias/cycle preservation across engine, frames, pending/client/physical request and current event args; clone mutation and repeated-consumption rejection.",
+    "Forbidden initial/action-prefix changes and unsupported arbitrary program counters reject explicitly.",
+    "No actual ID parsing, native session, future actual outcome or hidden state may enter the continuation constructor.",
+    "A later bounded real-input test must compare complete outputs and event/message chronology; none is run by this design task."
+  ],
+  "limitations": [
+    "Even an exact resumed conditional model is not a native state or online protection certificate.",
+    "Actual opaque IDs still need evidence-constrained relations, not string parsing or dropping identity fields.",
+    "Initial-model hypotheses require complete lawful history/action/observation coverage before actual-data filtering can be sound; current96 endpoint conformance does not prove that coverage.",
+    "No field is supplied from actual final outcomes to fill omitted Python frames or physical history.",
+    "The current six-point passive diagnostic remains a separate immutable120s preparation and is not changed by this design."
+  ]
+}

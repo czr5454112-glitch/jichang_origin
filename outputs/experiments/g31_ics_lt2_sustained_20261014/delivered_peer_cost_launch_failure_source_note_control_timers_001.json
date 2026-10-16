@@ -1,0 +1,17 @@
+{
+  "schema": "g31.delivered_peer.launch_failure_review.control_timers.v1",
+  "scope": "source plus small terminal file inventory; no raw, validator, model, native or test execution",
+  "source": {
+    "path": "scripts/experiments/g31_ics_circulation/measure_delivered_peer_cost.py",
+    "sha256": "955b91a3c8f99a4cbc1bc4f09afa9808eb78e657bf0ecd8d0c7541f68f257043"
+  },
+  "external": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\delivered_peer_cost_prepare_003\\external_application_wall.json",
+    "sha256": "59d0d86c7a810f592977f807f299632b5e824c9c90661644b37b716647519d0f"
+  },
+  "finding": "The unchanged run_child opens stdout.log and stderr.log with xb for both --prepare-worker and --worker. Successful preparation leaves these files; later execute creates its exclusive claim then raises FileExistsError before bounded_windows_job.run or worker validator invocation.",
+  "review_coverage_gap": "The earlier narrow review checked typed saved-record validation and private namespace wiring, but did not exercise or prove prepare-to-execute stage log separation. Pure tests did not include this staged flow.",
+  "required_fix": "Independent version with stage-specific logs and a fake prepare/execute flow guard; preserve prepare003 and its claim/failure artifacts without retry.",
+  "prior_review": "delivered_peer_cost_source_review_control_timers_003.json",
+  "no_failure_reclassification": true
+}

@@ -1,0 +1,3950 @@
+{
+  "schema": "g31.original_route_update.elapsed_diagnosis.v1",
+  "native_executions": 0,
+  "source_sha256": {
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\analyze_original_route_update_elapsed.py": "3d2113da5c1297191fa64a4776189a8b2017df324aa10660b63c887a3fd1d57f"
+  },
+  "cases": {
+    "baseline": {
+      "raw_sha256": "3c198f9b118cd3278828535f1adf9fe13f475ac11b5a0eb899cde617872ef04c",
+      "api_sha256": "1bea01311995263a786fa05bc862695ab612e6e8dc229a4d4ed83d9ee907058f",
+      "closed": true,
+      "full_root_or_censored_prefix_ms": 320.6656,
+      "native_envelopes_ms": 69.5837,
+      "unclassified_all_gaps_ms": 251.0819,
+      "native_calls_within_root": 209,
+      "post_root_tape_rows_excluded_from_this_partition": 957,
+      "native_by_role_endpoint": [
+        {
+          "role": "controller",
+          "endpoint": "advance_until_owner_notification",
+          "count": 74,
+          "nanoseconds": 3359300,
+          "milliseconds": 3.3593
+        },
+        {
+          "role": "controller",
+          "endpoint": "observe_protocol_control_policy_recent",
+          "count": 50,
+          "nanoseconds": 56409100,
+          "milliseconds": 56.4091
+        },
+        {
+          "role": "controller",
+          "endpoint": "protocol_command",
+          "count": 27,
+          "nanoseconds": 334200,
+          "milliseconds": 0.3342
+        },
+        {
+          "role": "controller",
+          "endpoint": "protocol_demand_signature",
+          "count": 40,
+          "nanoseconds": 4488000,
+          "milliseconds": 4.488
+        },
+        {
+          "role": "controller",
+          "endpoint": "submit_protocol_command",
+          "count": 10,
+          "nanoseconds": 451200,
+          "milliseconds": 0.4512
+        },
+        {
+          "role": "request",
+          "endpoint": "advance_to",
+          "count": 1,
+          "nanoseconds": 18100,
+          "milliseconds": 0.0181
+        },
+        {
+          "role": "request",
+          "endpoint": "observe_protocol",
+          "count": 4,
+          "nanoseconds": 4441900,
+          "milliseconds": 4.4419
+        },
+        {
+          "role": "request",
+          "endpoint": "protocol_command",
+          "count": 2,
+          "nanoseconds": 29300,
+          "milliseconds": 0.0293
+        },
+        {
+          "role": "request",
+          "endpoint": "submit_protocol_command",
+          "count": 1,
+          "nanoseconds": 52600,
+          "milliseconds": 0.0526
+        }
+      ],
+      "request_invocation_inner_bounds": [
+        {
+          "at": 9600.0,
+          "first_api": 0,
+          "after_api": 1,
+          "first_api_start_offset_ms": 0.1414,
+          "last_api_end_offset_ms": 1.3702,
+          "native_call_sum_ms": 1.2288,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9660.0,
+          "first_api": 189,
+          "after_api": 191,
+          "first_api_start_offset_ms": 271.1121,
+          "last_api_end_offset_ms": 280.9679,
+          "native_call_sum_ms": 1.198,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9662.0,
+          "first_api": 198,
+          "after_api": 200,
+          "first_api_start_offset_ms": 290.4506,
+          "last_api_end_offset_ms": 291.5599,
+          "native_call_sum_ms": 1.0333,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9662.2,
+          "first_api": 206,
+          "after_api": 209,
+          "first_api_start_offset_ms": 309.0124,
+          "last_api_end_offset_ms": 320.3277,
+          "native_call_sum_ms": 1.0818,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        }
+      ],
+      "eligibility_phase": {
+        "first_observed_at": 9600.0,
+        "source_service_seconds": 1.5,
+        "wire_delay_seconds": 2.0,
+        "public_time_lower_bound": 9603.5,
+        "actual_second_view_at": 9660.0,
+        "admission_to_second_native_view_start_ms": 271.1121,
+        "second_view_start_to_submit_native_start_ms": 9.803200000000004,
+        "submit_native_start_to_root_end_ms": 39.7503,
+        "counterfactual_runtime_measured": false
+      },
+      "partition_exact_nanoseconds": true
+    },
+    "drop_first_ack": {
+      "raw_sha256": "2d14b72e67c2a43ece48688bda2662e8d26415a65bf1a07dc80fb9c09064e3c6",
+      "api_sha256": "ec96637445b3de421e098fab966bb9dbd3c3dad9b9b5ac8ce63614a95eaf0d09",
+      "closed": true,
+      "full_root_or_censored_prefix_ms": 1535.1397,
+      "native_envelopes_ms": 299.4263,
+      "unclassified_all_gaps_ms": 1235.7134,
+      "native_calls_within_root": 2129,
+      "post_root_tape_rows_excluded_from_this_partition": 3630,
+      "native_by_role_endpoint": [
+        {
+          "role": "controller",
+          "endpoint": "advance_until_owner_notification",
+          "count": 269,
+          "nanoseconds": 11926900,
+          "milliseconds": 11.9269
+        },
+        {
+          "role": "controller",
+          "endpoint": "observe_protocol_control_policy_recent",
+          "count": 166,
+          "nanoseconds": 208178000,
+          "milliseconds": 208.178
+        },
+        {
+          "role": "controller",
+          "endpoint": "protocol_command",
+          "count": 1431,
+          "nanoseconds": 9907500,
+          "milliseconds": 9.9075
+        },
+        {
+          "role": "controller",
+          "endpoint": "protocol_demand_signature",
+          "count": 141,
+          "nanoseconds": 19052300,
+          "milliseconds": 19.0523
+        },
+        {
+          "role": "controller",
+          "endpoint": "submit_protocol_command",
+          "count": 51,
+          "nanoseconds": 2827700,
+          "milliseconds": 2.8277
+        },
+        {
+          "role": "request",
+          "endpoint": "advance_to",
+          "count": 1,
+          "nanoseconds": 14000,
+          "milliseconds": 0.014
+        },
+        {
+          "role": "request",
+          "endpoint": "observe_protocol",
+          "count": 35,
+          "nanoseconds": 46912100,
+          "milliseconds": 46.9121
+        },
+        {
+          "role": "request",
+          "endpoint": "protocol_command",
+          "count": 33,
+          "nanoseconds": 483800,
+          "milliseconds": 0.4838
+        },
+        {
+          "role": "request",
+          "endpoint": "submit_protocol_command",
+          "count": 2,
+          "nanoseconds": 124000,
+          "milliseconds": 0.124
+        }
+      ],
+      "request_invocation_inner_bounds": [
+        {
+          "at": 9600.0,
+          "first_api": 0,
+          "after_api": 1,
+          "first_api_start_offset_ms": 0.1412,
+          "last_api_end_offset_ms": 1.6267,
+          "native_call_sum_ms": 1.4855,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9660.0,
+          "first_api": 1338,
+          "after_api": 1340,
+          "first_api_start_offset_ms": 649.3906,
+          "last_api_end_offset_ms": 663.4862,
+          "native_call_sum_ms": 1.8581,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9662.0,
+          "first_api": 1355,
+          "after_api": 1357,
+          "first_api_start_offset_ms": 680.2125,
+          "last_api_end_offset_ms": 682.2706,
+          "native_call_sum_ms": 1.9458,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9663.5,
+          "first_api": 1374,
+          "after_api": 1376,
+          "first_api_start_offset_ms": 711.475,
+          "last_api_end_offset_ms": 713.4591,
+          "native_call_sum_ms": 1.8703,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9665.0,
+          "first_api": 1384,
+          "after_api": 1386,
+          "first_api_start_offset_ms": 736.7366,
+          "last_api_end_offset_ms": 738.6346,
+          "native_call_sum_ms": 1.7887,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9667.0,
+          "first_api": 1416,
+          "after_api": 1418,
+          "first_api_start_offset_ms": 777.2937,
+          "last_api_end_offset_ms": 779.1599,
+          "native_call_sum_ms": 1.7503,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9668.5,
+          "first_api": 1444,
+          "after_api": 1446,
+          "first_api_start_offset_ms": 811.2582,
+          "last_api_end_offset_ms": 812.4166,
+          "native_call_sum_ms": 1.0674,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9670.0,
+          "first_api": 1457,
+          "after_api": 1459,
+          "first_api_start_offset_ms": 835.315,
+          "last_api_end_offset_ms": 836.4387,
+          "native_call_sum_ms": 1.0474,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9672.0,
+          "first_api": 1469,
+          "after_api": 1471,
+          "first_api_start_offset_ms": 849.8112,
+          "last_api_end_offset_ms": 851.0884,
+          "native_call_sum_ms": 1.1969,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9673.5,
+          "first_api": 1490,
+          "after_api": 1492,
+          "first_api_start_offset_ms": 869.4074,
+          "last_api_end_offset_ms": 870.5776,
+          "native_call_sum_ms": 1.096,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9675.0,
+          "first_api": 1524,
+          "after_api": 1526,
+          "first_api_start_offset_ms": 903.8581,
+          "last_api_end_offset_ms": 904.9968,
+          "native_call_sum_ms": 1.0626,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9675.937986,
+          "first_api": 1563,
+          "after_api": 1565,
+          "first_api_start_offset_ms": 941.9742,
+          "last_api_end_offset_ms": 943.2629,
+          "native_call_sum_ms": 1.1979,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9678.5,
+          "first_api": 1613,
+          "after_api": 1615,
+          "first_api_start_offset_ms": 981.6046,
+          "last_api_end_offset_ms": 982.7459,
+          "native_call_sum_ms": 1.0648,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9679.75,
+          "first_api": 1626,
+          "after_api": 1628,
+          "first_api_start_offset_ms": 1002.1244,
+          "last_api_end_offset_ms": 1003.95,
+          "native_call_sum_ms": 1.7161,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9680.0,
+          "first_api": 1648,
+          "after_api": 1650,
+          "first_api_start_offset_ms": 1033.3067,
+          "last_api_end_offset_ms": 1035.131,
+          "native_call_sum_ms": 1.7151,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9681.25,
+          "first_api": 1668,
+          "after_api": 1670,
+          "first_api_start_offset_ms": 1059.1328,
+          "last_api_end_offset_ms": 1060.2138,
+          "native_call_sum_ms": 1.0038,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9684.75,
+          "first_api": 1692,
+          "after_api": 1694,
+          "first_api_start_offset_ms": 1093.8071,
+          "last_api_end_offset_ms": 1094.9139,
+          "native_call_sum_ms": 1.0329,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9686.25,
+          "first_api": 1707,
+          "after_api": 1709,
+          "first_api_start_offset_ms": 1116.2141,
+          "last_api_end_offset_ms": 1118.1043,
+          "native_call_sum_ms": 1.7825,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9692.9,
+          "first_api": 1726,
+          "after_api": 1728,
+          "first_api_start_offset_ms": 1141.0885,
+          "last_api_end_offset_ms": 1142.1526,
+          "native_call_sum_ms": 0.9901,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9694.4,
+          "first_api": 1743,
+          "after_api": 1745,
+          "first_api_start_offset_ms": 1164.9199,
+          "last_api_end_offset_ms": 1166.1441,
+          "native_call_sum_ms": 1.1477,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9696.699999999999,
+          "first_api": 1761,
+          "after_api": 1763,
+          "first_api_start_offset_ms": 1186.4587,
+          "last_api_end_offset_ms": 1187.7971,
+          "native_call_sum_ms": 1.2621,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9697.9,
+          "first_api": 1780,
+          "after_api": 1782,
+          "first_api_start_offset_ms": 1208.8966,
+          "last_api_end_offset_ms": 1210.6162,
+          "native_call_sum_ms": 1.6182,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9698.199999999999,
+          "first_api": 1798,
+          "after_api": 1800,
+          "first_api_start_offset_ms": 1227.5641,
+          "last_api_end_offset_ms": 1228.6584,
+          "native_call_sum_ms": 1.0083,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9699.4,
+          "first_api": 1818,
+          "after_api": 1820,
+          "first_api_start_offset_ms": 1246.5286,
+          "last_api_end_offset_ms": 1247.5792,
+          "native_call_sum_ms": 0.9768,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9701.699999999999,
+          "first_api": 1837,
+          "after_api": 1839,
+          "first_api_start_offset_ms": 1261.7848,
+          "last_api_end_offset_ms": 1262.8603,
+          "native_call_sum_ms": 1.0014,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9703.199999999999,
+          "first_api": 1856,
+          "after_api": 1858,
+          "first_api_start_offset_ms": 1282.2572,
+          "last_api_end_offset_ms": 1283.5051,
+          "native_call_sum_ms": 1.1026,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9705.3,
+          "first_api": 1875,
+          "after_api": 1877,
+          "first_api_start_offset_ms": 1297.53,
+          "last_api_end_offset_ms": 1298.6052,
+          "native_call_sum_ms": 1.0043,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9706.8,
+          "first_api": 1896,
+          "after_api": 1898,
+          "first_api_start_offset_ms": 1326.4488,
+          "last_api_end_offset_ms": 1328.4131,
+          "native_call_sum_ms": 1.8552,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9710.3,
+          "first_api": 1940,
+          "after_api": 1942,
+          "first_api_start_offset_ms": 1365.9292,
+          "last_api_end_offset_ms": 1367.6774,
+          "native_call_sum_ms": 1.6548,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9711.381484000001,
+          "first_api": 1962,
+          "after_api": 1964,
+          "first_api_start_offset_ms": 1389.1596,
+          "last_api_end_offset_ms": 1390.514,
+          "native_call_sum_ms": 1.2778,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9711.8,
+          "first_api": 1988,
+          "after_api": 1990,
+          "first_api_start_offset_ms": 1409.4571,
+          "last_api_end_offset_ms": 1411.2834,
+          "native_call_sum_ms": 1.7056,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9714.181484,
+          "first_api": 2013,
+          "after_api": 2015,
+          "first_api_start_offset_ms": 1437.1434,
+          "last_api_end_offset_ms": 1438.3741,
+          "native_call_sum_ms": 1.1517,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9721.699999999999,
+          "first_api": 2056,
+          "after_api": 2059,
+          "first_api_start_offset_ms": 1466.909,
+          "last_api_end_offset_ms": 1468.4534,
+          "native_call_sum_ms": 1.3068,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9723.199999999999,
+          "first_api": 2080,
+          "after_api": 2082,
+          "first_api_start_offset_ms": 1486.8317,
+          "last_api_end_offset_ms": 1488.0433,
+          "native_call_sum_ms": 1.134,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9723.9,
+          "first_api": 2126,
+          "after_api": 2129,
+          "first_api_start_offset_ms": 1520.1437,
+          "last_api_end_offset_ms": 1534.8181,
+          "native_call_sum_ms": 1.6544,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        }
+      ],
+      "eligibility_phase": {
+        "first_observed_at": 9600.0,
+        "source_service_seconds": 1.5,
+        "wire_delay_seconds": 2.0,
+        "public_time_lower_bound": 9603.5,
+        "actual_second_view_at": 9660.0,
+        "admission_to_second_native_view_start_ms": 649.3906,
+        "second_view_start_to_submit_native_start_ms": 14.020500000000084,
+        "submit_native_start_to_root_end_ms": 871.7286,
+        "counterfactual_runtime_measured": false
+      },
+      "partition_exact_nanoseconds": true
+    },
+    "ack_withheld_in_window": {
+      "raw_sha256": "0b41368da5ebe5beae13cdb162b9265da7a83ce616cfb43252ea605046ebd58d",
+      "api_sha256": "2aed14d267c70966fb2d1123e7f67f8c12f8e16869aafdfb782fcaee3c1cb304",
+      "closed": false,
+      "full_root_or_censored_prefix_ms": 28381.2882,
+      "native_envelopes_ms": 3641.8797,
+      "unclassified_all_gaps_ms": 24739.4085,
+      "native_calls_within_root": 132175,
+      "post_root_tape_rows_excluded_from_this_partition": 0,
+      "native_by_role_endpoint": [
+        {
+          "role": "controller",
+          "endpoint": "advance_until_owner_notification",
+          "count": 3116,
+          "nanoseconds": 117969200,
+          "milliseconds": 117.9692
+        },
+        {
+          "role": "controller",
+          "endpoint": "observe_protocol_control_policy_recent",
+          "count": 1616,
+          "nanoseconds": 2024984800,
+          "milliseconds": 2024.9848
+        },
+        {
+          "role": "controller",
+          "endpoint": "protocol_command",
+          "count": 124340,
+          "nanoseconds": 699194600,
+          "milliseconds": 699.1946
+        },
+        {
+          "role": "controller",
+          "endpoint": "protocol_demand_signature",
+          "count": 1563,
+          "nanoseconds": 228071300,
+          "milliseconds": 228.0713
+        },
+        {
+          "role": "controller",
+          "endpoint": "result_at",
+          "count": 1,
+          "nanoseconds": 43089300,
+          "milliseconds": 43.0893
+        },
+        {
+          "role": "controller",
+          "endpoint": "submit_protocol_command",
+          "count": 799,
+          "nanoseconds": 36364300,
+          "milliseconds": 36.3643
+        },
+        {
+          "role": "request",
+          "endpoint": "observe_protocol",
+          "count": 369,
+          "nanoseconds": 486777700,
+          "milliseconds": 486.7777
+        },
+        {
+          "role": "request",
+          "endpoint": "protocol_command",
+          "count": 367,
+          "nanoseconds": 5210800,
+          "milliseconds": 5.2108
+        },
+        {
+          "role": "request",
+          "endpoint": "submit_protocol_command",
+          "count": 4,
+          "nanoseconds": 217700,
+          "milliseconds": 0.2177
+        }
+      ],
+      "request_invocation_inner_bounds": [
+        {
+          "at": 9600.0,
+          "first_api": 0,
+          "after_api": 1,
+          "first_api_start_offset_ms": 0.1853,
+          "last_api_end_offset_ms": 1.361,
+          "native_call_sum_ms": 1.1757,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9660.0,
+          "first_api": 19853,
+          "after_api": 19855,
+          "first_api_start_offset_ms": 2940.7104,
+          "last_api_end_offset_ms": 2948.6472,
+          "native_call_sum_ms": 1.0544,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9662.0,
+          "first_api": 20952,
+          "after_api": 20954,
+          "first_api_start_offset_ms": 3096.5334,
+          "last_api_end_offset_ms": 3098.3946,
+          "native_call_sum_ms": 1.7482,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9663.5,
+          "first_api": 21558,
+          "after_api": 21560,
+          "first_api_start_offset_ms": 3199.4576,
+          "last_api_end_offset_ms": 3200.5104,
+          "native_call_sum_ms": 0.9639,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9665.0,
+          "first_api": 21936,
+          "after_api": 21938,
+          "first_api_start_offset_ms": 3265.9278,
+          "last_api_end_offset_ms": 3267.0347,
+          "native_call_sum_ms": 1.0277,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9665.000872,
+          "first_api": 21994,
+          "after_api": 21996,
+          "first_api_start_offset_ms": 3289.472,
+          "last_api_end_offset_ms": 3290.6072,
+          "native_call_sum_ms": 1.0535,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9665.001872,
+          "first_api": 22051,
+          "after_api": 22053,
+          "first_api_start_offset_ms": 3309.0504,
+          "last_api_end_offset_ms": 3310.1258,
+          "native_call_sum_ms": 0.9943,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9666.801872,
+          "first_api": 22718,
+          "after_api": 22720,
+          "first_api_start_offset_ms": 3408.7202,
+          "last_api_end_offset_ms": 3409.7266,
+          "native_call_sum_ms": 0.9293,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9667.0,
+          "first_api": 22953,
+          "after_api": 22955,
+          "first_api_start_offset_ms": 3444.1002,
+          "last_api_end_offset_ms": 3445.3497,
+          "native_call_sum_ms": 1.1613,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9668.053871999999,
+          "first_api": 23334,
+          "after_api": 23336,
+          "first_api_start_offset_ms": 3519.7379,
+          "last_api_end_offset_ms": 3521.5736,
+          "native_call_sum_ms": 1.7236,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9668.301872,
+          "first_api": 23392,
+          "after_api": 23394,
+          "first_api_start_offset_ms": 3543.7234,
+          "last_api_end_offset_ms": 3545.5138,
+          "native_call_sum_ms": 1.6779,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9668.5,
+          "first_api": 23538,
+          "after_api": 23540,
+          "first_api_start_offset_ms": 3578.6708,
+          "last_api_end_offset_ms": 3579.786,
+          "native_call_sum_ms": 1.0393,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9669.301872,
+          "first_api": 23863,
+          "after_api": 23865,
+          "first_api_start_offset_ms": 3633.3958,
+          "last_api_end_offset_ms": 3634.5734,
+          "native_call_sum_ms": 1.0946,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9670.0,
+          "first_api": 24011,
+          "after_api": 24013,
+          "first_api_start_offset_ms": 3659.8394,
+          "last_api_end_offset_ms": 3660.9205,
+          "native_call_sum_ms": 1.0112,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9670.801872,
+          "first_api": 24394,
+          "after_api": 24396,
+          "first_api_start_offset_ms": 3744.7513,
+          "last_api_end_offset_ms": 3745.7976,
+          "native_call_sum_ms": 0.9714,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9671.053871999999,
+          "first_api": 24541,
+          "after_api": 24543,
+          "first_api_start_offset_ms": 3771.4746,
+          "last_api_end_offset_ms": 3772.6266,
+          "native_call_sum_ms": 1.0729,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9671.301872,
+          "first_api": 24600,
+          "after_api": 24602,
+          "first_api_start_offset_ms": 3790.5015,
+          "last_api_end_offset_ms": 3791.6274,
+          "native_call_sum_ms": 1.0498,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9672.0,
+          "first_api": 24924,
+          "after_api": 24926,
+          "first_api_start_offset_ms": 3838.3433,
+          "last_api_end_offset_ms": 3840.1149,
+          "native_call_sum_ms": 1.6619,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9672.801872,
+          "first_api": 25308,
+          "after_api": 25310,
+          "first_api_start_offset_ms": 3918.7851,
+          "last_api_end_offset_ms": 3920.6462,
+          "native_call_sum_ms": 1.7479,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9673.5,
+          "first_api": 25544,
+          "after_api": 25546,
+          "first_api_start_offset_ms": 3962.0427,
+          "last_api_end_offset_ms": 3963.105,
+          "native_call_sum_ms": 0.9877,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9675.0,
+          "first_api": 25990,
+          "after_api": 25992,
+          "first_api_start_offset_ms": 4038.8633,
+          "last_api_end_offset_ms": 4040.0871,
+          "native_call_sum_ms": 1.1365,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9675.602872,
+          "first_api": 26495,
+          "after_api": 26497,
+          "first_api_start_offset_ms": 4114.9173,
+          "last_api_end_offset_ms": 4116.7148,
+          "native_call_sum_ms": 1.6813,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9677.102872,
+          "first_api": 26941,
+          "after_api": 26943,
+          "first_api_start_offset_ms": 4180.9063,
+          "last_api_end_offset_ms": 4182.5671,
+          "native_call_sum_ms": 1.5487,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9678.5,
+          "first_api": 27831,
+          "after_api": 27833,
+          "first_api_start_offset_ms": 4317.297,
+          "last_api_end_offset_ms": 4319.0602,
+          "native_call_sum_ms": 1.6499,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9678.737986,
+          "first_api": 27952,
+          "after_api": 27954,
+          "first_api_start_offset_ms": 4353.4772,
+          "last_api_end_offset_ms": 4355.2988,
+          "native_call_sum_ms": 1.7112,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9679.75,
+          "first_api": 28338,
+          "after_api": 28340,
+          "first_api_start_offset_ms": 4433.6081,
+          "last_api_end_offset_ms": 4435.3651,
+          "native_call_sum_ms": 1.6455,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9679.901872,
+          "first_api": 28490,
+          "after_api": 28492,
+          "first_api_start_offset_ms": 4477.1254,
+          "last_api_end_offset_ms": 4478.865,
+          "native_call_sum_ms": 1.6276,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9680.0,
+          "first_api": 28553,
+          "after_api": 28555,
+          "first_api_start_offset_ms": 4501.9315,
+          "last_api_end_offset_ms": 4504.0415,
+          "native_call_sum_ms": 1.9963,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9681.002872,
+          "first_api": 29179,
+          "after_api": 29181,
+          "first_api_start_offset_ms": 4596.853,
+          "last_api_end_offset_ms": 4598.0097,
+          "native_call_sum_ms": 1.0725,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9681.25,
+          "first_api": 29330,
+          "after_api": 29332,
+          "first_api_start_offset_ms": 4623.7032,
+          "last_api_end_offset_ms": 4624.721,
+          "native_call_sum_ms": 0.9404,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9681.401872,
+          "first_api": 29394,
+          "after_api": 29396,
+          "first_api_start_offset_ms": 4643.0313,
+          "last_api_end_offset_ms": 4644.7019,
+          "native_call_sum_ms": 1.5503,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9682.502872,
+          "first_api": 30022,
+          "after_api": 30024,
+          "first_api_start_offset_ms": 4738.2222,
+          "last_api_end_offset_ms": 4739.5025,
+          "native_call_sum_ms": 1.1749,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9683.401872,
+          "first_api": 30297,
+          "after_api": 30299,
+          "first_api_start_offset_ms": 4788.9429,
+          "last_api_end_offset_ms": 4790.7438,
+          "native_call_sum_ms": 1.6265,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9683.601872000001,
+          "first_api": 30448,
+          "after_api": 30450,
+          "first_api_start_offset_ms": 4821.7637,
+          "last_api_end_offset_ms": 4823.5892,
+          "native_call_sum_ms": 1.7404,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9684.100453,
+          "first_api": 30600,
+          "after_api": 30602,
+          "first_api_start_offset_ms": 4860.9032,
+          "last_api_end_offset_ms": 4862.903,
+          "native_call_sum_ms": 1.889,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9684.75,
+          "first_api": 30751,
+          "after_api": 30753,
+          "first_api_start_offset_ms": 4898.0233,
+          "last_api_end_offset_ms": 4899.1844,
+          "native_call_sum_ms": 1.0732,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9684.901872,
+          "first_api": 30902,
+          "after_api": 30904,
+          "first_api_start_offset_ms": 4925.7825,
+          "last_api_end_offset_ms": 4926.9606,
+          "native_call_sum_ms": 1.1012,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9685.101872000001,
+          "first_api": 30965,
+          "after_api": 30967,
+          "first_api_start_offset_ms": 4941.7442,
+          "last_api_end_offset_ms": 4942.7427,
+          "native_call_sum_ms": 0.9253,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9685.600453,
+          "first_api": 31204,
+          "after_api": 31206,
+          "first_api_start_offset_ms": 4977.2616,
+          "last_api_end_offset_ms": 4978.3265,
+          "native_call_sum_ms": 0.9899,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9686.25,
+          "first_api": 31444,
+          "after_api": 31446,
+          "first_api_start_offset_ms": 5017.0997,
+          "last_api_end_offset_ms": 5018.188,
+          "native_call_sum_ms": 1.001,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9686.402871999999,
+          "first_api": 31507,
+          "after_api": 31509,
+          "first_api_start_offset_ms": 5035.2904,
+          "last_api_end_offset_ms": 5036.3677,
+          "native_call_sum_ms": 0.9991,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9686.771299,
+          "first_api": 31570,
+          "after_api": 31572,
+          "first_api_start_offset_ms": 5050.8467,
+          "last_api_end_offset_ms": 5051.8611,
+          "native_call_sum_ms": 0.9413,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9687.902871999999,
+          "first_api": 31810,
+          "after_api": 31812,
+          "first_api_start_offset_ms": 5095.0545,
+          "last_api_end_offset_ms": 5096.7801,
+          "native_call_sum_ms": 1.6147,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9688.271299,
+          "first_api": 31873,
+          "after_api": 31875,
+          "first_api_start_offset_ms": 5139.7425,
+          "last_api_end_offset_ms": 5140.8982,
+          "native_call_sum_ms": 1.0534,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9692.9,
+          "first_api": 32715,
+          "after_api": 32717,
+          "first_api_start_offset_ms": 5250.5019,
+          "last_api_end_offset_ms": 5251.5235,
+          "native_call_sum_ms": 0.9505,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9694.4,
+          "first_api": 32957,
+          "after_api": 32959,
+          "first_api_start_offset_ms": 5291.0792,
+          "last_api_end_offset_ms": 5292.8633,
+          "native_call_sum_ms": 1.6701,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9695.951872,
+          "first_api": 33176,
+          "after_api": 33178,
+          "first_api_start_offset_ms": 5339.2004,
+          "last_api_end_offset_ms": 5340.2545,
+          "native_call_sum_ms": 0.9771,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9696.402871999999,
+          "first_api": 33305,
+          "after_api": 33307,
+          "first_api_start_offset_ms": 5364.3263,
+          "last_api_end_offset_ms": 5365.3479,
+          "native_call_sum_ms": 0.9435,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9696.403871999999,
+          "first_api": 33370,
+          "after_api": 33372,
+          "first_api_start_offset_ms": 5380.8241,
+          "last_api_end_offset_ms": 5381.8844,
+          "native_call_sum_ms": 0.9865,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9696.699999999999,
+          "first_api": 33523,
+          "after_api": 33525,
+          "first_api_start_offset_ms": 5407.6017,
+          "last_api_end_offset_ms": 5409.3554,
+          "native_call_sum_ms": 1.6349,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9697.451872,
+          "first_api": 33678,
+          "after_api": 33680,
+          "first_api_start_offset_ms": 5446.624,
+          "last_api_end_offset_ms": 5447.682,
+          "native_call_sum_ms": 0.9835,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9697.9,
+          "first_api": 33898,
+          "after_api": 33900,
+          "first_api_start_offset_ms": 5482.733,
+          "last_api_end_offset_ms": 5483.7448,
+          "native_call_sum_ms": 0.9362,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9698.199999999999,
+          "first_api": 33964,
+          "after_api": 33966,
+          "first_api_start_offset_ms": 5499.8373,
+          "last_api_end_offset_ms": 5500.8495,
+          "native_call_sum_ms": 0.9322,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9699.4,
+          "first_api": 34186,
+          "after_api": 34188,
+          "first_api_start_offset_ms": 5544.8196,
+          "last_api_end_offset_ms": 5545.9955,
+          "native_call_sum_ms": 1.105,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9699.701872,
+          "first_api": 34253,
+          "after_api": 34255,
+          "first_api_start_offset_ms": 5561.5741,
+          "last_api_end_offset_ms": 5562.6917,
+          "native_call_sum_ms": 1.0332,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9701.201872,
+          "first_api": 34629,
+          "after_api": 34631,
+          "first_api_start_offset_ms": 5620.6364,
+          "last_api_end_offset_ms": 5621.7587,
+          "native_call_sum_ms": 1.0419,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9701.699999999999,
+          "first_api": 34696,
+          "after_api": 34698,
+          "first_api_start_offset_ms": 5644.2447,
+          "last_api_end_offset_ms": 5645.9312,
+          "native_call_sum_ms": 1.5734,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9702.551872,
+          "first_api": 34941,
+          "after_api": 34943,
+          "first_api_start_offset_ms": 5689.1761,
+          "last_api_end_offset_ms": 5690.2932,
+          "native_call_sum_ms": 1.0385,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9703.199999999999,
+          "first_api": 35096,
+          "after_api": 35098,
+          "first_api_start_offset_ms": 5714.0953,
+          "last_api_end_offset_ms": 5715.3934,
+          "native_call_sum_ms": 1.2253,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9703.403871999999,
+          "first_api": 35252,
+          "after_api": 35254,
+          "first_api_start_offset_ms": 5743.6628,
+          "last_api_end_offset_ms": 5744.8876,
+          "native_call_sum_ms": 1.1196,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9704.903871999999,
+          "first_api": 35585,
+          "after_api": 35587,
+          "first_api_start_offset_ms": 5789.4891,
+          "last_api_end_offset_ms": 5790.5588,
+          "native_call_sum_ms": 0.9947,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9705.3,
+          "first_api": 35939,
+          "after_api": 35941,
+          "first_api_start_offset_ms": 5839.912,
+          "last_api_end_offset_ms": 5841.2034,
+          "native_call_sum_ms": 1.2151,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9705.551872,
+          "first_api": 36008,
+          "after_api": 36010,
+          "first_api_start_offset_ms": 5860.2231,
+          "last_api_end_offset_ms": 5861.2972,
+          "native_call_sum_ms": 0.9906,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9706.8,
+          "first_api": 36299,
+          "after_api": 36301,
+          "first_api_start_offset_ms": 5909.3374,
+          "last_api_end_offset_ms": 5910.3473,
+          "native_call_sum_ms": 0.9348,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9709.951872,
+          "first_api": 37709,
+          "after_api": 37711,
+          "first_api_start_offset_ms": 7472.9182,
+          "last_api_end_offset_ms": 7474.863,
+          "native_call_sum_ms": 1.8341,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9709.952872,
+          "first_api": 37779,
+          "after_api": 37781,
+          "first_api_start_offset_ms": 7498.6513,
+          "last_api_end_offset_ms": 7500.4222,
+          "native_call_sum_ms": 1.6608,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9710.051872,
+          "first_api": 37849,
+          "after_api": 37851,
+          "first_api_start_offset_ms": 7524.3302,
+          "last_api_end_offset_ms": 7526.1692,
+          "native_call_sum_ms": 1.7085,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9710.3,
+          "first_api": 38096,
+          "after_api": 38098,
+          "first_api_start_offset_ms": 7580.0286,
+          "last_api_end_offset_ms": 7581.8522,
+          "native_call_sum_ms": 1.6992,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9711.411453,
+          "first_api": 38432,
+          "after_api": 38434,
+          "first_api_start_offset_ms": 7645.0656,
+          "last_api_end_offset_ms": 7646.3539,
+          "native_call_sum_ms": 1.0933,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9711.551872,
+          "first_api": 38571,
+          "after_api": 38573,
+          "first_api_start_offset_ms": 7672.3618,
+          "last_api_end_offset_ms": 7673.4436,
+          "native_call_sum_ms": 1.008,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9711.8,
+          "first_api": 38818,
+          "after_api": 38820,
+          "first_api_start_offset_ms": 7717.2306,
+          "last_api_end_offset_ms": 7719.1008,
+          "native_call_sum_ms": 1.7611,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9712.701872,
+          "first_api": 39154,
+          "after_api": 39156,
+          "first_api_start_offset_ms": 7780.3743,
+          "last_api_end_offset_ms": 7782.206,
+          "native_call_sum_ms": 1.72,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9712.911453,
+          "first_api": 39400,
+          "after_api": 39402,
+          "first_api_start_offset_ms": 7836.8986,
+          "last_api_end_offset_ms": 7838.2532,
+          "native_call_sum_ms": 1.2774,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9714.181484,
+          "first_api": 39982,
+          "after_api": 39984,
+          "first_api_start_offset_ms": 7915.5531,
+          "last_api_end_offset_ms": 7917.2842,
+          "native_call_sum_ms": 1.6201,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9714.201872,
+          "first_api": 40052,
+          "after_api": 40054,
+          "first_api_start_offset_ms": 7934.8272,
+          "last_api_end_offset_ms": 7936.3053,
+          "native_call_sum_ms": 1.3957,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9716.451872,
+          "first_api": 41007,
+          "after_api": 41009,
+          "first_api_start_offset_ms": 8083.2489,
+          "last_api_end_offset_ms": 8084.3533,
+          "native_call_sum_ms": 1.0276,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9717.951872,
+          "first_api": 41608,
+          "after_api": 41610,
+          "first_api_start_offset_ms": 8162.7298,
+          "last_api_end_offset_ms": 8163.8101,
+          "native_call_sum_ms": 1.0042,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9721.699999999999,
+          "first_api": 43208,
+          "after_api": 43211,
+          "first_api_start_offset_ms": 8394.4296,
+          "last_api_end_offset_ms": 8395.777,
+          "native_call_sum_ms": 1.104,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9723.199999999999,
+          "first_api": 43775,
+          "after_api": 43777,
+          "first_api_start_offset_ms": 8483.4838,
+          "last_api_end_offset_ms": 8484.6741,
+          "native_call_sum_ms": 1.1162,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9725.000872,
+          "first_api": 44575,
+          "after_api": 44577,
+          "first_api_start_offset_ms": 8594.9518,
+          "last_api_end_offset_ms": 8595.9796,
+          "native_call_sum_ms": 0.9556,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9725.001872,
+          "first_api": 44647,
+          "after_api": 44649,
+          "first_api_start_offset_ms": 8612.7366,
+          "last_api_end_offset_ms": 8613.9864,
+          "native_call_sum_ms": 1.1641,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9726.099999999999,
+          "first_api": 45303,
+          "after_api": 45305,
+          "first_api_start_offset_ms": 8739.5486,
+          "last_api_end_offset_ms": 8741.3054,
+          "native_call_sum_ms": 1.6439,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9726.699999999999,
+          "first_api": 45449,
+          "after_api": 45451,
+          "first_api_start_offset_ms": 8784.8776,
+          "last_api_end_offset_ms": 8786.4329,
+          "native_call_sum_ms": 1.4402,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9726.801872,
+          "first_api": 45522,
+          "after_api": 45524,
+          "first_api_start_offset_ms": 8809.7217,
+          "last_api_end_offset_ms": 8810.8374,
+          "native_call_sum_ms": 1.0349,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9727.599999999999,
+          "first_api": 45933,
+          "after_api": 45935,
+          "first_api_start_offset_ms": 8895.1265,
+          "last_api_end_offset_ms": 8897.0451,
+          "native_call_sum_ms": 1.7137,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9728.053871999999,
+          "first_api": 46258,
+          "after_api": 46260,
+          "first_api_start_offset_ms": 8963.5255,
+          "last_api_end_offset_ms": 8965.5921,
+          "native_call_sum_ms": 1.9451,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9728.199999999999,
+          "first_api": 46332,
+          "after_api": 46334,
+          "first_api_start_offset_ms": 8989.6556,
+          "last_api_end_offset_ms": 8991.4559,
+          "native_call_sum_ms": 1.6878,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9728.301872,
+          "first_api": 46406,
+          "after_api": 46408,
+          "first_api_start_offset_ms": 9015.362,
+          "last_api_end_offset_ms": 9017.1944,
+          "native_call_sum_ms": 1.7194,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9728.5,
+          "first_api": 46568,
+          "after_api": 46570,
+          "first_api_start_offset_ms": 9057.5767,
+          "last_api_end_offset_ms": 9059.4104,
+          "native_call_sum_ms": 1.7168,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9729.301872,
+          "first_api": 46908,
+          "after_api": 46910,
+          "first_api_start_offset_ms": 9119.8236,
+          "last_api_end_offset_ms": 9121.6535,
+          "native_call_sum_ms": 1.7172,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9730.0,
+          "first_api": 47071,
+          "after_api": 47073,
+          "first_api_start_offset_ms": 9160.6003,
+          "last_api_end_offset_ms": 9162.4039,
+          "native_call_sum_ms": 1.6965,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9730.801872,
+          "first_api": 47484,
+          "after_api": 47486,
+          "first_api_start_offset_ms": 9230.2799,
+          "last_api_end_offset_ms": 9231.2878,
+          "native_call_sum_ms": 0.9341,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9731.053871999999,
+          "first_api": 47646,
+          "after_api": 47648,
+          "first_api_start_offset_ms": 9261.8497,
+          "last_api_end_offset_ms": 9263.6606,
+          "native_call_sum_ms": 1.6984,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9731.099999999999,
+          "first_api": 47720,
+          "after_api": 47722,
+          "first_api_start_offset_ms": 9281.7969,
+          "last_api_end_offset_ms": 9282.8805,
+          "native_call_sum_ms": 0.9925,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9731.301872,
+          "first_api": 47794,
+          "after_api": 47796,
+          "first_api_start_offset_ms": 9306.3581,
+          "last_api_end_offset_ms": 9308.2606,
+          "native_call_sum_ms": 1.7804,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9732.0,
+          "first_api": 48133,
+          "after_api": 48135,
+          "first_api_start_offset_ms": 9387.2316,
+          "last_api_end_offset_ms": 9388.4352,
+          "native_call_sum_ms": 1.1197,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9732.599999999999,
+          "first_api": 48458,
+          "after_api": 48460,
+          "first_api_start_offset_ms": 9438.604,
+          "last_api_end_offset_ms": 9439.8144,
+          "native_call_sum_ms": 1.1336,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9732.801872,
+          "first_api": 48621,
+          "after_api": 48623,
+          "first_api_start_offset_ms": 9464.7845,
+          "last_api_end_offset_ms": 9465.822,
+          "native_call_sum_ms": 0.9645,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9733.5,
+          "first_api": 48872,
+          "after_api": 48874,
+          "first_api_start_offset_ms": 9508.9526,
+          "last_api_end_offset_ms": 9510.283,
+          "native_call_sum_ms": 1.2512,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9734.499999999998,
+          "first_api": 49198,
+          "after_api": 49200,
+          "first_api_start_offset_ms": 9573.9331,
+          "last_api_end_offset_ms": 9575.0234,
+          "native_call_sum_ms": 1.0119,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9734.500999999998,
+          "first_api": 49274,
+          "after_api": 49276,
+          "first_api_start_offset_ms": 9594.8553,
+          "last_api_end_offset_ms": 9595.9133,
+          "native_call_sum_ms": 0.9841,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9735.602872,
+          "first_api": 50033,
+          "after_api": 50035,
+          "first_api_start_offset_ms": 9701.6871,
+          "last_api_end_offset_ms": 9703.5483,
+          "native_call_sum_ms": 1.75,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9737.102872,
+          "first_api": 50436,
+          "after_api": 50438,
+          "first_api_start_offset_ms": 9785.9914,
+          "last_api_end_offset_ms": 9787.7836,
+          "native_call_sum_ms": 1.6805,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9738.5,
+          "first_api": 51371,
+          "after_api": 51373,
+          "first_api_start_offset_ms": 9948.822,
+          "last_api_end_offset_ms": 9950.0708,
+          "native_call_sum_ms": 1.1367,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9738.737986,
+          "first_api": 51522,
+          "after_api": 51524,
+          "first_api_start_offset_ms": 9989.5626,
+          "last_api_end_offset_ms": 9991.4605,
+          "native_call_sum_ms": 1.7831,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9739.499999999998,
+          "first_api": 51850,
+          "after_api": 51852,
+          "first_api_start_offset_ms": 10053.7227,
+          "last_api_end_offset_ms": 10054.8642,
+          "native_call_sum_ms": 1.0538,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9739.500999999998,
+          "first_api": 51926,
+          "after_api": 51928,
+          "first_api_start_offset_ms": 10078.5421,
+          "last_api_end_offset_ms": 10080.3058,
+          "native_call_sum_ms": 1.6429,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9739.901872,
+          "first_api": 52327,
+          "after_api": 52329,
+          "first_api_start_offset_ms": 10144.5745,
+          "last_api_end_offset_ms": 10145.7765,
+          "native_call_sum_ms": 1.1171,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9740.0,
+          "first_api": 52404,
+          "after_api": 52406,
+          "first_api_start_offset_ms": 10162.8048,
+          "last_api_end_offset_ms": 10163.8302,
+          "native_call_sum_ms": 0.9522,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9741.002872,
+          "first_api": 53072,
+          "after_api": 53074,
+          "first_api_start_offset_ms": 10255.976,
+          "last_api_end_offset_ms": 10257.7895,
+          "native_call_sum_ms": 1.7003,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9741.400999999998,
+          "first_api": 53312,
+          "after_api": 53314,
+          "first_api_start_offset_ms": 10303.4041,
+          "last_api_end_offset_ms": 10304.8833,
+          "native_call_sum_ms": 1.3932,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9741.401872,
+          "first_api": 53390,
+          "after_api": 53392,
+          "first_api_start_offset_ms": 10329.0139,
+          "last_api_end_offset_ms": 10330.2141,
+          "native_call_sum_ms": 1.1009,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9742.502872,
+          "first_api": 54060,
+          "after_api": 54062,
+          "first_api_start_offset_ms": 10432.5038,
+          "last_api_end_offset_ms": 10434.2979,
+          "native_call_sum_ms": 1.6818,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9742.900999999998,
+          "first_api": 54225,
+          "after_api": 54227,
+          "first_api_start_offset_ms": 10465.8681,
+          "last_api_end_offset_ms": 10467.0045,
+          "native_call_sum_ms": 1.0591,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9743.401872,
+          "first_api": 54458,
+          "after_api": 54460,
+          "first_api_start_offset_ms": 10511.4273,
+          "last_api_end_offset_ms": 10512.4435,
+          "native_call_sum_ms": 0.9422,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9743.601872000001,
+          "first_api": 54624,
+          "after_api": 54626,
+          "first_api_start_offset_ms": 10539.6782,
+          "last_api_end_offset_ms": 10540.871,
+          "native_call_sum_ms": 1.1163,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9744.100453,
+          "first_api": 54791,
+          "after_api": 54793,
+          "first_api_start_offset_ms": 10572.0992,
+          "last_api_end_offset_ms": 10573.1783,
+          "native_call_sum_ms": 0.9997,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9744.75,
+          "first_api": 54957,
+          "after_api": 54959,
+          "first_api_start_offset_ms": 10598.7866,
+          "last_api_end_offset_ms": 10599.9273,
+          "native_call_sum_ms": 1.0569,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9744.901872,
+          "first_api": 55123,
+          "after_api": 55125,
+          "first_api_start_offset_ms": 10628.4871,
+          "last_api_end_offset_ms": 10629.5796,
+          "native_call_sum_ms": 1.0145,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9745.101872000001,
+          "first_api": 55201,
+          "after_api": 55203,
+          "first_api_start_offset_ms": 10646.2008,
+          "last_api_end_offset_ms": 10647.2286,
+          "native_call_sum_ms": 0.9502,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9745.600453,
+          "first_api": 55455,
+          "after_api": 55457,
+          "first_api_start_offset_ms": 10681.2407,
+          "last_api_end_offset_ms": 10682.3122,
+          "native_call_sum_ms": 0.9943,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9746.25,
+          "first_api": 55710,
+          "after_api": 55712,
+          "first_api_start_offset_ms": 10721.2209,
+          "last_api_end_offset_ms": 10722.4185,
+          "native_call_sum_ms": 1.0708,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9746.400999999998,
+          "first_api": 55788,
+          "after_api": 55790,
+          "first_api_start_offset_ms": 10738.4404,
+          "last_api_end_offset_ms": 10739.4763,
+          "native_call_sum_ms": 0.9597,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9746.402871999999,
+          "first_api": 55866,
+          "after_api": 55868,
+          "first_api_start_offset_ms": 10755.0345,
+          "last_api_end_offset_ms": 10756.1682,
+          "native_call_sum_ms": 1.0477,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9746.771299,
+          "first_api": 55944,
+          "after_api": 55946,
+          "first_api_start_offset_ms": 10772.0341,
+          "last_api_end_offset_ms": 10773.12,
+          "native_call_sum_ms": 1.0065,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9747.900999999998,
+          "first_api": 56199,
+          "after_api": 56201,
+          "first_api_start_offset_ms": 10838.789,
+          "last_api_end_offset_ms": 10839.998,
+          "native_call_sum_ms": 1.1267,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9747.902871999999,
+          "first_api": 56277,
+          "after_api": 56279,
+          "first_api_start_offset_ms": 10860.3711,
+          "last_api_end_offset_ms": 10862.2327,
+          "native_call_sum_ms": 1.7454,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9748.271299,
+          "first_api": 56355,
+          "after_api": 56357,
+          "first_api_start_offset_ms": 10880.8964,
+          "last_api_end_offset_ms": 10881.9872,
+          "native_call_sum_ms": 1.011,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9753.950999999997,
+          "first_api": 57437,
+          "after_api": 57439,
+          "first_api_start_offset_ms": 11045.6698,
+          "last_api_end_offset_ms": 11047.4546,
+          "native_call_sum_ms": 1.6704,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9755.450999999997,
+          "first_api": 57851,
+          "after_api": 57853,
+          "first_api_start_offset_ms": 11125.6173,
+          "last_api_end_offset_ms": 11127.4034,
+          "native_call_sum_ms": 1.6706,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9755.951872,
+          "first_api": 57932,
+          "after_api": 57934,
+          "first_api_start_offset_ms": 11151.019,
+          "last_api_end_offset_ms": 11152.1881,
+          "native_call_sum_ms": 1.0938,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9756.402871999999,
+          "first_api": 58091,
+          "after_api": 58093,
+          "first_api_start_offset_ms": 11179.2266,
+          "last_api_end_offset_ms": 11180.2399,
+          "native_call_sum_ms": 0.9373,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9756.403871999999,
+          "first_api": 58171,
+          "after_api": 58173,
+          "first_api_start_offset_ms": 11197.0436,
+          "last_api_end_offset_ms": 11198.0614,
+          "native_call_sum_ms": 0.9387,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9757.451872,
+          "first_api": 58506,
+          "after_api": 58508,
+          "first_api_start_offset_ms": 11254.0823,
+          "last_api_end_offset_ms": 11255.3004,
+          "native_call_sum_ms": 1.1402,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9757.700999999997,
+          "first_api": 58665,
+          "after_api": 58667,
+          "first_api_start_offset_ms": 11287.5057,
+          "last_api_end_offset_ms": 11289.3222,
+          "native_call_sum_ms": 1.6956,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9757.9,
+          "first_api": 58836,
+          "after_api": 58838,
+          "first_api_start_offset_ms": 11324.666,
+          "last_api_end_offset_ms": 11325.7724,
+          "native_call_sum_ms": 1.0262,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9758.950999999997,
+          "first_api": 59077,
+          "after_api": 59079,
+          "first_api_start_offset_ms": 11372.0252,
+          "last_api_end_offset_ms": 11373.8819,
+          "native_call_sum_ms": 1.7388,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9759.200999999997,
+          "first_api": 59246,
+          "after_api": 59248,
+          "first_api_start_offset_ms": 11410.763,
+          "last_api_end_offset_ms": 11411.9298,
+          "native_call_sum_ms": 1.0822,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9759.4,
+          "first_api": 59329,
+          "after_api": 59331,
+          "first_api_start_offset_ms": 11434.4564,
+          "last_api_end_offset_ms": 11435.9383,
+          "native_call_sum_ms": 1.3873,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9759.701872,
+          "first_api": 59411,
+          "after_api": 59413,
+          "first_api_start_offset_ms": 11453.2534,
+          "last_api_end_offset_ms": 11454.3748,
+          "native_call_sum_ms": 1.0433,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9760.450999999997,
+          "first_api": 59751,
+          "after_api": 59753,
+          "first_api_start_offset_ms": 11511.1717,
+          "last_api_end_offset_ms": 11512.3005,
+          "native_call_sum_ms": 1.0508,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9761.201872,
+          "first_api": 59914,
+          "after_api": 59916,
+          "first_api_start_offset_ms": 11547.692,
+          "last_api_end_offset_ms": 11548.7924,
+          "native_call_sum_ms": 1.0206,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9761.699999999999,
+          "first_api": 59996,
+          "after_api": 59998,
+          "first_api_start_offset_ms": 11569.6377,
+          "last_api_end_offset_ms": 11571.0937,
+          "native_call_sum_ms": 1.3686,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9762.551872,
+          "first_api": 60256,
+          "after_api": 60258,
+          "first_api_start_offset_ms": 11609.7845,
+          "last_api_end_offset_ms": 11611.593,
+          "native_call_sum_ms": 1.696,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9762.700999999997,
+          "first_api": 60338,
+          "after_api": 60340,
+          "first_api_start_offset_ms": 11630.7495,
+          "last_api_end_offset_ms": 11631.9318,
+          "native_call_sum_ms": 1.0997,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9763.199999999999,
+          "first_api": 60508,
+          "after_api": 60510,
+          "first_api_start_offset_ms": 11662.8582,
+          "last_api_end_offset_ms": 11664.6638,
+          "native_call_sum_ms": 1.6937,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9763.403871999999,
+          "first_api": 60679,
+          "after_api": 60681,
+          "first_api_start_offset_ms": 11694.4773,
+          "last_api_end_offset_ms": 11695.6217,
+          "native_call_sum_ms": 1.0624,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9764.200999999997,
+          "first_api": 60850,
+          "after_api": 60852,
+          "first_api_start_offset_ms": 11722.4066,
+          "last_api_end_offset_ms": 11723.504,
+          "native_call_sum_ms": 1.0213,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9764.903871999999,
+          "first_api": 61109,
+          "after_api": 61111,
+          "first_api_start_offset_ms": 11759.9381,
+          "last_api_end_offset_ms": 11761.025,
+          "native_call_sum_ms": 1.0122,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9765.551872,
+          "first_api": 61604,
+          "after_api": 61606,
+          "first_api_start_offset_ms": 11840.3671,
+          "last_api_end_offset_ms": 11842.1587,
+          "native_call_sum_ms": 1.6942,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9768.050999999998,
+          "first_api": 62713,
+          "after_api": 62715,
+          "first_api_start_offset_ms": 11997.386,
+          "last_api_end_offset_ms": 11998.4716,
+          "native_call_sum_ms": 1.0082,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9769.550999999998,
+          "first_api": 63405,
+          "after_api": 63407,
+          "first_api_start_offset_ms": 12090.778,
+          "last_api_end_offset_ms": 12091.8992,
+          "native_call_sum_ms": 1.0454,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9769.951872,
+          "first_api": 63579,
+          "after_api": 63581,
+          "first_api_start_offset_ms": 12122.6902,
+          "last_api_end_offset_ms": 12123.7676,
+          "native_call_sum_ms": 0.9952,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9769.952872,
+          "first_api": 63663,
+          "after_api": 63665,
+          "first_api_start_offset_ms": 12142.2193,
+          "last_api_end_offset_ms": 12143.9237,
+          "native_call_sum_ms": 1.5951,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9770.051872,
+          "first_api": 63747,
+          "after_api": 63749,
+          "first_api_start_offset_ms": 12161.9208,
+          "last_api_end_offset_ms": 12163.018,
+          "native_call_sum_ms": 1.0231,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9770.3,
+          "first_api": 64008,
+          "after_api": 64010,
+          "first_api_start_offset_ms": 12205.472,
+          "last_api_end_offset_ms": 12207.2291,
+          "native_call_sum_ms": 1.6432,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9770.700999999997,
+          "first_api": 64270,
+          "after_api": 64272,
+          "first_api_start_offset_ms": 12271.6117,
+          "last_api_end_offset_ms": 12272.799,
+          "native_call_sum_ms": 1.1012,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9771.411453,
+          "first_api": 64532,
+          "after_api": 64534,
+          "first_api_start_offset_ms": 12314.7356,
+          "last_api_end_offset_ms": 12315.8822,
+          "native_call_sum_ms": 1.0657,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9771.551872,
+          "first_api": 64701,
+          "after_api": 64703,
+          "first_api_start_offset_ms": 12348.1389,
+          "last_api_end_offset_ms": 12350.0623,
+          "native_call_sum_ms": 1.8154,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9771.8,
+          "first_api": 64875,
+          "after_api": 64877,
+          "first_api_start_offset_ms": 12383.0959,
+          "last_api_end_offset_ms": 12384.2911,
+          "native_call_sum_ms": 1.1213,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9772.200999999997,
+          "first_api": 65049,
+          "after_api": 65051,
+          "first_api_start_offset_ms": 12414.5371,
+          "last_api_end_offset_ms": 12416.2414,
+          "native_call_sum_ms": 1.5892,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9772.701872,
+          "first_api": 65313,
+          "after_api": 65315,
+          "first_api_start_offset_ms": 12462.7544,
+          "last_api_end_offset_ms": 12463.9264,
+          "native_call_sum_ms": 1.0909,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9772.911453,
+          "first_api": 65575,
+          "after_api": 65577,
+          "first_api_start_offset_ms": 12506.1471,
+          "last_api_end_offset_ms": 12507.2248,
+          "native_call_sum_ms": 1.0031,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9773.050999999998,
+          "first_api": 65834,
+          "after_api": 65836,
+          "first_api_start_offset_ms": 12552.4208,
+          "last_api_end_offset_ms": 12554.102,
+          "native_call_sum_ms": 1.6004,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9774.181484,
+          "first_api": 66275,
+          "after_api": 66277,
+          "first_api_start_offset_ms": 12634.2006,
+          "last_api_end_offset_ms": 12636.1564,
+          "native_call_sum_ms": 1.7222,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9774.201872,
+          "first_api": 66361,
+          "after_api": 66363,
+          "first_api_start_offset_ms": 12659.8434,
+          "last_api_end_offset_ms": 12660.9469,
+          "native_call_sum_ms": 0.997,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9774.450999999997,
+          "first_api": 66624,
+          "after_api": 66626,
+          "first_api_start_offset_ms": 12700.5223,
+          "last_api_end_offset_ms": 12702.3285,
+          "native_call_sum_ms": 1.6947,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9774.550999999998,
+          "first_api": 66712,
+          "after_api": 66714,
+          "first_api_start_offset_ms": 12725.7303,
+          "last_api_end_offset_ms": 12726.7441,
+          "native_call_sum_ms": 0.9397,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9775.700999999997,
+          "first_api": 67240,
+          "after_api": 67242,
+          "first_api_start_offset_ms": 12793.9494,
+          "last_api_end_offset_ms": 12795.037,
+          "native_call_sum_ms": 1.0129,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9775.950999999997,
+          "first_api": 67505,
+          "after_api": 67507,
+          "first_api_start_offset_ms": 12833.8046,
+          "last_api_end_offset_ms": 12834.9337,
+          "native_call_sum_ms": 1.0537,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9776.451872,
+          "first_api": 67683,
+          "after_api": 67685,
+          "first_api_start_offset_ms": 12871.0268,
+          "last_api_end_offset_ms": 12872.8135,
+          "native_call_sum_ms": 1.6533,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9777.200999999997,
+          "first_api": 68214,
+          "after_api": 68216,
+          "first_api_start_offset_ms": 12945.9667,
+          "last_api_end_offset_ms": 12947.0936,
+          "native_call_sum_ms": 1.0523,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9777.951872,
+          "first_api": 68390,
+          "after_api": 68392,
+          "first_api_start_offset_ms": 12978.8219,
+          "last_api_end_offset_ms": 12980.1224,
+          "native_call_sum_ms": 1.1656,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9779.450999999997,
+          "first_api": 69008,
+          "after_api": 69010,
+          "first_api_start_offset_ms": 13072.8461,
+          "last_api_end_offset_ms": 13073.9307,
+          "native_call_sum_ms": 1.0004,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9780.950999999997,
+          "first_api": 69974,
+          "after_api": 69976,
+          "first_api_start_offset_ms": 13185.3759,
+          "last_api_end_offset_ms": 13186.9702,
+          "native_call_sum_ms": 1.4985,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9784.800999999998,
+          "first_api": 71644,
+          "after_api": 71647,
+          "first_api_start_offset_ms": 13393.7795,
+          "last_api_end_offset_ms": 13395.6179,
+          "native_call_sum_ms": 1.5356,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9785.000872,
+          "first_api": 71823,
+          "after_api": 71825,
+          "first_api_start_offset_ms": 13433.5252,
+          "last_api_end_offset_ms": 13434.7382,
+          "native_call_sum_ms": 1.1239,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9785.001872,
+          "first_api": 71912,
+          "after_api": 71914,
+          "first_api_start_offset_ms": 13457.909,
+          "last_api_end_offset_ms": 13459.2052,
+          "native_call_sum_ms": 1.212,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9786.300999999998,
+          "first_api": 72707,
+          "after_api": 72709,
+          "first_api_start_offset_ms": 13573.6214,
+          "last_api_end_offset_ms": 13574.6988,
+          "native_call_sum_ms": 0.9918,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9786.699999999999,
+          "first_api": 72887,
+          "after_api": 72889,
+          "first_api_start_offset_ms": 13605.5659,
+          "last_api_end_offset_ms": 13606.7343,
+          "native_call_sum_ms": 1.0853,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9786.801872,
+          "first_api": 72977,
+          "after_api": 72979,
+          "first_api_start_offset_ms": 13622.702,
+          "last_api_end_offset_ms": 13623.7404,
+          "native_call_sum_ms": 0.9642,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9787.300999999998,
+          "first_api": 73334,
+          "after_api": 73336,
+          "first_api_start_offset_ms": 13694.3512,
+          "last_api_end_offset_ms": 13695.4683,
+          "native_call_sum_ms": 1.0412,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9788.053871999999,
+          "first_api": 73871,
+          "after_api": 73873,
+          "first_api_start_offset_ms": 13777.8391,
+          "last_api_end_offset_ms": 13779.0235,
+          "native_call_sum_ms": 1.093,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9788.199999999999,
+          "first_api": 73962,
+          "after_api": 73964,
+          "first_api_start_offset_ms": 13795.799,
+          "last_api_end_offset_ms": 13796.8364,
+          "native_call_sum_ms": 0.9628,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9788.301872,
+          "first_api": 74053,
+          "after_api": 74055,
+          "first_api_start_offset_ms": 13813.7841,
+          "last_api_end_offset_ms": 13814.8002,
+          "native_call_sum_ms": 0.9394,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9788.5,
+          "first_api": 74232,
+          "after_api": 74234,
+          "first_api_start_offset_ms": 13842.8995,
+          "last_api_end_offset_ms": 13844.7932,
+          "native_call_sum_ms": 1.7842,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9788.800999999998,
+          "first_api": 74413,
+          "after_api": 74415,
+          "first_api_start_offset_ms": 13877.5699,
+          "last_api_end_offset_ms": 13879.4986,
+          "native_call_sum_ms": 1.8064,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9789.301872,
+          "first_api": 74682,
+          "after_api": 74684,
+          "first_api_start_offset_ms": 13938.3317,
+          "last_api_end_offset_ms": 13940.2628,
+          "native_call_sum_ms": 1.8173,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9789.800999999998,
+          "first_api": 74863,
+          "after_api": 74865,
+          "first_api_start_offset_ms": 13972.36,
+          "last_api_end_offset_ms": 13973.4265,
+          "native_call_sum_ms": 0.9899,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9790.0,
+          "first_api": 74955,
+          "after_api": 74957,
+          "first_api_start_offset_ms": 13995.2539,
+          "last_api_end_offset_ms": 13997.0059,
+          "native_call_sum_ms": 1.6447,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9790.801872,
+          "first_api": 75404,
+          "after_api": 75406,
+          "first_api_start_offset_ms": 14059.7622,
+          "last_api_end_offset_ms": 14060.7718,
+          "native_call_sum_ms": 0.9373,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9791.053871999999,
+          "first_api": 75584,
+          "after_api": 75586,
+          "first_api_start_offset_ms": 14091.1644,
+          "last_api_end_offset_ms": 14092.9061,
+          "native_call_sum_ms": 1.6237,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9791.099999999999,
+          "first_api": 75676,
+          "after_api": 75678,
+          "first_api_start_offset_ms": 14117.9796,
+          "last_api_end_offset_ms": 14119.8605,
+          "native_call_sum_ms": 1.7707,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9791.300999999998,
+          "first_api": 75768,
+          "after_api": 75770,
+          "first_api_start_offset_ms": 14145.1501,
+          "last_api_end_offset_ms": 14146.9078,
+          "native_call_sum_ms": 1.6478,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9791.301872,
+          "first_api": 75860,
+          "after_api": 75862,
+          "first_api_start_offset_ms": 14172.1721,
+          "last_api_end_offset_ms": 14173.335,
+          "native_call_sum_ms": 1.0176,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9792.0,
+          "first_api": 76217,
+          "after_api": 76219,
+          "first_api_start_offset_ms": 14218.0518,
+          "last_api_end_offset_ms": 14219.103,
+          "native_call_sum_ms": 0.9783,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9792.300999999998,
+          "first_api": 76400,
+          "after_api": 76402,
+          "first_api_start_offset_ms": 14250.2066,
+          "last_api_end_offset_ms": 14251.3297,
+          "native_call_sum_ms": 1.042,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9792.599999999999,
+          "first_api": 76670,
+          "after_api": 76672,
+          "first_api_start_offset_ms": 14291.515,
+          "last_api_end_offset_ms": 14293.0421,
+          "native_call_sum_ms": 1.4085,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9792.801872,
+          "first_api": 76851,
+          "after_api": 76853,
+          "first_api_start_offset_ms": 14325.4607,
+          "last_api_end_offset_ms": 14326.562,
+          "native_call_sum_ms": 1.0252,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9793.5,
+          "first_api": 77120,
+          "after_api": 77122,
+          "first_api_start_offset_ms": 14363.2858,
+          "last_api_end_offset_ms": 14364.3238,
+          "native_call_sum_ms": 0.9663,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9793.800999999998,
+          "first_api": 77393,
+          "after_api": 77395,
+          "first_api_start_offset_ms": 14407.442,
+          "last_api_end_offset_ms": 14409.2418,
+          "native_call_sum_ms": 1.686,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9795.602872,
+          "first_api": 78470,
+          "after_api": 78472,
+          "first_api_start_offset_ms": 14567.9469,
+          "last_api_end_offset_ms": 14569.492,
+          "native_call_sum_ms": 1.4515,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9797.102872,
+          "first_api": 78921,
+          "after_api": 78923,
+          "first_api_start_offset_ms": 14653.8449,
+          "last_api_end_offset_ms": 14655.6789,
+          "native_call_sum_ms": 1.7232,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9797.900999999998,
+          "first_api": 79636,
+          "after_api": 79638,
+          "first_api_start_offset_ms": 14744.2271,
+          "last_api_end_offset_ms": 14745.3633,
+          "native_call_sum_ms": 1.057,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9798.5,
+          "first_api": 79999,
+          "after_api": 80001,
+          "first_api_start_offset_ms": 14801.6192,
+          "last_api_end_offset_ms": 14803.1866,
+          "native_call_sum_ms": 1.4528,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9798.737986,
+          "first_api": 80184,
+          "after_api": 80186,
+          "first_api_start_offset_ms": 16350.009,
+          "last_api_end_offset_ms": 16351.7632,
+          "native_call_sum_ms": 1.6449,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9799.400999999998,
+          "first_api": 80457,
+          "after_api": 80459,
+          "first_api_start_offset_ms": 16407.2642,
+          "last_api_end_offset_ms": 16409.2022,
+          "native_call_sum_ms": 1.8185,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9799.499999999998,
+          "first_api": 80641,
+          "after_api": 80643,
+          "first_api_start_offset_ms": 16455.2968,
+          "last_api_end_offset_ms": 16457.0601,
+          "native_call_sum_ms": 1.6493,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9799.500999999998,
+          "first_api": 80735,
+          "after_api": 80737,
+          "first_api_start_offset_ms": 16482.8764,
+          "last_api_end_offset_ms": 16484.6655,
+          "native_call_sum_ms": 1.6751,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9799.901872,
+          "first_api": 81099,
+          "after_api": 81101,
+          "first_api_start_offset_ms": 16551.0757,
+          "last_api_end_offset_ms": 16552.284,
+          "native_call_sum_ms": 1.1262,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9800.0,
+          "first_api": 81194,
+          "after_api": 81196,
+          "first_api_start_offset_ms": 16575.4865,
+          "last_api_end_offset_ms": 16576.6418,
+          "native_call_sum_ms": 1.0744,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9801.002872,
+          "first_api": 81916,
+          "after_api": 81918,
+          "first_api_start_offset_ms": 16680.5447,
+          "last_api_end_offset_ms": 16681.6507,
+          "native_call_sum_ms": 1.0248,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9801.401872,
+          "first_api": 82285,
+          "after_api": 82287,
+          "first_api_start_offset_ms": 16744.6166,
+          "last_api_end_offset_ms": 16745.7903,
+          "native_call_sum_ms": 1.0984,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9802.502872,
+          "first_api": 83006,
+          "after_api": 83008,
+          "first_api_start_offset_ms": 16850.7186,
+          "last_api_end_offset_ms": 16851.9943,
+          "native_call_sum_ms": 1.1953,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9802.900999999998,
+          "first_api": 83188,
+          "after_api": 83190,
+          "first_api_start_offset_ms": 16889.8402,
+          "last_api_end_offset_ms": 16890.9841,
+          "native_call_sum_ms": 1.067,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9803.401872,
+          "first_api": 83469,
+          "after_api": 83471,
+          "first_api_start_offset_ms": 16928.5777,
+          "last_api_end_offset_ms": 16929.6073,
+          "native_call_sum_ms": 0.956,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9803.601872000001,
+          "first_api": 83651,
+          "after_api": 83653,
+          "first_api_start_offset_ms": 16956.749,
+          "last_api_end_offset_ms": 16957.8084,
+          "native_call_sum_ms": 0.9845,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9804.100453,
+          "first_api": 83834,
+          "after_api": 83836,
+          "first_api_start_offset_ms": 16984.4175,
+          "last_api_end_offset_ms": 16985.5664,
+          "native_call_sum_ms": 1.0658,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9804.400999999998,
+          "first_api": 83928,
+          "after_api": 83930,
+          "first_api_start_offset_ms": 17005.6601,
+          "last_api_end_offset_ms": 17007.4553,
+          "native_call_sum_ms": 1.6818,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9804.75,
+          "first_api": 84110,
+          "after_api": 84112,
+          "first_api_start_offset_ms": 17044.8719,
+          "last_api_end_offset_ms": 17046.377,
+          "native_call_sum_ms": 1.4273,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9804.901872,
+          "first_api": 84292,
+          "after_api": 84294,
+          "first_api_start_offset_ms": 17083.2406,
+          "last_api_end_offset_ms": 17085.0063,
+          "native_call_sum_ms": 1.6719,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9805.101872000001,
+          "first_api": 84386,
+          "after_api": 84388,
+          "first_api_start_offset_ms": 17108.1002,
+          "last_api_end_offset_ms": 17109.2867,
+          "native_call_sum_ms": 1.1092,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9805.600453,
+          "first_api": 84656,
+          "after_api": 84658,
+          "first_api_start_offset_ms": 17148.7365,
+          "last_api_end_offset_ms": 17149.8017,
+          "native_call_sum_ms": 0.9901,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9806.25,
+          "first_api": 84927,
+          "after_api": 84929,
+          "first_api_start_offset_ms": 17188.6756,
+          "last_api_end_offset_ms": 17190.465,
+          "native_call_sum_ms": 1.6788,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9806.400999999998,
+          "first_api": 85021,
+          "after_api": 85023,
+          "first_api_start_offset_ms": 17210.66,
+          "last_api_end_offset_ms": 17211.7798,
+          "native_call_sum_ms": 0.9871,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9806.402871999999,
+          "first_api": 85115,
+          "after_api": 85117,
+          "first_api_start_offset_ms": 17230.2543,
+          "last_api_end_offset_ms": 17231.3832,
+          "native_call_sum_ms": 1.0446,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9806.771299,
+          "first_api": 85209,
+          "after_api": 85211,
+          "first_api_start_offset_ms": 17252.9037,
+          "last_api_end_offset_ms": 17254.1347,
+          "native_call_sum_ms": 1.1553,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9807.900999999998,
+          "first_api": 85480,
+          "after_api": 85482,
+          "first_api_start_offset_ms": 17299.3855,
+          "last_api_end_offset_ms": 17300.4714,
+          "native_call_sum_ms": 1.0045,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9807.902871999999,
+          "first_api": 85574,
+          "after_api": 85576,
+          "first_api_start_offset_ms": 17322.0885,
+          "last_api_end_offset_ms": 17323.9059,
+          "native_call_sum_ms": 1.7306,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9808.271299,
+          "first_api": 85668,
+          "after_api": 85670,
+          "first_api_start_offset_ms": 17347.4841,
+          "last_api_end_offset_ms": 17349.2386,
+          "native_call_sum_ms": 1.6415,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9815.951872,
+          "first_api": 87396,
+          "after_api": 87398,
+          "first_api_start_offset_ms": 17654.9355,
+          "last_api_end_offset_ms": 17656.7487,
+          "native_call_sum_ms": 1.6981,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9816.402871999999,
+          "first_api": 87583,
+          "after_api": 87585,
+          "first_api_start_offset_ms": 17699.7551,
+          "last_api_end_offset_ms": 17701.6503,
+          "native_call_sum_ms": 1.7632,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9816.403871999999,
+          "first_api": 87677,
+          "after_api": 87679,
+          "first_api_start_offset_ms": 17727.5959,
+          "last_api_end_offset_ms": 17729.5638,
+          "native_call_sum_ms": 1.8524,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9817.451872,
+          "first_api": 88040,
+          "after_api": 88042,
+          "first_api_start_offset_ms": 17795.9332,
+          "last_api_end_offset_ms": 17797.8266,
+          "native_call_sum_ms": 1.7756,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9817.9,
+          "first_api": 88409,
+          "after_api": 88411,
+          "first_api_start_offset_ms": 17869.6834,
+          "last_api_end_offset_ms": 17871.1918,
+          "native_call_sum_ms": 1.4232,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9818.950999999997,
+          "first_api": 88689,
+          "after_api": 88691,
+          "first_api_start_offset_ms": 17930.8881,
+          "last_api_end_offset_ms": 17932.8397,
+          "native_call_sum_ms": 1.8206,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9819.4,
+          "first_api": 88964,
+          "after_api": 88966,
+          "first_api_start_offset_ms": 17987.7421,
+          "last_api_end_offset_ms": 17989.0492,
+          "native_call_sum_ms": 1.1959,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9819.701872,
+          "first_api": 89058,
+          "after_api": 89060,
+          "first_api_start_offset_ms": 18012.0773,
+          "last_api_end_offset_ms": 18013.7087,
+          "native_call_sum_ms": 1.52,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9820.450999999997,
+          "first_api": 89422,
+          "after_api": 89424,
+          "first_api_start_offset_ms": 18084.2174,
+          "last_api_end_offset_ms": 18086.0891,
+          "native_call_sum_ms": 1.7603,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9820.550999999998,
+          "first_api": 89516,
+          "after_api": 89518,
+          "first_api_start_offset_ms": 18105.419,
+          "last_api_end_offset_ms": 18107.2401,
+          "native_call_sum_ms": 1.7044,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9821.201872,
+          "first_api": 89706,
+          "after_api": 89708,
+          "first_api_start_offset_ms": 18156.5108,
+          "last_api_end_offset_ms": 18158.4371,
+          "native_call_sum_ms": 1.8083,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9821.699999999999,
+          "first_api": 89801,
+          "after_api": 89803,
+          "first_api_start_offset_ms": 18185.3052,
+          "last_api_end_offset_ms": 18187.1742,
+          "native_call_sum_ms": 1.7498,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9822.551872,
+          "first_api": 90074,
+          "after_api": 90076,
+          "first_api_start_offset_ms": 18244.1127,
+          "last_api_end_offset_ms": 18245.9951,
+          "native_call_sum_ms": 1.7707,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9822.700999999997,
+          "first_api": 90169,
+          "after_api": 90171,
+          "first_api_start_offset_ms": 18272.9946,
+          "last_api_end_offset_ms": 18274.8016,
+          "native_call_sum_ms": 1.694,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9823.050999999998,
+          "first_api": 90352,
+          "after_api": 90354,
+          "first_api_start_offset_ms": 18316.2053,
+          "last_api_end_offset_ms": 18318.1591,
+          "native_call_sum_ms": 1.8012,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9823.199999999999,
+          "first_api": 90447,
+          "after_api": 90449,
+          "first_api_start_offset_ms": 18345.479,
+          "last_api_end_offset_ms": 18347.3702,
+          "native_call_sum_ms": 1.7801,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9823.403871999999,
+          "first_api": 90631,
+          "after_api": 90633,
+          "first_api_start_offset_ms": 18392.2601,
+          "last_api_end_offset_ms": 18394.1472,
+          "native_call_sum_ms": 1.7734,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9823.550999999998,
+          "first_api": 90815,
+          "after_api": 90817,
+          "first_api_start_offset_ms": 18433.3907,
+          "last_api_end_offset_ms": 18435.2822,
+          "native_call_sum_ms": 1.7694,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9824.200999999997,
+          "first_api": 90912,
+          "after_api": 90914,
+          "first_api_start_offset_ms": 18483.6484,
+          "last_api_end_offset_ms": 18485.5032,
+          "native_call_sum_ms": 1.7397,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9824.903871999999,
+          "first_api": 91185,
+          "after_api": 91187,
+          "first_api_start_offset_ms": 18533.0205,
+          "last_api_end_offset_ms": 18534.1869,
+          "native_call_sum_ms": 1.086,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9825.550999999998,
+          "first_api": 91750,
+          "after_api": 91752,
+          "first_api_start_offset_ms": 18627.773,
+          "last_api_end_offset_ms": 18629.872,
+          "native_call_sum_ms": 1.9826,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9825.551872,
+          "first_api": 91846,
+          "after_api": 91848,
+          "first_api_start_offset_ms": 18655.6001,
+          "last_api_end_offset_ms": 18657.2969,
+          "native_call_sum_ms": 1.6202,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9826.050999999998,
+          "first_api": 92031,
+          "after_api": 92033,
+          "first_api_start_offset_ms": 18696.9397,
+          "last_api_end_offset_ms": 18698.7866,
+          "native_call_sum_ms": 1.7299,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9828.550999999998,
+          "first_api": 93406,
+          "after_api": 93408,
+          "first_api_start_offset_ms": 18912.2817,
+          "last_api_end_offset_ms": 18913.4339,
+          "native_call_sum_ms": 1.0737,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9829.951872,
+          "first_api": 94144,
+          "after_api": 94146,
+          "first_api_start_offset_ms": 19019.8427,
+          "last_api_end_offset_ms": 19021.2983,
+          "native_call_sum_ms": 1.3592,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9829.952872,
+          "first_api": 94240,
+          "after_api": 94242,
+          "first_api_start_offset_ms": 19045.8223,
+          "last_api_end_offset_ms": 19047.0362,
+          "native_call_sum_ms": 1.1288,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9830.051872,
+          "first_api": 94336,
+          "after_api": 94338,
+          "first_api_start_offset_ms": 19066.6018,
+          "last_api_end_offset_ms": 19068.3733,
+          "native_call_sum_ms": 1.6584,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9830.3,
+          "first_api": 94609,
+          "after_api": 94611,
+          "first_api_start_offset_ms": 19124.3352,
+          "last_api_end_offset_ms": 19126.2123,
+          "native_call_sum_ms": 1.7585,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9831.411453,
+          "first_api": 95066,
+          "after_api": 95068,
+          "first_api_start_offset_ms": 19213.1845,
+          "last_api_end_offset_ms": 19215.0724,
+          "native_call_sum_ms": 1.777,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9831.551872,
+          "first_api": 95257,
+          "after_api": 95259,
+          "first_api_start_offset_ms": 19258.9817,
+          "last_api_end_offset_ms": 19260.7633,
+          "native_call_sum_ms": 1.6625,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9831.8,
+          "first_api": 95442,
+          "after_api": 95444,
+          "first_api_start_offset_ms": 19302.9113,
+          "last_api_end_offset_ms": 19304.7863,
+          "native_call_sum_ms": 1.7403,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9832.701872,
+          "first_api": 95899,
+          "after_api": 95901,
+          "first_api_start_offset_ms": 19390.9437,
+          "last_api_end_offset_ms": 19392.8295,
+          "native_call_sum_ms": 1.7706,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9832.911453,
+          "first_api": 96171,
+          "after_api": 96173,
+          "first_api_start_offset_ms": 19444.7542,
+          "last_api_end_offset_ms": 19446.5502,
+          "native_call_sum_ms": 1.6789,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9833.050999999998,
+          "first_api": 96450,
+          "after_api": 96452,
+          "first_api_start_offset_ms": 19499.9452,
+          "last_api_end_offset_ms": 19501.7748,
+          "native_call_sum_ms": 1.7191,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9834.181484,
+          "first_api": 96901,
+          "after_api": 96903,
+          "first_api_start_offset_ms": 19582.5109,
+          "last_api_end_offset_ms": 19584.3308,
+          "native_call_sum_ms": 1.7068,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9834.201872,
+          "first_api": 96997,
+          "after_api": 96999,
+          "first_api_start_offset_ms": 19610.139,
+          "last_api_end_offset_ms": 19611.8868,
+          "native_call_sum_ms": 1.6346,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9834.550999999998,
+          "first_api": 97365,
+          "after_api": 97367,
+          "first_api_start_offset_ms": 19678.5188,
+          "last_api_end_offset_ms": 19679.7191,
+          "native_call_sum_ms": 1.1123,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9835.700999999997,
+          "first_api": 97902,
+          "after_api": 97904,
+          "first_api_start_offset_ms": 19763.8543,
+          "last_api_end_offset_ms": 19765.7697,
+          "native_call_sum_ms": 1.8033,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9836.451872,
+          "first_api": 98360,
+          "after_api": 98362,
+          "first_api_start_offset_ms": 19844.0291,
+          "last_api_end_offset_ms": 19845.1339,
+          "native_call_sum_ms": 1.0265,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9837.200999999997,
+          "first_api": 98899,
+          "after_api": 98901,
+          "first_api_start_offset_ms": 19927.0375,
+          "last_api_end_offset_ms": 19928.6609,
+          "native_call_sum_ms": 1.5238,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9837.951872,
+          "first_api": 99083,
+          "after_api": 99085,
+          "first_api_start_offset_ms": 19969.3169,
+          "last_api_end_offset_ms": 19971.1385,
+          "native_call_sum_ms": 1.7064,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9839.450999999997,
+          "first_api": 99709,
+          "after_api": 99711,
+          "first_api_start_offset_ms": 20071.0755,
+          "last_api_end_offset_ms": 20072.5435,
+          "native_call_sum_ms": 1.1854,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9840.950999999997,
+          "first_api": 100707,
+          "after_api": 100709,
+          "first_api_start_offset_ms": 20243.4647,
+          "last_api_end_offset_ms": 20244.7282,
+          "native_call_sum_ms": 1.174,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9845.000872,
+          "first_api": 102631,
+          "after_api": 102634,
+          "first_api_start_offset_ms": 20494.8793,
+          "last_api_end_offset_ms": 20496.1791,
+          "native_call_sum_ms": 1.0668,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9845.001872,
+          "first_api": 102728,
+          "after_api": 102730,
+          "first_api_start_offset_ms": 20514.8297,
+          "last_api_end_offset_ms": 20515.9252,
+          "native_call_sum_ms": 1.0227,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9846.699999999999,
+          "first_api": 103741,
+          "after_api": 103743,
+          "first_api_start_offset_ms": 20643.7561,
+          "last_api_end_offset_ms": 20644.8027,
+          "native_call_sum_ms": 0.972,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9846.801872,
+          "first_api": 103837,
+          "after_api": 103839,
+          "first_api_start_offset_ms": 20667.8099,
+          "last_api_end_offset_ms": 20669.5788,
+          "native_call_sum_ms": 1.6511,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9848.053871999999,
+          "first_api": 104756,
+          "after_api": 104758,
+          "first_api_start_offset_ms": 20773.0612,
+          "last_api_end_offset_ms": 20774.8089,
+          "native_call_sum_ms": 1.66,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9848.199999999999,
+          "first_api": 104852,
+          "after_api": 104854,
+          "first_api_start_offset_ms": 20801.0203,
+          "last_api_end_offset_ms": 20802.9719,
+          "native_call_sum_ms": 1.831,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9848.301872,
+          "first_api": 104948,
+          "after_api": 104950,
+          "first_api_start_offset_ms": 20828.7952,
+          "last_api_end_offset_ms": 20830.5201,
+          "native_call_sum_ms": 1.6155,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9848.5,
+          "first_api": 105132,
+          "after_api": 105134,
+          "first_api_start_offset_ms": 20865.9201,
+          "last_api_end_offset_ms": 20867.1239,
+          "native_call_sum_ms": 1.1239,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9849.300999999998,
+          "first_api": 105589,
+          "after_api": 105591,
+          "first_api_start_offset_ms": 20925.9689,
+          "last_api_end_offset_ms": 20927.0313,
+          "native_call_sum_ms": 0.9896,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9849.301872,
+          "first_api": 105687,
+          "after_api": 105689,
+          "first_api_start_offset_ms": 20955.5077,
+          "last_api_end_offset_ms": 20957.0753,
+          "native_call_sum_ms": 1.4628,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9849.800999999998,
+          "first_api": 105873,
+          "after_api": 105875,
+          "first_api_start_offset_ms": 20990.503,
+          "last_api_end_offset_ms": 20991.653,
+          "native_call_sum_ms": 1.0744,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9850.0,
+          "first_api": 105970,
+          "after_api": 105972,
+          "first_api_start_offset_ms": 21013.4486,
+          "last_api_end_offset_ms": 21015.2514,
+          "native_call_sum_ms": 1.6954,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9850.000872,
+          "first_api": 106067,
+          "after_api": 106069,
+          "first_api_start_offset_ms": 21035.6406,
+          "last_api_end_offset_ms": 21037.453,
+          "native_call_sum_ms": 1.7373,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9850.800999999998,
+          "first_api": 106526,
+          "after_api": 106528,
+          "first_api_start_offset_ms": 21108.8149,
+          "last_api_end_offset_ms": 21110.0695,
+          "native_call_sum_ms": 1.1706,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9850.801872,
+          "first_api": 106625,
+          "after_api": 106627,
+          "first_api_start_offset_ms": 21131.3879,
+          "last_api_end_offset_ms": 21132.4084,
+          "native_call_sum_ms": 0.9461,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9851.053871999999,
+          "first_api": 106811,
+          "after_api": 106813,
+          "first_api_start_offset_ms": 21158.2989,
+          "last_api_end_offset_ms": 21159.3609,
+          "native_call_sum_ms": 0.9886,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9851.099999999999,
+          "first_api": 106909,
+          "after_api": 106911,
+          "first_api_start_offset_ms": 21178.0324,
+          "last_api_end_offset_ms": 21179.928,
+          "native_call_sum_ms": 1.6918,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9851.300999999998,
+          "first_api": 107007,
+          "after_api": 107009,
+          "first_api_start_offset_ms": 21200.1156,
+          "last_api_end_offset_ms": 21201.2476,
+          "native_call_sum_ms": 1.0563,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9851.301872,
+          "first_api": 107105,
+          "after_api": 107107,
+          "first_api_start_offset_ms": 21218.3453,
+          "last_api_end_offset_ms": 21219.5663,
+          "native_call_sum_ms": 1.1492,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9852.0,
+          "first_api": 107468,
+          "after_api": 107470,
+          "first_api_start_offset_ms": 21277.7883,
+          "last_api_end_offset_ms": 21278.9158,
+          "native_call_sum_ms": 1.0548,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9852.300999999998,
+          "first_api": 107663,
+          "after_api": 107665,
+          "first_api_start_offset_ms": 21312.6839,
+          "last_api_end_offset_ms": 21313.8508,
+          "native_call_sum_ms": 1.0907,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9852.599999999999,
+          "first_api": 107939,
+          "after_api": 107941,
+          "first_api_start_offset_ms": 21363.326,
+          "last_api_end_offset_ms": 21365.2469,
+          "native_call_sum_ms": 1.8023,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9852.801872,
+          "first_api": 108126,
+          "after_api": 108128,
+          "first_api_start_offset_ms": 21400.6869,
+          "last_api_end_offset_ms": 21402.5932,
+          "native_call_sum_ms": 1.7969,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9853.5,
+          "first_api": 108401,
+          "after_api": 108403,
+          "first_api_start_offset_ms": 21443.8188,
+          "last_api_end_offset_ms": 21445.0253,
+          "native_call_sum_ms": 1.1259,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9853.800999999998,
+          "first_api": 108686,
+          "after_api": 108688,
+          "first_api_start_offset_ms": 21490.6595,
+          "last_api_end_offset_ms": 21491.7633,
+          "native_call_sum_ms": 1.0277,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9854.300999999998,
+          "first_api": 108784,
+          "after_api": 108786,
+          "first_api_start_offset_ms": 21515.0018,
+          "last_api_end_offset_ms": 21516.846,
+          "native_call_sum_ms": 1.7346,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9855.602872,
+          "first_api": 109891,
+          "after_api": 109893,
+          "first_api_start_offset_ms": 21673.3886,
+          "last_api_end_offset_ms": 21675.2701,
+          "native_call_sum_ms": 1.7674,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9855.800999999998,
+          "first_api": 109989,
+          "after_api": 109991,
+          "first_api_start_offset_ms": 21701.3776,
+          "last_api_end_offset_ms": 21703.1738,
+          "native_call_sum_ms": 1.6866,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9857.102872,
+          "first_api": 110458,
+          "after_api": 110460,
+          "first_api_start_offset_ms": 21807.6706,
+          "last_api_end_offset_ms": 21808.7544,
+          "native_call_sum_ms": 1.0122,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9858.5,
+          "first_api": 111556,
+          "after_api": 111558,
+          "first_api_start_offset_ms": 21961.522,
+          "last_api_end_offset_ms": 21962.7257,
+          "native_call_sum_ms": 1.1181,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9858.737986,
+          "first_api": 111751,
+          "after_api": 111753,
+          "first_api_start_offset_ms": 21998.2233,
+          "last_api_end_offset_ms": 21999.2606,
+          "native_call_sum_ms": 0.9629,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9859.499999999998,
+          "first_api": 112220,
+          "after_api": 112222,
+          "first_api_start_offset_ms": 22086.1348,
+          "last_api_end_offset_ms": 22087.6254,
+          "native_call_sum_ms": 1.3753,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9859.500999999998,
+          "first_api": 112318,
+          "after_api": 112320,
+          "first_api_start_offset_ms": 22104.9487,
+          "last_api_end_offset_ms": 22106.064,
+          "native_call_sum_ms": 1.0318,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9859.901872,
+          "first_api": 112690,
+          "after_api": 112692,
+          "first_api_start_offset_ms": 22158.4566,
+          "last_api_end_offset_ms": 22159.666,
+          "native_call_sum_ms": 1.1341,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9860.0,
+          "first_api": 112789,
+          "after_api": 112791,
+          "first_api_start_offset_ms": 22180.7791,
+          "last_api_end_offset_ms": 22182.5031,
+          "native_call_sum_ms": 1.617,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9861.002872,
+          "first_api": 113523,
+          "after_api": 113525,
+          "first_api_start_offset_ms": 22293.5143,
+          "last_api_end_offset_ms": 22294.5497,
+          "native_call_sum_ms": 0.9602,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9861.401872,
+          "first_api": 113904,
+          "after_api": 113906,
+          "first_api_start_offset_ms": 22343.7203,
+          "last_api_end_offset_ms": 22344.828,
+          "native_call_sum_ms": 1.0326,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9862.502872,
+          "first_api": 114637,
+          "after_api": 114639,
+          "first_api_start_offset_ms": 22432.2247,
+          "last_api_end_offset_ms": 22433.3187,
+          "native_call_sum_ms": 1.0197,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9862.900999999998,
+          "first_api": 114823,
+          "after_api": 114825,
+          "first_api_start_offset_ms": 22461.5435,
+          "last_api_end_offset_ms": 22462.7241,
+          "native_call_sum_ms": 1.0637,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9863.401872,
+          "first_api": 115116,
+          "after_api": 115118,
+          "first_api_start_offset_ms": 22504.7767,
+          "last_api_end_offset_ms": 22506.0127,
+          "native_call_sum_ms": 1.1485,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9863.601872000001,
+          "first_api": 115302,
+          "after_api": 115304,
+          "first_api_start_offset_ms": 22537.246,
+          "last_api_end_offset_ms": 22539.0443,
+          "native_call_sum_ms": 1.6809,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9864.100453,
+          "first_api": 115489,
+          "after_api": 115491,
+          "first_api_start_offset_ms": 22572.3496,
+          "last_api_end_offset_ms": 22573.453,
+          "native_call_sum_ms": 1.025,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9864.400999999998,
+          "first_api": 115587,
+          "after_api": 115589,
+          "first_api_start_offset_ms": 22593.9987,
+          "last_api_end_offset_ms": 22595.7694,
+          "native_call_sum_ms": 1.6613,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9864.75,
+          "first_api": 115773,
+          "after_api": 115775,
+          "first_api_start_offset_ms": 22634.6995,
+          "last_api_end_offset_ms": 22636.6433,
+          "native_call_sum_ms": 1.8349,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9864.901872,
+          "first_api": 115959,
+          "after_api": 115961,
+          "first_api_start_offset_ms": 22676.5564,
+          "last_api_end_offset_ms": 22678.4761,
+          "native_call_sum_ms": 1.8069,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9865.101872000001,
+          "first_api": 116057,
+          "after_api": 116059,
+          "first_api_start_offset_ms": 22700.4151,
+          "last_api_end_offset_ms": 22702.2355,
+          "native_call_sum_ms": 1.711,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9865.600453,
+          "first_api": 116331,
+          "after_api": 116333,
+          "first_api_start_offset_ms": 22747.5893,
+          "last_api_end_offset_ms": 22748.7675,
+          "native_call_sum_ms": 1.0982,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9866.25,
+          "first_api": 116606,
+          "after_api": 116608,
+          "first_api_start_offset_ms": 22785.1168,
+          "last_api_end_offset_ms": 22786.5182,
+          "native_call_sum_ms": 1.3292,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9866.400999999998,
+          "first_api": 116704,
+          "after_api": 116706,
+          "first_api_start_offset_ms": 22805.5291,
+          "last_api_end_offset_ms": 22806.8167,
+          "native_call_sum_ms": 1.2076,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9866.402871999999,
+          "first_api": 116802,
+          "after_api": 116804,
+          "first_api_start_offset_ms": 22826.1413,
+          "last_api_end_offset_ms": 22827.8265,
+          "native_call_sum_ms": 1.5763,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9866.771299,
+          "first_api": 116900,
+          "after_api": 116902,
+          "first_api_start_offset_ms": 22847.9228,
+          "last_api_end_offset_ms": 22848.9649,
+          "native_call_sum_ms": 0.9709,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9867.900999999998,
+          "first_api": 117175,
+          "after_api": 117177,
+          "first_api_start_offset_ms": 22892.4665,
+          "last_api_end_offset_ms": 22893.5782,
+          "native_call_sum_ms": 1.0351,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9867.902871999999,
+          "first_api": 117273,
+          "after_api": 117275,
+          "first_api_start_offset_ms": 22911.7201,
+          "last_api_end_offset_ms": 22912.9937,
+          "native_call_sum_ms": 1.1953,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9868.271299,
+          "first_api": 117371,
+          "after_api": 117373,
+          "first_api_start_offset_ms": 22931.6433,
+          "last_api_end_offset_ms": 22932.7979,
+          "native_call_sum_ms": 1.0786,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9875.951872,
+          "first_api": 119139,
+          "after_api": 119141,
+          "first_api_start_offset_ms": 23165.6842,
+          "last_api_end_offset_ms": 23166.7449,
+          "native_call_sum_ms": 0.9876,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9876.402871999999,
+          "first_api": 119334,
+          "after_api": 119336,
+          "first_api_start_offset_ms": 23200.6523,
+          "last_api_end_offset_ms": 23202.3918,
+          "native_call_sum_ms": 1.6282,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9876.403871999999,
+          "first_api": 119432,
+          "after_api": 119434,
+          "first_api_start_offset_ms": 23228.1537,
+          "last_api_end_offset_ms": 23229.8787,
+          "native_call_sum_ms": 1.6149,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9877.451872,
+          "first_api": 119803,
+          "after_api": 119805,
+          "first_api_start_offset_ms": 23333.4872,
+          "last_api_end_offset_ms": 23335.3463,
+          "native_call_sum_ms": 1.7498,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9877.9,
+          "first_api": 120184,
+          "after_api": 120186,
+          "first_api_start_offset_ms": 23390.3411,
+          "last_api_end_offset_ms": 23391.4306,
+          "native_call_sum_ms": 1.0134,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9878.950999999997,
+          "first_api": 120476,
+          "after_api": 120478,
+          "first_api_start_offset_ms": 23433.6397,
+          "last_api_end_offset_ms": 23434.6487,
+          "native_call_sum_ms": 0.9349,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9879.4,
+          "first_api": 120759,
+          "after_api": 120761,
+          "first_api_start_offset_ms": 23485.3265,
+          "last_api_end_offset_ms": 23487.1119,
+          "native_call_sum_ms": 1.6726,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9879.701872,
+          "first_api": 120857,
+          "after_api": 120859,
+          "first_api_start_offset_ms": 23512.5805,
+          "last_api_end_offset_ms": 23514.1058,
+          "native_call_sum_ms": 1.4167,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9880.450999999997,
+          "first_api": 121229,
+          "after_api": 121231,
+          "first_api_start_offset_ms": 23579.143,
+          "last_api_end_offset_ms": 23580.2902,
+          "native_call_sum_ms": 1.0616,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9881.201872,
+          "first_api": 121521,
+          "after_api": 121523,
+          "first_api_start_offset_ms": 23632.9769,
+          "last_api_end_offset_ms": 23634.5529,
+          "native_call_sum_ms": 1.4811,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9881.699999999999,
+          "first_api": 121619,
+          "after_api": 121621,
+          "first_api_start_offset_ms": 23658.547,
+          "last_api_end_offset_ms": 23659.6376,
+          "native_call_sum_ms": 1.015,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9882.551872,
+          "first_api": 121895,
+          "after_api": 121897,
+          "first_api_start_offset_ms": 23704.2974,
+          "last_api_end_offset_ms": 23706.2437,
+          "native_call_sum_ms": 1.8557,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9882.700999999997,
+          "first_api": 121993,
+          "after_api": 121995,
+          "first_api_start_offset_ms": 23732.8509,
+          "last_api_end_offset_ms": 23734.7097,
+          "native_call_sum_ms": 1.7467,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9883.199999999999,
+          "first_api": 122179,
+          "after_api": 122181,
+          "first_api_start_offset_ms": 23765.4404,
+          "last_api_end_offset_ms": 23766.6264,
+          "native_call_sum_ms": 1.1013,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9883.403871999999,
+          "first_api": 122366,
+          "after_api": 122368,
+          "first_api_start_offset_ms": 23794.0803,
+          "last_api_end_offset_ms": 23795.1456,
+          "native_call_sum_ms": 0.9907,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9884.200999999997,
+          "first_api": 122650,
+          "after_api": 122652,
+          "first_api_start_offset_ms": 23848.9782,
+          "last_api_end_offset_ms": 23850.7501,
+          "native_call_sum_ms": 1.661,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9884.903871999999,
+          "first_api": 122925,
+          "after_api": 122927,
+          "first_api_start_offset_ms": 23896.0348,
+          "last_api_end_offset_ms": 23897.1936,
+          "native_call_sum_ms": 1.0773,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9885.550999999998,
+          "first_api": 123500,
+          "after_api": 123502,
+          "first_api_start_offset_ms": 23979.3422,
+          "last_api_end_offset_ms": 23981.1737,
+          "native_call_sum_ms": 1.7146,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9885.551872,
+          "first_api": 123598,
+          "after_api": 123600,
+          "first_api_start_offset_ms": 24006.6204,
+          "last_api_end_offset_ms": 24007.7169,
+          "native_call_sum_ms": 1.0207,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9887.950999999997,
+          "first_api": 124803,
+          "after_api": 124805,
+          "first_api_start_offset_ms": 24149.7707,
+          "last_api_end_offset_ms": 24150.995,
+          "native_call_sum_ms": 1.1407,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9887.951999999997,
+          "first_api": 124903,
+          "after_api": 124905,
+          "first_api_start_offset_ms": 24172.2748,
+          "last_api_end_offset_ms": 24173.3985,
+          "native_call_sum_ms": 1.0467,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9888.550999999998,
+          "first_api": 125279,
+          "after_api": 125281,
+          "first_api_start_offset_ms": 24223.6544,
+          "last_api_end_offset_ms": 24224.7223,
+          "native_call_sum_ms": 0.9905,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9889.951872,
+          "first_api": 126033,
+          "after_api": 126035,
+          "first_api_start_offset_ms": 24324.7222,
+          "last_api_end_offset_ms": 24325.9031,
+          "native_call_sum_ms": 1.0939,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9889.952872,
+          "first_api": 126133,
+          "after_api": 126135,
+          "first_api_start_offset_ms": 24347.8524,
+          "last_api_end_offset_ms": 24349.7855,
+          "native_call_sum_ms": 1.8245,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9890.051872,
+          "first_api": 126233,
+          "after_api": 126235,
+          "first_api_start_offset_ms": 24373.496,
+          "last_api_end_offset_ms": 24374.5968,
+          "native_call_sum_ms": 1.0222,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9890.3,
+          "first_api": 126510,
+          "after_api": 126512,
+          "first_api_start_offset_ms": 26032.7347,
+          "last_api_end_offset_ms": 26033.8739,
+          "native_call_sum_ms": 1.0642,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9891.411453,
+          "first_api": 126975,
+          "after_api": 126977,
+          "first_api_start_offset_ms": 26097.3052,
+          "last_api_end_offset_ms": 26098.4308,
+          "native_call_sum_ms": 1.0516,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9891.551872,
+          "first_api": 127174,
+          "after_api": 127176,
+          "first_api_start_offset_ms": 26131.7471,
+          "last_api_end_offset_ms": 26133.5335,
+          "native_call_sum_ms": 1.6743,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9891.8,
+          "first_api": 127363,
+          "after_api": 127365,
+          "first_api_start_offset_ms": 26168.5487,
+          "last_api_end_offset_ms": 26169.8602,
+          "native_call_sum_ms": 1.228,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9892.701872,
+          "first_api": 127828,
+          "after_api": 127830,
+          "first_api_start_offset_ms": 26228.5982,
+          "last_api_end_offset_ms": 26229.8162,
+          "native_call_sum_ms": 1.144,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9892.911453,
+          "first_api": 128104,
+          "after_api": 128106,
+          "first_api_start_offset_ms": 26268.4039,
+          "last_api_end_offset_ms": 26270.0114,
+          "native_call_sum_ms": 1.5318,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9892.950999999997,
+          "first_api": 128292,
+          "after_api": 128294,
+          "first_api_start_offset_ms": 26310.7437,
+          "last_api_end_offset_ms": 26312.5466,
+          "native_call_sum_ms": 1.69,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9892.951999999997,
+          "first_api": 128491,
+          "after_api": 128493,
+          "first_api_start_offset_ms": 26355.5642,
+          "last_api_end_offset_ms": 26357.419,
+          "native_call_sum_ms": 1.7405,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9893.050999999998,
+          "first_api": 128591,
+          "after_api": 128593,
+          "first_api_start_offset_ms": 26383.2979,
+          "last_api_end_offset_ms": 26384.6273,
+          "native_call_sum_ms": 1.1316,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9894.181484,
+          "first_api": 129046,
+          "after_api": 129048,
+          "first_api_start_offset_ms": 26460.3364,
+          "last_api_end_offset_ms": 26461.6057,
+          "native_call_sum_ms": 1.1674,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9894.201872,
+          "first_api": 129146,
+          "after_api": 129148,
+          "first_api_start_offset_ms": 26482.7539,
+          "last_api_end_offset_ms": 26484.4717,
+          "native_call_sum_ms": 1.5981,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9894.550999999998,
+          "first_api": 129522,
+          "after_api": 129524,
+          "first_api_start_offset_ms": 26538.951,
+          "last_api_end_offset_ms": 26542.0427,
+          "native_call_sum_ms": 1.8382,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9895.700999999997,
+          "first_api": 130063,
+          "after_api": 130065,
+          "first_api_start_offset_ms": 26646.0867,
+          "last_api_end_offset_ms": 26647.7101,
+          "native_call_sum_ms": 1.5024,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9896.451872,
+          "first_api": 130529,
+          "after_api": 130531,
+          "first_api_start_offset_ms": 26721.2753,
+          "last_api_end_offset_ms": 26722.9076,
+          "native_call_sum_ms": 1.5217,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9897.200999999997,
+          "first_api": 131072,
+          "after_api": 131074,
+          "first_api_start_offset_ms": 26814.8909,
+          "last_api_end_offset_ms": 26816.8347,
+          "native_call_sum_ms": 1.8643,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9897.951872,
+          "first_api": 131260,
+          "after_api": 131262,
+          "first_api_start_offset_ms": 26858.4173,
+          "last_api_end_offset_ms": 26860.2773,
+          "native_call_sum_ms": 1.7474,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        },
+        {
+          "at": 9899.450999999997,
+          "first_api": 131890,
+          "after_api": 131892,
+          "first_api_start_offset_ms": 26970.3714,
+          "last_api_end_offset_ms": 26972.1551,
+          "native_call_sum_ms": 1.6834,
+          "scope": "First native start to last native end is only an inner invocation envelope; surrounding Python work is retained in the unclassified gaps."
+        }
+      ],
+      "eligibility_phase": {
+        "first_observed_at": 9600.0,
+        "source_service_seconds": 1.5,
+        "wire_delay_seconds": 2.0,
+        "public_time_lower_bound": 9603.5,
+        "actual_second_view_at": 9660.0,
+        "admission_to_second_native_view_start_ms": 2940.7104,
+        "second_view_start_to_submit_native_start_ms": 7.876600000000053,
+        "submit_native_start_to_root_end_ms": 25432.7012,
+        "counterfactual_runtime_measured": false
+      },
+      "partition_exact_nanoseconds": true
+    }
+  },
+  "complete_100ms_certified": false,
+  "scope": "Disjoint native call envelopes and all remaining wall time, with no subtraction from the full root. Native envelopes include physical work; gaps include policy/copies/codec/evidence/dispatch and are not exclusive CPU phases."
+}

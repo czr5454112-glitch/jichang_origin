@@ -1,0 +1,1034 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="34" skipped="0" tests="84" time="11.089" timestamp="2026-10-15T20:00:30.705158+08:00" hostname="LAPTOP-M3GASC4G"><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_direct_peer_fifo_precedes_possible_own_bridge_and_is_read_only" time="0.001" /><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_only_current_head_per_source_never_skips_unreachable_predecessor" time="0.001" /><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_bridge_uses_least_actual_public_nonloader_nonstorage_node" time="0.001" /><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_bridge_endpoint_contract_and_path_are_necessary[same_zone]" time="0.001" /><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_bridge_endpoint_contract_and_path_are_necessary[full]" time="0.001" /><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_bridge_endpoint_contract_and_path_are_necessary[not_receive]" time="0.001" /><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_bridge_endpoint_contract_and_path_are_necessary[not_export]" time="0.001" /><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_bridge_endpoint_contract_and_path_are_necessary[min_stock]" time="0.001" /><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_bridge_endpoint_contract_and_path_are_necessary[loader]" time="0.001" /><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_bridge_endpoint_contract_and_path_are_necessary[storage]" time="0.001" /><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_bridge_endpoint_contract_and_path_are_necessary[zero_edge]" time="0.001" /><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_no_unsupported_export_or_own_head_promise[source_min]" time="0.001" /><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_no_unsupported_export_or_own_head_promise[source_permission]" time="0.001" /><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_no_unsupported_export_or_own_head_promise[own_full]" time="0.001" /><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_no_unsupported_export_or_own_head_promise[own_unreachable]" time="0.001" /><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_no_unsupported_export_or_own_head_promise[no_own_head]" time="0.001" /><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_empty_bridge_arrival_cannot_make_another_bridge_without_new_completion" time="0.001" /><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_missing_malformed_authority_is_not_empty_queue[future_head]" time="0.001" /><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_missing_malformed_authority_is_not_empty_queue[duplicate_job]" time="0.001" /><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_missing_malformed_authority_is_not_empty_queue[missing_projection]" time="0.001" /><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_missing_malformed_authority_is_not_empty_queue[missing_stock]" time="0.001" /><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_missing_malformed_authority_is_not_empty_queue[bool_occupancy]" time="0.001" /><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_missing_malformed_authority_is_not_empty_queue[bad_receipt]" time="0.001" /><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_actual_compact_empty_jobs_still_has_joinable_current_own_heads" time="1.057"><failure message="AssertionError: assert ([] == []&#10;  &#10;  Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'&#10;  &#10;    owner:system_domestic and 20830.0 == 20840.0)">def test_actual_compact_empty_jobs_still_has_joinable_current_own_heads():
+&gt;       value,view,peer=actual_owner();nodes={n['node']:n for n in view['node_contracts']}
+                        ^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:178: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def actual_owner():
+        """Actual saved compact endpoint, source self-copy and delivered peer.
+    
+        Calling the new candidate on these saved facts is a pure counterfactual,
+        never a new runtime/delivery or physical-execution claim.
+        """
+        gate,proof_view,box,peer=actual_fixture()
+        path=p.base.OUT/'original_low_wip_third_prepare_001/api/013730.json.gz'
+        encoded=path.read_bytes()
+        assert hashlib.sha256(encoded).hexdigest()=='fa4e4a01484a1549423f0a7ab5943dc6674c67d4bac0eab7e2fd960f49b44b93'
+        record=json.loads(gzip.decompress(encoded));assert record['endpoint']=='observe_protocol_control_policy_recent'
+&gt;       view=record['result'];assert view['jobs']==[] and view['owner_id']==gate.owner and view['now']==proof_view['now']
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert ([] == []
+E         
+E         Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'
+E         
+E           owner:system_domestic and 20830.0 == 20840.0)
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:157: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_actual_compact_join_rejects_missing_or_changed_current_authority[schema]" time="0.077"><failure message="AssertionError: assert ([] == []&#10;  &#10;  Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'&#10;  &#10;    owner:system_domestic and 20830.0 == 20840.0)">defect = 'schema'
+
+    @pytest.mark.parametrize('defect',['schema','capture_source','capture_future','missing_head','changed_head',
+        'changed_deadline','stale_current','omitted_contract','omitted_group','duplicate_group','missing_projection'])
+    def test_actual_compact_join_rejects_missing_or_changed_current_authority(defect):
+&gt;       value,view,_=actual_owner();nodes={n['node']:n for n in view['node_contracts']}
+                     ^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:194: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def actual_owner():
+        """Actual saved compact endpoint, source self-copy and delivered peer.
+    
+        Calling the new candidate on these saved facts is a pure counterfactual,
+        never a new runtime/delivery or physical-execution claim.
+        """
+        gate,proof_view,box,peer=actual_fixture()
+        path=p.base.OUT/'original_low_wip_third_prepare_001/api/013730.json.gz'
+        encoded=path.read_bytes()
+        assert hashlib.sha256(encoded).hexdigest()=='fa4e4a01484a1549423f0a7ab5943dc6674c67d4bac0eab7e2fd960f49b44b93'
+        record=json.loads(gzip.decompress(encoded));assert record['endpoint']=='observe_protocol_control_policy_recent'
+&gt;       view=record['result'];assert view['jobs']==[] and view['owner_id']==gate.owner and view['now']==proof_view['now']
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert ([] == []
+E         
+E         Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'
+E         
+E           owner:system_domestic and 20830.0 == 20840.0)
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:157: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_actual_compact_join_rejects_missing_or_changed_current_authority[capture_source]" time="0.069"><failure message="AssertionError: assert ([] == []&#10;  &#10;  Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'&#10;  &#10;    owner:system_domestic and 20830.0 == 20840.0)">defect = 'capture_source'
+
+    @pytest.mark.parametrize('defect',['schema','capture_source','capture_future','missing_head','changed_head',
+        'changed_deadline','stale_current','omitted_contract','omitted_group','duplicate_group','missing_projection'])
+    def test_actual_compact_join_rejects_missing_or_changed_current_authority(defect):
+&gt;       value,view,_=actual_owner();nodes={n['node']:n for n in view['node_contracts']}
+                     ^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:194: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def actual_owner():
+        """Actual saved compact endpoint, source self-copy and delivered peer.
+    
+        Calling the new candidate on these saved facts is a pure counterfactual,
+        never a new runtime/delivery or physical-execution claim.
+        """
+        gate,proof_view,box,peer=actual_fixture()
+        path=p.base.OUT/'original_low_wip_third_prepare_001/api/013730.json.gz'
+        encoded=path.read_bytes()
+        assert hashlib.sha256(encoded).hexdigest()=='fa4e4a01484a1549423f0a7ab5943dc6674c67d4bac0eab7e2fd960f49b44b93'
+        record=json.loads(gzip.decompress(encoded));assert record['endpoint']=='observe_protocol_control_policy_recent'
+&gt;       view=record['result'];assert view['jobs']==[] and view['owner_id']==gate.owner and view['now']==proof_view['now']
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert ([] == []
+E         
+E         Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'
+E         
+E           owner:system_domestic and 20830.0 == 20840.0)
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:157: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_actual_compact_join_rejects_missing_or_changed_current_authority[capture_future]" time="0.079"><failure message="AssertionError: assert ([] == []&#10;  &#10;  Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'&#10;  &#10;    owner:system_domestic and 20830.0 == 20840.0)">defect = 'capture_future'
+
+    @pytest.mark.parametrize('defect',['schema','capture_source','capture_future','missing_head','changed_head',
+        'changed_deadline','stale_current','omitted_contract','omitted_group','duplicate_group','missing_projection'])
+    def test_actual_compact_join_rejects_missing_or_changed_current_authority(defect):
+&gt;       value,view,_=actual_owner();nodes={n['node']:n for n in view['node_contracts']}
+                     ^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:194: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def actual_owner():
+        """Actual saved compact endpoint, source self-copy and delivered peer.
+    
+        Calling the new candidate on these saved facts is a pure counterfactual,
+        never a new runtime/delivery or physical-execution claim.
+        """
+        gate,proof_view,box,peer=actual_fixture()
+        path=p.base.OUT/'original_low_wip_third_prepare_001/api/013730.json.gz'
+        encoded=path.read_bytes()
+        assert hashlib.sha256(encoded).hexdigest()=='fa4e4a01484a1549423f0a7ab5943dc6674c67d4bac0eab7e2fd960f49b44b93'
+        record=json.loads(gzip.decompress(encoded));assert record['endpoint']=='observe_protocol_control_policy_recent'
+&gt;       view=record['result'];assert view['jobs']==[] and view['owner_id']==gate.owner and view['now']==proof_view['now']
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert ([] == []
+E         
+E         Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'
+E         
+E           owner:system_domestic and 20830.0 == 20840.0)
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:157: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_actual_compact_join_rejects_missing_or_changed_current_authority[missing_head]" time="0.070"><failure message="AssertionError: assert ([] == []&#10;  &#10;  Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'&#10;  &#10;    owner:system_domestic and 20830.0 == 20840.0)">defect = 'missing_head'
+
+    @pytest.mark.parametrize('defect',['schema','capture_source','capture_future','missing_head','changed_head',
+        'changed_deadline','stale_current','omitted_contract','omitted_group','duplicate_group','missing_projection'])
+    def test_actual_compact_join_rejects_missing_or_changed_current_authority(defect):
+&gt;       value,view,_=actual_owner();nodes={n['node']:n for n in view['node_contracts']}
+                     ^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:194: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def actual_owner():
+        """Actual saved compact endpoint, source self-copy and delivered peer.
+    
+        Calling the new candidate on these saved facts is a pure counterfactual,
+        never a new runtime/delivery or physical-execution claim.
+        """
+        gate,proof_view,box,peer=actual_fixture()
+        path=p.base.OUT/'original_low_wip_third_prepare_001/api/013730.json.gz'
+        encoded=path.read_bytes()
+        assert hashlib.sha256(encoded).hexdigest()=='fa4e4a01484a1549423f0a7ab5943dc6674c67d4bac0eab7e2fd960f49b44b93'
+        record=json.loads(gzip.decompress(encoded));assert record['endpoint']=='observe_protocol_control_policy_recent'
+&gt;       view=record['result'];assert view['jobs']==[] and view['owner_id']==gate.owner and view['now']==proof_view['now']
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert ([] == []
+E         
+E         Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'
+E         
+E           owner:system_domestic and 20830.0 == 20840.0)
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:157: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_actual_compact_join_rejects_missing_or_changed_current_authority[changed_head]" time="0.082"><failure message="AssertionError: assert ([] == []&#10;  &#10;  Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'&#10;  &#10;    owner:system_domestic and 20830.0 == 20840.0)">defect = 'changed_head'
+
+    @pytest.mark.parametrize('defect',['schema','capture_source','capture_future','missing_head','changed_head',
+        'changed_deadline','stale_current','omitted_contract','omitted_group','duplicate_group','missing_projection'])
+    def test_actual_compact_join_rejects_missing_or_changed_current_authority(defect):
+&gt;       value,view,_=actual_owner();nodes={n['node']:n for n in view['node_contracts']}
+                     ^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:194: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def actual_owner():
+        """Actual saved compact endpoint, source self-copy and delivered peer.
+    
+        Calling the new candidate on these saved facts is a pure counterfactual,
+        never a new runtime/delivery or physical-execution claim.
+        """
+        gate,proof_view,box,peer=actual_fixture()
+        path=p.base.OUT/'original_low_wip_third_prepare_001/api/013730.json.gz'
+        encoded=path.read_bytes()
+        assert hashlib.sha256(encoded).hexdigest()=='fa4e4a01484a1549423f0a7ab5943dc6674c67d4bac0eab7e2fd960f49b44b93'
+        record=json.loads(gzip.decompress(encoded));assert record['endpoint']=='observe_protocol_control_policy_recent'
+&gt;       view=record['result'];assert view['jobs']==[] and view['owner_id']==gate.owner and view['now']==proof_view['now']
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert ([] == []
+E         
+E         Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'
+E         
+E           owner:system_domestic and 20830.0 == 20840.0)
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:157: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_actual_compact_join_rejects_missing_or_changed_current_authority[changed_deadline]" time="0.072"><failure message="AssertionError: assert ([] == []&#10;  &#10;  Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'&#10;  &#10;    owner:system_domestic and 20830.0 == 20840.0)">defect = 'changed_deadline'
+
+    @pytest.mark.parametrize('defect',['schema','capture_source','capture_future','missing_head','changed_head',
+        'changed_deadline','stale_current','omitted_contract','omitted_group','duplicate_group','missing_projection'])
+    def test_actual_compact_join_rejects_missing_or_changed_current_authority(defect):
+&gt;       value,view,_=actual_owner();nodes={n['node']:n for n in view['node_contracts']}
+                     ^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:194: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def actual_owner():
+        """Actual saved compact endpoint, source self-copy and delivered peer.
+    
+        Calling the new candidate on these saved facts is a pure counterfactual,
+        never a new runtime/delivery or physical-execution claim.
+        """
+        gate,proof_view,box,peer=actual_fixture()
+        path=p.base.OUT/'original_low_wip_third_prepare_001/api/013730.json.gz'
+        encoded=path.read_bytes()
+        assert hashlib.sha256(encoded).hexdigest()=='fa4e4a01484a1549423f0a7ab5943dc6674c67d4bac0eab7e2fd960f49b44b93'
+        record=json.loads(gzip.decompress(encoded));assert record['endpoint']=='observe_protocol_control_policy_recent'
+&gt;       view=record['result'];assert view['jobs']==[] and view['owner_id']==gate.owner and view['now']==proof_view['now']
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert ([] == []
+E         
+E         Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'
+E         
+E           owner:system_domestic and 20830.0 == 20840.0)
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:157: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_actual_compact_join_rejects_missing_or_changed_current_authority[stale_current]" time="0.074"><failure message="AssertionError: assert ([] == []&#10;  &#10;  Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'&#10;  &#10;    owner:system_domestic and 20830.0 == 20840.0)">defect = 'stale_current'
+
+    @pytest.mark.parametrize('defect',['schema','capture_source','capture_future','missing_head','changed_head',
+        'changed_deadline','stale_current','omitted_contract','omitted_group','duplicate_group','missing_projection'])
+    def test_actual_compact_join_rejects_missing_or_changed_current_authority(defect):
+&gt;       value,view,_=actual_owner();nodes={n['node']:n for n in view['node_contracts']}
+                     ^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:194: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def actual_owner():
+        """Actual saved compact endpoint, source self-copy and delivered peer.
+    
+        Calling the new candidate on these saved facts is a pure counterfactual,
+        never a new runtime/delivery or physical-execution claim.
+        """
+        gate,proof_view,box,peer=actual_fixture()
+        path=p.base.OUT/'original_low_wip_third_prepare_001/api/013730.json.gz'
+        encoded=path.read_bytes()
+        assert hashlib.sha256(encoded).hexdigest()=='fa4e4a01484a1549423f0a7ab5943dc6674c67d4bac0eab7e2fd960f49b44b93'
+        record=json.loads(gzip.decompress(encoded));assert record['endpoint']=='observe_protocol_control_policy_recent'
+&gt;       view=record['result'];assert view['jobs']==[] and view['owner_id']==gate.owner and view['now']==proof_view['now']
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert ([] == []
+E         
+E         Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'
+E         
+E           owner:system_domestic and 20830.0 == 20840.0)
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:157: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_actual_compact_join_rejects_missing_or_changed_current_authority[omitted_contract]" time="0.075"><failure message="AssertionError: assert ([] == []&#10;  &#10;  Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'&#10;  &#10;    owner:system_domestic and 20830.0 == 20840.0)">defect = 'omitted_contract'
+
+    @pytest.mark.parametrize('defect',['schema','capture_source','capture_future','missing_head','changed_head',
+        'changed_deadline','stale_current','omitted_contract','omitted_group','duplicate_group','missing_projection'])
+    def test_actual_compact_join_rejects_missing_or_changed_current_authority(defect):
+&gt;       value,view,_=actual_owner();nodes={n['node']:n for n in view['node_contracts']}
+                     ^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:194: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def actual_owner():
+        """Actual saved compact endpoint, source self-copy and delivered peer.
+    
+        Calling the new candidate on these saved facts is a pure counterfactual,
+        never a new runtime/delivery or physical-execution claim.
+        """
+        gate,proof_view,box,peer=actual_fixture()
+        path=p.base.OUT/'original_low_wip_third_prepare_001/api/013730.json.gz'
+        encoded=path.read_bytes()
+        assert hashlib.sha256(encoded).hexdigest()=='fa4e4a01484a1549423f0a7ab5943dc6674c67d4bac0eab7e2fd960f49b44b93'
+        record=json.loads(gzip.decompress(encoded));assert record['endpoint']=='observe_protocol_control_policy_recent'
+&gt;       view=record['result'];assert view['jobs']==[] and view['owner_id']==gate.owner and view['now']==proof_view['now']
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert ([] == []
+E         
+E         Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'
+E         
+E           owner:system_domestic and 20830.0 == 20840.0)
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:157: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_actual_compact_join_rejects_missing_or_changed_current_authority[omitted_group]" time="0.079"><failure message="AssertionError: assert ([] == []&#10;  &#10;  Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'&#10;  &#10;    owner:system_domestic and 20830.0 == 20840.0)">defect = 'omitted_group'
+
+    @pytest.mark.parametrize('defect',['schema','capture_source','capture_future','missing_head','changed_head',
+        'changed_deadline','stale_current','omitted_contract','omitted_group','duplicate_group','missing_projection'])
+    def test_actual_compact_join_rejects_missing_or_changed_current_authority(defect):
+&gt;       value,view,_=actual_owner();nodes={n['node']:n for n in view['node_contracts']}
+                     ^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:194: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def actual_owner():
+        """Actual saved compact endpoint, source self-copy and delivered peer.
+    
+        Calling the new candidate on these saved facts is a pure counterfactual,
+        never a new runtime/delivery or physical-execution claim.
+        """
+        gate,proof_view,box,peer=actual_fixture()
+        path=p.base.OUT/'original_low_wip_third_prepare_001/api/013730.json.gz'
+        encoded=path.read_bytes()
+        assert hashlib.sha256(encoded).hexdigest()=='fa4e4a01484a1549423f0a7ab5943dc6674c67d4bac0eab7e2fd960f49b44b93'
+        record=json.loads(gzip.decompress(encoded));assert record['endpoint']=='observe_protocol_control_policy_recent'
+&gt;       view=record['result'];assert view['jobs']==[] and view['owner_id']==gate.owner and view['now']==proof_view['now']
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert ([] == []
+E         
+E         Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'
+E         
+E           owner:system_domestic and 20830.0 == 20840.0)
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:157: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_actual_compact_join_rejects_missing_or_changed_current_authority[duplicate_group]" time="0.078"><failure message="AssertionError: assert ([] == []&#10;  &#10;  Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'&#10;  &#10;    owner:system_domestic and 20830.0 == 20840.0)">defect = 'duplicate_group'
+
+    @pytest.mark.parametrize('defect',['schema','capture_source','capture_future','missing_head','changed_head',
+        'changed_deadline','stale_current','omitted_contract','omitted_group','duplicate_group','missing_projection'])
+    def test_actual_compact_join_rejects_missing_or_changed_current_authority(defect):
+&gt;       value,view,_=actual_owner();nodes={n['node']:n for n in view['node_contracts']}
+                     ^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:194: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def actual_owner():
+        """Actual saved compact endpoint, source self-copy and delivered peer.
+    
+        Calling the new candidate on these saved facts is a pure counterfactual,
+        never a new runtime/delivery or physical-execution claim.
+        """
+        gate,proof_view,box,peer=actual_fixture()
+        path=p.base.OUT/'original_low_wip_third_prepare_001/api/013730.json.gz'
+        encoded=path.read_bytes()
+        assert hashlib.sha256(encoded).hexdigest()=='fa4e4a01484a1549423f0a7ab5943dc6674c67d4bac0eab7e2fd960f49b44b93'
+        record=json.loads(gzip.decompress(encoded));assert record['endpoint']=='observe_protocol_control_policy_recent'
+&gt;       view=record['result'];assert view['jobs']==[] and view['owner_id']==gate.owner and view['now']==proof_view['now']
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert ([] == []
+E         
+E         Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'
+E         
+E           owner:system_domestic and 20830.0 == 20840.0)
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:157: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_actual_compact_join_rejects_missing_or_changed_current_authority[missing_projection]" time="0.081"><failure message="AssertionError: assert ([] == []&#10;  &#10;  Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'&#10;  &#10;    owner:system_domestic and 20830.0 == 20840.0)">defect = 'missing_projection'
+
+    @pytest.mark.parametrize('defect',['schema','capture_source','capture_future','missing_head','changed_head',
+        'changed_deadline','stale_current','omitted_contract','omitted_group','duplicate_group','missing_projection'])
+    def test_actual_compact_join_rejects_missing_or_changed_current_authority(defect):
+&gt;       value,view,_=actual_owner();nodes={n['node']:n for n in view['node_contracts']}
+                     ^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:194: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def actual_owner():
+        """Actual saved compact endpoint, source self-copy and delivered peer.
+    
+        Calling the new candidate on these saved facts is a pure counterfactual,
+        never a new runtime/delivery or physical-execution claim.
+        """
+        gate,proof_view,box,peer=actual_fixture()
+        path=p.base.OUT/'original_low_wip_third_prepare_001/api/013730.json.gz'
+        encoded=path.read_bytes()
+        assert hashlib.sha256(encoded).hexdigest()=='fa4e4a01484a1549423f0a7ab5943dc6674c67d4bac0eab7e2fd960f49b44b93'
+        record=json.loads(gzip.decompress(encoded));assert record['endpoint']=='observe_protocol_control_policy_recent'
+&gt;       view=record['result'];assert view['jobs']==[] and view['owner_id']==gate.owner and view['now']==proof_view['now']
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert ([] == []
+E         
+E         Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'
+E         
+E           owner:system_domestic and 20830.0 == 20840.0)
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:157: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_actual_shaped_facts_produce_exact_token_request_after_watermark_consumed" time="0.083"><failure message="AssertionError: assert ([] == []&#10;  &#10;  Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'&#10;  &#10;    owner:system_domestic and 20830.0 == 20840.0)">def test_actual_shaped_facts_produce_exact_token_request_after_watermark_consumed():
+&gt;       value,view,peer=actual_owner();old=value.possession.consumed;original=value.client.submit
+                        ^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:213: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def actual_owner():
+        """Actual saved compact endpoint, source self-copy and delivered peer.
+    
+        Calling the new candidate on these saved facts is a pure counterfactual,
+        never a new runtime/delivery or physical-execution claim.
+        """
+        gate,proof_view,box,peer=actual_fixture()
+        path=p.base.OUT/'original_low_wip_third_prepare_001/api/013730.json.gz'
+        encoded=path.read_bytes()
+        assert hashlib.sha256(encoded).hexdigest()=='fa4e4a01484a1549423f0a7ab5943dc6674c67d4bac0eab7e2fd960f49b44b93'
+        record=json.loads(gzip.decompress(encoded));assert record['endpoint']=='observe_protocol_control_policy_recent'
+&gt;       view=record['result'];assert view['jobs']==[] and view['owner_id']==gate.owner and view['now']==proof_view['now']
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert ([] == []
+E         
+E         Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'
+E         
+E           owner:system_domestic and 20830.0 == 20840.0)
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:157: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_checkpoint_retains_both_monotone_consumptions_without_restore_claim" time="0.071"><failure message="AssertionError: assert ([] == []&#10;  &#10;  Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'&#10;  &#10;    owner:system_domestic and 20830.0 == 20840.0)">def test_checkpoint_retains_both_monotone_consumptions_without_restore_claim():
+&gt;       value,_,_=actual_owner();value.activate();saved=value.controller_checkpoint()
+                  ^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:231: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def actual_owner():
+        """Actual saved compact endpoint, source self-copy and delivered peer.
+    
+        Calling the new candidate on these saved facts is a pure counterfactual,
+        never a new runtime/delivery or physical-execution claim.
+        """
+        gate,proof_view,box,peer=actual_fixture()
+        path=p.base.OUT/'original_low_wip_third_prepare_001/api/013730.json.gz'
+        encoded=path.read_bytes()
+        assert hashlib.sha256(encoded).hexdigest()=='fa4e4a01484a1549423f0a7ab5943dc6674c67d4bac0eab7e2fd960f49b44b93'
+        record=json.loads(gzip.decompress(encoded));assert record['endpoint']=='observe_protocol_control_policy_recent'
+&gt;       view=record['result'];assert view['jobs']==[] and view['owner_id']==gate.owner and view['now']==proof_view['now']
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert ([] == []
+E         
+E         Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'
+E         
+E           owner:system_domestic and 20830.0 == 20840.0)
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:157: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_fresh_current_barrier_cap_sticks_even_without_token_and_relays_once" time="0.073"><failure message="AssertionError: assert ([] == []&#10;  &#10;  Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'&#10;  &#10;    owner:system_domestic and 20830.0 == 20840.0)">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x00000231A5170510&gt;
+
+    def test_fresh_current_barrier_cap_sticks_even_without_token_and_relays_once(monkeypatch):
+&gt;       value,view,peer=actual_owner();view['trays']=[]
+                        ^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:242: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def actual_owner():
+        """Actual saved compact endpoint, source self-copy and delivered peer.
+    
+        Calling the new candidate on these saved facts is a pure counterfactual,
+        never a new runtime/delivery or physical-execution claim.
+        """
+        gate,proof_view,box,peer=actual_fixture()
+        path=p.base.OUT/'original_low_wip_third_prepare_001/api/013730.json.gz'
+        encoded=path.read_bytes()
+        assert hashlib.sha256(encoded).hexdigest()=='fa4e4a01484a1549423f0a7ab5943dc6674c67d4bac0eab7e2fd960f49b44b93'
+        record=json.loads(gzip.decompress(encoded));assert record['endpoint']=='observe_protocol_control_policy_recent'
+&gt;       view=record['result'];assert view['jobs']==[] and view['owner_id']==gate.owner and view['now']==proof_view['now']
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert ([] == []
+E         
+E         Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'
+E         
+E           owner:system_domestic and 20830.0 == 20840.0)
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:157: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_received_barrier_fails_closed[pending]" time="0.079"><failure message="AssertionError: assert ([] == []&#10;  &#10;  Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'&#10;  &#10;    owner:system_domestic and 20830.0 == 20840.0)">defect = 'pending'
+
+    @pytest.mark.parametrize('defect',['pending','rejected','old_peer','missing_parking','new_unpublished'])
+    def test_received_barrier_fails_closed(defect):
+&gt;       value,view,peer=actual_owner();box=value.client.state['outbox'];nodes={n['node']:n for n in view['node_contracts']}
+                        ^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:254: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def actual_owner():
+        """Actual saved compact endpoint, source self-copy and delivered peer.
+    
+        Calling the new candidate on these saved facts is a pure counterfactual,
+        never a new runtime/delivery or physical-execution claim.
+        """
+        gate,proof_view,box,peer=actual_fixture()
+        path=p.base.OUT/'original_low_wip_third_prepare_001/api/013730.json.gz'
+        encoded=path.read_bytes()
+        assert hashlib.sha256(encoded).hexdigest()=='fa4e4a01484a1549423f0a7ab5943dc6674c67d4bac0eab7e2fd960f49b44b93'
+        record=json.loads(gzip.decompress(encoded));assert record['endpoint']=='observe_protocol_control_policy_recent'
+&gt;       view=record['result'];assert view['jobs']==[] and view['owner_id']==gate.owner and view['now']==proof_view['now']
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert ([] == []
+E         
+E         Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'
+E         
+E           owner:system_domestic and 20830.0 == 20840.0)
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:157: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_received_barrier_fails_closed[rejected]" time="0.079"><failure message="AssertionError: assert ([] == []&#10;  &#10;  Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'&#10;  &#10;    owner:system_domestic and 20830.0 == 20840.0)">defect = 'rejected'
+
+    @pytest.mark.parametrize('defect',['pending','rejected','old_peer','missing_parking','new_unpublished'])
+    def test_received_barrier_fails_closed(defect):
+&gt;       value,view,peer=actual_owner();box=value.client.state['outbox'];nodes={n['node']:n for n in view['node_contracts']}
+                        ^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:254: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def actual_owner():
+        """Actual saved compact endpoint, source self-copy and delivered peer.
+    
+        Calling the new candidate on these saved facts is a pure counterfactual,
+        never a new runtime/delivery or physical-execution claim.
+        """
+        gate,proof_view,box,peer=actual_fixture()
+        path=p.base.OUT/'original_low_wip_third_prepare_001/api/013730.json.gz'
+        encoded=path.read_bytes()
+        assert hashlib.sha256(encoded).hexdigest()=='fa4e4a01484a1549423f0a7ab5943dc6674c67d4bac0eab7e2fd960f49b44b93'
+        record=json.loads(gzip.decompress(encoded));assert record['endpoint']=='observe_protocol_control_policy_recent'
+&gt;       view=record['result'];assert view['jobs']==[] and view['owner_id']==gate.owner and view['now']==proof_view['now']
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert ([] == []
+E         
+E         Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'
+E         
+E           owner:system_domestic and 20830.0 == 20840.0)
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:157: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_received_barrier_fails_closed[old_peer]" time="0.070"><failure message="AssertionError: assert ([] == []&#10;  &#10;  Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'&#10;  &#10;    owner:system_domestic and 20830.0 == 20840.0)">defect = 'old_peer'
+
+    @pytest.mark.parametrize('defect',['pending','rejected','old_peer','missing_parking','new_unpublished'])
+    def test_received_barrier_fails_closed(defect):
+&gt;       value,view,peer=actual_owner();box=value.client.state['outbox'];nodes={n['node']:n for n in view['node_contracts']}
+                        ^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:254: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def actual_owner():
+        """Actual saved compact endpoint, source self-copy and delivered peer.
+    
+        Calling the new candidate on these saved facts is a pure counterfactual,
+        never a new runtime/delivery or physical-execution claim.
+        """
+        gate,proof_view,box,peer=actual_fixture()
+        path=p.base.OUT/'original_low_wip_third_prepare_001/api/013730.json.gz'
+        encoded=path.read_bytes()
+        assert hashlib.sha256(encoded).hexdigest()=='fa4e4a01484a1549423f0a7ab5943dc6674c67d4bac0eab7e2fd960f49b44b93'
+        record=json.loads(gzip.decompress(encoded));assert record['endpoint']=='observe_protocol_control_policy_recent'
+&gt;       view=record['result'];assert view['jobs']==[] and view['owner_id']==gate.owner and view['now']==proof_view['now']
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert ([] == []
+E         
+E         Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'
+E         
+E           owner:system_domestic and 20830.0 == 20840.0)
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:157: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_received_barrier_fails_closed[missing_parking]" time="0.071"><failure message="AssertionError: assert ([] == []&#10;  &#10;  Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'&#10;  &#10;    owner:system_domestic and 20830.0 == 20840.0)">defect = 'missing_parking'
+
+    @pytest.mark.parametrize('defect',['pending','rejected','old_peer','missing_parking','new_unpublished'])
+    def test_received_barrier_fails_closed(defect):
+&gt;       value,view,peer=actual_owner();box=value.client.state['outbox'];nodes={n['node']:n for n in view['node_contracts']}
+                        ^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:254: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def actual_owner():
+        """Actual saved compact endpoint, source self-copy and delivered peer.
+    
+        Calling the new candidate on these saved facts is a pure counterfactual,
+        never a new runtime/delivery or physical-execution claim.
+        """
+        gate,proof_view,box,peer=actual_fixture()
+        path=p.base.OUT/'original_low_wip_third_prepare_001/api/013730.json.gz'
+        encoded=path.read_bytes()
+        assert hashlib.sha256(encoded).hexdigest()=='fa4e4a01484a1549423f0a7ab5943dc6674c67d4bac0eab7e2fd960f49b44b93'
+        record=json.loads(gzip.decompress(encoded));assert record['endpoint']=='observe_protocol_control_policy_recent'
+&gt;       view=record['result'];assert view['jobs']==[] and view['owner_id']==gate.owner and view['now']==proof_view['now']
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert ([] == []
+E         
+E         Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'
+E         
+E           owner:system_domestic and 20830.0 == 20840.0)
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:157: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_received_barrier_fails_closed[new_unpublished]" time="0.074"><failure message="AssertionError: assert ([] == []&#10;  &#10;  Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'&#10;  &#10;    owner:system_domestic and 20830.0 == 20840.0)">defect = 'new_unpublished'
+
+    @pytest.mark.parametrize('defect',['pending','rejected','old_peer','missing_parking','new_unpublished'])
+    def test_received_barrier_fails_closed(defect):
+&gt;       value,view,peer=actual_owner();box=value.client.state['outbox'];nodes={n['node']:n for n in view['node_contracts']}
+                        ^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:254: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def actual_owner():
+        """Actual saved compact endpoint, source self-copy and delivered peer.
+    
+        Calling the new candidate on these saved facts is a pure counterfactual,
+        never a new runtime/delivery or physical-execution claim.
+        """
+        gate,proof_view,box,peer=actual_fixture()
+        path=p.base.OUT/'original_low_wip_third_prepare_001/api/013730.json.gz'
+        encoded=path.read_bytes()
+        assert hashlib.sha256(encoded).hexdigest()=='fa4e4a01484a1549423f0a7ab5943dc6674c67d4bac0eab7e2fd960f49b44b93'
+        record=json.loads(gzip.decompress(encoded));assert record['endpoint']=='observe_protocol_control_policy_recent'
+&gt;       view=record['result'];assert view['jobs']==[] and view['owner_id']==gate.owner and view['now']==proof_view['now']
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert ([] == []
+E         
+E         Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'
+E         
+E           owner:system_domestic and 20830.0 == 20840.0)
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:157: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_received_duplicate_ACK_after_selfcapture_not_false_pending" time="0.074"><failure message="AssertionError: assert ([] == []&#10;  &#10;  Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'&#10;  &#10;    owner:system_domestic and 20830.0 == 20840.0)">def test_received_duplicate_ACK_after_selfcapture_not_false_pending():
+&gt;       value,view,peer=actual_owner();box=value.client.state['outbox'];nodes={n['node']:n for n in view['node_contracts']}
+                        ^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:268: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def actual_owner():
+        """Actual saved compact endpoint, source self-copy and delivered peer.
+    
+        Calling the new candidate on these saved facts is a pure counterfactual,
+        never a new runtime/delivery or physical-execution claim.
+        """
+        gate,proof_view,box,peer=actual_fixture()
+        path=p.base.OUT/'original_low_wip_third_prepare_001/api/013730.json.gz'
+        encoded=path.read_bytes()
+        assert hashlib.sha256(encoded).hexdigest()=='fa4e4a01484a1549423f0a7ab5943dc6674c67d4bac0eab7e2fd960f49b44b93'
+        record=json.loads(gzip.decompress(encoded));assert record['endpoint']=='observe_protocol_control_policy_recent'
+&gt;       view=record['result'];assert view['jobs']==[] and view['owner_id']==gate.owner and view['now']==proof_view['now']
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert ([] == []
+E         
+E         Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'
+E         
+E           owner:system_domestic and 20830.0 == 20840.0)
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:157: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_halted_owner_refreshes_without_any_observation_or_new_action" time="0.077"><failure message="AssertionError: assert ([] == []&#10;  &#10;  Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'&#10;  &#10;    owner:system_domestic and 20830.0 == 20840.0)">def test_halted_owner_refreshes_without_any_observation_or_new_action():
+&gt;       value,_,_=actual_owner();value.halt_new_actions=True;value.activate()
+                  ^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:276: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def actual_owner():
+        """Actual saved compact endpoint, source self-copy and delivered peer.
+    
+        Calling the new candidate on these saved facts is a pure counterfactual,
+        never a new runtime/delivery or physical-execution claim.
+        """
+        gate,proof_view,box,peer=actual_fixture()
+        path=p.base.OUT/'original_low_wip_third_prepare_001/api/013730.json.gz'
+        encoded=path.read_bytes()
+        assert hashlib.sha256(encoded).hexdigest()=='fa4e4a01484a1549423f0a7ab5943dc6674c67d4bac0eab7e2fd960f49b44b93'
+        record=json.loads(gzip.decompress(encoded));assert record['endpoint']=='observe_protocol_control_policy_recent'
+&gt;       view=record['result'];assert view['jobs']==[] and view['owner_id']==gate.owner and view['now']==proof_view['now']
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert ([] == []
+E         
+E         Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'
+E         
+E           owner:system_domestic and 20830.0 == 20840.0)
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:157: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_transition_to_quiet_executes_only_original_startup_activation" time="0.083"><failure message="AssertionError: assert ([] == []&#10;  &#10;  Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'&#10;  &#10;    owner:system_domestic and 20830.0 == 20840.0)">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x00000231A469C650&gt;
+
+    def test_transition_to_quiet_executes_only_original_startup_activation(monkeypatch):
+&gt;       value,_,_=actual_owner();value.quiet=False;calls=[]
+                  ^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:281: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def actual_owner():
+        """Actual saved compact endpoint, source self-copy and delivered peer.
+    
+        Calling the new candidate on these saved facts is a pure counterfactual,
+        never a new runtime/delivery or physical-execution claim.
+        """
+        gate,proof_view,box,peer=actual_fixture()
+        path=p.base.OUT/'original_low_wip_third_prepare_001/api/013730.json.gz'
+        encoded=path.read_bytes()
+        assert hashlib.sha256(encoded).hexdigest()=='fa4e4a01484a1549423f0a7ab5943dc6674c67d4bac0eab7e2fd960f49b44b93'
+        record=json.loads(gzip.decompress(encoded));assert record['endpoint']=='observe_protocol_control_policy_recent'
+&gt;       view=record['result'];assert view['jobs']==[] and view['owner_id']==gate.owner and view['now']==proof_view['now']
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert ([] == []
+E         
+E         Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'
+E         
+E           owner:system_domestic and 20830.0 == 20840.0)
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:157: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_historical_cap_delivery_is_not_full_replay_or_new_action_permission" time="0.070"><failure message="AssertionError: assert ([] == []&#10;  &#10;  Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'&#10;  &#10;    owner:system_domestic and 20830.0 == 20840.0)">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x00000231A4B643D0&gt;
+
+    def test_historical_cap_delivery_is_not_full_replay_or_new_action_permission(monkeypatch):
+&gt;       summary,plan,public=historical_guard_fixture(monkeypatch)
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:304: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_g31_circulation_cooperative_bridge_policy.py:292: in historical_guard_fixture
+    value,view,peer=actual_owner();box=value.client.state['outbox'];nodes={n['node']:n for n in view['node_contracts']}
+                    ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def actual_owner():
+        """Actual saved compact endpoint, source self-copy and delivered peer.
+    
+        Calling the new candidate on these saved facts is a pure counterfactual,
+        never a new runtime/delivery or physical-execution claim.
+        """
+        gate,proof_view,box,peer=actual_fixture()
+        path=p.base.OUT/'original_low_wip_third_prepare_001/api/013730.json.gz'
+        encoded=path.read_bytes()
+        assert hashlib.sha256(encoded).hexdigest()=='fa4e4a01484a1549423f0a7ab5943dc6674c67d4bac0eab7e2fd960f49b44b93'
+        record=json.loads(gzip.decompress(encoded));assert record['endpoint']=='observe_protocol_control_policy_recent'
+&gt;       view=record['result'];assert view['jobs']==[] and view['owner_id']==gate.owner and view['now']==proof_view['now']
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert ([] == []
+E         
+E         Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'
+E         
+E           owner:system_domestic and 20830.0 == 20840.0)
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:157: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_cap_proof_alone_never_certifies_undelivered_relay[unsubmitted]" time="0.073"><failure message="AssertionError: assert ([] == []&#10;  &#10;  Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'&#10;  &#10;    owner:system_domestic and 20830.0 == 20840.0)">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x00000231A4FBC610&gt;
+defect = 'unsubmitted'
+
+    @pytest.mark.parametrize('defect',['unsubmitted','missing_ack','undelivered','expired_delivery','digest','wrong_owner','no_cap','failure','duplicate_ids','duplicate_jobs'])
+    def test_cap_proof_alone_never_certifies_undelivered_relay(monkeypatch,defect):
+&gt;       summary,plan,public=historical_guard_fixture(monkeypatch);relay=summary['cap_relay']
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:312: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_g31_circulation_cooperative_bridge_policy.py:292: in historical_guard_fixture
+    value,view,peer=actual_owner();box=value.client.state['outbox'];nodes={n['node']:n for n in view['node_contracts']}
+                    ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def actual_owner():
+        """Actual saved compact endpoint, source self-copy and delivered peer.
+    
+        Calling the new candidate on these saved facts is a pure counterfactual,
+        never a new runtime/delivery or physical-execution claim.
+        """
+        gate,proof_view,box,peer=actual_fixture()
+        path=p.base.OUT/'original_low_wip_third_prepare_001/api/013730.json.gz'
+        encoded=path.read_bytes()
+        assert hashlib.sha256(encoded).hexdigest()=='fa4e4a01484a1549423f0a7ab5943dc6674c67d4bac0eab7e2fd960f49b44b93'
+        record=json.loads(gzip.decompress(encoded));assert record['endpoint']=='observe_protocol_control_policy_recent'
+&gt;       view=record['result'];assert view['jobs']==[] and view['owner_id']==gate.owner and view['now']==proof_view['now']
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert ([] == []
+E         
+E         Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'
+E         
+E           owner:system_domestic and 20830.0 == 20840.0)
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:157: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_cap_proof_alone_never_certifies_undelivered_relay[missing_ack]" time="0.079"><failure message="AssertionError: assert ([] == []&#10;  &#10;  Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'&#10;  &#10;    owner:system_domestic and 20830.0 == 20840.0)">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x00000231A53C43D0&gt;
+defect = 'missing_ack'
+
+    @pytest.mark.parametrize('defect',['unsubmitted','missing_ack','undelivered','expired_delivery','digest','wrong_owner','no_cap','failure','duplicate_ids','duplicate_jobs'])
+    def test_cap_proof_alone_never_certifies_undelivered_relay(monkeypatch,defect):
+&gt;       summary,plan,public=historical_guard_fixture(monkeypatch);relay=summary['cap_relay']
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:312: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_g31_circulation_cooperative_bridge_policy.py:292: in historical_guard_fixture
+    value,view,peer=actual_owner();box=value.client.state['outbox'];nodes={n['node']:n for n in view['node_contracts']}
+                    ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def actual_owner():
+        """Actual saved compact endpoint, source self-copy and delivered peer.
+    
+        Calling the new candidate on these saved facts is a pure counterfactual,
+        never a new runtime/delivery or physical-execution claim.
+        """
+        gate,proof_view,box,peer=actual_fixture()
+        path=p.base.OUT/'original_low_wip_third_prepare_001/api/013730.json.gz'
+        encoded=path.read_bytes()
+        assert hashlib.sha256(encoded).hexdigest()=='fa4e4a01484a1549423f0a7ab5943dc6674c67d4bac0eab7e2fd960f49b44b93'
+        record=json.loads(gzip.decompress(encoded));assert record['endpoint']=='observe_protocol_control_policy_recent'
+&gt;       view=record['result'];assert view['jobs']==[] and view['owner_id']==gate.owner and view['now']==proof_view['now']
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert ([] == []
+E         
+E         Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'
+E         
+E           owner:system_domestic and 20830.0 == 20840.0)
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:157: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_cap_proof_alone_never_certifies_undelivered_relay[undelivered]" time="0.073"><failure message="AssertionError: assert ([] == []&#10;  &#10;  Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'&#10;  &#10;    owner:system_domestic and 20830.0 == 20840.0)">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x00000231A536C690&gt;
+defect = 'undelivered'
+
+    @pytest.mark.parametrize('defect',['unsubmitted','missing_ack','undelivered','expired_delivery','digest','wrong_owner','no_cap','failure','duplicate_ids','duplicate_jobs'])
+    def test_cap_proof_alone_never_certifies_undelivered_relay(monkeypatch,defect):
+&gt;       summary,plan,public=historical_guard_fixture(monkeypatch);relay=summary['cap_relay']
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:312: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_g31_circulation_cooperative_bridge_policy.py:292: in historical_guard_fixture
+    value,view,peer=actual_owner();box=value.client.state['outbox'];nodes={n['node']:n for n in view['node_contracts']}
+                    ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def actual_owner():
+        """Actual saved compact endpoint, source self-copy and delivered peer.
+    
+        Calling the new candidate on these saved facts is a pure counterfactual,
+        never a new runtime/delivery or physical-execution claim.
+        """
+        gate,proof_view,box,peer=actual_fixture()
+        path=p.base.OUT/'original_low_wip_third_prepare_001/api/013730.json.gz'
+        encoded=path.read_bytes()
+        assert hashlib.sha256(encoded).hexdigest()=='fa4e4a01484a1549423f0a7ab5943dc6674c67d4bac0eab7e2fd960f49b44b93'
+        record=json.loads(gzip.decompress(encoded));assert record['endpoint']=='observe_protocol_control_policy_recent'
+&gt;       view=record['result'];assert view['jobs']==[] and view['owner_id']==gate.owner and view['now']==proof_view['now']
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert ([] == []
+E         
+E         Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'
+E         
+E           owner:system_domestic and 20830.0 == 20840.0)
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:157: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_cap_proof_alone_never_certifies_undelivered_relay[expired_delivery]" time="0.073"><failure message="AssertionError: assert ([] == []&#10;  &#10;  Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'&#10;  &#10;    owner:system_domestic and 20830.0 == 20840.0)">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x00000231A474F310&gt;
+defect = 'expired_delivery'
+
+    @pytest.mark.parametrize('defect',['unsubmitted','missing_ack','undelivered','expired_delivery','digest','wrong_owner','no_cap','failure','duplicate_ids','duplicate_jobs'])
+    def test_cap_proof_alone_never_certifies_undelivered_relay(monkeypatch,defect):
+&gt;       summary,plan,public=historical_guard_fixture(monkeypatch);relay=summary['cap_relay']
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:312: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_g31_circulation_cooperative_bridge_policy.py:292: in historical_guard_fixture
+    value,view,peer=actual_owner();box=value.client.state['outbox'];nodes={n['node']:n for n in view['node_contracts']}
+                    ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def actual_owner():
+        """Actual saved compact endpoint, source self-copy and delivered peer.
+    
+        Calling the new candidate on these saved facts is a pure counterfactual,
+        never a new runtime/delivery or physical-execution claim.
+        """
+        gate,proof_view,box,peer=actual_fixture()
+        path=p.base.OUT/'original_low_wip_third_prepare_001/api/013730.json.gz'
+        encoded=path.read_bytes()
+        assert hashlib.sha256(encoded).hexdigest()=='fa4e4a01484a1549423f0a7ab5943dc6674c67d4bac0eab7e2fd960f49b44b93'
+        record=json.loads(gzip.decompress(encoded));assert record['endpoint']=='observe_protocol_control_policy_recent'
+&gt;       view=record['result'];assert view['jobs']==[] and view['owner_id']==gate.owner and view['now']==proof_view['now']
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert ([] == []
+E         
+E         Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'
+E         
+E           owner:system_domestic and 20830.0 == 20840.0)
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:157: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_cap_proof_alone_never_certifies_undelivered_relay[digest]" time="0.080"><failure message="AssertionError: assert ([] == []&#10;  &#10;  Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'&#10;  &#10;    owner:system_domestic and 20830.0 == 20840.0)">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x00000231A4631310&gt;
+defect = 'digest'
+
+    @pytest.mark.parametrize('defect',['unsubmitted','missing_ack','undelivered','expired_delivery','digest','wrong_owner','no_cap','failure','duplicate_ids','duplicate_jobs'])
+    def test_cap_proof_alone_never_certifies_undelivered_relay(monkeypatch,defect):
+&gt;       summary,plan,public=historical_guard_fixture(monkeypatch);relay=summary['cap_relay']
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:312: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_g31_circulation_cooperative_bridge_policy.py:292: in historical_guard_fixture
+    value,view,peer=actual_owner();box=value.client.state['outbox'];nodes={n['node']:n for n in view['node_contracts']}
+                    ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def actual_owner():
+        """Actual saved compact endpoint, source self-copy and delivered peer.
+    
+        Calling the new candidate on these saved facts is a pure counterfactual,
+        never a new runtime/delivery or physical-execution claim.
+        """
+        gate,proof_view,box,peer=actual_fixture()
+        path=p.base.OUT/'original_low_wip_third_prepare_001/api/013730.json.gz'
+        encoded=path.read_bytes()
+        assert hashlib.sha256(encoded).hexdigest()=='fa4e4a01484a1549423f0a7ab5943dc6674c67d4bac0eab7e2fd960f49b44b93'
+        record=json.loads(gzip.decompress(encoded));assert record['endpoint']=='observe_protocol_control_policy_recent'
+&gt;       view=record['result'];assert view['jobs']==[] and view['owner_id']==gate.owner and view['now']==proof_view['now']
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert ([] == []
+E         
+E         Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'
+E         
+E           owner:system_domestic and 20830.0 == 20840.0)
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:157: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_cap_proof_alone_never_certifies_undelivered_relay[wrong_owner]" time="0.078"><failure message="AssertionError: assert ([] == []&#10;  &#10;  Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'&#10;  &#10;    owner:system_domestic and 20830.0 == 20840.0)">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x00000231A4D44210&gt;
+defect = 'wrong_owner'
+
+    @pytest.mark.parametrize('defect',['unsubmitted','missing_ack','undelivered','expired_delivery','digest','wrong_owner','no_cap','failure','duplicate_ids','duplicate_jobs'])
+    def test_cap_proof_alone_never_certifies_undelivered_relay(monkeypatch,defect):
+&gt;       summary,plan,public=historical_guard_fixture(monkeypatch);relay=summary['cap_relay']
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:312: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_g31_circulation_cooperative_bridge_policy.py:292: in historical_guard_fixture
+    value,view,peer=actual_owner();box=value.client.state['outbox'];nodes={n['node']:n for n in view['node_contracts']}
+                    ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def actual_owner():
+        """Actual saved compact endpoint, source self-copy and delivered peer.
+    
+        Calling the new candidate on these saved facts is a pure counterfactual,
+        never a new runtime/delivery or physical-execution claim.
+        """
+        gate,proof_view,box,peer=actual_fixture()
+        path=p.base.OUT/'original_low_wip_third_prepare_001/api/013730.json.gz'
+        encoded=path.read_bytes()
+        assert hashlib.sha256(encoded).hexdigest()=='fa4e4a01484a1549423f0a7ab5943dc6674c67d4bac0eab7e2fd960f49b44b93'
+        record=json.loads(gzip.decompress(encoded));assert record['endpoint']=='observe_protocol_control_policy_recent'
+&gt;       view=record['result'];assert view['jobs']==[] and view['owner_id']==gate.owner and view['now']==proof_view['now']
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert ([] == []
+E         
+E         Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'
+E         
+E           owner:system_domestic and 20830.0 == 20840.0)
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:157: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_cap_proof_alone_never_certifies_undelivered_relay[no_cap]" time="0.094"><failure message="AssertionError: assert ([] == []&#10;  &#10;  Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'&#10;  &#10;    owner:system_domestic and 20830.0 == 20840.0)">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x00000231A4E04490&gt;
+defect = 'no_cap'
+
+    @pytest.mark.parametrize('defect',['unsubmitted','missing_ack','undelivered','expired_delivery','digest','wrong_owner','no_cap','failure','duplicate_ids','duplicate_jobs'])
+    def test_cap_proof_alone_never_certifies_undelivered_relay(monkeypatch,defect):
+&gt;       summary,plan,public=historical_guard_fixture(monkeypatch);relay=summary['cap_relay']
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:312: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_g31_circulation_cooperative_bridge_policy.py:292: in historical_guard_fixture
+    value,view,peer=actual_owner();box=value.client.state['outbox'];nodes={n['node']:n for n in view['node_contracts']}
+                    ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def actual_owner():
+        """Actual saved compact endpoint, source self-copy and delivered peer.
+    
+        Calling the new candidate on these saved facts is a pure counterfactual,
+        never a new runtime/delivery or physical-execution claim.
+        """
+        gate,proof_view,box,peer=actual_fixture()
+        path=p.base.OUT/'original_low_wip_third_prepare_001/api/013730.json.gz'
+        encoded=path.read_bytes()
+        assert hashlib.sha256(encoded).hexdigest()=='fa4e4a01484a1549423f0a7ab5943dc6674c67d4bac0eab7e2fd960f49b44b93'
+        record=json.loads(gzip.decompress(encoded));assert record['endpoint']=='observe_protocol_control_policy_recent'
+&gt;       view=record['result'];assert view['jobs']==[] and view['owner_id']==gate.owner and view['now']==proof_view['now']
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert ([] == []
+E         
+E         Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'
+E         
+E           owner:system_domestic and 20830.0 == 20840.0)
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:157: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_cap_proof_alone_never_certifies_undelivered_relay[failure]" time="0.085"><failure message="AssertionError: assert ([] == []&#10;  &#10;  Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'&#10;  &#10;    owner:system_domestic and 20830.0 == 20840.0)">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x00000231A4D10310&gt;
+defect = 'failure'
+
+    @pytest.mark.parametrize('defect',['unsubmitted','missing_ack','undelivered','expired_delivery','digest','wrong_owner','no_cap','failure','duplicate_ids','duplicate_jobs'])
+    def test_cap_proof_alone_never_certifies_undelivered_relay(monkeypatch,defect):
+&gt;       summary,plan,public=historical_guard_fixture(monkeypatch);relay=summary['cap_relay']
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:312: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_g31_circulation_cooperative_bridge_policy.py:292: in historical_guard_fixture
+    value,view,peer=actual_owner();box=value.client.state['outbox'];nodes={n['node']:n for n in view['node_contracts']}
+                    ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def actual_owner():
+        """Actual saved compact endpoint, source self-copy and delivered peer.
+    
+        Calling the new candidate on these saved facts is a pure counterfactual,
+        never a new runtime/delivery or physical-execution claim.
+        """
+        gate,proof_view,box,peer=actual_fixture()
+        path=p.base.OUT/'original_low_wip_third_prepare_001/api/013730.json.gz'
+        encoded=path.read_bytes()
+        assert hashlib.sha256(encoded).hexdigest()=='fa4e4a01484a1549423f0a7ab5943dc6674c67d4bac0eab7e2fd960f49b44b93'
+        record=json.loads(gzip.decompress(encoded));assert record['endpoint']=='observe_protocol_control_policy_recent'
+&gt;       view=record['result'];assert view['jobs']==[] and view['owner_id']==gate.owner and view['now']==proof_view['now']
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert ([] == []
+E         
+E         Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'
+E         
+E           owner:system_domestic and 20830.0 == 20840.0)
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:157: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_cap_proof_alone_never_certifies_undelivered_relay[duplicate_ids]" time="0.073"><failure message="AssertionError: assert ([] == []&#10;  &#10;  Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'&#10;  &#10;    owner:system_domestic and 20830.0 == 20840.0)">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x00000231A4F50350&gt;
+defect = 'duplicate_ids'
+
+    @pytest.mark.parametrize('defect',['unsubmitted','missing_ack','undelivered','expired_delivery','digest','wrong_owner','no_cap','failure','duplicate_ids','duplicate_jobs'])
+    def test_cap_proof_alone_never_certifies_undelivered_relay(monkeypatch,defect):
+&gt;       summary,plan,public=historical_guard_fixture(monkeypatch);relay=summary['cap_relay']
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:312: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_g31_circulation_cooperative_bridge_policy.py:292: in historical_guard_fixture
+    value,view,peer=actual_owner();box=value.client.state['outbox'];nodes={n['node']:n for n in view['node_contracts']}
+                    ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def actual_owner():
+        """Actual saved compact endpoint, source self-copy and delivered peer.
+    
+        Calling the new candidate on these saved facts is a pure counterfactual,
+        never a new runtime/delivery or physical-execution claim.
+        """
+        gate,proof_view,box,peer=actual_fixture()
+        path=p.base.OUT/'original_low_wip_third_prepare_001/api/013730.json.gz'
+        encoded=path.read_bytes()
+        assert hashlib.sha256(encoded).hexdigest()=='fa4e4a01484a1549423f0a7ab5943dc6674c67d4bac0eab7e2fd960f49b44b93'
+        record=json.loads(gzip.decompress(encoded));assert record['endpoint']=='observe_protocol_control_policy_recent'
+&gt;       view=record['result'];assert view['jobs']==[] and view['owner_id']==gate.owner and view['now']==proof_view['now']
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert ([] == []
+E         
+E         Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'
+E         
+E           owner:system_domestic and 20830.0 == 20840.0)
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:157: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_cap_proof_alone_never_certifies_undelivered_relay[duplicate_jobs]" time="0.071"><failure message="AssertionError: assert ([] == []&#10;  &#10;  Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'&#10;  &#10;    owner:system_domestic and 20830.0 == 20840.0)">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x00000231A4F500D0&gt;
+defect = 'duplicate_jobs'
+
+    @pytest.mark.parametrize('defect',['unsubmitted','missing_ack','undelivered','expired_delivery','digest','wrong_owner','no_cap','failure','duplicate_ids','duplicate_jobs'])
+    def test_cap_proof_alone_never_certifies_undelivered_relay(monkeypatch,defect):
+&gt;       summary,plan,public=historical_guard_fixture(monkeypatch);relay=summary['cap_relay']
+                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:312: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_g31_circulation_cooperative_bridge_policy.py:292: in historical_guard_fixture
+    value,view,peer=actual_owner();box=value.client.state['outbox'];nodes={n['node']:n for n in view['node_contracts']}
+                    ^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+    def actual_owner():
+        """Actual saved compact endpoint, source self-copy and delivered peer.
+    
+        Calling the new candidate on these saved facts is a pure counterfactual,
+        never a new runtime/delivery or physical-execution claim.
+        """
+        gate,proof_view,box,peer=actual_fixture()
+        path=p.base.OUT/'original_low_wip_third_prepare_001/api/013730.json.gz'
+        encoded=path.read_bytes()
+        assert hashlib.sha256(encoded).hexdigest()=='fa4e4a01484a1549423f0a7ab5943dc6674c67d4bac0eab7e2fd960f49b44b93'
+        record=json.loads(gzip.decompress(encoded));assert record['endpoint']=='observe_protocol_control_policy_recent'
+&gt;       view=record['result'];assert view['jobs']==[] and view['owner_id']==gate.owner and view['now']==proof_view['now']
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       AssertionError: assert ([] == []
+E         
+E         Use -v to get more diff and 'owner:system_domestic' == 'owner:system_domestic'
+E         
+E           owner:system_domestic and 20830.0 == 20840.0)
+
+tests\test_g31_circulation_cooperative_bridge_policy.py:157: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_policy_failure_preserves_other_owner_retry_and_full_native_horizon[terminal]" time="0.002" /><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_policy_failure_preserves_other_owner_retry_and_full_native_horizon[guard]" time="0.001" /><testcase classname="tests.test_g31_circulation_cooperative_bridge_policy" name="test_fixed_domain_and_original005_source_are_not_changed" time="0.002" /><testcase classname="tests.test_g31_circulation_current_possession_permit" name="test_real_saved_facts_support_current_possession_not_arrival_causality" time="0.312" /><testcase classname="tests.test_g31_circulation_current_possession_permit" name="test_live_local_token_and_selfcopy_must_both_match[loaded]" time="0.080" /><testcase classname="tests.test_g31_circulation_current_possession_permit" name="test_live_local_token_and_selfcopy_must_both_match[holding]" time="0.079" /><testcase classname="tests.test_g31_circulation_current_possession_permit" name="test_live_local_token_and_selfcopy_must_both_match[future_available]" time="0.072" /><testcase classname="tests.test_g31_circulation_current_possession_permit" name="test_live_local_token_and_selfcopy_must_both_match[edge]" time="0.091" /><testcase classname="tests.test_g31_circulation_current_possession_permit" name="test_live_local_token_and_selfcopy_must_both_match[reception]" time="0.081" /><testcase classname="tests.test_g31_circulation_current_possession_permit" name="test_live_local_token_and_selfcopy_must_both_match[moved]" time="0.131" /><testcase classname="tests.test_g31_circulation_current_possession_permit" name="test_live_local_token_and_selfcopy_must_both_match[generation]" time="0.161" /><testcase classname="tests.test_g31_circulation_current_possession_permit" name="test_live_local_token_and_selfcopy_must_both_match[traversal]" time="0.150" /><testcase classname="tests.test_g31_circulation_current_possession_permit" name="test_live_local_token_and_selfcopy_must_both_match[foreign_owner]" time="0.081" /><testcase classname="tests.test_g31_circulation_current_possession_permit" name="test_complete_delivered_action_barrier_and_own_payload[pending]" time="0.169" /><testcase classname="tests.test_g31_circulation_current_possession_permit" name="test_complete_delivered_action_barrier_and_own_payload[rejected]" time="0.148" /><testcase classname="tests.test_g31_circulation_current_possession_permit" name="test_complete_delivered_action_barrier_and_own_payload[nontoken]" time="0.127" /><testcase classname="tests.test_g31_circulation_current_possession_permit" name="test_complete_delivered_action_barrier_and_own_payload[new_unpublished]" time="0.181" /><testcase classname="tests.test_g31_circulation_current_possession_permit" name="test_complete_delivered_action_barrier_and_own_payload[expired_self]" time="0.094" /><testcase classname="tests.test_g31_circulation_current_possession_permit" name="test_complete_delivered_action_barrier_and_own_payload[expired_peer]" time="0.132" /><testcase classname="tests.test_g31_circulation_current_possession_permit" name="test_complete_delivered_action_barrier_and_own_payload[missing_parking]" time="0.165" /><testcase classname="tests.test_g31_circulation_current_possession_permit" name="test_complete_delivered_action_barrier_and_own_payload[peer_pending]" time="0.151" /><testcase classname="tests.test_g31_circulation_current_possession_permit" name="test_complete_delivered_action_barrier_and_own_payload[unknown_kind]" time="0.150" /><testcase classname="tests.test_g31_circulation_current_possession_permit" name="test_exact_set_not_count_and_no_ack_revision_reopens_consumption" time="0.332" /><testcase classname="tests.test_g31_circulation_current_possession_permit" name="test_emitted_evidence_and_checkpoint_cannot_mutate_gate" time="0.236" /><testcase classname="tests.test_g31_circulation_current_possession_permit" name="test_missing_or_corrupt_consumed_state_does_not_restore[None]" time="0.084" /><testcase classname="tests.test_g31_circulation_current_possession_permit" name="test_missing_or_corrupt_consumed_state_does_not_restore[bad1]" time="0.070" /><testcase classname="tests.test_g31_circulation_current_possession_permit" name="test_missing_or_corrupt_consumed_state_does_not_restore[bad2]" time="0.069" /></testsuite></testsuites>

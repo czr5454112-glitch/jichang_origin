@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="1.426" timestamp="2026-10-15T14:30:12.699804+08:00" hostname="LAPTOP-M3GASC4G"><testcase classname="tests.test_g31_circulation_chained_saved_horizon" name="test_rehashed_initial_reported_source_drift_is_not_hidden_by_restored_bytes" time="0.179"><failure message="Failed: DID NOT RAISE ValueError">tmp_path = WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_lt2_sustained_20261014/tmp_chain_drift_counterexample_001/test_rehashed_initial_reported0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x00000169D9DF16D0&gt;
+
+    def test_rehashed_initial_reported_source_drift_is_not_hidden_by_restored_bytes(tmp_path,monkeypatch):
+        f=fixture(tmp_path,monkeypatch)
+        cut_path=f["ancestor_cut"];cut=read(cut_path)
+        initial=Path(cut["source_directory"])
+        receipt=read(initial/"receipt.json")
+        receipt["source_changed"]=["policy.py"]
+        receipt_hash=write(initial/"receipt.json",receipt)
+        write(cut_path.parent/"source_receipt_snapshot.json",receipt)
+        write(f["source"]/"resume_source/source_receipt_snapshot.json",receipt)
+        cut["source_receipt_sha256"]=receipt_hash
+        cut_hash=write(cut_path,cut)
+        write(f["source"]/"resume_source/cut_manifest.json",cut)
+        resumed=read(f["source"]/"receipt.json")
+        stop_path=Path(chain.option(resumed,"--stop-receipt"))
+        stop=read(stop_path);stop["cut_manifest_sha256"]=cut_hash
+        stop_hash=write(stop_path,stop)
+        write(f["source"]/"resume_source/stop_receipt.json",stop)
+        resumed["cut_manifest_sha256"]=cut_hash
+        command=resumed["command"]
+        command[command.index("--expected-cut-sha256")+1]=cut_hash
+        command[command.index("--expected-stop-sha256")+1]=stop_hash
+        # Deliberately unchanged live/archive bytes: the producer's explicit drift
+        # report is material even when a transient edit was later reverted.
+        verifier=chain.ChainProof(f["source"],resumed,f["manifest"],f["evidence"])
+&gt;       with pytest.raises(ValueError,match="ancestor_reported_source_drift"):
+E       Failed: DID NOT RAISE ValueError
+
+tests\test_g31_circulation_chained_saved_horizon.py:243: Failed</failure></testcase></testsuite></testsuites>

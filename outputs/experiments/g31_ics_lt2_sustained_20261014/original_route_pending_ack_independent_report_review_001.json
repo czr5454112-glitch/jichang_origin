@@ -1,0 +1,52 @@
+{
+  "status": "passed_narrow_report_and_root_clock_review",
+  "recorded_utc": "2026-10-15T09:25:04.158678+00:00",
+  "evidence_sha256": {
+    "independent_verification.json": "660547e068fe019793090200ff269b2697fe1bdb7465dff03e6465edb1f8c0cc",
+    "receipt.json": "3e362645d8074b6e21c4bf49418ebdf14aaf7995327391e00ebc45cbcfd9ed9b",
+    "external_launch_receipt.json": "8c4a941028b2b88529905551c2e1214ac58c0a10b09c4b5ffe33a3fd134db163",
+    "powershell_launch_receipt.json": "f2255ed74dc120fa1f88f6054328407474e3b5b05f2dc94a77aa5dbe016689be",
+    "campaign.json": "d019d4842a736051a24d869e6a220017e0ac1c1b65674fc75867ef17502cfc50",
+    "preregistered_protocol.json": "bd5138fd2d537c10a0a318a344ace861ba27796e88ed2b28a577f8d9fb60a701",
+    "baseline/raw.json.gz": "9c7339ad9efd7fa26bcfe298de93b0fcd4e5422ec27f3d6d893300f6b7d2df41",
+    "drop_first_ack/raw.json.gz": "d4c42a04a975895935aad0cf77429daec0faf54f0e0b91fea8843c43f0ed540a",
+    "ack_withheld_in_window/raw.json.gz": "6e2734fed8cc2b27e84733d99bbf75ef5f692b53eeab780a317ce0ecc1f5b0ea"
+  },
+  "cases": [
+    {
+      "case": "baseline",
+      "closed": true,
+      "warm_elapsed_upper_or_open_prefix_ms": 64.3337,
+      "last_actual_physical_observation_at": 9605.5,
+      "retained_ack_delivered_at": 9605.7,
+      "omitted_postproof_full_reads": 1,
+      "immutable_submit_attempts": 1,
+      "child_plus_parent_setup_ms": 18046.2555
+    },
+    {
+      "case": "drop_first_ack",
+      "closed": true,
+      "warm_elapsed_upper_or_open_prefix_ms": 970.5869,
+      "last_actual_physical_observation_at": 9605.5,
+      "retained_ack_delivered_at": 9667.4,
+      "omitted_postproof_full_reads": 36,
+      "immutable_submit_attempts": 2,
+      "child_plus_parent_setup_ms": 19965.7236
+    },
+    {
+      "case": "ack_withheld_in_window",
+      "closed": false,
+      "warm_elapsed_upper_or_open_prefix_ms": 27365.3727,
+      "last_actual_physical_observation_at": 9605.5,
+      "retained_ack_delivered_at": null,
+      "omitted_postproof_full_reads": 482,
+      "immutable_submit_attempts": 5,
+      "child_plus_parent_setup_ms": 57688.0545
+    }
+  ],
+  "whole_application_campaign_wall_seconds": 199.1382522,
+  "scope": "Read terminal receipts and three small raw root snapshots; recomputed root/cold clock arithmetic and omission counters. Did not independently repeat the147171-row API replay or native execution. That evidence remains the pinned already-reviewed saved verifier report.",
+  "limits": "Normal64.3337ms is one selected initialized-prefix finite first-hop root upper envelope; fault root970.5869ms and open prefix27365.3727ms remain. Cold setup remains charged. This is not an original-business all-request100ms certificate, physical job completion or hard-real-time guarantee.",
+  "native_executions": 0,
+  "complete_business_request_100ms_certified": false
+}

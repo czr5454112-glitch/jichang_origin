@@ -1,0 +1,85 @@
+{
+  "schema": "g31.preexisting_route_preference.design.v1",
+  "status": "source_and_saved_evidence_bound_design_no_native",
+  "saved_diagnostic": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\native_preexisting_business_003_failure_diagnosis.json",
+    "sha256": "736f519a5440dd6fb06f5d124f57a18d7572345a9fbc528106ce6d7aa13336e5"
+  },
+  "compiled_native025_authority": {
+    "build_receipt": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\native025_build_001\\receipt.json",
+    "sha256": "616e3b93706174395684bb81ef22f84ac6b26f405ada4f4b0eb69a52e2ed8df2",
+    "sources": {
+      "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\native025_build_001\\source\\cpp\\ics_core\\runtime\\circulation_runtime_impl.hpp": "98a87e43dfab00818c8402a9115a87791308913aa89d231463d637322b6513bc",
+      "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\native025_build_001\\source\\cpp\\ics_core\\runtime\\event_driven_junction.hpp": "e95479cbfce94d7a7bee9c2608486052734330efa35274faa4f396eda27b87fd"
+    }
+  },
+  "observed": {
+    "all60_horizon_and_5_jobs_complete": true,
+    "route_counts": [
+      {
+        "job": "loaded",
+        "next": 1,
+        "ack": "rejected",
+        "count": 45
+      },
+      {
+        "job": "reuse1",
+        "next": 3,
+        "ack": "updated",
+        "count": 53
+      },
+      {
+        "job": "reuse2",
+        "next": 3,
+        "ack": "updated",
+        "count": 60
+      },
+      {
+        "job": "loaded",
+        "next": 2,
+        "ack": "updated",
+        "count": 15
+      },
+      {
+        "job": "reuse1",
+        "next": 8,
+        "ack": "updated",
+        "count": 2
+      },
+      {
+        "job": "reuse1",
+        "next": 3,
+        "ack": "rejected",
+        "count": 5
+      }
+    ],
+    "initial_actual_edge_mismatches": 0,
+    "reuse1_selected3_actual8": 14,
+    "among14_ack_updated": 9,
+    "among14_ack_rejected_receiving_full": 5,
+    "all14_actual_dispatch3_receiving_full": true
+  },
+  "correction_to_earlier_conversation_summary": "50 rejected consists of45initial plus5late, not50initial;14late edge mismatches consist of9updated then shielded plus5already rejected, not14updated. Saved per-row raw diagnosis remains unchanged and correct.",
+  "native_semantics": [
+    "control_route checks current can_enter at command execution; occupied next node rejects even if public model predicts future clearance",
+    "apply_circulation_route_preference changes model_score only for matching generation/traversal/from, unexpired updated request, shield_allowed and nonfault candidate",
+    "preference does not reserve a receiving berth; an intervening incoming E can invalidate its benefit before actual dispatch",
+    "native ranking/fallback must be modeled; blocked preference is neither unconditional forced wait nor unconditional best-allowed fallback"
+  ],
+  "implementation_plan": [
+    "new independent projection primitive: command validation at wire execution, immutable accepted/rejected result, later identity/expiry/allowed guarded preference scoring",
+    "derive finite supported S4 ranking from public service-aware potential/calendar/queue facts; unavailable state remains unknown",
+    "track installed preference separately from actual EDGE_ENTER and source-local delivered ACK; retain all5jobs and allintended actions",
+    "closed-loop candidate requires owner-local receiving allowance, sufficient service window and cross-delay occupancy bounds; rejection or changed occupancy needs fresh immutable request with explicit parent lineage, never rejection promotion",
+    "same physics/information/actions/budget for strong coordinate/plateau/pair/enumeration references",
+    "native_keep may be separately declared and actual-edge audited; old rejected1 is never rewritten as updated"
+  ],
+  "pending": [
+    "pure implementation/tests",
+    "offline all60 positive/negative command-dispatch validation",
+    "fresh source-pinned native candidate after approval"
+  ],
+  "native_executions": 0,
+  "business_protection_certified": false,
+  "old_evidence_reinterpreted": false
+}

@@ -1,0 +1,4871 @@
+{
+  "schema": "g31.single_owned_C18.saved_cost_analysis.v1",
+  "status": "saved18_clock_partition_complete",
+  "source": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\single_owned_C18_prepare_002\\verification.json",
+    "sha256": "f01b6e3f743ce5fb73f561d71774d1e9960c2cea36969dffef099bb290510480"
+  },
+  "compact": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\single_owned_C18_prepare_002\\actual_compact_summary_001.json",
+    "sha256": "f0f7661f8b848c6033dd78e2702c62d2159727559fa5220c608c9b7877242802"
+  },
+  "rows": {
+    "normal/block0_load0/fixed_default": {
+      "root": {
+        "status": "conditionally_closed",
+        "closed": true,
+        "observed_within_100ms": false,
+        "complete_100ms_certified": false,
+        "warm_ms": 705.3323,
+        "reasons": []
+      },
+      "choice": "native_default",
+      "hop": {
+        "from": 0,
+        "to": 1,
+        "observed_at": 4.171,
+        "evidence": "observed_entry_future_exit",
+        "tray": {
+          "tray_id": "L",
+          "node": 0,
+          "mode": "loaded",
+          "edge_from": 0,
+          "edge_to": 1,
+          "available_at": 0.0,
+          "reception_node": -1,
+          "generation": 1,
+          "traversal_id": 1,
+          "business_bag_id": "loaded",
+          "committed_prefix": [
+            0
+          ],
+          "edge_exit_at": 5.171
+        }
+      },
+      "root_started_ns": 78897994947300,
+      "outside_return_ns": 78898700279600,
+      "warm_partition_ns": {
+        "admission_through_A_collection": 29299900,
+        "collection_through_final_check": 25072900,
+        "postcheck_through_last_event": 553129500,
+        "last_event_to_finalization": 42900,
+        "complete_evidence_build_through_first_encode": 39426400,
+        "strict_roundtrip_hash_ledger_return_tail": 58360700
+      },
+      "warm_partition_ms": {
+        "admission_through_A_collection": 29.2999,
+        "collection_through_final_check": 25.0729,
+        "postcheck_through_last_event": 553.1295,
+        "last_event_to_finalization": 0.0429,
+        "complete_evidence_build_through_first_encode": 39.4264,
+        "strict_roundtrip_hash_ledger_return_tail": 58.3607
+      },
+      "exclusive_known_and_residual_ms": {
+        "recorded_native_advance_with_response_copy": 3.8805,
+        "original_refresh_with_trace_and_queries": 64.233,
+        "RPC_attempt_with_validation": 0.0,
+        "unclassified_prefinalization": 539.4317,
+        "complete_finalization": 97.7871
+      },
+      "nested_query_ms": 8.4162,
+      "refresh_excluding_query_envelope_ms": 55.8168,
+      "phase_clock_coverage_ms": {
+        "admission_through_A_collection": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.5752,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "collection_through_final_check": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "postcheck_through_last_event": {
+          "recorded_native_advance_with_response_copy": 3.8805,
+          "original_refresh_with_trace_and_queries": 63.6578,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "last_event_to_finalization": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "complete_evidence_build_through_first_encode": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "strict_roundtrip_hash_ledger_return_tail": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        }
+      },
+      "counts": {
+        "events": 261,
+        "advance_calls": 119,
+        "refreshes": 206,
+        "queries": 660,
+        "new_ACK_bodies": 8,
+        "reused_ACK_body_reads": 647
+      },
+      "event_counts": {
+        "collection_boundary": 1,
+        "actual_A_collection": 1,
+        "predeclared_default_control": 1,
+        "final_local_and_receiver_check": 1,
+        "root_observation_gate": 100,
+        "continuation": 19,
+        "mandatory_drain": 19,
+        "post_drain_observation": 19,
+        "root_observation_gate_completion": 100
+      },
+      "event_interarrival_ms_not_function_cost": {
+        "collection_boundary": 5.6158,
+        "actual_A_collection": 23.6841,
+        "predeclared_default_control": 1.0554,
+        "final_local_and_receiver_check": 24.0175,
+        "root_observation_gate": 491.6075,
+        "continuation": 11.8426,
+        "mandatory_drain": 17.0408,
+        "post_drain_observation": 3.1555,
+        "root_observation_gate_completion": 29.4831
+      },
+      "payload": {
+        "complete_bytes": 1320914,
+        "top_level_value_bytes": {
+          "schema": 39,
+          "root_id": 35,
+          "state": 33,
+          "owner": 3,
+          "root_started_ns": 14,
+          "root_deadline_ns": 14,
+          "decision_cutoff_ns": 14,
+          "choice": 16,
+          "command_id": 4,
+          "hop": 293,
+          "events": 907849,
+          "participation_contract_sha256": 66,
+          "complete_100ms_certified": 5,
+          "full_business_protection_certified": 5,
+          "scope": 157,
+          "initial_endpoint_records": 116494,
+          "runtime_query_proof": 295571
+        },
+        "runtime_proof_value_bytes": {
+          "schema": 50,
+          "checkpoint": 75,
+          "trace": 235444,
+          "calls": 2126,
+          "creations": 1404,
+          "outbox": 9927,
+          "ack_handling_count": 1,
+          "admission_count": 3,
+          "advance_calls": 46025,
+          "saved_data_grants_native_authority": 5,
+          "first_hop_observation_contract": 315
+        },
+        "trace_value_bytes": {
+          "schema": 40,
+          "reads": 190708,
+          "ack_bodies": 7911,
+          "refreshes": 36586,
+          "invalid": 4,
+          "complete_query_endpoint_not_claimed": 4,
+          "scope": 85
+        },
+        "event_bytes_by_stage": {
+          "collection_boundary": 187,
+          "actual_A_collection": 17377,
+          "predeclared_default_control": 236,
+          "final_local_and_receiver_check": 13945,
+          "root_observation_gate": 247353,
+          "continuation": 271636,
+          "mandatory_drain": 3584,
+          "post_drain_observation": 272917,
+          "root_observation_gate_completion": 80352
+        },
+        "ACK_unique_body_bytes": 7902,
+        "ACK_reused_body_read_bytes_proxy": 787249,
+        "ACK_by_request": {
+          "live:1:A:seed-demand": {
+            "queries": 116,
+            "reused_body_reads": 115,
+            "body_payload_bytes_examined_proxy": 50485
+          },
+          "live:1:A:initial-planning": {
+            "queries": 116,
+            "reused_body_reads": 115,
+            "body_payload_bytes_examined_proxy": 404915
+          },
+          "live:1:B:seed-demand": {
+            "queries": 90,
+            "reused_body_reads": 89,
+            "body_payload_bytes_examined_proxy": 39071
+          },
+          "live:1:B:initial-planning": {
+            "queries": 90,
+            "reused_body_reads": 89,
+            "body_payload_bytes_examined_proxy": 239321
+          },
+          "live:1:B:fixed-initial-supply": {
+            "queries": 90,
+            "reused_body_reads": 88,
+            "body_payload_bytes_examined_proxy": 12760
+          },
+          "live:1:B:supply-recovery-1": {
+            "queries": 77,
+            "reused_body_reads": 74,
+            "body_payload_bytes_examined_proxy": 10513
+          },
+          "live:1:A:demand-82": {
+            "queries": 81,
+            "reused_body_reads": 77,
+            "body_payload_bytes_examined_proxy": 30184
+          }
+        }
+      },
+      "overrides": [],
+      "native_setup_before_root_ms": 10.3005,
+      "RPC": null
+    },
+    "normal/block0_load0/budget_two": {
+      "root": {
+        "status": "conditionally_closed",
+        "closed": true,
+        "observed_within_100ms": false,
+        "complete_100ms_certified": false,
+        "warm_ms": 637.5884,
+        "reasons": []
+      },
+      "choice": "native_default",
+      "hop": {
+        "from": 0,
+        "to": 1,
+        "observed_at": 4.171,
+        "evidence": "observed_entry_future_exit",
+        "tray": {
+          "tray_id": "L",
+          "node": 0,
+          "mode": "loaded",
+          "edge_from": 0,
+          "edge_to": 1,
+          "available_at": 0.0,
+          "reception_node": -1,
+          "generation": 1,
+          "traversal_id": 1,
+          "business_bag_id": "loaded",
+          "committed_prefix": [
+            0
+          ],
+          "edge_exit_at": 5.171
+        }
+      },
+      "root_started_ns": 78903235374500,
+      "outside_return_ns": 78903872962900,
+      "warm_partition_ns": {
+        "admission_through_A_collection": 28468000,
+        "collection_through_final_check": 50449300,
+        "postcheck_through_last_event": 443339700,
+        "last_event_to_finalization": 56400,
+        "complete_evidence_build_through_first_encode": 45230900,
+        "strict_roundtrip_hash_ledger_return_tail": 70044100
+      },
+      "warm_partition_ms": {
+        "admission_through_A_collection": 28.468,
+        "collection_through_final_check": 50.4493,
+        "postcheck_through_last_event": 443.3397,
+        "last_event_to_finalization": 0.0564,
+        "complete_evidence_build_through_first_encode": 45.2309,
+        "strict_roundtrip_hash_ledger_return_tail": 70.0441
+      },
+      "exclusive_known_and_residual_ms": {
+        "recorded_native_advance_with_response_copy": 3.4383,
+        "original_refresh_with_trace_and_queries": 60.3729,
+        "RPC_attempt_with_validation": 26.832,
+        "unclassified_prefinalization": 431.6702,
+        "complete_finalization": 115.275
+      },
+      "nested_query_ms": 7.9563,
+      "refresh_excluding_query_envelope_ms": 52.4166,
+      "phase_clock_coverage_ms": {
+        "admission_through_A_collection": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.5725,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "collection_through_final_check": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 26.832
+        },
+        "postcheck_through_last_event": {
+          "recorded_native_advance_with_response_copy": 3.4383,
+          "original_refresh_with_trace_and_queries": 59.8004,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "last_event_to_finalization": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "complete_evidence_build_through_first_encode": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "strict_roundtrip_hash_ledger_return_tail": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        }
+      },
+      "counts": {
+        "events": 262,
+        "advance_calls": 119,
+        "refreshes": 206,
+        "queries": 660,
+        "new_ACK_bodies": 8,
+        "reused_ACK_body_reads": 647
+      },
+      "event_counts": {
+        "collection_boundary": 1,
+        "actual_A_collection": 1,
+        "two_choice_reply": 1,
+        "RPC_attempt": 1,
+        "final_local_and_receiver_check": 1,
+        "root_observation_gate": 100,
+        "continuation": 19,
+        "mandatory_drain": 19,
+        "post_drain_observation": 19,
+        "root_observation_gate_completion": 100
+      },
+      "event_interarrival_ms_not_function_cost": {
+        "collection_boundary": 5.3847,
+        "actual_A_collection": 23.0833,
+        "two_choice_reply": 26.0193,
+        "RPC_attempt": 1.8198,
+        "final_local_and_receiver_check": 22.6102,
+        "root_observation_gate": 388.2635,
+        "continuation": 11.2018,
+        "mandatory_drain": 14.0001,
+        "post_drain_observation": 2.9645,
+        "root_observation_gate_completion": 26.9098
+      },
+      "payload": {
+        "complete_bytes": 1357478,
+        "top_level_value_bytes": {
+          "schema": 39,
+          "root_id": 32,
+          "state": 33,
+          "owner": 3,
+          "root_started_ns": 14,
+          "root_deadline_ns": 14,
+          "decision_cutoff_ns": 14,
+          "choice": 16,
+          "command_id": 4,
+          "hop": 293,
+          "events": 944412,
+          "participation_contract_sha256": 66,
+          "complete_100ms_certified": 5,
+          "full_business_protection_certified": 5,
+          "scope": 157,
+          "initial_endpoint_records": 116494,
+          "runtime_query_proof": 295575
+        },
+        "runtime_proof_value_bytes": {
+          "schema": 50,
+          "checkpoint": 75,
+          "trace": 235444,
+          "calls": 2126,
+          "creations": 1404,
+          "outbox": 9927,
+          "ack_handling_count": 1,
+          "admission_count": 3,
+          "advance_calls": 46029,
+          "saved_data_grants_native_authority": 5,
+          "first_hop_observation_contract": 315
+        },
+        "trace_value_bytes": {
+          "schema": 40,
+          "reads": 190708,
+          "ack_bodies": 7911,
+          "refreshes": 36586,
+          "invalid": 4,
+          "complete_query_endpoint_not_claimed": 4,
+          "scope": 85
+        },
+        "event_bytes_by_stage": {
+          "collection_boundary": 187,
+          "actual_A_collection": 17377,
+          "two_choice_reply": 36883,
+          "RPC_attempt": 207,
+          "final_local_and_receiver_check": 13945,
+          "root_observation_gate": 247353,
+          "continuation": 271636,
+          "mandatory_drain": 3588,
+          "post_drain_observation": 272917,
+          "root_observation_gate_completion": 80056
+        },
+        "ACK_unique_body_bytes": 7902,
+        "ACK_reused_body_read_bytes_proxy": 787249,
+        "ACK_by_request": {
+          "live:1:A:seed-demand": {
+            "queries": 116,
+            "reused_body_reads": 115,
+            "body_payload_bytes_examined_proxy": 50485
+          },
+          "live:1:A:initial-planning": {
+            "queries": 116,
+            "reused_body_reads": 115,
+            "body_payload_bytes_examined_proxy": 404915
+          },
+          "live:1:B:seed-demand": {
+            "queries": 90,
+            "reused_body_reads": 89,
+            "body_payload_bytes_examined_proxy": 39071
+          },
+          "live:1:B:initial-planning": {
+            "queries": 90,
+            "reused_body_reads": 89,
+            "body_payload_bytes_examined_proxy": 239321
+          },
+          "live:1:B:fixed-initial-supply": {
+            "queries": 90,
+            "reused_body_reads": 88,
+            "body_payload_bytes_examined_proxy": 12760
+          },
+          "live:1:B:supply-recovery-1": {
+            "queries": 77,
+            "reused_body_reads": 74,
+            "body_payload_bytes_examined_proxy": 10513
+          },
+          "live:1:A:demand-82": {
+            "queries": 81,
+            "reused_body_reads": 77,
+            "body_payload_bytes_examined_proxy": 30184
+          }
+        }
+      },
+      "overrides": [],
+      "native_setup_before_root_ms": 8.6837,
+      "RPC": {
+        "caller_ms": 24.2495,
+        "worker_compute_ms": 15.7398,
+        "selection": {
+          "status": "default_incumbent",
+          "choice": "native_default",
+          "candidate_eligible": false
+        },
+        "budget": {
+          "worker_started_ns": 78903266483900,
+          "root_started_ns": 78903235374500,
+          "decision_cutoff_ns": 78903295374500,
+          "root_deadline_ns": 78903335374500,
+          "finalization_reserve_is_WCET": false,
+          "baseline_finished_ns": 78903278045600,
+          "candidate_finished_ns": 78903281303800,
+          "atomic_overrun": false,
+          "candidate_unexecuted": false,
+          "worker_finished_ns": 78903282198500
+        }
+      }
+    },
+    "normal/block0_load1/fixed_default": {
+      "root": {
+        "status": "conditionally_closed",
+        "closed": true,
+        "observed_within_100ms": false,
+        "complete_100ms_certified": false,
+        "warm_ms": 744.3196,
+        "reasons": []
+      },
+      "choice": "native_default",
+      "hop": {
+        "from": 0,
+        "to": 1,
+        "observed_at": 6.171,
+        "evidence": "observed_entry_future_exit",
+        "tray": {
+          "tray_id": "L",
+          "node": 0,
+          "mode": "loaded",
+          "edge_from": 0,
+          "edge_to": 1,
+          "available_at": 0.0,
+          "reception_node": -1,
+          "generation": 1,
+          "traversal_id": 1,
+          "business_bag_id": "loaded",
+          "committed_prefix": [
+            0
+          ],
+          "edge_exit_at": 7.171
+        }
+      },
+      "root_started_ns": 78908340373200,
+      "outside_return_ns": 78909084692800,
+      "warm_partition_ns": {
+        "admission_through_A_collection": 24767900,
+        "collection_through_final_check": 22325100,
+        "postcheck_through_last_event": 576683100,
+        "last_event_to_finalization": 46500,
+        "complete_evidence_build_through_first_encode": 43892300,
+        "strict_roundtrip_hash_ledger_return_tail": 76604700
+      },
+      "warm_partition_ms": {
+        "admission_through_A_collection": 24.7679,
+        "collection_through_final_check": 22.3251,
+        "postcheck_through_last_event": 576.6831,
+        "last_event_to_finalization": 0.0465,
+        "complete_evidence_build_through_first_encode": 43.8923,
+        "strict_roundtrip_hash_ledger_return_tail": 76.6047
+      },
+      "exclusive_known_and_residual_ms": {
+        "recorded_native_advance_with_response_copy": 4.7342,
+        "original_refresh_with_trace_and_queries": 94.1678,
+        "RPC_attempt_with_validation": 0.0,
+        "unclassified_prefinalization": 524.9206,
+        "complete_finalization": 120.497
+      },
+      "nested_query_ms": 12.6601,
+      "refresh_excluding_query_envelope_ms": 81.5077,
+      "phase_clock_coverage_ms": {
+        "admission_through_A_collection": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.5499,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "collection_through_final_check": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "postcheck_through_last_event": {
+          "recorded_native_advance_with_response_copy": 4.7342,
+          "original_refresh_with_trace_and_queries": 93.6179,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "last_event_to_finalization": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "complete_evidence_build_through_first_encode": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "strict_roundtrip_hash_ledger_return_tail": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        }
+      },
+      "counts": {
+        "events": 341,
+        "advance_calls": 159,
+        "refreshes": 286,
+        "queries": 940,
+        "new_ACK_bodies": 8,
+        "reused_ACK_body_reads": 927
+      },
+      "event_counts": {
+        "collection_boundary": 1,
+        "actual_A_collection": 1,
+        "predeclared_default_control": 1,
+        "final_local_and_receiver_check": 1,
+        "root_observation_gate": 140,
+        "continuation": 19,
+        "mandatory_drain": 19,
+        "post_drain_observation": 19,
+        "root_observation_gate_completion": 140
+      },
+      "event_interarrival_ms_not_function_cost": {
+        "collection_boundary": 5.1664,
+        "actual_A_collection": 19.6015,
+        "predeclared_default_control": 0.7447,
+        "final_local_and_receiver_check": 21.5804,
+        "root_observation_gate": 508.0631,
+        "continuation": 11.6146,
+        "mandatory_drain": 16.0442,
+        "post_drain_observation": 3.0744,
+        "root_observation_gate_completion": 37.8868
+      },
+      "payload": {
+        "complete_bytes": 1567382,
+        "top_level_value_bytes": {
+          "schema": 39,
+          "root_id": 35,
+          "state": 33,
+          "owner": 3,
+          "root_started_ns": 14,
+          "root_deadline_ns": 14,
+          "decision_cutoff_ns": 14,
+          "choice": 16,
+          "command_id": 4,
+          "hop": 293,
+          "events": 1040781,
+          "participation_contract_sha256": 66,
+          "complete_100ms_certified": 5,
+          "full_business_protection_certified": 5,
+          "scope": 157,
+          "initial_endpoint_records": 116494,
+          "runtime_query_proof": 409107
+        },
+        "runtime_proof_value_bytes": {
+          "schema": 50,
+          "checkpoint": 75,
+          "trace": 332826,
+          "calls": 2126,
+          "creations": 1404,
+          "outbox": 9927,
+          "ack_handling_count": 1,
+          "admission_count": 3,
+          "advance_calls": 62179,
+          "saved_data_grants_native_authority": 5,
+          "first_hop_observation_contract": 315
+        },
+        "trace_value_bytes": {
+          "schema": 40,
+          "reads": 273374,
+          "ack_bodies": 7911,
+          "refreshes": 51302,
+          "invalid": 4,
+          "complete_query_endpoint_not_claimed": 4,
+          "scope": 85
+        },
+        "event_bytes_by_stage": {
+          "collection_boundary": 187,
+          "actual_A_collection": 17377,
+          "predeclared_default_control": 236,
+          "final_local_and_receiver_check": 13945,
+          "root_observation_gate": 349887,
+          "continuation": 271636,
+          "mandatory_drain": 3586,
+          "post_drain_observation": 272917,
+          "root_observation_gate_completion": 110668
+        },
+        "ACK_unique_body_bytes": 7902,
+        "ACK_reused_body_read_bytes_proxy": 1098009,
+        "ACK_by_request": {
+          "live:1:A:seed-demand": {
+            "queries": 156,
+            "reused_body_reads": 155,
+            "body_payload_bytes_examined_proxy": 68045
+          },
+          "live:1:A:initial-planning": {
+            "queries": 156,
+            "reused_body_reads": 155,
+            "body_payload_bytes_examined_proxy": 545755
+          },
+          "live:1:B:seed-demand": {
+            "queries": 130,
+            "reused_body_reads": 129,
+            "body_payload_bytes_examined_proxy": 56631
+          },
+          "live:1:B:initial-planning": {
+            "queries": 130,
+            "reused_body_reads": 129,
+            "body_payload_bytes_examined_proxy": 346881
+          },
+          "live:1:B:fixed-initial-supply": {
+            "queries": 130,
+            "reused_body_reads": 128,
+            "body_payload_bytes_examined_proxy": 18560
+          },
+          "live:1:B:supply-recovery-1": {
+            "queries": 117,
+            "reused_body_reads": 114,
+            "body_payload_bytes_examined_proxy": 16273
+          },
+          "live:1:A:demand-82": {
+            "queries": 121,
+            "reused_body_reads": 117,
+            "body_payload_bytes_examined_proxy": 45864
+          }
+        }
+      },
+      "overrides": [],
+      "native_setup_before_root_ms": 8.5959,
+      "RPC": null
+    },
+    "normal/block0_load1/budget_two": {
+      "root": {
+        "status": "conditionally_closed",
+        "closed": true,
+        "observed_within_100ms": false,
+        "complete_100ms_certified": false,
+        "warm_ms": 489.4887,
+        "reasons": []
+      },
+      "choice": "prefer_2",
+      "hop": {
+        "from": 0,
+        "to": 2,
+        "observed_at": 1.1,
+        "evidence": "observed_entry_future_exit",
+        "tray": {
+          "tray_id": "L",
+          "node": 0,
+          "mode": "loaded",
+          "edge_from": 0,
+          "edge_to": 2,
+          "available_at": 0.0,
+          "reception_node": -1,
+          "generation": 1,
+          "traversal_id": 1,
+          "business_bag_id": "loaded",
+          "committed_prefix": [
+            0
+          ],
+          "edge_exit_at": 3.1
+        }
+      },
+      "root_started_ns": 78913408791500,
+      "outside_return_ns": 78913898280200,
+      "warm_partition_ns": {
+        "admission_through_A_collection": 26342400,
+        "collection_through_final_check": 57900600,
+        "postcheck_through_last_event": 342217600,
+        "last_event_to_finalization": 42300,
+        "complete_evidence_build_through_first_encode": 23421300,
+        "strict_roundtrip_hash_ledger_return_tail": 39564500
+      },
+      "warm_partition_ms": {
+        "admission_through_A_collection": 26.3424,
+        "collection_through_final_check": 57.9006,
+        "postcheck_through_last_event": 342.2176,
+        "last_event_to_finalization": 0.0423,
+        "complete_evidence_build_through_first_encode": 23.4213,
+        "strict_roundtrip_hash_ledger_return_tail": 39.5645
+      },
+      "exclusive_known_and_residual_ms": {
+        "recorded_native_advance_with_response_copy": 1.3425,
+        "original_refresh_with_trace_and_queries": 19.6225,
+        "RPC_attempt_with_validation": 32.967,
+        "unclassified_prefinalization": 372.5709,
+        "complete_finalization": 62.9858
+      },
+      "nested_query_ms": 2.5868,
+      "refresh_excluding_query_envelope_ms": 17.0357,
+      "phase_clock_coverage_ms": {
+        "admission_through_A_collection": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.5911,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "collection_through_final_check": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 32.967
+        },
+        "postcheck_through_last_event": {
+          "recorded_native_advance_with_response_copy": 1.3425,
+          "original_refresh_with_trace_and_queries": 19.0314,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "last_event_to_finalization": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "complete_evidence_build_through_first_encode": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "strict_roundtrip_hash_ledger_return_tail": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        }
+      },
+      "counts": {
+        "events": 95,
+        "advance_calls": 40,
+        "refreshes": 65,
+        "queries": 210,
+        "new_ACK_bodies": 7,
+        "reused_ACK_body_reads": 196
+      },
+      "event_counts": {
+        "collection_boundary": 1,
+        "actual_A_collection": 1,
+        "two_choice_reply": 1,
+        "RPC_attempt": 1,
+        "final_local_and_receiver_check": 1,
+        "root_observation_gate": 30,
+        "continuation": 10,
+        "mandatory_drain": 10,
+        "post_drain_observation": 10,
+        "root_observation_gate_completion": 30
+      },
+      "event_interarrival_ms_not_function_cost": {
+        "collection_boundary": 5.4486,
+        "actual_A_collection": 20.8938,
+        "two_choice_reply": 31.411,
+        "RPC_attempt": 2.5994,
+        "final_local_and_receiver_check": 23.8902,
+        "root_observation_gate": 313.1671,
+        "continuation": 6.5634,
+        "mandatory_drain": 8.5471,
+        "post_drain_observation": 1.811,
+        "root_observation_gate_completion": 12.129
+      },
+      "payload": {
+        "complete_bytes": 704680,
+        "top_level_value_bytes": {
+          "schema": 39,
+          "root_id": 32,
+          "state": 40,
+          "owner": 3,
+          "root_started_ns": 14,
+          "root_deadline_ns": 14,
+          "decision_cutoff_ns": 14,
+          "choice": 10,
+          "command_id": 24,
+          "hop": 289,
+          "events": 477902,
+          "participation_contract_sha256": 66,
+          "complete_100ms_certified": 5,
+          "full_business_protection_certified": 5,
+          "scope": 157,
+          "initial_endpoint_records": 116494,
+          "runtime_query_proof": 109270
+        },
+        "runtime_proof_value_bytes": {
+          "schema": 50,
+          "checkpoint": 75,
+          "trace": 79173,
+          "calls": 2161,
+          "creations": 1735,
+          "outbox": 10084,
+          "ack_handling_count": 1,
+          "admission_count": 2,
+          "advance_calls": 15473,
+          "saved_data_grants_native_authority": 5,
+          "first_hop_observation_contract": 315
+        },
+        "trace_value_bytes": {
+          "schema": 40,
+          "reads": 60002,
+          "ack_bodies": 7568,
+          "refreshes": 11364,
+          "invalid": 4,
+          "complete_query_endpoint_not_claimed": 4,
+          "scope": 85
+        },
+        "event_bytes_by_stage": {
+          "collection_boundary": 187,
+          "actual_A_collection": 17377,
+          "two_choice_reply": 50952,
+          "RPC_attempt": 207,
+          "final_local_and_receiver_check": 13945,
+          "root_observation_gate": 75080,
+          "continuation": 146222,
+          "mandatory_drain": 1856,
+          "post_drain_observation": 146796,
+          "root_observation_gate_completion": 25184
+        },
+        "ACK_unique_body_bytes": 7560,
+        "ACK_reused_body_read_bytes_proxy": 240413,
+        "ACK_by_request": {
+          "live:1:A:seed-demand": {
+            "queries": 39,
+            "reused_body_reads": 38,
+            "body_payload_bytes_examined_proxy": 16682
+          },
+          "live:1:A:initial-planning": {
+            "queries": 39,
+            "reused_body_reads": 38,
+            "body_payload_bytes_examined_proxy": 133798
+          },
+          "live:1:A:initial-route": {
+            "queries": 38,
+            "reused_body_reads": 35,
+            "body_payload_bytes_examined_proxy": 6790
+          },
+          "live:1:B:seed-demand": {
+            "queries": 26,
+            "reused_body_reads": 25,
+            "body_payload_bytes_examined_proxy": 10975
+          },
+          "live:1:B:initial-planning": {
+            "queries": 26,
+            "reused_body_reads": 25,
+            "body_payload_bytes_examined_proxy": 67225
+          },
+          "live:1:B:fixed-initial-supply": {
+            "queries": 26,
+            "reused_body_reads": 24,
+            "body_payload_bytes_examined_proxy": 3480
+          },
+          "live:1:B:supply-recovery-1": {
+            "queries": 13,
+            "reused_body_reads": 11,
+            "body_payload_bytes_examined_proxy": 1463
+          },
+          "live:1:A:demand-84": {
+            "queries": 3,
+            "reused_body_reads": 0,
+            "body_payload_bytes_examined_proxy": 0
+          }
+        }
+      },
+      "overrides": [],
+      "native_setup_before_root_ms": 8.3683,
+      "RPC": {
+        "caller_ms": 29.6712,
+        "worker_compute_ms": 18.3159,
+        "selection": {
+          "status": "conditional_two_choice_selection",
+          "choice": "prefer_2",
+          "candidate_eligible": true
+        },
+        "budget": {
+          "worker_started_ns": 78913437862700,
+          "root_started_ns": 78913408791500,
+          "decision_cutoff_ns": 78913468791500,
+          "root_deadline_ns": 78913508791500,
+          "finalization_reserve_is_WCET": false,
+          "baseline_finished_ns": 78913450263400,
+          "candidate_finished_ns": 78913455216200,
+          "atomic_overrun": false,
+          "candidate_unexecuted": false,
+          "worker_finished_ns": 78913456158700
+        }
+      }
+    },
+    "normal/block0_load2/fixed_default": {
+      "root": {
+        "status": "conditionally_closed",
+        "closed": true,
+        "observed_within_100ms": false,
+        "complete_100ms_certified": false,
+        "warm_ms": 810.443,
+        "reasons": []
+      },
+      "choice": "native_default",
+      "hop": {
+        "from": 0,
+        "to": 1,
+        "observed_at": 8.171,
+        "evidence": "observed_entry_future_exit",
+        "tray": {
+          "tray_id": "L",
+          "node": 0,
+          "mode": "loaded",
+          "edge_from": 0,
+          "edge_to": 1,
+          "available_at": 0.0,
+          "reception_node": -1,
+          "generation": 1,
+          "traversal_id": 1,
+          "business_bag_id": "loaded",
+          "committed_prefix": [
+            0
+          ],
+          "edge_exit_at": 9.171
+        }
+      },
+      "root_started_ns": 78918717077500,
+      "outside_return_ns": 78919527520500,
+      "warm_partition_ns": {
+        "admission_through_A_collection": 28342700,
+        "collection_through_final_check": 36021800,
+        "postcheck_through_last_event": 579519600,
+        "last_event_to_finalization": 41200,
+        "complete_evidence_build_through_first_encode": 88667200,
+        "strict_roundtrip_hash_ledger_return_tail": 77850500
+      },
+      "warm_partition_ms": {
+        "admission_through_A_collection": 28.3427,
+        "collection_through_final_check": 36.0218,
+        "postcheck_through_last_event": 579.5196,
+        "last_event_to_finalization": 0.0412,
+        "complete_evidence_build_through_first_encode": 88.6672,
+        "strict_roundtrip_hash_ledger_return_tail": 77.8505
+      },
+      "exclusive_known_and_residual_ms": {
+        "recorded_native_advance_with_response_copy": 5.1481,
+        "original_refresh_with_trace_and_queries": 106.8652,
+        "RPC_attempt_with_validation": 0.0,
+        "unclassified_prefinalization": 531.912,
+        "complete_finalization": 166.5177
+      },
+      "nested_query_ms": 13.6903,
+      "refresh_excluding_query_envelope_ms": 93.1749,
+      "phase_clock_coverage_ms": {
+        "admission_through_A_collection": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.4515,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "collection_through_final_check": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "postcheck_through_last_event": {
+          "recorded_native_advance_with_response_copy": 5.1481,
+          "original_refresh_with_trace_and_queries": 106.4137,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "last_event_to_finalization": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "complete_evidence_build_through_first_encode": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "strict_roundtrip_hash_ledger_return_tail": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        }
+      },
+      "counts": {
+        "events": 421,
+        "advance_calls": 199,
+        "refreshes": 366,
+        "queries": 1220,
+        "new_ACK_bodies": 8,
+        "reused_ACK_body_reads": 1207
+      },
+      "event_counts": {
+        "collection_boundary": 1,
+        "actual_A_collection": 1,
+        "predeclared_default_control": 1,
+        "final_local_and_receiver_check": 1,
+        "root_observation_gate": 180,
+        "continuation": 19,
+        "mandatory_drain": 19,
+        "post_drain_observation": 19,
+        "root_observation_gate_completion": 180
+      },
+      "event_interarrival_ms_not_function_cost": {
+        "collection_boundary": 4.7459,
+        "actual_A_collection": 23.5968,
+        "predeclared_default_control": 1.0671,
+        "final_local_and_receiver_check": 34.9547,
+        "root_observation_gate": 512.7702,
+        "continuation": 10.17,
+        "mandatory_drain": 14.4516,
+        "post_drain_observation": 3.0868,
+        "root_observation_gate_completion": 39.041
+      },
+      "payload": {
+        "complete_bytes": 1813850,
+        "top_level_value_bytes": {
+          "schema": 39,
+          "root_id": 35,
+          "state": 33,
+          "owner": 3,
+          "root_started_ns": 14,
+          "root_deadline_ns": 14,
+          "decision_cutoff_ns": 14,
+          "choice": 16,
+          "command_id": 4,
+          "hop": 293,
+          "events": 1173549,
+          "participation_contract_sha256": 66,
+          "complete_100ms_certified": 5,
+          "full_business_protection_certified": 5,
+          "scope": 157,
+          "initial_endpoint_records": 116494,
+          "runtime_query_proof": 522807
+        },
+        "runtime_proof_value_bytes": {
+          "schema": 50,
+          "checkpoint": 76,
+          "trace": 430429,
+          "calls": 2126,
+          "creations": 1404,
+          "outbox": 9927,
+          "ack_handling_count": 1,
+          "admission_count": 3,
+          "advance_calls": 78275,
+          "saved_data_grants_native_authority": 5,
+          "first_hop_observation_contract": 315
+        },
+        "trace_value_bytes": {
+          "schema": 40,
+          "reads": 356162,
+          "ack_bodies": 7911,
+          "refreshes": 66117,
+          "invalid": 4,
+          "complete_query_endpoint_not_claimed": 4,
+          "scope": 85
+        },
+        "event_bytes_by_stage": {
+          "collection_boundary": 187,
+          "actual_A_collection": 17377,
+          "predeclared_default_control": 236,
+          "final_local_and_receiver_check": 13945,
+          "root_observation_gate": 452271,
+          "continuation": 271636,
+          "mandatory_drain": 3586,
+          "post_drain_observation": 272917,
+          "root_observation_gate_completion": 140972
+        },
+        "ACK_unique_body_bytes": 7902,
+        "ACK_reused_body_read_bytes_proxy": 1408769,
+        "ACK_by_request": {
+          "live:1:A:seed-demand": {
+            "queries": 196,
+            "reused_body_reads": 195,
+            "body_payload_bytes_examined_proxy": 85605
+          },
+          "live:1:A:initial-planning": {
+            "queries": 196,
+            "reused_body_reads": 195,
+            "body_payload_bytes_examined_proxy": 686595
+          },
+          "live:1:B:seed-demand": {
+            "queries": 170,
+            "reused_body_reads": 169,
+            "body_payload_bytes_examined_proxy": 74191
+          },
+          "live:1:B:initial-planning": {
+            "queries": 170,
+            "reused_body_reads": 169,
+            "body_payload_bytes_examined_proxy": 454441
+          },
+          "live:1:B:fixed-initial-supply": {
+            "queries": 170,
+            "reused_body_reads": 168,
+            "body_payload_bytes_examined_proxy": 24360
+          },
+          "live:1:B:supply-recovery-1": {
+            "queries": 157,
+            "reused_body_reads": 154,
+            "body_payload_bytes_examined_proxy": 22033
+          },
+          "live:1:A:demand-82": {
+            "queries": 161,
+            "reused_body_reads": 157,
+            "body_payload_bytes_examined_proxy": 61544
+          }
+        }
+      },
+      "overrides": [],
+      "native_setup_before_root_ms": 7.5417,
+      "RPC": null
+    },
+    "normal/block0_load2/budget_two": {
+      "root": {
+        "status": "conditionally_closed",
+        "closed": true,
+        "observed_within_100ms": false,
+        "complete_100ms_certified": false,
+        "warm_ms": 885.403,
+        "reasons": []
+      },
+      "choice": "native_default",
+      "hop": {
+        "from": 0,
+        "to": 1,
+        "observed_at": 8.171,
+        "evidence": "observed_entry_future_exit",
+        "tray": {
+          "tray_id": "L",
+          "node": 0,
+          "mode": "loaded",
+          "edge_from": 0,
+          "edge_to": 1,
+          "available_at": 0.0,
+          "reception_node": -1,
+          "generation": 1,
+          "traversal_id": 1,
+          "business_bag_id": "loaded",
+          "committed_prefix": [
+            0
+          ],
+          "edge_exit_at": 9.171
+        }
+      },
+      "root_started_ns": 78923693480800,
+      "outside_return_ns": 78924578883800,
+      "warm_partition_ns": {
+        "admission_through_A_collection": 24322200,
+        "collection_through_final_check": 107834400,
+        "postcheck_through_last_event": 611910200,
+        "last_event_to_finalization": 41000,
+        "complete_evidence_build_through_first_encode": 52728900,
+        "strict_roundtrip_hash_ledger_return_tail": 88566300
+      },
+      "warm_partition_ms": {
+        "admission_through_A_collection": 24.3222,
+        "collection_through_final_check": 107.8344,
+        "postcheck_through_last_event": 611.9102,
+        "last_event_to_finalization": 0.041,
+        "complete_evidence_build_through_first_encode": 52.7289,
+        "strict_roundtrip_hash_ledger_return_tail": 88.5663
+      },
+      "exclusive_known_and_residual_ms": {
+        "recorded_native_advance_with_response_copy": 5.3883,
+        "original_refresh_with_trace_and_queries": 115.2292,
+        "RPC_attempt_with_validation": 41.6021,
+        "unclassified_prefinalization": 581.8882,
+        "complete_finalization": 141.2952
+      },
+      "nested_query_ms": 15.8287,
+      "refresh_excluding_query_envelope_ms": 99.4005,
+      "phase_clock_coverage_ms": {
+        "admission_through_A_collection": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.4144,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "collection_through_final_check": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 41.6021
+        },
+        "postcheck_through_last_event": {
+          "recorded_native_advance_with_response_copy": 5.3883,
+          "original_refresh_with_trace_and_queries": 114.8148,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "last_event_to_finalization": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "complete_evidence_build_through_first_encode": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "strict_roundtrip_hash_ledger_return_tail": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        }
+      },
+      "counts": {
+        "events": 423,
+        "advance_calls": 199,
+        "refreshes": 366,
+        "queries": 1220,
+        "new_ACK_bodies": 8,
+        "reused_ACK_body_reads": 1207
+      },
+      "event_counts": {
+        "collection_boundary": 1,
+        "actual_A_collection": 1,
+        "decision_return_overrun_default_incumbent": 1,
+        "two_choice_reply": 1,
+        "RPC_attempt": 1,
+        "final_local_and_receiver_check": 1,
+        "root_observation_gate": 180,
+        "continuation": 19,
+        "mandatory_drain": 19,
+        "post_drain_observation": 19,
+        "root_observation_gate_completion": 180
+      },
+      "event_interarrival_ms_not_function_cost": {
+        "collection_boundary": 4.7454,
+        "actual_A_collection": 19.5768,
+        "decision_return_overrun_default_incumbent": 38.5785,
+        "two_choice_reply": 0.0207,
+        "RPC_attempt": 3.9959,
+        "final_local_and_receiver_check": 65.2393,
+        "root_observation_gate": 542.5127,
+        "continuation": 10.9626,
+        "mandatory_drain": 14.1391,
+        "post_drain_observation": 2.936,
+        "root_observation_gate_completion": 41.3598
+      },
+      "payload": {
+        "complete_bytes": 1865227,
+        "top_level_value_bytes": {
+          "schema": 39,
+          "root_id": 32,
+          "state": 33,
+          "owner": 3,
+          "root_started_ns": 14,
+          "root_deadline_ns": 14,
+          "decision_cutoff_ns": 14,
+          "choice": 16,
+          "command_id": 4,
+          "hop": 293,
+          "events": 1224929,
+          "participation_contract_sha256": 66,
+          "complete_100ms_certified": 5,
+          "full_business_protection_certified": 5,
+          "scope": 157,
+          "initial_endpoint_records": 116494,
+          "runtime_query_proof": 522807
+        },
+        "runtime_proof_value_bytes": {
+          "schema": 50,
+          "checkpoint": 76,
+          "trace": 430429,
+          "calls": 2126,
+          "creations": 1404,
+          "outbox": 9927,
+          "ack_handling_count": 1,
+          "admission_count": 3,
+          "advance_calls": 78275,
+          "saved_data_grants_native_authority": 5,
+          "first_hop_observation_contract": 315
+        },
+        "trace_value_bytes": {
+          "schema": 40,
+          "reads": 356162,
+          "ack_bodies": 7911,
+          "refreshes": 66117,
+          "invalid": 4,
+          "complete_query_endpoint_not_claimed": 4,
+          "scope": 85
+        },
+        "event_bytes_by_stage": {
+          "collection_boundary": 186,
+          "actual_A_collection": 17377,
+          "decision_return_overrun_default_incumbent": 99,
+          "two_choice_reply": 51849,
+          "RPC_attempt": 207,
+          "final_local_and_receiver_check": 13945,
+          "root_observation_gate": 452271,
+          "continuation": 271636,
+          "mandatory_drain": 3586,
+          "post_drain_observation": 272917,
+          "root_observation_gate_completion": 140432
+        },
+        "ACK_unique_body_bytes": 7902,
+        "ACK_reused_body_read_bytes_proxy": 1408769,
+        "ACK_by_request": {
+          "live:1:A:seed-demand": {
+            "queries": 196,
+            "reused_body_reads": 195,
+            "body_payload_bytes_examined_proxy": 85605
+          },
+          "live:1:A:initial-planning": {
+            "queries": 196,
+            "reused_body_reads": 195,
+            "body_payload_bytes_examined_proxy": 686595
+          },
+          "live:1:B:seed-demand": {
+            "queries": 170,
+            "reused_body_reads": 169,
+            "body_payload_bytes_examined_proxy": 74191
+          },
+          "live:1:B:initial-planning": {
+            "queries": 170,
+            "reused_body_reads": 169,
+            "body_payload_bytes_examined_proxy": 454441
+          },
+          "live:1:B:fixed-initial-supply": {
+            "queries": 170,
+            "reused_body_reads": 168,
+            "body_payload_bytes_examined_proxy": 24360
+          },
+          "live:1:B:supply-recovery-1": {
+            "queries": 157,
+            "reused_body_reads": 154,
+            "body_payload_bytes_examined_proxy": 22033
+          },
+          "live:1:A:demand-82": {
+            "queries": 161,
+            "reused_body_reads": 157,
+            "body_payload_bytes_examined_proxy": 61544
+          }
+        }
+      },
+      "overrides": [
+        {
+          "stage": "decision_return_overrun_default_incumbent",
+          "at": 0.11,
+          "root_elapsed_ms": 62.9007
+        }
+      ],
+      "native_setup_before_root_ms": 9.6192,
+      "RPC": {
+        "caller_ms": 36.8765,
+        "worker_compute_ms": 24.0115,
+        "selection": {
+          "status": "conditional_two_choice_selection",
+          "choice": "prefer_2",
+          "candidate_eligible": true
+        },
+        "budget": {
+          "worker_started_ns": 78923720404700,
+          "root_started_ns": 78923693480800,
+          "decision_cutoff_ns": 78923753480800,
+          "root_deadline_ns": 78923793480800,
+          "finalization_reserve_is_WCET": false,
+          "baseline_finished_ns": 78923736543900,
+          "candidate_finished_ns": 78923743160900,
+          "atomic_overrun": false,
+          "candidate_unexecuted": false,
+          "worker_finished_ns": 78923744382400
+        }
+      }
+    },
+    "normal/block1_load0/fixed_default": {
+      "root": {
+        "status": "conditionally_closed",
+        "closed": true,
+        "observed_within_100ms": false,
+        "complete_100ms_certified": false,
+        "warm_ms": 560.2417,
+        "reasons": []
+      },
+      "choice": "native_default",
+      "hop": {
+        "from": 0,
+        "to": 1,
+        "observed_at": 3.1,
+        "evidence": "observed_entry_future_exit",
+        "tray": {
+          "tray_id": "L",
+          "node": 0,
+          "mode": "loaded",
+          "edge_from": 0,
+          "edge_to": 1,
+          "available_at": 0.0,
+          "reception_node": -1,
+          "generation": 1,
+          "traversal_id": 1,
+          "business_bag_id": "loaded",
+          "committed_prefix": [
+            0
+          ],
+          "edge_exit_at": 4.1
+        }
+      },
+      "root_started_ns": 78928777416800,
+      "outside_return_ns": 78929337658500,
+      "warm_partition_ns": {
+        "admission_through_A_collection": 30379000,
+        "collection_through_final_check": 25578200,
+        "postcheck_through_last_event": 436879000,
+        "last_event_to_finalization": 40300,
+        "complete_evidence_build_through_first_encode": 24443700,
+        "strict_roundtrip_hash_ledger_return_tail": 42921500
+      },
+      "warm_partition_ms": {
+        "admission_through_A_collection": 30.379,
+        "collection_through_final_check": 25.5782,
+        "postcheck_through_last_event": 436.879,
+        "last_event_to_finalization": 0.0403,
+        "complete_evidence_build_through_first_encode": 24.4437,
+        "strict_roundtrip_hash_ledger_return_tail": 42.9215
+      },
+      "exclusive_known_and_residual_ms": {
+        "recorded_native_advance_with_response_copy": 2.6415,
+        "original_refresh_with_trace_and_queries": 47.9859,
+        "RPC_attempt_with_validation": 0.0,
+        "unclassified_prefinalization": 442.2491,
+        "complete_finalization": 67.3652
+      },
+      "nested_query_ms": 6.528,
+      "refresh_excluding_query_envelope_ms": 41.4579,
+      "phase_clock_coverage_ms": {
+        "admission_through_A_collection": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.4518,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "collection_through_final_check": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "postcheck_through_last_event": {
+          "recorded_native_advance_with_response_copy": 2.6415,
+          "original_refresh_with_trace_and_queries": 47.5341,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "last_event_to_finalization": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "complete_evidence_build_through_first_encode": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "strict_roundtrip_hash_ledger_return_tail": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        }
+      },
+      "counts": {
+        "events": 172,
+        "advance_calls": 79,
+        "refreshes": 140,
+        "queries": 491,
+        "new_ACK_bodies": 10,
+        "reused_ACK_body_reads": 480
+      },
+      "event_counts": {
+        "collection_boundary": 1,
+        "actual_A_collection": 1,
+        "predeclared_default_control": 1,
+        "final_local_and_receiver_check": 1,
+        "root_observation_gate": 69,
+        "continuation": 10,
+        "mandatory_drain": 10,
+        "post_drain_observation": 10,
+        "root_observation_gate_completion": 69
+      },
+      "event_interarrival_ms_not_function_cost": {
+        "collection_boundary": 4.9185,
+        "actual_A_collection": 25.4605,
+        "predeclared_default_control": 1.0313,
+        "final_local_and_receiver_check": 24.5469,
+        "root_observation_gate": 400.3182,
+        "continuation": 6.3029,
+        "mandatory_drain": 8.1553,
+        "post_drain_observation": 1.6858,
+        "root_observation_gate_completion": 20.4168
+      },
+      "payload": {
+        "complete_bytes": 884291,
+        "top_level_value_bytes": {
+          "schema": 39,
+          "root_id": 35,
+          "state": 33,
+          "owner": 3,
+          "root_started_ns": 14,
+          "root_deadline_ns": 14,
+          "decision_cutoff_ns": 14,
+          "choice": 16,
+          "command_id": 4,
+          "hop": 289,
+          "events": 543053,
+          "participation_contract_sha256": 66,
+          "complete_100ms_certified": 5,
+          "full_business_protection_certified": 5,
+          "scope": 157,
+          "initial_endpoint_records": 116494,
+          "runtime_query_proof": 223748
+        },
+        "runtime_proof_value_bytes": {
+          "schema": 50,
+          "checkpoint": 77,
+          "trace": 175807,
+          "calls": 2746,
+          "creations": 2861,
+          "outbox": 11190,
+          "ack_handling_count": 2,
+          "admission_count": 3,
+          "advance_calls": 30496,
+          "saved_data_grants_native_authority": 5,
+          "first_hop_observation_contract": 315
+        },
+        "trace_value_bytes": {
+          "schema": 40,
+          "reads": 142654,
+          "ack_bodies": 7992,
+          "refreshes": 24922,
+          "invalid": 4,
+          "complete_query_endpoint_not_claimed": 4,
+          "scope": 85
+        },
+        "event_bytes_by_stage": {
+          "collection_boundary": 187,
+          "actual_A_collection": 17377,
+          "predeclared_default_control": 236,
+          "final_local_and_receiver_check": 13945,
+          "root_observation_gate": 179896,
+          "continuation": 137141,
+          "mandatory_drain": 1878,
+          "post_drain_observation": 137706,
+          "root_observation_gate_completion": 54514
+        },
+        "ACK_unique_body_bytes": 7981,
+        "ACK_reused_body_read_bytes_proxy": 522624,
+        "ACK_by_request": {
+          "live:1:A:seed-demand": {
+            "queries": 74,
+            "reused_body_reads": 73,
+            "body_payload_bytes_examined_proxy": 32047
+          },
+          "live:1:A:initial-planning": {
+            "queries": 74,
+            "reused_body_reads": 73,
+            "body_payload_bytes_examined_proxy": 257033
+          },
+          "live:1:B:seed-demand": {
+            "queries": 66,
+            "reused_body_reads": 65,
+            "body_payload_bytes_examined_proxy": 28535
+          },
+          "live:1:B:initial-planning": {
+            "queries": 66,
+            "reused_body_reads": 65,
+            "body_payload_bytes_examined_proxy": 174785
+          },
+          "live:1:B:fixed-initial-supply": {
+            "queries": 66,
+            "reused_body_reads": 64,
+            "body_payload_bytes_examined_proxy": 9280
+          },
+          "live:1:B:supply-recovery-1": {
+            "queries": 53,
+            "reused_body_reads": 52,
+            "body_payload_bytes_examined_proxy": 7488
+          },
+          "live:1:B:supply-recovery-2": {
+            "queries": 41,
+            "reused_body_reads": 40,
+            "body_payload_bytes_examined_proxy": 6320
+          },
+          "live:1:B:supply-recovery-3": {
+            "queries": 29,
+            "reused_body_reads": 28,
+            "body_payload_bytes_examined_proxy": 4424
+          },
+          "live:1:B:supply-recovery-4": {
+            "queries": 17,
+            "reused_body_reads": 16,
+            "body_payload_bytes_examined_proxy": 2080
+          },
+          "live:1:B:supply-recovery-5": {
+            "queries": 5,
+            "reused_body_reads": 4,
+            "body_payload_bytes_examined_proxy": 632
+          }
+        }
+      },
+      "overrides": [],
+      "native_setup_before_root_ms": 7.7545,
+      "RPC": null
+    },
+    "normal/block1_load0/budget_two": {
+      "root": {
+        "status": "conditionally_closed",
+        "closed": true,
+        "observed_within_100ms": false,
+        "complete_100ms_certified": false,
+        "warm_ms": 588.9226,
+        "reasons": []
+      },
+      "choice": "native_default",
+      "hop": {
+        "from": 0,
+        "to": 1,
+        "observed_at": 3.1,
+        "evidence": "observed_entry_future_exit",
+        "tray": {
+          "tray_id": "L",
+          "node": 0,
+          "mode": "loaded",
+          "edge_from": 0,
+          "edge_to": 1,
+          "available_at": 0.0,
+          "reception_node": -1,
+          "generation": 1,
+          "traversal_id": 1,
+          "business_bag_id": "loaded",
+          "committed_prefix": [
+            0
+          ],
+          "edge_exit_at": 4.1
+        }
+      },
+      "root_started_ns": 78934476195600,
+      "outside_return_ns": 78935065118200,
+      "warm_partition_ns": {
+        "admission_through_A_collection": 29798800,
+        "collection_through_final_check": 64161100,
+        "postcheck_through_last_event": 384229000,
+        "last_event_to_finalization": 46500,
+        "complete_evidence_build_through_first_encode": 30375300,
+        "strict_roundtrip_hash_ledger_return_tail": 80311900
+      },
+      "warm_partition_ms": {
+        "admission_through_A_collection": 29.7988,
+        "collection_through_final_check": 64.1611,
+        "postcheck_through_last_event": 384.229,
+        "last_event_to_finalization": 0.0465,
+        "complete_evidence_build_through_first_encode": 30.3753,
+        "strict_roundtrip_hash_ledger_return_tail": 80.3119
+      },
+      "exclusive_known_and_residual_ms": {
+        "recorded_native_advance_with_response_copy": 2.0545,
+        "original_refresh_with_trace_and_queries": 37.4991,
+        "RPC_attempt_with_validation": 40.165,
+        "unclassified_prefinalization": 398.5168,
+        "complete_finalization": 110.6872
+      },
+      "nested_query_ms": 4.8627,
+      "refresh_excluding_query_envelope_ms": 32.6364,
+      "phase_clock_coverage_ms": {
+        "admission_through_A_collection": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.5907,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "collection_through_final_check": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 40.165
+        },
+        "postcheck_through_last_event": {
+          "recorded_native_advance_with_response_copy": 2.0545,
+          "original_refresh_with_trace_and_queries": 36.9084,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "last_event_to_finalization": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "complete_evidence_build_through_first_encode": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "strict_roundtrip_hash_ledger_return_tail": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        }
+      },
+      "counts": {
+        "events": 174,
+        "advance_calls": 79,
+        "refreshes": 140,
+        "queries": 491,
+        "new_ACK_bodies": 10,
+        "reused_ACK_body_reads": 480
+      },
+      "event_counts": {
+        "collection_boundary": 1,
+        "actual_A_collection": 1,
+        "decision_return_overrun_default_incumbent": 1,
+        "two_choice_reply": 1,
+        "RPC_attempt": 1,
+        "final_local_and_receiver_check": 1,
+        "root_observation_gate": 69,
+        "continuation": 10,
+        "mandatory_drain": 10,
+        "post_drain_observation": 10,
+        "root_observation_gate_completion": 69
+      },
+      "event_interarrival_ms_not_function_cost": {
+        "collection_boundary": 4.486,
+        "actual_A_collection": 25.3128,
+        "decision_return_overrun_default_incumbent": 36.9957,
+        "two_choice_reply": 0.0156,
+        "RPC_attempt": 3.8811,
+        "final_local_and_receiver_check": 23.2687,
+        "root_observation_gate": 354.1738,
+        "continuation": 5.4393,
+        "mandatory_drain": 6.766,
+        "post_drain_observation": 1.4167,
+        "root_observation_gate_completion": 16.4332
+      },
+      "payload": {
+        "complete_bytes": 937630,
+        "top_level_value_bytes": {
+          "schema": 39,
+          "root_id": 32,
+          "state": 33,
+          "owner": 3,
+          "root_started_ns": 14,
+          "root_deadline_ns": 14,
+          "decision_cutoff_ns": 14,
+          "choice": 16,
+          "command_id": 4,
+          "hop": 289,
+          "events": 596393,
+          "participation_contract_sha256": 66,
+          "complete_100ms_certified": 5,
+          "full_business_protection_certified": 5,
+          "scope": 157,
+          "initial_endpoint_records": 116494,
+          "runtime_query_proof": 223750
+        },
+        "runtime_proof_value_bytes": {
+          "schema": 50,
+          "checkpoint": 77,
+          "trace": 175807,
+          "calls": 2746,
+          "creations": 2861,
+          "outbox": 11190,
+          "ack_handling_count": 2,
+          "admission_count": 3,
+          "advance_calls": 30498,
+          "saved_data_grants_native_authority": 5,
+          "first_hop_observation_contract": 315
+        },
+        "trace_value_bytes": {
+          "schema": 40,
+          "reads": 142654,
+          "ack_bodies": 7992,
+          "refreshes": 24922,
+          "invalid": 4,
+          "complete_query_endpoint_not_claimed": 4,
+          "scope": 85
+        },
+        "event_bytes_by_stage": {
+          "collection_boundary": 187,
+          "actual_A_collection": 17377,
+          "decision_return_overrun_default_incumbent": 99,
+          "two_choice_reply": 53471,
+          "RPC_attempt": 207,
+          "final_local_and_receiver_check": 13945,
+          "root_observation_gate": 179896,
+          "continuation": 137141,
+          "mandatory_drain": 1880,
+          "post_drain_observation": 137706,
+          "root_observation_gate_completion": 54309
+        },
+        "ACK_unique_body_bytes": 7981,
+        "ACK_reused_body_read_bytes_proxy": 522624,
+        "ACK_by_request": {
+          "live:1:A:seed-demand": {
+            "queries": 74,
+            "reused_body_reads": 73,
+            "body_payload_bytes_examined_proxy": 32047
+          },
+          "live:1:A:initial-planning": {
+            "queries": 74,
+            "reused_body_reads": 73,
+            "body_payload_bytes_examined_proxy": 257033
+          },
+          "live:1:B:seed-demand": {
+            "queries": 66,
+            "reused_body_reads": 65,
+            "body_payload_bytes_examined_proxy": 28535
+          },
+          "live:1:B:initial-planning": {
+            "queries": 66,
+            "reused_body_reads": 65,
+            "body_payload_bytes_examined_proxy": 174785
+          },
+          "live:1:B:fixed-initial-supply": {
+            "queries": 66,
+            "reused_body_reads": 64,
+            "body_payload_bytes_examined_proxy": 9280
+          },
+          "live:1:B:supply-recovery-1": {
+            "queries": 53,
+            "reused_body_reads": 52,
+            "body_payload_bytes_examined_proxy": 7488
+          },
+          "live:1:B:supply-recovery-2": {
+            "queries": 41,
+            "reused_body_reads": 40,
+            "body_payload_bytes_examined_proxy": 6320
+          },
+          "live:1:B:supply-recovery-3": {
+            "queries": 29,
+            "reused_body_reads": 28,
+            "body_payload_bytes_examined_proxy": 4424
+          },
+          "live:1:B:supply-recovery-4": {
+            "queries": 17,
+            "reused_body_reads": 16,
+            "body_payload_bytes_examined_proxy": 2080
+          },
+          "live:1:B:supply-recovery-5": {
+            "queries": 5,
+            "reused_body_reads": 4,
+            "body_payload_bytes_examined_proxy": 632
+          }
+        }
+      },
+      "overrides": [
+        {
+          "stage": "decision_return_overrun_default_incumbent",
+          "at": 0.11,
+          "root_elapsed_ms": 66.7945
+        }
+      ],
+      "native_setup_before_root_ms": 7.1501,
+      "RPC": {
+        "caller_ms": 35.5432,
+        "worker_compute_ms": 23.2703,
+        "selection": {
+          "status": "conditional_two_choice_selection",
+          "choice": "prefer_2",
+          "candidate_eligible": true
+        },
+        "budget": {
+          "worker_started_ns": 78934508077000,
+          "root_started_ns": 78934476195600,
+          "decision_cutoff_ns": 78934536195600,
+          "root_deadline_ns": 78934576195600,
+          "finalization_reserve_is_WCET": false,
+          "baseline_finished_ns": 78934523985700,
+          "candidate_finished_ns": 78934530052500,
+          "atomic_overrun": false,
+          "candidate_unexecuted": false,
+          "worker_finished_ns": 78934531312100
+        }
+      }
+    },
+    "normal/block1_load1/fixed_default": {
+      "root": {
+        "status": "conditionally_closed",
+        "closed": true,
+        "observed_within_100ms": false,
+        "complete_100ms_certified": false,
+        "warm_ms": 580.1105,
+        "reasons": []
+      },
+      "choice": "native_default",
+      "hop": {
+        "from": 0,
+        "to": 1,
+        "observed_at": 3.1,
+        "evidence": "observed_entry_future_exit",
+        "tray": {
+          "tray_id": "L",
+          "node": 0,
+          "mode": "loaded",
+          "edge_from": 0,
+          "edge_to": 1,
+          "available_at": 0.0,
+          "reception_node": -1,
+          "generation": 1,
+          "traversal_id": 1,
+          "business_bag_id": "loaded",
+          "committed_prefix": [
+            0
+          ],
+          "edge_exit_at": 4.1
+        }
+      },
+      "root_started_ns": 78940212753800,
+      "outside_return_ns": 78940792864300,
+      "warm_partition_ns": {
+        "admission_through_A_collection": 29265900,
+        "collection_through_final_check": 26293800,
+        "postcheck_through_last_event": 442129000,
+        "last_event_to_finalization": 44900,
+        "complete_evidence_build_through_first_encode": 37488000,
+        "strict_roundtrip_hash_ledger_return_tail": 44888900
+      },
+      "warm_partition_ms": {
+        "admission_through_A_collection": 29.2659,
+        "collection_through_final_check": 26.2938,
+        "postcheck_through_last_event": 442.129,
+        "last_event_to_finalization": 0.0449,
+        "complete_evidence_build_through_first_encode": 37.488,
+        "strict_roundtrip_hash_ledger_return_tail": 44.8889
+      },
+      "exclusive_known_and_residual_ms": {
+        "recorded_native_advance_with_response_copy": 2.4856,
+        "original_refresh_with_trace_and_queries": 47.6034,
+        "RPC_attempt_with_validation": 0.0,
+        "unclassified_prefinalization": 447.6446,
+        "complete_finalization": 82.3769
+      },
+      "nested_query_ms": 6.5989,
+      "refresh_excluding_query_envelope_ms": 41.0045,
+      "phase_clock_coverage_ms": {
+        "admission_through_A_collection": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.5759,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "collection_through_final_check": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "postcheck_through_last_event": {
+          "recorded_native_advance_with_response_copy": 2.4856,
+          "original_refresh_with_trace_and_queries": 47.0275,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "last_event_to_finalization": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "complete_evidence_build_through_first_encode": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "strict_roundtrip_hash_ledger_return_tail": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        }
+      },
+      "counts": {
+        "events": 172,
+        "advance_calls": 79,
+        "refreshes": 140,
+        "queries": 491,
+        "new_ACK_bodies": 10,
+        "reused_ACK_body_reads": 480
+      },
+      "event_counts": {
+        "collection_boundary": 1,
+        "actual_A_collection": 1,
+        "predeclared_default_control": 1,
+        "final_local_and_receiver_check": 1,
+        "root_observation_gate": 69,
+        "continuation": 10,
+        "mandatory_drain": 10,
+        "post_drain_observation": 10,
+        "root_observation_gate_completion": 69
+      },
+      "event_interarrival_ms_not_function_cost": {
+        "collection_boundary": 4.6292,
+        "actual_A_collection": 24.6367,
+        "predeclared_default_control": 1.0244,
+        "final_local_and_receiver_check": 25.2694,
+        "root_observation_gate": 405.0987,
+        "continuation": 6.3186,
+        "mandatory_drain": 8.3664,
+        "post_drain_observation": 1.9415,
+        "root_observation_gate_completion": 20.4038
+      },
+      "payload": {
+        "complete_bytes": 884291,
+        "top_level_value_bytes": {
+          "schema": 39,
+          "root_id": 35,
+          "state": 33,
+          "owner": 3,
+          "root_started_ns": 14,
+          "root_deadline_ns": 14,
+          "decision_cutoff_ns": 14,
+          "choice": 16,
+          "command_id": 4,
+          "hop": 289,
+          "events": 543053,
+          "participation_contract_sha256": 66,
+          "complete_100ms_certified": 5,
+          "full_business_protection_certified": 5,
+          "scope": 157,
+          "initial_endpoint_records": 116494,
+          "runtime_query_proof": 223748
+        },
+        "runtime_proof_value_bytes": {
+          "schema": 50,
+          "checkpoint": 77,
+          "trace": 175807,
+          "calls": 2746,
+          "creations": 2861,
+          "outbox": 11190,
+          "ack_handling_count": 2,
+          "admission_count": 3,
+          "advance_calls": 30496,
+          "saved_data_grants_native_authority": 5,
+          "first_hop_observation_contract": 315
+        },
+        "trace_value_bytes": {
+          "schema": 40,
+          "reads": 142654,
+          "ack_bodies": 7992,
+          "refreshes": 24922,
+          "invalid": 4,
+          "complete_query_endpoint_not_claimed": 4,
+          "scope": 85
+        },
+        "event_bytes_by_stage": {
+          "collection_boundary": 187,
+          "actual_A_collection": 17377,
+          "predeclared_default_control": 236,
+          "final_local_and_receiver_check": 13945,
+          "root_observation_gate": 179896,
+          "continuation": 137141,
+          "mandatory_drain": 1878,
+          "post_drain_observation": 137706,
+          "root_observation_gate_completion": 54514
+        },
+        "ACK_unique_body_bytes": 7981,
+        "ACK_reused_body_read_bytes_proxy": 522624,
+        "ACK_by_request": {
+          "live:1:A:seed-demand": {
+            "queries": 74,
+            "reused_body_reads": 73,
+            "body_payload_bytes_examined_proxy": 32047
+          },
+          "live:1:A:initial-planning": {
+            "queries": 74,
+            "reused_body_reads": 73,
+            "body_payload_bytes_examined_proxy": 257033
+          },
+          "live:1:B:seed-demand": {
+            "queries": 66,
+            "reused_body_reads": 65,
+            "body_payload_bytes_examined_proxy": 28535
+          },
+          "live:1:B:initial-planning": {
+            "queries": 66,
+            "reused_body_reads": 65,
+            "body_payload_bytes_examined_proxy": 174785
+          },
+          "live:1:B:fixed-initial-supply": {
+            "queries": 66,
+            "reused_body_reads": 64,
+            "body_payload_bytes_examined_proxy": 9280
+          },
+          "live:1:B:supply-recovery-1": {
+            "queries": 53,
+            "reused_body_reads": 52,
+            "body_payload_bytes_examined_proxy": 7488
+          },
+          "live:1:B:supply-recovery-2": {
+            "queries": 41,
+            "reused_body_reads": 40,
+            "body_payload_bytes_examined_proxy": 6320
+          },
+          "live:1:B:supply-recovery-3": {
+            "queries": 29,
+            "reused_body_reads": 28,
+            "body_payload_bytes_examined_proxy": 4424
+          },
+          "live:1:B:supply-recovery-4": {
+            "queries": 17,
+            "reused_body_reads": 16,
+            "body_payload_bytes_examined_proxy": 2080
+          },
+          "live:1:B:supply-recovery-5": {
+            "queries": 5,
+            "reused_body_reads": 4,
+            "body_payload_bytes_examined_proxy": 632
+          }
+        }
+      },
+      "overrides": [],
+      "native_setup_before_root_ms": 7.3325,
+      "RPC": null
+    },
+    "normal/block1_load1/budget_two": {
+      "root": {
+        "status": "conditionally_closed",
+        "closed": true,
+        "observed_within_100ms": false,
+        "complete_100ms_certified": false,
+        "warm_ms": 578.8027,
+        "reasons": []
+      },
+      "choice": "native_default",
+      "hop": {
+        "from": 0,
+        "to": 1,
+        "observed_at": 3.1,
+        "evidence": "observed_entry_future_exit",
+        "tray": {
+          "tray_id": "L",
+          "node": 0,
+          "mode": "loaded",
+          "edge_from": 0,
+          "edge_to": 1,
+          "available_at": 0.0,
+          "reception_node": -1,
+          "generation": 1,
+          "traversal_id": 1,
+          "business_bag_id": "loaded",
+          "committed_prefix": [
+            0
+          ],
+          "edge_exit_at": 4.1
+        }
+      },
+      "root_started_ns": 78945972670900,
+      "outside_return_ns": 78946551473600,
+      "warm_partition_ns": {
+        "admission_through_A_collection": 30290600,
+        "collection_through_final_check": 75555800,
+        "postcheck_through_last_event": 394875200,
+        "last_event_to_finalization": 42300,
+        "complete_evidence_build_through_first_encode": 29448900,
+        "strict_roundtrip_hash_ledger_return_tail": 48589900
+      },
+      "warm_partition_ms": {
+        "admission_through_A_collection": 30.2906,
+        "collection_through_final_check": 75.5558,
+        "postcheck_through_last_event": 394.8752,
+        "last_event_to_finalization": 0.0423,
+        "complete_evidence_build_through_first_encode": 29.4489,
+        "strict_roundtrip_hash_ledger_return_tail": 48.5899
+      },
+      "exclusive_known_and_residual_ms": {
+        "recorded_native_advance_with_response_copy": 2.2173,
+        "original_refresh_with_trace_and_queries": 38.6455,
+        "RPC_attempt_with_validation": 46.2877,
+        "unclassified_prefinalization": 413.6134,
+        "complete_finalization": 78.0388
+      },
+      "nested_query_ms": 5.0532,
+      "refresh_excluding_query_envelope_ms": 33.5923,
+      "phase_clock_coverage_ms": {
+        "admission_through_A_collection": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.584,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "collection_through_final_check": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 46.2877
+        },
+        "postcheck_through_last_event": {
+          "recorded_native_advance_with_response_copy": 2.2173,
+          "original_refresh_with_trace_and_queries": 38.0615,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "last_event_to_finalization": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "complete_evidence_build_through_first_encode": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "strict_roundtrip_hash_ledger_return_tail": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        }
+      },
+      "counts": {
+        "events": 174,
+        "advance_calls": 79,
+        "refreshes": 140,
+        "queries": 491,
+        "new_ACK_bodies": 10,
+        "reused_ACK_body_reads": 480
+      },
+      "event_counts": {
+        "collection_boundary": 1,
+        "actual_A_collection": 1,
+        "decision_return_overrun_default_incumbent": 1,
+        "two_choice_reply": 1,
+        "RPC_attempt": 1,
+        "final_local_and_receiver_check": 1,
+        "root_observation_gate": 69,
+        "continuation": 10,
+        "mandatory_drain": 10,
+        "post_drain_observation": 10,
+        "root_observation_gate_completion": 69
+      },
+      "event_interarrival_ms_not_function_cost": {
+        "collection_boundary": 5.0858,
+        "actual_A_collection": 25.2048,
+        "decision_return_overrun_default_incumbent": 42.7207,
+        "two_choice_reply": 0.028,
+        "RPC_attempt": 4.2468,
+        "final_local_and_receiver_check": 28.5603,
+        "root_observation_gate": 363.8828,
+        "continuation": 5.5281,
+        "mandatory_drain": 7.0493,
+        "post_drain_observation": 1.3917,
+        "root_observation_gate_completion": 17.0233
+      },
+      "payload": {
+        "complete_bytes": 942109,
+        "top_level_value_bytes": {
+          "schema": 39,
+          "root_id": 32,
+          "state": 33,
+          "owner": 3,
+          "root_started_ns": 14,
+          "root_deadline_ns": 14,
+          "decision_cutoff_ns": 14,
+          "choice": 16,
+          "command_id": 4,
+          "hop": 289,
+          "events": 600872,
+          "participation_contract_sha256": 66,
+          "complete_100ms_certified": 5,
+          "full_business_protection_certified": 5,
+          "scope": 157,
+          "initial_endpoint_records": 116494,
+          "runtime_query_proof": 223750
+        },
+        "runtime_proof_value_bytes": {
+          "schema": 50,
+          "checkpoint": 77,
+          "trace": 175807,
+          "calls": 2746,
+          "creations": 2861,
+          "outbox": 11190,
+          "ack_handling_count": 2,
+          "admission_count": 3,
+          "advance_calls": 30498,
+          "saved_data_grants_native_authority": 5,
+          "first_hop_observation_contract": 315
+        },
+        "trace_value_bytes": {
+          "schema": 40,
+          "reads": 142654,
+          "ack_bodies": 7992,
+          "refreshes": 24922,
+          "invalid": 4,
+          "complete_query_endpoint_not_claimed": 4,
+          "scope": 85
+        },
+        "event_bytes_by_stage": {
+          "collection_boundary": 187,
+          "actual_A_collection": 17377,
+          "decision_return_overrun_default_incumbent": 99,
+          "two_choice_reply": 57950,
+          "RPC_attempt": 207,
+          "final_local_and_receiver_check": 13945,
+          "root_observation_gate": 179896,
+          "continuation": 137141,
+          "mandatory_drain": 1880,
+          "post_drain_observation": 137706,
+          "root_observation_gate_completion": 54309
+        },
+        "ACK_unique_body_bytes": 7981,
+        "ACK_reused_body_read_bytes_proxy": 522624,
+        "ACK_by_request": {
+          "live:1:A:seed-demand": {
+            "queries": 74,
+            "reused_body_reads": 73,
+            "body_payload_bytes_examined_proxy": 32047
+          },
+          "live:1:A:initial-planning": {
+            "queries": 74,
+            "reused_body_reads": 73,
+            "body_payload_bytes_examined_proxy": 257033
+          },
+          "live:1:B:seed-demand": {
+            "queries": 66,
+            "reused_body_reads": 65,
+            "body_payload_bytes_examined_proxy": 28535
+          },
+          "live:1:B:initial-planning": {
+            "queries": 66,
+            "reused_body_reads": 65,
+            "body_payload_bytes_examined_proxy": 174785
+          },
+          "live:1:B:fixed-initial-supply": {
+            "queries": 66,
+            "reused_body_reads": 64,
+            "body_payload_bytes_examined_proxy": 9280
+          },
+          "live:1:B:supply-recovery-1": {
+            "queries": 53,
+            "reused_body_reads": 52,
+            "body_payload_bytes_examined_proxy": 7488
+          },
+          "live:1:B:supply-recovery-2": {
+            "queries": 41,
+            "reused_body_reads": 40,
+            "body_payload_bytes_examined_proxy": 6320
+          },
+          "live:1:B:supply-recovery-3": {
+            "queries": 29,
+            "reused_body_reads": 28,
+            "body_payload_bytes_examined_proxy": 4424
+          },
+          "live:1:B:supply-recovery-4": {
+            "queries": 17,
+            "reused_body_reads": 16,
+            "body_payload_bytes_examined_proxy": 2080
+          },
+          "live:1:B:supply-recovery-5": {
+            "queries": 5,
+            "reused_body_reads": 4,
+            "body_payload_bytes_examined_proxy": 632
+          }
+        }
+      },
+      "overrides": [
+        {
+          "stage": "decision_return_overrun_default_incumbent",
+          "at": 0.11,
+          "root_elapsed_ms": 73.0113
+        }
+      ],
+      "native_setup_before_root_ms": 8.649,
+      "RPC": {
+        "caller_ms": 41.1141,
+        "worker_compute_ms": 27.1508,
+        "selection": {
+          "status": "conditional_two_choice_selection",
+          "choice": "prefer_2",
+          "candidate_eligible": true
+        },
+        "budget": {
+          "worker_started_ns": 78946005295200,
+          "root_started_ns": 78945972670900,
+          "decision_cutoff_ns": 78946032670900,
+          "root_deadline_ns": 78946072670900,
+          "finalization_reserve_is_WCET": false,
+          "baseline_finished_ns": 78946025856900,
+          "candidate_finished_ns": 78946031374400,
+          "atomic_overrun": false,
+          "candidate_unexecuted": false,
+          "worker_finished_ns": 78946032420700
+        }
+      }
+    },
+    "normal/block1_load2/fixed_default": {
+      "root": {
+        "status": "conditionally_closed",
+        "closed": true,
+        "observed_within_100ms": false,
+        "complete_100ms_certified": false,
+        "warm_ms": 565.127,
+        "reasons": []
+      },
+      "choice": "native_default",
+      "hop": {
+        "from": 0,
+        "to": 1,
+        "observed_at": 3.1,
+        "evidence": "observed_entry_future_exit",
+        "tray": {
+          "tray_id": "L",
+          "node": 0,
+          "mode": "loaded",
+          "edge_from": 0,
+          "edge_to": 1,
+          "available_at": 0.0,
+          "reception_node": -1,
+          "generation": 1,
+          "traversal_id": 1,
+          "business_bag_id": "loaded",
+          "committed_prefix": [
+            0
+          ],
+          "edge_exit_at": 4.1
+        }
+      },
+      "root_started_ns": 78951730094800,
+      "outside_return_ns": 78952295221800,
+      "warm_partition_ns": {
+        "admission_through_A_collection": 32606700,
+        "collection_through_final_check": 26290700,
+        "postcheck_through_last_event": 393261200,
+        "last_event_to_finalization": 41400,
+        "complete_evidence_build_through_first_encode": 29311200,
+        "strict_roundtrip_hash_ledger_return_tail": 83615800
+      },
+      "warm_partition_ms": {
+        "admission_through_A_collection": 32.6067,
+        "collection_through_final_check": 26.2907,
+        "postcheck_through_last_event": 393.2612,
+        "last_event_to_finalization": 0.0414,
+        "complete_evidence_build_through_first_encode": 29.3112,
+        "strict_roundtrip_hash_ledger_return_tail": 83.6158
+      },
+      "exclusive_known_and_residual_ms": {
+        "recorded_native_advance_with_response_copy": 2.42,
+        "original_refresh_with_trace_and_queries": 41.6752,
+        "RPC_attempt_with_validation": 0.0,
+        "unclassified_prefinalization": 408.1048,
+        "complete_finalization": 112.927
+      },
+      "nested_query_ms": 5.6471,
+      "refresh_excluding_query_envelope_ms": 36.0281,
+      "phase_clock_coverage_ms": {
+        "admission_through_A_collection": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.5645,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "collection_through_final_check": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "postcheck_through_last_event": {
+          "recorded_native_advance_with_response_copy": 2.42,
+          "original_refresh_with_trace_and_queries": 41.1107,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "last_event_to_finalization": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "complete_evidence_build_through_first_encode": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "strict_roundtrip_hash_ledger_return_tail": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        }
+      },
+      "counts": {
+        "events": 172,
+        "advance_calls": 79,
+        "refreshes": 140,
+        "queries": 491,
+        "new_ACK_bodies": 10,
+        "reused_ACK_body_reads": 480
+      },
+      "event_counts": {
+        "collection_boundary": 1,
+        "actual_A_collection": 1,
+        "predeclared_default_control": 1,
+        "final_local_and_receiver_check": 1,
+        "root_observation_gate": 69,
+        "continuation": 10,
+        "mandatory_drain": 10,
+        "post_drain_observation": 10,
+        "root_observation_gate_completion": 69
+      },
+      "event_interarrival_ms_not_function_cost": {
+        "collection_boundary": 5.8105,
+        "actual_A_collection": 26.7962,
+        "predeclared_default_control": 0.772,
+        "final_local_and_receiver_check": 25.5187,
+        "root_observation_gate": 362.2031,
+        "continuation": 5.3913,
+        "mandatory_drain": 6.8833,
+        "post_drain_observation": 1.367,
+        "root_observation_gate_completion": 17.4165
+      },
+      "payload": {
+        "complete_bytes": 884297,
+        "top_level_value_bytes": {
+          "schema": 39,
+          "root_id": 35,
+          "state": 33,
+          "owner": 3,
+          "root_started_ns": 14,
+          "root_deadline_ns": 14,
+          "decision_cutoff_ns": 14,
+          "choice": 16,
+          "command_id": 4,
+          "hop": 289,
+          "events": 543057,
+          "participation_contract_sha256": 66,
+          "complete_100ms_certified": 5,
+          "full_business_protection_certified": 5,
+          "scope": 157,
+          "initial_endpoint_records": 116494,
+          "runtime_query_proof": 223750
+        },
+        "runtime_proof_value_bytes": {
+          "schema": 50,
+          "checkpoint": 77,
+          "trace": 175807,
+          "calls": 2746,
+          "creations": 2861,
+          "outbox": 11190,
+          "ack_handling_count": 2,
+          "admission_count": 3,
+          "advance_calls": 30498,
+          "saved_data_grants_native_authority": 5,
+          "first_hop_observation_contract": 315
+        },
+        "trace_value_bytes": {
+          "schema": 40,
+          "reads": 142654,
+          "ack_bodies": 7992,
+          "refreshes": 24922,
+          "invalid": 4,
+          "complete_query_endpoint_not_claimed": 4,
+          "scope": 85
+        },
+        "event_bytes_by_stage": {
+          "collection_boundary": 187,
+          "actual_A_collection": 17377,
+          "predeclared_default_control": 236,
+          "final_local_and_receiver_check": 13945,
+          "root_observation_gate": 179896,
+          "continuation": 137141,
+          "mandatory_drain": 1880,
+          "post_drain_observation": 137706,
+          "root_observation_gate_completion": 54516
+        },
+        "ACK_unique_body_bytes": 7981,
+        "ACK_reused_body_read_bytes_proxy": 522624,
+        "ACK_by_request": {
+          "live:1:A:seed-demand": {
+            "queries": 74,
+            "reused_body_reads": 73,
+            "body_payload_bytes_examined_proxy": 32047
+          },
+          "live:1:A:initial-planning": {
+            "queries": 74,
+            "reused_body_reads": 73,
+            "body_payload_bytes_examined_proxy": 257033
+          },
+          "live:1:B:seed-demand": {
+            "queries": 66,
+            "reused_body_reads": 65,
+            "body_payload_bytes_examined_proxy": 28535
+          },
+          "live:1:B:initial-planning": {
+            "queries": 66,
+            "reused_body_reads": 65,
+            "body_payload_bytes_examined_proxy": 174785
+          },
+          "live:1:B:fixed-initial-supply": {
+            "queries": 66,
+            "reused_body_reads": 64,
+            "body_payload_bytes_examined_proxy": 9280
+          },
+          "live:1:B:supply-recovery-1": {
+            "queries": 53,
+            "reused_body_reads": 52,
+            "body_payload_bytes_examined_proxy": 7488
+          },
+          "live:1:B:supply-recovery-2": {
+            "queries": 41,
+            "reused_body_reads": 40,
+            "body_payload_bytes_examined_proxy": 6320
+          },
+          "live:1:B:supply-recovery-3": {
+            "queries": 29,
+            "reused_body_reads": 28,
+            "body_payload_bytes_examined_proxy": 4424
+          },
+          "live:1:B:supply-recovery-4": {
+            "queries": 17,
+            "reused_body_reads": 16,
+            "body_payload_bytes_examined_proxy": 2080
+          },
+          "live:1:B:supply-recovery-5": {
+            "queries": 5,
+            "reused_body_reads": 4,
+            "body_payload_bytes_examined_proxy": 632
+          }
+        }
+      },
+      "overrides": [],
+      "native_setup_before_root_ms": 9.095,
+      "RPC": null
+    },
+    "normal/block1_load2/budget_two": {
+      "root": {
+        "status": "conditionally_closed",
+        "closed": true,
+        "observed_within_100ms": false,
+        "complete_100ms_certified": false,
+        "warm_ms": 592.4366,
+        "reasons": []
+      },
+      "choice": "native_default",
+      "hop": {
+        "from": 0,
+        "to": 1,
+        "observed_at": 3.1,
+        "evidence": "observed_entry_future_exit",
+        "tray": {
+          "tray_id": "L",
+          "node": 0,
+          "mode": "loaded",
+          "edge_from": 0,
+          "edge_to": 1,
+          "available_at": 0.0,
+          "reception_node": -1,
+          "generation": 1,
+          "traversal_id": 1,
+          "business_bag_id": "loaded",
+          "committed_prefix": [
+            0
+          ],
+          "edge_exit_at": 4.1
+        }
+      },
+      "root_started_ns": 78957444601300,
+      "outside_return_ns": 78958037037900,
+      "warm_partition_ns": {
+        "admission_through_A_collection": 29390300,
+        "collection_through_final_check": 66412500,
+        "postcheck_through_last_event": 417601400,
+        "last_event_to_finalization": 41600,
+        "complete_evidence_build_through_first_encode": 31782000,
+        "strict_roundtrip_hash_ledger_return_tail": 47208800
+      },
+      "warm_partition_ms": {
+        "admission_through_A_collection": 29.3903,
+        "collection_through_final_check": 66.4125,
+        "postcheck_through_last_event": 417.6014,
+        "last_event_to_finalization": 0.0416,
+        "complete_evidence_build_through_first_encode": 31.782,
+        "strict_roundtrip_hash_ledger_return_tail": 47.2088
+      },
+      "exclusive_known_and_residual_ms": {
+        "recorded_native_advance_with_response_copy": 2.2867,
+        "original_refresh_with_trace_and_queries": 43.1853,
+        "RPC_attempt_with_validation": 37.3748,
+        "unclassified_prefinalization": 430.599,
+        "complete_finalization": 78.9908
+      },
+      "nested_query_ms": 5.6833,
+      "refresh_excluding_query_envelope_ms": 37.502,
+      "phase_clock_coverage_ms": {
+        "admission_through_A_collection": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.5638,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "collection_through_final_check": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 37.3748
+        },
+        "postcheck_through_last_event": {
+          "recorded_native_advance_with_response_copy": 2.2867,
+          "original_refresh_with_trace_and_queries": 42.6215,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "last_event_to_finalization": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "complete_evidence_build_through_first_encode": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "strict_roundtrip_hash_ledger_return_tail": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        }
+      },
+      "counts": {
+        "events": 174,
+        "advance_calls": 79,
+        "refreshes": 140,
+        "queries": 491,
+        "new_ACK_bodies": 10,
+        "reused_ACK_body_reads": 480
+      },
+      "event_counts": {
+        "collection_boundary": 1,
+        "actual_A_collection": 1,
+        "decision_return_overrun_default_incumbent": 1,
+        "two_choice_reply": 1,
+        "RPC_attempt": 1,
+        "final_local_and_receiver_check": 1,
+        "root_observation_gate": 69,
+        "continuation": 10,
+        "mandatory_drain": 10,
+        "post_drain_observation": 10,
+        "root_observation_gate_completion": 69
+      },
+      "event_interarrival_ms_not_function_cost": {
+        "collection_boundary": 5.3578,
+        "actual_A_collection": 24.0325,
+        "decision_return_overrun_default_incumbent": 34.9275,
+        "two_choice_reply": 0.0147,
+        "RPC_attempt": 3.2216,
+        "final_local_and_receiver_check": 28.2487,
+        "root_observation_gate": 383.6709,
+        "continuation": 6.2065,
+        "mandatory_drain": 7.5956,
+        "post_drain_observation": 1.5526,
+        "root_observation_gate_completion": 18.5758
+      },
+      "payload": {
+        "complete_bytes": 937673,
+        "top_level_value_bytes": {
+          "schema": 39,
+          "root_id": 32,
+          "state": 33,
+          "owner": 3,
+          "root_started_ns": 14,
+          "root_deadline_ns": 14,
+          "decision_cutoff_ns": 14,
+          "choice": 16,
+          "command_id": 4,
+          "hop": 289,
+          "events": 596442,
+          "participation_contract_sha256": 66,
+          "complete_100ms_certified": 5,
+          "full_business_protection_certified": 5,
+          "scope": 157,
+          "initial_endpoint_records": 116494,
+          "runtime_query_proof": 223744
+        },
+        "runtime_proof_value_bytes": {
+          "schema": 50,
+          "checkpoint": 77,
+          "trace": 175807,
+          "calls": 2746,
+          "creations": 2861,
+          "outbox": 11190,
+          "ack_handling_count": 2,
+          "admission_count": 3,
+          "advance_calls": 30492,
+          "saved_data_grants_native_authority": 5,
+          "first_hop_observation_contract": 315
+        },
+        "trace_value_bytes": {
+          "schema": 40,
+          "reads": 142654,
+          "ack_bodies": 7992,
+          "refreshes": 24922,
+          "invalid": 4,
+          "complete_query_endpoint_not_claimed": 4,
+          "scope": 85
+        },
+        "event_bytes_by_stage": {
+          "collection_boundary": 187,
+          "actual_A_collection": 17377,
+          "decision_return_overrun_default_incumbent": 99,
+          "two_choice_reply": 53532,
+          "RPC_attempt": 207,
+          "final_local_and_receiver_check": 13945,
+          "root_observation_gate": 179896,
+          "continuation": 137141,
+          "mandatory_drain": 1874,
+          "post_drain_observation": 137706,
+          "root_observation_gate_completion": 54303
+        },
+        "ACK_unique_body_bytes": 7981,
+        "ACK_reused_body_read_bytes_proxy": 522624,
+        "ACK_by_request": {
+          "live:1:A:seed-demand": {
+            "queries": 74,
+            "reused_body_reads": 73,
+            "body_payload_bytes_examined_proxy": 32047
+          },
+          "live:1:A:initial-planning": {
+            "queries": 74,
+            "reused_body_reads": 73,
+            "body_payload_bytes_examined_proxy": 257033
+          },
+          "live:1:B:seed-demand": {
+            "queries": 66,
+            "reused_body_reads": 65,
+            "body_payload_bytes_examined_proxy": 28535
+          },
+          "live:1:B:initial-planning": {
+            "queries": 66,
+            "reused_body_reads": 65,
+            "body_payload_bytes_examined_proxy": 174785
+          },
+          "live:1:B:fixed-initial-supply": {
+            "queries": 66,
+            "reused_body_reads": 64,
+            "body_payload_bytes_examined_proxy": 9280
+          },
+          "live:1:B:supply-recovery-1": {
+            "queries": 53,
+            "reused_body_reads": 52,
+            "body_payload_bytes_examined_proxy": 7488
+          },
+          "live:1:B:supply-recovery-2": {
+            "queries": 41,
+            "reused_body_reads": 40,
+            "body_payload_bytes_examined_proxy": 6320
+          },
+          "live:1:B:supply-recovery-3": {
+            "queries": 29,
+            "reused_body_reads": 28,
+            "body_payload_bytes_examined_proxy": 4424
+          },
+          "live:1:B:supply-recovery-4": {
+            "queries": 17,
+            "reused_body_reads": 16,
+            "body_payload_bytes_examined_proxy": 2080
+          },
+          "live:1:B:supply-recovery-5": {
+            "queries": 5,
+            "reused_body_reads": 4,
+            "body_payload_bytes_examined_proxy": 632
+          }
+        }
+      },
+      "overrides": [
+        {
+          "stage": "decision_return_overrun_default_incumbent",
+          "at": 0.11,
+          "root_elapsed_ms": 64.3178
+        }
+      ],
+      "native_setup_before_root_ms": 8.2156,
+      "RPC": {
+        "caller_ms": 33.4503,
+        "worker_compute_ms": 21.2271,
+        "selection": {
+          "status": "conditional_two_choice_selection",
+          "choice": "prefer_2",
+          "candidate_eligible": true
+        },
+        "budget": {
+          "worker_started_ns": 78957476173200,
+          "root_started_ns": 78957444601300,
+          "decision_cutoff_ns": 78957504601300,
+          "root_deadline_ns": 78957544601300,
+          "finalization_reserve_is_WCET": false,
+          "baseline_finished_ns": 78957490423900,
+          "candidate_finished_ns": 78957496103700,
+          "atomic_overrun": false,
+          "candidate_unexecuted": false,
+          "worker_finished_ns": 78957497362000
+        }
+      }
+    },
+    "initial_ack_drop3/block0_load0/fixed_default": {
+      "root": {
+        "status": "unknown_or_open",
+        "closed": false,
+        "observed_within_100ms": false,
+        "complete_100ms_certified": false,
+        "warm_ms": 725.7572,
+        "reasons": [
+          "endpoint_certificate_incomplete_or_invalid"
+        ]
+      },
+      "choice": null,
+      "hop": null,
+      "root_started_ns": 78963345329000,
+      "outside_return_ns": 78964071086200,
+      "warm_partition_ns": {
+        "admission_through_A_collection": 18000700,
+        "collection_through_final_check": 0,
+        "postcheck_through_last_event": 0,
+        "last_event_to_finalization": 573863200,
+        "complete_evidence_build_through_first_encode": 61333200,
+        "strict_roundtrip_hash_ledger_return_tail": 72560100
+      },
+      "warm_partition_ms": {
+        "admission_through_A_collection": 18.0007,
+        "collection_through_final_check": 0.0,
+        "postcheck_through_last_event": 0.0,
+        "last_event_to_finalization": 573.8632,
+        "complete_evidence_build_through_first_encode": 61.3332,
+        "strict_roundtrip_hash_ledger_return_tail": 72.5601
+      },
+      "exclusive_known_and_residual_ms": {
+        "recorded_native_advance_with_response_copy": 15.2029,
+        "original_refresh_with_trace_and_queries": 394.5013,
+        "RPC_attempt_with_validation": 0.0,
+        "unclassified_prefinalization": 182.1597,
+        "complete_finalization": 133.8933
+      },
+      "nested_query_ms": 46.3165,
+      "refresh_excluding_query_envelope_ms": 348.1848,
+      "phase_clock_coverage_ms": {
+        "admission_through_A_collection": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0307,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "collection_through_final_check": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "postcheck_through_last_event": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "last_event_to_finalization": {
+          "recorded_native_advance_with_response_copy": 15.2029,
+          "original_refresh_with_trace_and_queries": 394.4706,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "complete_evidence_build_through_first_encode": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "strict_roundtrip_hash_ledger_return_tail": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        }
+      },
+      "counts": {
+        "events": 2,
+        "advance_calls": 819,
+        "refreshes": 1639,
+        "queries": 3278,
+        "new_ACK_bodies": 4,
+        "reused_ACK_body_reads": 3128
+      },
+      "event_counts": {
+        "collection_boundary": 1,
+        "actual_A_collection": 1
+      },
+      "event_interarrival_ms_not_function_cost": {
+        "collection_boundary": 5.3032,
+        "actual_A_collection": 12.6975
+      },
+      "payload": {
+        "complete_bytes": 1602810,
+        "top_level_value_bytes": {
+          "schema": 39,
+          "root_id": 46,
+          "state": 20,
+          "owner": 3,
+          "root_started_ns": 14,
+          "root_deadline_ns": 14,
+          "decision_cutoff_ns": 14,
+          "choice": 4,
+          "command_id": 4,
+          "hop": 4,
+          "events": 913,
+          "participation_contract_sha256": 66,
+          "complete_100ms_certified": 5,
+          "full_business_protection_certified": 5,
+          "scope": 157,
+          "initial_endpoint_records": 17611,
+          "runtime_query_proof": 1583589
+        },
+        "runtime_proof_value_bytes": {
+          "schema": 50,
+          "checkpoint": 77,
+          "trace": 1257789,
+          "calls": 4237,
+          "creations": 621,
+          "outbox": 8413,
+          "ack_handling_count": 1,
+          "admission_count": 4,
+          "advance_calls": 311881,
+          "saved_data_grants_native_authority": 5,
+          "first_hop_observation_contract": 315
+        },
+        "trace_value_bytes": {
+          "schema": 40,
+          "reads": 953052,
+          "ack_bodies": 7145,
+          "refreshes": 297353,
+          "invalid": 4,
+          "complete_query_endpoint_not_claimed": 4,
+          "scope": 85
+        },
+        "event_bytes_by_stage": {
+          "collection_boundary": 187,
+          "actual_A_collection": 723
+        },
+        "ACK_unique_body_bytes": 7140,
+        "ACK_reused_body_read_bytes_proxy": 5583480,
+        "ACK_by_request": {
+          "live:1:A:seed-demand": {
+            "queries": 820,
+            "reused_body_reads": 782,
+            "body_payload_bytes_examined_proxy": 353464
+          },
+          "live:1:A:initial-planning": {
+            "queries": 820,
+            "reused_body_reads": 782,
+            "body_payload_bytes_examined_proxy": 2763588
+          },
+          "live:1:B:seed-demand": {
+            "queries": 819,
+            "reused_body_reads": 782,
+            "body_payload_bytes_examined_proxy": 353464
+          },
+          "live:1:B:initial-planning": {
+            "queries": 819,
+            "reused_body_reads": 782,
+            "body_payload_bytes_examined_proxy": 2112964
+          }
+        }
+      },
+      "overrides": [],
+      "native_setup_before_root_ms": 7.2114,
+      "RPC": null
+    },
+    "initial_ack_drop3/block0_load0/budget_two": {
+      "root": {
+        "status": "unknown_or_open",
+        "closed": false,
+        "observed_within_100ms": false,
+        "complete_100ms_certified": false,
+        "warm_ms": 782.7234,
+        "reasons": [
+          "endpoint_certificate_incomplete_or_invalid"
+        ]
+      },
+      "choice": null,
+      "hop": null,
+      "root_started_ns": 78965617841200,
+      "outside_return_ns": 78966400564600,
+      "warm_partition_ns": {
+        "admission_through_A_collection": 17301200,
+        "collection_through_final_check": 0,
+        "postcheck_through_last_event": 0,
+        "last_event_to_finalization": 631126700,
+        "complete_evidence_build_through_first_encode": 52851800,
+        "strict_roundtrip_hash_ledger_return_tail": 81443700
+      },
+      "warm_partition_ms": {
+        "admission_through_A_collection": 17.3012,
+        "collection_through_final_check": 0.0,
+        "postcheck_through_last_event": 0.0,
+        "last_event_to_finalization": 631.1267,
+        "complete_evidence_build_through_first_encode": 52.8518,
+        "strict_roundtrip_hash_ledger_return_tail": 81.4437
+      },
+      "exclusive_known_and_residual_ms": {
+        "recorded_native_advance_with_response_copy": 15.3994,
+        "original_refresh_with_trace_and_queries": 443.0719,
+        "RPC_attempt_with_validation": 0.0,
+        "unclassified_prefinalization": 189.9566,
+        "complete_finalization": 134.2955
+      },
+      "nested_query_ms": 49.133,
+      "refresh_excluding_query_envelope_ms": 393.9389,
+      "phase_clock_coverage_ms": {
+        "admission_through_A_collection": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0415,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "collection_through_final_check": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "postcheck_through_last_event": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "last_event_to_finalization": {
+          "recorded_native_advance_with_response_copy": 15.3994,
+          "original_refresh_with_trace_and_queries": 443.0304,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "complete_evidence_build_through_first_encode": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "strict_roundtrip_hash_ledger_return_tail": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        }
+      },
+      "counts": {
+        "events": 2,
+        "advance_calls": 819,
+        "refreshes": 1639,
+        "queries": 3278,
+        "new_ACK_bodies": 4,
+        "reused_ACK_body_reads": 3128
+      },
+      "event_counts": {
+        "collection_boundary": 1,
+        "actual_A_collection": 1
+      },
+      "event_interarrival_ms_not_function_cost": {
+        "collection_boundary": 5.1108,
+        "actual_A_collection": 12.1904
+      },
+      "payload": {
+        "complete_bytes": 1602807,
+        "top_level_value_bytes": {
+          "schema": 39,
+          "root_id": 43,
+          "state": 20,
+          "owner": 3,
+          "root_started_ns": 14,
+          "root_deadline_ns": 14,
+          "decision_cutoff_ns": 14,
+          "choice": 4,
+          "command_id": 4,
+          "hop": 4,
+          "events": 913,
+          "participation_contract_sha256": 66,
+          "complete_100ms_certified": 5,
+          "full_business_protection_certified": 5,
+          "scope": 157,
+          "initial_endpoint_records": 17611,
+          "runtime_query_proof": 1583589
+        },
+        "runtime_proof_value_bytes": {
+          "schema": 50,
+          "checkpoint": 77,
+          "trace": 1257789,
+          "calls": 4237,
+          "creations": 621,
+          "outbox": 8413,
+          "ack_handling_count": 1,
+          "admission_count": 4,
+          "advance_calls": 311881,
+          "saved_data_grants_native_authority": 5,
+          "first_hop_observation_contract": 315
+        },
+        "trace_value_bytes": {
+          "schema": 40,
+          "reads": 953052,
+          "ack_bodies": 7145,
+          "refreshes": 297353,
+          "invalid": 4,
+          "complete_query_endpoint_not_claimed": 4,
+          "scope": 85
+        },
+        "event_bytes_by_stage": {
+          "collection_boundary": 187,
+          "actual_A_collection": 723
+        },
+        "ACK_unique_body_bytes": 7140,
+        "ACK_reused_body_read_bytes_proxy": 5583480,
+        "ACK_by_request": {
+          "live:1:A:seed-demand": {
+            "queries": 820,
+            "reused_body_reads": 782,
+            "body_payload_bytes_examined_proxy": 353464
+          },
+          "live:1:A:initial-planning": {
+            "queries": 820,
+            "reused_body_reads": 782,
+            "body_payload_bytes_examined_proxy": 2763588
+          },
+          "live:1:B:seed-demand": {
+            "queries": 819,
+            "reused_body_reads": 782,
+            "body_payload_bytes_examined_proxy": 353464
+          },
+          "live:1:B:initial-planning": {
+            "queries": 819,
+            "reused_body_reads": 782,
+            "body_payload_bytes_examined_proxy": 2112964
+          }
+        }
+      },
+      "overrides": [],
+      "native_setup_before_root_ms": 7.331,
+      "RPC": null
+    },
+    "postsubmit_source_outage/block0_load0/fixed_default": {
+      "root": {
+        "status": "conditionally_closed",
+        "closed": true,
+        "observed_within_100ms": false,
+        "complete_100ms_certified": false,
+        "warm_ms": 421.8976,
+        "reasons": []
+      },
+      "choice": "native_default",
+      "hop": {
+        "from": 0,
+        "to": 1,
+        "observed_at": 1.1,
+        "evidence": "observed_entry_future_exit",
+        "tray": {
+          "tray_id": "L",
+          "node": 0,
+          "mode": "loaded",
+          "edge_from": 0,
+          "edge_to": 1,
+          "available_at": 0.0,
+          "reception_node": -1,
+          "generation": 1,
+          "traversal_id": 1,
+          "business_bag_id": "loaded",
+          "committed_prefix": [
+            0
+          ],
+          "edge_exit_at": 2.1
+        }
+      },
+      "root_started_ns": 78967918862800,
+      "outside_return_ns": 78968340760400,
+      "warm_partition_ns": {
+        "admission_through_A_collection": 26449700,
+        "collection_through_final_check": 19861200,
+        "postcheck_through_last_event": 341006400,
+        "last_event_to_finalization": 39200,
+        "complete_evidence_build_through_first_encode": 15331600,
+        "strict_roundtrip_hash_ledger_return_tail": 19209500
+      },
+      "warm_partition_ms": {
+        "admission_through_A_collection": 26.4497,
+        "collection_through_final_check": 19.8612,
+        "postcheck_through_last_event": 341.0064,
+        "last_event_to_finalization": 0.0392,
+        "complete_evidence_build_through_first_encode": 15.3316,
+        "strict_roundtrip_hash_ledger_return_tail": 19.2095
+      },
+      "exclusive_known_and_residual_ms": {
+        "recorded_native_advance_with_response_copy": 0.973,
+        "original_refresh_with_trace_and_queries": 16.1775,
+        "RPC_attempt_with_validation": 0.0,
+        "unclassified_prefinalization": 370.206,
+        "complete_finalization": 34.5411
+      },
+      "nested_query_ms": 2.2395,
+      "refresh_excluding_query_envelope_ms": 13.938,
+      "phase_clock_coverage_ms": {
+        "admission_through_A_collection": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.5776,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "collection_through_final_check": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "postcheck_through_last_event": {
+          "recorded_native_advance_with_response_copy": 0.973,
+          "original_refresh_with_trace_and_queries": 15.5999,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "last_event_to_finalization": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "complete_evidence_build_through_first_encode": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "strict_roundtrip_hash_ledger_return_tail": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        }
+      },
+      "counts": {
+        "events": 68,
+        "advance_calls": 29,
+        "refreshes": 50,
+        "queries": 120,
+        "new_ACK_bodies": 4,
+        "reused_ACK_body_reads": 96
+      },
+      "event_counts": {
+        "collection_boundary": 1,
+        "actual_A_collection": 1,
+        "predeclared_default_control": 1,
+        "final_local_and_receiver_check": 1,
+        "root_observation_gate": 23,
+        "continuation": 6,
+        "mandatory_drain": 6,
+        "post_drain_observation": 6,
+        "root_observation_gate_completion": 23
+      },
+      "event_interarrival_ms_not_function_cost": {
+        "collection_boundary": 5.4822,
+        "actual_A_collection": 20.9675,
+        "predeclared_default_control": 0.7521,
+        "final_local_and_receiver_check": 19.1091,
+        "root_observation_gate": 322.8662,
+        "continuation": 3.9447,
+        "mandatory_drain": 5.0431,
+        "post_drain_observation": 1.148,
+        "root_observation_gate_completion": 8.0044
+      },
+      "payload": {
+        "complete_bytes": 458344,
+        "top_level_value_bytes": {
+          "schema": 39,
+          "root_id": 53,
+          "state": 33,
+          "owner": 3,
+          "root_started_ns": 14,
+          "root_deadline_ns": 14,
+          "decision_cutoff_ns": 14,
+          "choice": 16,
+          "command_id": 4,
+          "hop": 289,
+          "events": 267920,
+          "participation_contract_sha256": 66,
+          "complete_100ms_certified": 5,
+          "full_business_protection_certified": 5,
+          "scope": 157,
+          "initial_endpoint_records": 116494,
+          "runtime_query_proof": 72916
+        },
+        "runtime_proof_value_bytes": {
+          "schema": 50,
+          "checkpoint": 75,
+          "trace": 50301,
+          "calls": 1602,
+          "creations": 859,
+          "outbox": 8652,
+          "ack_handling_count": 1,
+          "admission_count": 2,
+          "advance_calls": 10858,
+          "saved_data_grants_native_authority": 5,
+          "first_hop_observation_contract": 315
+        },
+        "trace_value_bytes": {
+          "schema": 40,
+          "reads": 34277,
+          "ack_bodies": 7093,
+          "refreshes": 8692,
+          "invalid": 4,
+          "complete_query_endpoint_not_claimed": 4,
+          "scope": 85
+        },
+        "event_bytes_by_stage": {
+          "collection_boundary": 187,
+          "actual_A_collection": 17377,
+          "predeclared_default_control": 236,
+          "final_local_and_receiver_check": 13945,
+          "root_observation_gate": 50708,
+          "continuation": 82427,
+          "mandatory_drain": 1104,
+          "post_drain_observation": 82672,
+          "root_observation_gate_completion": 19195
+        },
+        "ACK_unique_body_bytes": 7088,
+        "ACK_reused_body_read_bytes_proxy": 174272,
+        "ACK_by_request": {
+          "live:1:A:seed-demand": {
+            "queries": 30,
+            "reused_body_reads": 29,
+            "body_payload_bytes_examined_proxy": 12731
+          },
+          "live:1:A:initial-planning": {
+            "queries": 30,
+            "reused_body_reads": 29,
+            "body_payload_bytes_examined_proxy": 102109
+          },
+          "live:1:B:seed-demand": {
+            "queries": 20,
+            "reused_body_reads": 19,
+            "body_payload_bytes_examined_proxy": 8341
+          },
+          "live:1:B:initial-planning": {
+            "queries": 20,
+            "reused_body_reads": 19,
+            "body_payload_bytes_examined_proxy": 51091
+          },
+          "live:1:B:fixed-initial-supply": {
+            "queries": 20,
+            "reused_body_reads": 0,
+            "body_payload_bytes_examined_proxy": 0
+          }
+        }
+      },
+      "overrides": [],
+      "native_setup_before_root_ms": 8.7307,
+      "RPC": null
+    },
+    "postsubmit_source_outage/block0_load0/budget_two": {
+      "root": {
+        "status": "conditionally_closed",
+        "closed": true,
+        "observed_within_100ms": false,
+        "complete_100ms_certified": false,
+        "warm_ms": 445.5075,
+        "reasons": []
+      },
+      "choice": "native_default",
+      "hop": {
+        "from": 0,
+        "to": 1,
+        "observed_at": 1.1,
+        "evidence": "observed_entry_future_exit",
+        "tray": {
+          "tray_id": "L",
+          "node": 0,
+          "mode": "loaded",
+          "edge_from": 0,
+          "edge_to": 1,
+          "available_at": 0.0,
+          "reception_node": -1,
+          "generation": 1,
+          "traversal_id": 1,
+          "business_bag_id": "loaded",
+          "committed_prefix": [
+            0
+          ],
+          "edge_exit_at": 2.1
+        }
+      },
+      "root_started_ns": 78972863825100,
+      "outside_return_ns": 78973309332600,
+      "warm_partition_ns": {
+        "admission_through_A_collection": 23446700,
+        "collection_through_final_check": 47944000,
+        "postcheck_through_last_event": 322918200,
+        "last_event_to_finalization": 40500,
+        "complete_evidence_build_through_first_encode": 16085700,
+        "strict_roundtrip_hash_ledger_return_tail": 35072400
+      },
+      "warm_partition_ms": {
+        "admission_through_A_collection": 23.4467,
+        "collection_through_final_check": 47.944,
+        "postcheck_through_last_event": 322.9182,
+        "last_event_to_finalization": 0.0405,
+        "complete_evidence_build_through_first_encode": 16.0857,
+        "strict_roundtrip_hash_ledger_return_tail": 35.0724
+      },
+      "exclusive_known_and_residual_ms": {
+        "recorded_native_advance_with_response_copy": 0.8905,
+        "original_refresh_with_trace_and_queries": 12.9638,
+        "RPC_attempt_with_validation": 24.9938,
+        "unclassified_prefinalization": 355.5013,
+        "complete_finalization": 51.1581
+      },
+      "nested_query_ms": 1.6115,
+      "refresh_excluding_query_envelope_ms": 11.3523,
+      "phase_clock_coverage_ms": {
+        "admission_through_A_collection": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.4834,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "collection_through_final_check": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 24.9938
+        },
+        "postcheck_through_last_event": {
+          "recorded_native_advance_with_response_copy": 0.8905,
+          "original_refresh_with_trace_and_queries": 12.4804,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "last_event_to_finalization": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "complete_evidence_build_through_first_encode": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "strict_roundtrip_hash_ledger_return_tail": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        }
+      },
+      "counts": {
+        "events": 69,
+        "advance_calls": 29,
+        "refreshes": 50,
+        "queries": 120,
+        "new_ACK_bodies": 4,
+        "reused_ACK_body_reads": 96
+      },
+      "event_counts": {
+        "collection_boundary": 1,
+        "actual_A_collection": 1,
+        "two_choice_reply": 1,
+        "RPC_attempt": 1,
+        "final_local_and_receiver_check": 1,
+        "root_observation_gate": 23,
+        "continuation": 6,
+        "mandatory_drain": 6,
+        "post_drain_observation": 6,
+        "root_observation_gate_completion": 23
+      },
+      "event_interarrival_ms_not_function_cost": {
+        "collection_boundary": 4.6362,
+        "actual_A_collection": 18.8105,
+        "two_choice_reply": 23.7029,
+        "RPC_attempt": 1.9921,
+        "final_local_and_receiver_check": 22.249,
+        "root_observation_gate": 308.5194,
+        "continuation": 2.9286,
+        "mandatory_drain": 4.1497,
+        "post_drain_observation": 0.7854,
+        "root_observation_gate_completion": 6.5351
+      },
+      "payload": {
+        "complete_bytes": 495151,
+        "top_level_value_bytes": {
+          "schema": 39,
+          "root_id": 50,
+          "state": 33,
+          "owner": 3,
+          "root_started_ns": 14,
+          "root_deadline_ns": 14,
+          "decision_cutoff_ns": 14,
+          "choice": 16,
+          "command_id": 4,
+          "hop": 289,
+          "events": 304728,
+          "participation_contract_sha256": 66,
+          "complete_100ms_certified": 5,
+          "full_business_protection_certified": 5,
+          "scope": 157,
+          "initial_endpoint_records": 116494,
+          "runtime_query_proof": 72918
+        },
+        "runtime_proof_value_bytes": {
+          "schema": 50,
+          "checkpoint": 75,
+          "trace": 50301,
+          "calls": 1602,
+          "creations": 859,
+          "outbox": 8652,
+          "ack_handling_count": 1,
+          "admission_count": 2,
+          "advance_calls": 10860,
+          "saved_data_grants_native_authority": 5,
+          "first_hop_observation_contract": 315
+        },
+        "trace_value_bytes": {
+          "schema": 40,
+          "reads": 34277,
+          "ack_bodies": 7093,
+          "refreshes": 8692,
+          "invalid": 4,
+          "complete_query_endpoint_not_claimed": 4,
+          "scope": 85
+        },
+        "event_bytes_by_stage": {
+          "collection_boundary": 187,
+          "actual_A_collection": 17377,
+          "two_choice_reply": 36901,
+          "RPC_attempt": 207,
+          "final_local_and_receiver_check": 13945,
+          "root_observation_gate": 50708,
+          "continuation": 82427,
+          "mandatory_drain": 1106,
+          "post_drain_observation": 82672,
+          "root_observation_gate_completion": 19128
+        },
+        "ACK_unique_body_bytes": 7088,
+        "ACK_reused_body_read_bytes_proxy": 174272,
+        "ACK_by_request": {
+          "live:1:A:seed-demand": {
+            "queries": 30,
+            "reused_body_reads": 29,
+            "body_payload_bytes_examined_proxy": 12731
+          },
+          "live:1:A:initial-planning": {
+            "queries": 30,
+            "reused_body_reads": 29,
+            "body_payload_bytes_examined_proxy": 102109
+          },
+          "live:1:B:seed-demand": {
+            "queries": 20,
+            "reused_body_reads": 19,
+            "body_payload_bytes_examined_proxy": 8341
+          },
+          "live:1:B:initial-planning": {
+            "queries": 20,
+            "reused_body_reads": 19,
+            "body_payload_bytes_examined_proxy": 51091
+          },
+          "live:1:B:fixed-initial-supply": {
+            "queries": 20,
+            "reused_body_reads": 0,
+            "body_payload_bytes_examined_proxy": 0
+          }
+        }
+      },
+      "overrides": [],
+      "native_setup_before_root_ms": 6.9235,
+      "RPC": {
+        "caller_ms": 22.3083,
+        "worker_compute_ms": 14.2206,
+        "selection": {
+          "status": "default_incumbent",
+          "choice": "native_default",
+          "candidate_eligible": false
+        },
+        "budget": {
+          "worker_started_ns": 78972889323400,
+          "root_started_ns": 78972863825100,
+          "decision_cutoff_ns": 78972923825100,
+          "root_deadline_ns": 78972963825100,
+          "finalization_reserve_is_WCET": false,
+          "baseline_finished_ns": 78972899406700,
+          "candidate_finished_ns": 78972902652500,
+          "atomic_overrun": false,
+          "candidate_unexecuted": false,
+          "worker_finished_ns": 78972903525700
+        }
+      }
+    },
+    "postsubmit_B_execution_outage/block0_load0/fixed_default": {
+      "root": {
+        "status": "conditionally_closed",
+        "closed": true,
+        "observed_within_100ms": false,
+        "complete_100ms_certified": false,
+        "warm_ms": 414.5762,
+        "reasons": []
+      },
+      "choice": "native_default",
+      "hop": {
+        "from": 0,
+        "to": 1,
+        "observed_at": 1.1,
+        "evidence": "observed_entry_future_exit",
+        "tray": {
+          "tray_id": "L",
+          "node": 0,
+          "mode": "loaded",
+          "edge_from": 0,
+          "edge_to": 1,
+          "available_at": 0.0,
+          "reception_node": -1,
+          "generation": 1,
+          "traversal_id": 1,
+          "business_bag_id": "loaded",
+          "committed_prefix": [
+            0
+          ],
+          "edge_exit_at": 2.1
+        }
+      },
+      "root_started_ns": 78977991961900,
+      "outside_return_ns": 78978406538100,
+      "warm_partition_ns": {
+        "admission_through_A_collection": 25096700,
+        "collection_through_final_check": 23566200,
+        "postcheck_through_last_event": 330203700,
+        "last_event_to_finalization": 41000,
+        "complete_evidence_build_through_first_encode": 15489000,
+        "strict_roundtrip_hash_ledger_return_tail": 20179600
+      },
+      "warm_partition_ms": {
+        "admission_through_A_collection": 25.0967,
+        "collection_through_final_check": 23.5662,
+        "postcheck_through_last_event": 330.2037,
+        "last_event_to_finalization": 0.041,
+        "complete_evidence_build_through_first_encode": 15.489,
+        "strict_roundtrip_hash_ledger_return_tail": 20.1796
+      },
+      "exclusive_known_and_residual_ms": {
+        "recorded_native_advance_with_response_copy": 0.9314,
+        "original_refresh_with_trace_and_queries": 13.7191,
+        "RPC_attempt_with_validation": 0.0,
+        "unclassified_prefinalization": 364.2571,
+        "complete_finalization": 35.6686
+      },
+      "nested_query_ms": 1.7312,
+      "refresh_excluding_query_envelope_ms": 11.9879,
+      "phase_clock_coverage_ms": {
+        "admission_through_A_collection": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.5584,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "collection_through_final_check": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "postcheck_through_last_event": {
+          "recorded_native_advance_with_response_copy": 0.9314,
+          "original_refresh_with_trace_and_queries": 13.1607,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "last_event_to_finalization": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "complete_evidence_build_through_first_encode": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "strict_roundtrip_hash_ledger_return_tail": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        }
+      },
+      "counts": {
+        "events": 68,
+        "advance_calls": 29,
+        "refreshes": 50,
+        "queries": 120,
+        "new_ACK_bodies": 4,
+        "reused_ACK_body_reads": 96
+      },
+      "event_counts": {
+        "collection_boundary": 1,
+        "actual_A_collection": 1,
+        "predeclared_default_control": 1,
+        "final_local_and_receiver_check": 1,
+        "root_observation_gate": 23,
+        "continuation": 6,
+        "mandatory_drain": 6,
+        "post_drain_observation": 6,
+        "root_observation_gate_completion": 23
+      },
+      "event_interarrival_ms_not_function_cost": {
+        "collection_boundary": 5.0174,
+        "actual_A_collection": 20.0793,
+        "predeclared_default_control": 0.8124,
+        "final_local_and_receiver_check": 22.7538,
+        "root_observation_gate": 313.2194,
+        "continuation": 3.4827,
+        "mandatory_drain": 4.7441,
+        "post_drain_observation": 0.9295,
+        "root_observation_gate_completion": 7.828
+      },
+      "payload": {
+        "complete_bytes": 458470,
+        "top_level_value_bytes": {
+          "schema": 39,
+          "root_id": 58,
+          "state": 33,
+          "owner": 3,
+          "root_started_ns": 14,
+          "root_deadline_ns": 14,
+          "decision_cutoff_ns": 14,
+          "choice": 16,
+          "command_id": 4,
+          "hop": 289,
+          "events": 268039,
+          "participation_contract_sha256": 66,
+          "complete_100ms_certified": 5,
+          "full_business_protection_certified": 5,
+          "scope": 157,
+          "initial_endpoint_records": 116494,
+          "runtime_query_proof": 72918
+        },
+        "runtime_proof_value_bytes": {
+          "schema": 50,
+          "checkpoint": 75,
+          "trace": 50301,
+          "calls": 1602,
+          "creations": 859,
+          "outbox": 8652,
+          "ack_handling_count": 1,
+          "admission_count": 2,
+          "advance_calls": 10860,
+          "saved_data_grants_native_authority": 5,
+          "first_hop_observation_contract": 315
+        },
+        "trace_value_bytes": {
+          "schema": 40,
+          "reads": 34277,
+          "ack_bodies": 7093,
+          "refreshes": 8692,
+          "invalid": 4,
+          "complete_query_endpoint_not_claimed": 4,
+          "scope": 85
+        },
+        "event_bytes_by_stage": {
+          "collection_boundary": 187,
+          "actual_A_collection": 17377,
+          "predeclared_default_control": 236,
+          "final_local_and_receiver_check": 13945,
+          "root_observation_gate": 50708,
+          "continuation": 82427,
+          "mandatory_drain": 1106,
+          "post_drain_observation": 82672,
+          "root_observation_gate_completion": 19312
+        },
+        "ACK_unique_body_bytes": 7088,
+        "ACK_reused_body_read_bytes_proxy": 174272,
+        "ACK_by_request": {
+          "live:1:A:seed-demand": {
+            "queries": 30,
+            "reused_body_reads": 29,
+            "body_payload_bytes_examined_proxy": 12731
+          },
+          "live:1:A:initial-planning": {
+            "queries": 30,
+            "reused_body_reads": 29,
+            "body_payload_bytes_examined_proxy": 102109
+          },
+          "live:1:B:seed-demand": {
+            "queries": 20,
+            "reused_body_reads": 19,
+            "body_payload_bytes_examined_proxy": 8341
+          },
+          "live:1:B:initial-planning": {
+            "queries": 20,
+            "reused_body_reads": 19,
+            "body_payload_bytes_examined_proxy": 51091
+          },
+          "live:1:B:fixed-initial-supply": {
+            "queries": 20,
+            "reused_body_reads": 0,
+            "body_payload_bytes_examined_proxy": 0
+          }
+        }
+      },
+      "overrides": [],
+      "native_setup_before_root_ms": 8.8181,
+      "RPC": null
+    },
+    "postsubmit_B_execution_outage/block0_load0/budget_two": {
+      "root": {
+        "status": "conditionally_closed",
+        "closed": true,
+        "observed_within_100ms": false,
+        "complete_100ms_certified": false,
+        "warm_ms": 439.103,
+        "reasons": []
+      },
+      "choice": "native_default",
+      "hop": {
+        "from": 0,
+        "to": 1,
+        "observed_at": 1.1,
+        "evidence": "observed_entry_future_exit",
+        "tray": {
+          "tray_id": "L",
+          "node": 0,
+          "mode": "loaded",
+          "edge_from": 0,
+          "edge_to": 1,
+          "available_at": 0.0,
+          "reception_node": -1,
+          "generation": 1,
+          "traversal_id": 1,
+          "business_bag_id": "loaded",
+          "committed_prefix": [
+            0
+          ],
+          "edge_exit_at": 2.1
+        }
+      },
+      "root_started_ns": 78983082105900,
+      "outside_return_ns": 78983521208900,
+      "warm_partition_ns": {
+        "admission_through_A_collection": 23024600,
+        "collection_through_final_check": 48062000,
+        "postcheck_through_last_event": 332054900,
+        "last_event_to_finalization": 42600,
+        "complete_evidence_build_through_first_encode": 15431000,
+        "strict_roundtrip_hash_ledger_return_tail": 20487900
+      },
+      "warm_partition_ms": {
+        "admission_through_A_collection": 23.0246,
+        "collection_through_final_check": 48.062,
+        "postcheck_through_last_event": 332.0549,
+        "last_event_to_finalization": 0.0426,
+        "complete_evidence_build_through_first_encode": 15.431,
+        "strict_roundtrip_hash_ledger_return_tail": 20.4879
+      },
+      "exclusive_known_and_residual_ms": {
+        "recorded_native_advance_with_response_copy": 0.8827,
+        "original_refresh_with_trace_and_queries": 13.3341,
+        "RPC_attempt_with_validation": 26.6039,
+        "unclassified_prefinalization": 362.3634,
+        "complete_finalization": 35.9189
+      },
+      "nested_query_ms": 1.7159,
+      "refresh_excluding_query_envelope_ms": 11.6182,
+      "phase_clock_coverage_ms": {
+        "admission_through_A_collection": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.4681,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "collection_through_final_check": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 26.6039
+        },
+        "postcheck_through_last_event": {
+          "recorded_native_advance_with_response_copy": 0.8827,
+          "original_refresh_with_trace_and_queries": 12.866,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "last_event_to_finalization": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "complete_evidence_build_through_first_encode": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        },
+        "strict_roundtrip_hash_ledger_return_tail": {
+          "recorded_native_advance_with_response_copy": 0.0,
+          "original_refresh_with_trace_and_queries": 0.0,
+          "RPC_attempt_with_validation": 0.0
+        }
+      },
+      "counts": {
+        "events": 69,
+        "advance_calls": 29,
+        "refreshes": 50,
+        "queries": 120,
+        "new_ACK_bodies": 4,
+        "reused_ACK_body_reads": 96
+      },
+      "event_counts": {
+        "collection_boundary": 1,
+        "actual_A_collection": 1,
+        "two_choice_reply": 1,
+        "RPC_attempt": 1,
+        "final_local_and_receiver_check": 1,
+        "root_observation_gate": 23,
+        "continuation": 6,
+        "mandatory_drain": 6,
+        "post_drain_observation": 6,
+        "root_observation_gate_completion": 23
+      },
+      "event_interarrival_ms_not_function_cost": {
+        "collection_boundary": 5.1465,
+        "actual_A_collection": 17.8781,
+        "two_choice_reply": 25.2869,
+        "RPC_attempt": 2.4705,
+        "final_local_and_receiver_check": 20.3046,
+        "root_observation_gate": 316.4534,
+        "continuation": 3.1818,
+        "mandatory_drain": 4.301,
+        "post_drain_observation": 1.0919,
+        "root_observation_gate_completion": 7.0268
+      },
+      "payload": {
+        "complete_bytes": 495276,
+        "top_level_value_bytes": {
+          "schema": 39,
+          "root_id": 55,
+          "state": 33,
+          "owner": 3,
+          "root_started_ns": 14,
+          "root_deadline_ns": 14,
+          "decision_cutoff_ns": 14,
+          "choice": 16,
+          "command_id": 4,
+          "hop": 289,
+          "events": 304848,
+          "participation_contract_sha256": 66,
+          "complete_100ms_certified": 5,
+          "full_business_protection_certified": 5,
+          "scope": 157,
+          "initial_endpoint_records": 116494,
+          "runtime_query_proof": 72918
+        },
+        "runtime_proof_value_bytes": {
+          "schema": 50,
+          "checkpoint": 75,
+          "trace": 50301,
+          "calls": 1602,
+          "creations": 859,
+          "outbox": 8652,
+          "ack_handling_count": 1,
+          "admission_count": 2,
+          "advance_calls": 10860,
+          "saved_data_grants_native_authority": 5,
+          "first_hop_observation_contract": 315
+        },
+        "trace_value_bytes": {
+          "schema": 40,
+          "reads": 34277,
+          "ack_bodies": 7093,
+          "refreshes": 8692,
+          "invalid": 4,
+          "complete_query_endpoint_not_claimed": 4,
+          "scope": 85
+        },
+        "event_bytes_by_stage": {
+          "collection_boundary": 187,
+          "actual_A_collection": 17377,
+          "two_choice_reply": 36906,
+          "RPC_attempt": 207,
+          "final_local_and_receiver_check": 13945,
+          "root_observation_gate": 50708,
+          "continuation": 82427,
+          "mandatory_drain": 1106,
+          "post_drain_observation": 82672,
+          "root_observation_gate_completion": 19243
+        },
+        "ACK_unique_body_bytes": 7088,
+        "ACK_reused_body_read_bytes_proxy": 174272,
+        "ACK_by_request": {
+          "live:1:A:seed-demand": {
+            "queries": 30,
+            "reused_body_reads": 29,
+            "body_payload_bytes_examined_proxy": 12731
+          },
+          "live:1:A:initial-planning": {
+            "queries": 30,
+            "reused_body_reads": 29,
+            "body_payload_bytes_examined_proxy": 102109
+          },
+          "live:1:B:seed-demand": {
+            "queries": 20,
+            "reused_body_reads": 19,
+            "body_payload_bytes_examined_proxy": 8341
+          },
+          "live:1:B:initial-planning": {
+            "queries": 20,
+            "reused_body_reads": 19,
+            "body_payload_bytes_examined_proxy": 51091
+          },
+          "live:1:B:fixed-initial-supply": {
+            "queries": 20,
+            "reused_body_reads": 0,
+            "body_payload_bytes_examined_proxy": 0
+          }
+        }
+      },
+      "overrides": [],
+      "native_setup_before_root_ms": 7.7899,
+      "RPC": {
+        "caller_ms": 23.0099,
+        "worker_compute_ms": 14.3015,
+        "selection": {
+          "status": "default_incumbent",
+          "choice": "native_default",
+          "candidate_eligible": false
+        },
+        "budget": {
+          "worker_started_ns": 78983107714000,
+          "root_started_ns": 78983082105900,
+          "decision_cutoff_ns": 78983142105900,
+          "root_deadline_ns": 78983182105900,
+          "finalization_reserve_is_WCET": false,
+          "baseline_finished_ns": 78983117882400,
+          "candidate_finished_ns": 78983121119000,
+          "atomic_overrun": false,
+          "candidate_unexecuted": false,
+          "worker_finished_ns": 78983121991800
+        }
+      }
+    }
+  },
+  "summaries": {
+    "all18": {
+      "warm_ms": {
+        "count": 18,
+        "sum": 10967.781,
+        "median": 584.51655,
+        "min": 414.5762,
+        "max": 885.403
+      },
+      "partitions_ms": {
+        "admission_through_A_collection": {
+          "count": 18,
+          "sum": 476.59400000000005,
+          "median": 27.3962,
+          "min": 17.3012,
+          "max": 32.6067
+        },
+        "collection_through_final_check": {
+          "count": 18,
+          "sum": 723.3296,
+          "median": 31.1578,
+          "min": 0.0,
+          "max": 107.8344
+        },
+        "postcheck_through_last_event": {
+          "count": 18,
+          "sum": 6901.9577,
+          "median": 394.0682,
+          "min": 0.0,
+          "max": 611.9102
+        },
+        "last_event_to_finalization": {
+          "count": 18,
+          "sum": 1205.6805,
+          "median": 0.0423,
+          "min": 0.0392,
+          "max": 631.1267
+        },
+        "complete_evidence_build_through_first_encode": {
+          "count": 18,
+          "sum": 652.7384,
+          "median": 31.07865,
+          "min": 15.3316,
+          "max": 88.6672
+        },
+        "strict_roundtrip_hash_ledger_return_tail": {
+          "count": 18,
+          "sum": 1007.4808000000002,
+          "median": 53.475300000000004,
+          "min": 19.2095,
+          "max": 88.5663
+        }
+      },
+      "exclusive_ms": {
+        "recorded_native_advance_with_response_copy": {
+          "count": 18,
+          "sum": 72.3174,
+          "median": 2.4528,
+          "min": 0.8827,
+          "max": 15.3994
+        },
+        "original_refresh_with_trace_and_queries": {
+          "count": 18,
+          "sum": 1610.8527,
+          "median": 45.39435,
+          "min": 12.9638,
+          "max": 443.0719
+        },
+        "RPC_attempt_with_validation": {
+          "count": 18,
+          "sum": 276.8263,
+          "median": 0.0,
+          "min": 0.0,
+          "max": 46.2877
+        },
+        "unclassified_prefinalization": {
+          "count": 18,
+          "sum": 7347.5654,
+          "median": 410.8591,
+          "min": 182.1597,
+          "max": 581.8882
+        },
+        "complete_finalization": {
+          "count": 18,
+          "sum": 1660.2191999999995,
+          "median": 90.082,
+          "min": 34.5411,
+          "max": 166.5177
+        }
+      },
+      "nested_query_ms": {
+        "count": 18,
+        "sum": 198.25920000000002,
+        "median": 6.10565,
+        "min": 1.6115,
+        "max": 49.133
+      },
+      "payload_bytes": {
+        "count": 18,
+        "sum": 19212680,
+        "median": 937651.5,
+        "min": 458344,
+        "max": 1865227
+      },
+      "counts": {
+        "events": 3119,
+        "advance_calls": 3063,
+        "refreshes": 5813,
+        "queries": 14892,
+        "new_ACK_bodies": 131,
+        "reused_ACK_body_reads": 14351
+      }
+    },
+    "closed16": {
+      "warm_ms": {
+        "count": 16,
+        "sum": 9459.3004,
+        "median": 579.4566,
+        "min": 414.5762,
+        "max": 885.403
+      },
+      "partitions_ms": {
+        "admission_through_A_collection": {
+          "count": 16,
+          "sum": 441.29210000000006,
+          "median": 28.40535,
+          "min": 23.0246,
+          "max": 32.6067
+        },
+        "collection_through_final_check": {
+          "count": 16,
+          "sum": 723.3296,
+          "median": 41.9829,
+          "min": 19.8612,
+          "max": 107.8344
+        },
+        "postcheck_through_last_event": {
+          "count": 16,
+          "sum": 6901.9577,
+          "median": 406.2383,
+          "min": 322.9182,
+          "max": 611.9102
+        },
+        "last_event_to_finalization": {
+          "count": 16,
+          "sum": 0.6906,
+          "median": 0.04195,
+          "min": 0.0392,
+          "max": 0.0564
+        },
+        "complete_evidence_build_through_first_encode": {
+          "count": 16,
+          "sum": 538.5533999999999,
+          "median": 29.9121,
+          "min": 15.3316,
+          "max": 88.6672
+        },
+        "strict_roundtrip_hash_ledger_return_tail": {
+          "count": 16,
+          "sum": 853.4770000000001,
+          "median": 47.89935,
+          "min": 19.2095,
+          "max": 88.5663
+        }
+      },
+      "exclusive_ms": {
+        "recorded_native_advance_with_response_copy": {
+          "count": 16,
+          "sum": 41.71510000000001,
+          "median": 2.35335,
+          "min": 0.8827,
+          "max": 5.3883
+        },
+        "original_refresh_with_trace_and_queries": {
+          "count": 16,
+          "sum": 773.2795,
+          "median": 42.43025,
+          "min": 12.9638,
+          "max": 115.2292
+        },
+        "RPC_attempt_with_validation": {
+          "count": 16,
+          "sum": 276.8263,
+          "median": 12.4969,
+          "min": 0.0,
+          "max": 46.2877
+        },
+        "unclassified_prefinalization": {
+          "count": 16,
+          "sum": 6975.4491,
+          "median": 422.1062,
+          "min": 355.5013,
+          "max": 581.8882
+        },
+        "complete_finalization": {
+          "count": 16,
+          "sum": 1392.0303999999996,
+          "median": 80.68385,
+          "min": 34.5411,
+          "max": 166.5177
+        }
+      },
+      "nested_query_ms": {
+        "count": 16,
+        "sum": 102.80970000000002,
+        "median": 5.6652000000000005,
+        "min": 1.6115,
+        "max": 15.8287
+      },
+      "payload_bytes": {
+        "count": 16,
+        "sum": 16007063,
+        "median": 910963.5,
+        "min": 458344,
+        "max": 1865227
+      },
+      "counts": {
+        "events": 3115,
+        "advance_calls": 1425,
+        "refreshes": 2535,
+        "queries": 8336,
+        "new_ACK_bodies": 123,
+        "reused_ACK_body_reads": 8095
+      }
+    },
+    "default_closed": {
+      "warm_ms": {
+        "count": 8,
+        "sum": 4802.0479,
+        "median": 572.61875,
+        "min": 414.5762,
+        "max": 810.443
+      },
+      "partitions_ms": {
+        "admission_through_A_collection": {
+          "count": 8,
+          "sum": 226.20850000000002,
+          "median": 28.804299999999998,
+          "min": 24.7679,
+          "max": 32.6067
+        },
+        "collection_through_final_check": {
+          "count": 8,
+          "sum": 205.0099,
+          "median": 25.32555,
+          "min": 19.8612,
+          "max": 36.0218
+        },
+        "postcheck_through_last_event": {
+          "count": 8,
+          "sum": 3652.8115,
+          "median": 439.504,
+          "min": 330.2037,
+          "max": 579.5196
+        },
+        "last_event_to_finalization": {
+          "count": 8,
+          "sum": 0.3374,
+          "median": 0.0413,
+          "min": 0.0392,
+          "max": 0.0465
+        },
+        "complete_evidence_build_through_first_encode": {
+          "count": 8,
+          "sum": 294.0494,
+          "median": 33.3996,
+          "min": 15.3316,
+          "max": 88.6672
+        },
+        "strict_roundtrip_hash_ledger_return_tail": {
+          "count": 8,
+          "sum": 423.6312,
+          "median": 51.6248,
+          "min": 19.2095,
+          "max": 83.6158
+        }
+      },
+      "exclusive_ms": {
+        "recorded_native_advance_with_response_copy": {
+          "count": 8,
+          "sum": 23.214300000000005,
+          "median": 2.56355,
+          "min": 0.9314,
+          "max": 5.1481
+        },
+        "original_refresh_with_trace_and_queries": {
+          "count": 8,
+          "sum": 432.4271000000001,
+          "median": 47.794650000000004,
+          "min": 13.7191,
+          "max": 106.8652
+        },
+        "RPC_attempt_with_validation": {
+          "count": 8,
+          "sum": 0.0,
+          "median": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        },
+        "unclassified_prefinalization": {
+          "count": 8,
+          "sum": 3628.7259,
+          "median": 444.94685000000004,
+          "min": 364.2571,
+          "max": 539.4317
+        },
+        "complete_finalization": {
+          "count": 8,
+          "sum": 717.6806,
+          "median": 90.082,
+          "min": 34.5411,
+          "max": 166.5177
+        }
+      },
+      "nested_query_ms": {
+        "count": 8,
+        "sum": 57.5113,
+        "median": 6.56345,
+        "min": 1.7312,
+        "max": 13.6903
+      },
+      "payload_bytes": {
+        "count": 8,
+        "sum": 8271839,
+        "median": 884294.0,
+        "min": 458344,
+        "max": 1813850
+      },
+      "counts": {
+        "events": 1675,
+        "advance_calls": 772,
+        "refreshes": 1378,
+        "queries": 4533,
+        "new_ACK_bodies": 62,
+        "reused_ACK_body_reads": 4413
+      }
+    },
+    "budget_closed": {
+      "warm_ms": {
+        "count": 8,
+        "sum": 4657.2525,
+        "median": 583.86265,
+        "min": 439.103,
+        "max": 885.403
+      },
+      "partitions_ms": {
+        "admission_through_A_collection": {
+          "count": 8,
+          "sum": 215.0836,
+          "median": 27.4052,
+          "min": 23.0246,
+          "max": 30.2906
+        },
+        "collection_through_final_check": {
+          "count": 8,
+          "sum": 518.3197,
+          "median": 61.03085,
+          "min": 47.944,
+          "max": 107.8344
+        },
+        "postcheck_through_last_event": {
+          "count": 8,
+          "sum": 3249.1462,
+          "median": 389.5521,
+          "min": 322.9182,
+          "max": 611.9102
+        },
+        "last_event_to_finalization": {
+          "count": 8,
+          "sum": 0.35319999999999996,
+          "median": 0.0423,
+          "min": 0.0405,
+          "max": 0.0564
+        },
+        "complete_evidence_build_through_first_encode": {
+          "count": 8,
+          "sum": 244.50400000000005,
+          "median": 29.9121,
+          "min": 15.431,
+          "max": 52.7289
+        },
+        "strict_roundtrip_hash_ledger_return_tail": {
+          "count": 8,
+          "sum": 429.8458,
+          "median": 47.89935,
+          "min": 20.4879,
+          "max": 88.5663
+        }
+      },
+      "exclusive_ms": {
+        "recorded_native_advance_with_response_copy": {
+          "count": 8,
+          "sum": 18.5008,
+          "median": 2.1359,
+          "min": 0.8827,
+          "max": 5.3883
+        },
+        "original_refresh_with_trace_and_queries": {
+          "count": 8,
+          "sum": 340.85239999999993,
+          "median": 38.0723,
+          "min": 12.9638,
+          "max": 115.2292
+        },
+        "RPC_attempt_with_validation": {
+          "count": 8,
+          "sum": 276.8263,
+          "median": 35.1709,
+          "min": 24.9938,
+          "max": 46.2877
+        },
+        "unclassified_prefinalization": {
+          "count": 8,
+          "sum": 3346.7232000000004,
+          "median": 406.06510000000003,
+          "min": 355.5013,
+          "max": 581.8882
+        },
+        "complete_finalization": {
+          "count": 8,
+          "sum": 674.3498000000001,
+          "median": 78.5148,
+          "min": 35.9189,
+          "max": 141.2952
+        }
+      },
+      "nested_query_ms": {
+        "count": 8,
+        "sum": 45.2984,
+        "median": 4.95795,
+        "min": 1.6115,
+        "max": 15.8287
+      },
+      "payload_bytes": {
+        "count": 8,
+        "sum": 7735224,
+        "median": 937651.5,
+        "min": 495151,
+        "max": 1865227
+      },
+      "counts": {
+        "events": 1440,
+        "advance_calls": 653,
+        "refreshes": 1157,
+        "queries": 3803,
+        "new_ACK_bodies": 61,
+        "reused_ACK_body_reads": 3682
+      }
+    },
+    "unknown2": {
+      "warm_ms": {
+        "count": 2,
+        "sum": 1508.4805999999999,
+        "median": 754.2402999999999,
+        "min": 725.7572,
+        "max": 782.7234
+      },
+      "partitions_ms": {
+        "admission_through_A_collection": {
+          "count": 2,
+          "sum": 35.3019,
+          "median": 17.65095,
+          "min": 17.3012,
+          "max": 18.0007
+        },
+        "collection_through_final_check": {
+          "count": 2,
+          "sum": 0.0,
+          "median": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        },
+        "postcheck_through_last_event": {
+          "count": 2,
+          "sum": 0.0,
+          "median": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        },
+        "last_event_to_finalization": {
+          "count": 2,
+          "sum": 1204.9899,
+          "median": 602.49495,
+          "min": 573.8632,
+          "max": 631.1267
+        },
+        "complete_evidence_build_through_first_encode": {
+          "count": 2,
+          "sum": 114.185,
+          "median": 57.0925,
+          "min": 52.8518,
+          "max": 61.3332
+        },
+        "strict_roundtrip_hash_ledger_return_tail": {
+          "count": 2,
+          "sum": 154.0038,
+          "median": 77.0019,
+          "min": 72.5601,
+          "max": 81.4437
+        }
+      },
+      "exclusive_ms": {
+        "recorded_native_advance_with_response_copy": {
+          "count": 2,
+          "sum": 30.6023,
+          "median": 15.30115,
+          "min": 15.2029,
+          "max": 15.3994
+        },
+        "original_refresh_with_trace_and_queries": {
+          "count": 2,
+          "sum": 837.5732,
+          "median": 418.7866,
+          "min": 394.5013,
+          "max": 443.0719
+        },
+        "RPC_attempt_with_validation": {
+          "count": 2,
+          "sum": 0.0,
+          "median": 0.0,
+          "min": 0.0,
+          "max": 0.0
+        },
+        "unclassified_prefinalization": {
+          "count": 2,
+          "sum": 372.1163,
+          "median": 186.05815,
+          "min": 182.1597,
+          "max": 189.9566
+        },
+        "complete_finalization": {
+          "count": 2,
+          "sum": 268.1888,
+          "median": 134.0944,
+          "min": 133.8933,
+          "max": 134.2955
+        }
+      },
+      "nested_query_ms": {
+        "count": 2,
+        "sum": 95.4495,
+        "median": 47.72475,
+        "min": 46.3165,
+        "max": 49.133
+      },
+      "payload_bytes": {
+        "count": 2,
+        "sum": 3205617,
+        "median": 1602808.5,
+        "min": 1602807,
+        "max": 1602810
+      },
+      "counts": {
+        "events": 4,
+        "advance_calls": 1638,
+        "refreshes": 3278,
+        "queries": 6556,
+        "new_ACK_bodies": 8,
+        "reused_ACK_body_reads": 6256
+      }
+    }
+  },
+  "raw_inputs_read_once": {
+    "normal/block0_load0/fixed_default": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\single_owned_C18_prepare_002\\raw\\normal\\block0_load0\\fixed_default.json.gz",
+      "sha256": "d985664fe8079b6ab1ed84682482b7dbe1d8122c1bb8bbb024ee8d775aa31a3f",
+      "compressed_bytes": 707478,
+      "decoded_bytes": 7472452
+    },
+    "normal/block0_load0/budget_two": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\single_owned_C18_prepare_002\\raw\\normal\\block0_load0\\budget_two.json.gz",
+      "sha256": "f0ce24668452fd1f97e7c9bd2ae4150cc6dd0e05805c92e642f3a3f81e8d0614",
+      "compressed_bytes": 712916,
+      "decoded_bytes": 7512701
+    },
+    "normal/block0_load1/fixed_default": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\single_owned_C18_prepare_002\\raw\\normal\\block0_load1\\fixed_default.json.gz",
+      "sha256": "ec3505c46fce5fdd1582c851feded18a2a88c8ca9595515752083146bfe07128",
+      "compressed_bytes": 716541,
+      "decoded_bytes": 7608510
+    },
+    "normal/block0_load1/budget_two": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\single_owned_C18_prepare_002\\raw\\normal\\block0_load1\\budget_two.json.gz",
+      "sha256": "ea1f9ff909670e0feb1011bbd5f1ec0df6d01dc65296d4fb58e0d28aca8f4d46",
+      "compressed_bytes": 685046,
+      "decoded_bytes": 7207826
+    },
+    "normal/block0_load2/fixed_default": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\single_owned_C18_prepare_002\\raw\\normal\\block0_load2\\fixed_default.json.gz",
+      "sha256": "4cb85fc2a8f99d439f75cd8075d052c79b9e3c827705eed40d1fe958be505d4b",
+      "compressed_bytes": 725204,
+      "decoded_bytes": 7747332
+    },
+    "normal/block0_load2/budget_two": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\single_owned_C18_prepare_002\\raw\\normal\\block0_load2\\budget_two.json.gz",
+      "sha256": "8325a91564d272a27486a546be8db86e8fa6cda3b928ba82eadd2b4a1dcd44f7",
+      "compressed_bytes": 734668,
+      "decoded_bytes": 7803907
+    },
+    "normal/block1_load0/fixed_default": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\single_owned_C18_prepare_002\\raw\\normal\\block1_load0\\fixed_default.json.gz",
+      "sha256": "441a83aeee476b4b759fd8aa5e648a471e4d81dff01bf4dc7103031648c1937a",
+      "compressed_bytes": 818723,
+      "decoded_bytes": 8923498
+    },
+    "normal/block1_load0/budget_two": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\single_owned_C18_prepare_002\\raw\\normal\\block1_load0\\budget_two.json.gz",
+      "sha256": "9c7d2d774653e2b2712c33758e5cc8257a4a9269da778c4021a376032d1b26b8",
+      "compressed_bytes": 826443,
+      "decoded_bytes": 8982492
+    },
+    "normal/block1_load1/fixed_default": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\single_owned_C18_prepare_002\\raw\\normal\\block1_load1\\fixed_default.json.gz",
+      "sha256": "8aaeaa12b29d4a773d14b6a912537bb96b53c0391a5e3422d85eb581fba34e28",
+      "compressed_bytes": 818796,
+      "decoded_bytes": 8923971
+    },
+    "normal/block1_load1/budget_two": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\single_owned_C18_prepare_002\\raw\\normal\\block1_load1\\budget_two.json.gz",
+      "sha256": "87d0fe6d742aeab2527363fdec9e9be8587cb3d8388fdba04b8b3695dd1f1952",
+      "compressed_bytes": 828000,
+      "decoded_bytes": 8987823
+    },
+    "normal/block1_load2/fixed_default": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\single_owned_C18_prepare_002\\raw\\normal\\block1_load2\\fixed_default.json.gz",
+      "sha256": "1a52866cdacde7bfddefedb47ca5232796e784fbc33e16fda09b1c7fc2f83b70",
+      "compressed_bytes": 817879,
+      "decoded_bytes": 8916955
+    },
+    "normal/block1_load2/budget_two": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\single_owned_C18_prepare_002\\raw\\normal\\block1_load2\\budget_two.json.gz",
+      "sha256": "5dab59ca2495540e05924b2bf7c5aed327175eafed40822d6ddd54b96a45314d",
+      "compressed_bytes": 825760,
+      "decoded_bytes": 8975974
+    },
+    "initial_ack_drop3/block0_load0/fixed_default": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\single_owned_C18_prepare_002\\raw\\initial_ack_drop3\\block0_load0\\fixed_default.json.gz",
+      "sha256": "eb02785c75566567d4188520134eed64a4c361508c3707d2ccde1a8d3e6ea8db",
+      "compressed_bytes": 385549,
+      "decoded_bytes": 4084644
+    },
+    "initial_ack_drop3/block0_load0/budget_two": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\single_owned_C18_prepare_002\\raw\\initial_ack_drop3\\block0_load0\\budget_two.json.gz",
+      "sha256": "9207699d12830405be4a8bbd74ceeed3c73977dd0d3880a33a2139687c8a0fda",
+      "compressed_bytes": 385820,
+      "decoded_bytes": 4084621
+    },
+    "postsubmit_source_outage/block0_load0/fixed_default": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\single_owned_C18_prepare_002\\raw\\postsubmit_source_outage\\block0_load0\\fixed_default.json.gz",
+      "sha256": "21f3df37ce96ebcdda2f3d0941274876045dd8f1bea61ecf61d2a0bab41c3cb8",
+      "compressed_bytes": 634514,
+      "decoded_bytes": 6706210
+    },
+    "postsubmit_source_outage/block0_load0/budget_two": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\single_owned_C18_prepare_002\\raw\\postsubmit_source_outage\\block0_load0\\budget_two.json.gz",
+      "sha256": "1663b03abaf72d43b4699bbcc903f53a12024580d24f9a1849c375ec5bbe5a99",
+      "compressed_bytes": 639216,
+      "decoded_bytes": 6746932
+    },
+    "postsubmit_B_execution_outage/block0_load0/fixed_default": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\single_owned_C18_prepare_002\\raw\\postsubmit_B_execution_outage\\block0_load0\\fixed_default.json.gz",
+      "sha256": "ddc62658dad7b7e7a7cabd103439430a30ea582942789d473e8d395fe150d4e5",
+      "compressed_bytes": 634567,
+      "decoded_bytes": 6706488
+    },
+    "postsubmit_B_execution_outage/block0_load0/budget_two": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\single_owned_C18_prepare_002\\raw\\postsubmit_B_execution_outage\\block0_load0\\budget_two.json.gz",
+      "sha256": "4a2a982b90266ee70d8278d5d445cc06f47a10dd69b4390a3d2af326280ba2be",
+      "compressed_bytes": 640263,
+      "decoded_bytes": 6747207
+    }
+  },
+  "source_pins": {
+    "initial_owner_route_request.py": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\initial_owner_route_request.py",
+      "sha256": "6d57c6d3d9b9ba679d05208cba5f696e8cb73db7fcd99a4f6f274f183ee0990c"
+    },
+    "initial_owner_route_campaign.py": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\initial_owner_route_campaign.py",
+      "sha256": "b2a1e742937ad889d765c8a9eeec0dadbf6b237a9557fbcdb73df616dc3bcfd1"
+    },
+    "initial_owner_route_gated_evidence_v2.py": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\initial_owner_route_gated_evidence_v2.py",
+      "sha256": "916822d38b15dd06d40f9b96bf5340eb2ec68a9f5866d1644608d64aca6989a1"
+    },
+    "initial_owner_route_outbox_trace.py": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\initial_owner_route_outbox_trace.py",
+      "sha256": "8d23150332528b7caaec7b527b7db6972a8496dc8c75313de7e63c6db3c65f39"
+    },
+    "initial_owner_route_outbox_trace_v2.py": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\initial_owner_route_outbox_trace_v2.py",
+      "sha256": "61ccd609c3ef5ee7c9f86a31ec58151b3ea8702f1fae23c6ce3556f07e0671b5"
+    },
+    "initial_owner_route_gate_adapter.py": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\initial_owner_route_gate_adapter.py",
+      "sha256": "02aff6252d4b8051405aa153016b2cbf4477c55600b7a5ff34e23865ed8bd106"
+    },
+    "research_native_preexisting_v3_bound.py": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_native_preexisting_v3_bound.py",
+      "sha256": "f04d9aec586a73500dc79a185571994f2e4b0866c2f43ac9e8674255f7d1c6ca"
+    },
+    "complete_root_evidence_owned_decode_v2.py": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\complete_root_evidence_owned_decode_v2.py",
+      "sha256": "af582029cf0a42ac870858fb22325353d71c9750210fbd8a7f82258a98546102"
+    },
+    "single_root_evidence.py": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\single_root_evidence.py",
+      "sha256": "e5f925b7e97ed4def3352778b29bb9fa99458939e4528b796fccd2bbca546a0e"
+    },
+    "complete_root_evidence_codec.py": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\complete_root_evidence_codec.py",
+      "sha256": "7e05b5c16ac305ba13024c9787306f5f7ced7b349c938a8c544ab022696fd3cb"
+    },
+    "initial_owner_route_single_capture_owned_codec.py": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\initial_owner_route_single_capture_owned_codec.py",
+      "sha256": "6f1a7e46ed74aa4a44fc4a02951fa63dd135cc444a116853d7061c01e27eebb2"
+    }
+  },
+  "reader": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\analyze_single_owned_C18_cost_v2.py",
+    "sha256": "1219b5e961fae554683f921429ea6c00be99f949aa18c19099fb98e989cde987"
+  },
+  "interval_semantics": {
+    "partition": "Six adjacent integer-clock intervals sum exactly to full root. Medians of columns need not sum to median root.",
+    "event_clock": "_record timestamps before its deepcopy; event-to-event spans include prior record copying and intervening work, not isolated stage functions.",
+    "exclusive": "Recorded advance, refresh, and RPC-attempt intervals verified disjoint; prefinal remainder is not attributed to a function.",
+    "query": "Actual query envelopes are nested inside refresh and MUST NOT be added to refresh; refresh remainder includes ACK comparison, strict_same, copies, trace bookkeeping and retry dispatch with no finer clock.",
+    "advance": "Starts after argument snapshot; includes native call and response deepcopy. Not isolated native computation.",
+    "finalization": "Build-to-first-encode includes runtime proof/C-or-fallback normalize/first encode. Tail includes strict parse/reencode, hash, ledger encode, append/return. No exact split inside either interval.",
+    "payload": "Byte sizes/counts are structure proxies, not time or C-direct-support evidence."
+  },
+  "cold": {
+    "C_provider": {
+      "status": "passed_actual_provider_identity_with_unmeasured_fallback",
+      "setup_ms": 4691.7507,
+      "close_identity_ms": 4210.2906,
+      "actual_direct_C_supported": null,
+      "actual_fallback_count": null,
+      "provider_includes_original_fallback": true,
+      "extension_unload_certified": false,
+      "scope": "Cold provider setup/identity close belong to full campaign; root publication remains fully timed."
+    },
+    "RPC_startup_ms": 876.9131,
+    "RPC_cleanup_ms": 318.9342,
+    "scope": "Cold setup, 3 full file checks, native branch setup, whole40 continuation, export and saved audit remain separately charged; none is amortized out of full campaign."
+  },
+  "no_new_native_model_C_profile": true,
+  "full_saved_verifier_rerun": false,
+  "GC": "Default process GC remains enabled; no sample-local cycle reclamation claim.",
+  "elapsed_before_export_ms": 3121.0511
+}

@@ -1,0 +1,49 @@
+{
+  "schema": "g31.user_resume_process_observation.v1",
+  "observed_utc": "2026-10-15T01:58:17.6566870Z",
+  "authorization": "User requested comprehensive resume after pause",
+  "all_original_identities_absent": true,
+  "processes": [
+    {
+      "expected": {
+        "ProcessId": 40460,
+        "ParentProcessId": 58908,
+        "CreationDate": "2026-10-14T21:05:51.550724+08:00",
+        "CommandLine": "\"C:\\PROGRAMING\\python3.11.9\\python.exe\" -m scripts.experiments.g31_ics_circulation.resume_full_day --cut-manifest outputs/experiments/g31_ics_lt2_sustained_20261014/full024_resume_cut_001/cut_manifest.json --expected-cut-sha256 e3a46a03057dba68c1d9d6f08cb5b2329d076afa605e90fa8e9b9cc37daaa0c5 --stop-receipt outputs/experiments/g31_ics_lt2_sustained_20261014/full024_resume_cut_001/source_stop_receipt.json --expected-stop-sha256 a6a8bfdcbbb24fd41761c16a6e3cf082fe675087e7e037743378224a080ea7fb --binary build_lt_session_024/python/czr005_circulation.cp311-win_amd64.pyd --suite full1x --horizon 86400 --event-budget 1000000 --hard-timeout 7200 --output outputs/experiments/g31_ics_lt2_sustained_20261014/full024_resume_native_001"
+      },
+      "observed": null,
+      "old_identity_present": false
+    },
+    {
+      "expected": {
+        "ProcessId": 28768,
+        "ParentProcessId": 30692,
+        "CreationDate": "2026-10-14T21:27:31.034667+08:00",
+        "CommandLine": "\"C:\\PROGRAMING\\python3.11.9\\python.exe\" -m scripts.experiments.g31_ics_circulation.full_day_sparse_pool --binary build_lt_session_024/python/czr005_circulation.cp311-win_amd64.pyd --expected-binary-sha256 030e4e116cd0ced9e4acc6a00ba5e111cbd5d2a48f14b62e9f2539f1e6a7710c --suite full2x --horizon 86400 --segment-seconds 3600 --event-budget 1000000 --max-activations 1000000 --activation-shard-budget 500 --hard-timeout 7200 --travel-pool on --output outputs/experiments/g31_ics_lt2_sustained_20261014/full024_sparse_pool_2x_001"
+      },
+      "observed": null,
+      "old_identity_present": false
+    },
+    {
+      "expected": {
+        "ProcessId": 50784,
+        "ParentProcessId": 40460,
+        "CreationDate": "2026-10-14T21:05:54.401293+08:00",
+        "CommandLine": "C:\\PROGRAMING\\python3.11.9\\python.exe -m scripts.experiments.g31_ics_circulation.resume_full_day --cut-manifest outputs/experiments/g31_ics_lt2_sustained_20261014/full024_resume_cut_001/cut_manifest.json --expected-cut-sha256 e3a46a03057dba68c1d9d6f08cb5b2329d076afa605e90fa8e9b9cc37daaa0c5 --stop-receipt outputs/experiments/g31_ics_lt2_sustained_20261014/full024_resume_cut_001/source_stop_receipt.json --expected-stop-sha256 a6a8bfdcbbb24fd41761c16a6e3cf082fe675087e7e037743378224a080ea7fb --binary build_lt_session_024/python/czr005_circulation.cp311-win_amd64.pyd --suite full1x --horizon 86400 --event-budget 1000000 --hard-timeout 7200 --output outputs/experiments/g31_ics_lt2_sustained_20261014/full024_resume_native_001 --worker"
+      },
+      "observed": null,
+      "old_identity_present": false
+    },
+    {
+      "expected": {
+        "ProcessId": 48428,
+        "ParentProcessId": 28768,
+        "CreationDate": "2026-10-14T21:27:31.673533+08:00",
+        "CommandLine": "C:\\PROGRAMING\\python3.11.9\\python.exe -m scripts.experiments.g31_ics_circulation.full_day_sparse_pool --binary build_lt_session_024\\python\\czr005_circulation.cp311-win_amd64.pyd --expected-binary-sha256 030e4e116cd0ced9e4acc6a00ba5e111cbd5d2a48f14b62e9f2539f1e6a7710c --suite full2x --horizon 86400.0 --segment-seconds 3600.0 --event-budget 1000000 --max-activations 1000000 --activation-shard-budget 500 --hard-timeout 7200.0 --travel-pool on --output outputs\\experiments\\g31_ics_lt2_sustained_20261014\\full024_sparse_pool_2x_001 --worker"
+      },
+      "observed": null,
+      "old_identity_present": false
+    }
+  ],
+  "interpretation": "Observed absent, not a successful exit or a known termination cause."
+}

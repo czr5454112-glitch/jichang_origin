@@ -1,0 +1,4712 @@
+{
+  "schema": "g31.action_dependency_diagnostic.v1",
+  "status": "bounded_pure_differential_passed",
+  "source_sha256": {
+    "scripts\\experiments\\g31_ics_circulation\\public_preference_protection_cut.py": "0c7e1557dd9b4fd3c444e1ea6b944e3bde6a966cd65b90f29d68a5e6e7d08d0a",
+    "scripts\\experiments\\g31_ics_circulation\\public_native_preference_projection.py": "f501e125feb6ddb4fc343f55ddf684781741d13b71d6fa9178b485ff8ce3b4b7",
+    "scripts\\experiments\\g31_ics_circulation\\public_reuse_model.py": "bb1bf8bc35822b671e9db5844e136ff91f187c4d92d465190f5d630f7cb739d1",
+    "scripts\\experiments\\g31_ics_circulation\\public_preference_request_context.py": "9c64e97e1e954a3639696ba5ca1f72f9f85e07032121f389b7e34507dfa71c3c"
+  },
+  "source_proof": {
+    "projection_source_sha256": "f501e125feb6ddb4fc343f55ddf684781741d13b71d6fa9178b485ff8ce3b4b7",
+    "legacy_source_sha256": "bb1bf8bc35822b671e9db5844e136ff91f187c4d92d465190f5d630f7cb739d1",
+    "completion_write": "Projection.run unload branch is the sole post-constructor completed write.",
+    "single_assignment_scope": "Restricted initial 3-tray/5-job population. load_waiting removes each waiting job by changing its jstatus to loading; no transition restores waiting. Initial loaded/blocker jobs are not waiting. complete_leg clears goal before scheduling unload and try_depart ignores no-goal trays.",
+    "future_actions": "return_decision/later_decision/route command do not modify a completed job or its recorded completion time.",
+    "interpretation": "A strict > witness refutes all-job protection in this pinned conditional model only; unexecuted suffix remains unknown.",
+    "runtime_boundary": "Reviewed repository functions and isolated builtin input, not a security boundary against arbitrary in-process monkeypatches."
+  },
+  "run_AST_restores_exactly": true,
+  "cases": [
+    {
+      "case_index": 0,
+      "counts": {
+        "full": 4,
+        "strict_cut": 28,
+        "hypothetically_reusable_prior_clause": 10,
+        "new_clause": 18
+      }
+    },
+    {
+      "case_index": 1,
+      "counts": {
+        "full": 12,
+        "strict_cut": 20,
+        "hypothetically_reusable_prior_clause": 0,
+        "new_clause": 20
+      }
+    },
+    {
+      "case_index": 2,
+      "counts": {
+        "full": 11,
+        "strict_cut": 21,
+        "hypothetically_reusable_prior_clause": 0,
+        "new_clause": 21
+      }
+    },
+    {
+      "case_index": 3,
+      "counts": {
+        "full": 24,
+        "strict_cut": 8,
+        "hypothetically_reusable_prior_clause": 0,
+        "new_clause": 8
+      }
+    },
+    {
+      "case_index": 4,
+      "counts": {
+        "full": 24,
+        "strict_cut": 8,
+        "hypothetically_reusable_prior_clause": 0,
+        "new_clause": 8
+      }
+    },
+    {
+      "case_index": 5,
+      "counts": {
+        "full": 24,
+        "strict_cut": 8,
+        "hypothetically_reusable_prior_clause": 0,
+        "new_clause": 8
+      }
+    }
+  ],
+  "rows": [
+    {
+      "case_index": 0,
+      "action_index": 0,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 0.11,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 0,
+      "action_index": 1,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 0.11,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 0,
+      "action_index": 2,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 0.11,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "reuse1",
+        "candidate_completed_at": 14.210999999999993,
+        "baseline_completed_at": 13.720999999999993,
+        "cut_at": 14.210999999999993,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "receiver": 6.469999999999999,
+          "loaded": 8.270999999999997,
+          "reuse1": 14.210999999999993
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 0,
+      "action_index": 3,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 0.11,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "reuse1",
+        "candidate_completed_at": 14.210999999999993,
+        "baseline_completed_at": 13.720999999999993,
+        "cut_at": 14.210999999999993,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "receiver": 6.469999999999999,
+          "loaded": 8.270999999999997,
+          "reuse1": 14.210999999999993
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 0,
+      "action_index": 4,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 0.30100000000000005,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 0,
+      "action_index": 5,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 0.30100000000000005,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 0,
+      "action_index": 6,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 0.30100000000000005,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "reuse1",
+        "candidate_completed_at": 13.841999999999993,
+        "baseline_completed_at": 13.720999999999993,
+        "cut_at": 13.841999999999993,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "receiver": 6.100999999999999,
+          "loaded": 7.9019999999999975,
+          "reuse1": 13.841999999999993
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 0,
+      "action_index": 7,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 0.30100000000000005,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "reuse1",
+        "candidate_completed_at": 13.841999999999993,
+        "baseline_completed_at": 13.720999999999993,
+        "cut_at": 13.841999999999993,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "receiver": 6.100999999999999,
+          "loaded": 7.9019999999999975,
+          "reuse1": 13.841999999999993
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 0,
+      "action_index": 8,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 2.201,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 8.001,
+        "baseline_completed_at": 6.469999999999999,
+        "cut_at": 8.001,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 5.199999999999999,
+          "receiver": 8.001
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 0,
+      "action_index": 9,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 2.201,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 8.001,
+        "baseline_completed_at": 6.469999999999999,
+        "cut_at": 8.001,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 5.199999999999999,
+          "receiver": 8.001
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 0,
+      "action_index": 10,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 2.201,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 8.001,
+        "baseline_completed_at": 6.469999999999999,
+        "cut_at": 8.001,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 5.199999999999999,
+          "receiver": 8.001
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 0,
+      "action_index": 11,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 2.201,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 8.001,
+        "baseline_completed_at": 6.469999999999999,
+        "cut_at": 8.001,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 5.199999999999999,
+          "receiver": 8.001
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": [
+        10
+      ]
+    },
+    {
+      "case_index": 0,
+      "action_index": 12,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 8.01,
+        "baseline_completed_at": 6.469999999999999,
+        "cut_at": 8.01,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 5.199999999999999,
+          "receiver": 8.01
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 0,
+      "action_index": 13,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 8.01,
+        "baseline_completed_at": 6.469999999999999,
+        "cut_at": 8.01,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 5.199999999999999,
+          "receiver": 8.01
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 0,
+      "action_index": 14,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 8.01,
+        "baseline_completed_at": 6.469999999999999,
+        "cut_at": 8.01,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 5.199999999999999,
+          "receiver": 8.01
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 0,
+      "action_index": 15,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 8.01,
+        "baseline_completed_at": 6.469999999999999,
+        "cut_at": 8.01,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 5.199999999999999,
+          "receiver": 8.01
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": [
+        14
+      ]
+    },
+    {
+      "case_index": 0,
+      "action_index": 16,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 0.11,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 6.599999999999999,
+        "baseline_completed_at": 6.469999999999999,
+        "cut_at": 6.599999999999999,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 6.199999999999998,
+          "receiver": 6.599999999999999
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 0,
+      "action_index": 17,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 0.11,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 6.599999999999999,
+        "baseline_completed_at": 6.469999999999999,
+        "cut_at": 6.599999999999999,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 6.199999999999998,
+          "receiver": 6.599999999999999
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": [
+        16
+      ]
+    },
+    {
+      "case_index": 0,
+      "action_index": 18,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 0.11,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 6.599999999999999,
+        "baseline_completed_at": 6.469999999999999,
+        "cut_at": 6.599999999999999,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 6.199999999999998,
+          "receiver": 6.599999999999999
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 0,
+      "action_index": 19,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 0.11,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 6.599999999999999,
+        "baseline_completed_at": 6.469999999999999,
+        "cut_at": 6.599999999999999,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 6.199999999999998,
+          "receiver": 6.599999999999999
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": [
+        18
+      ]
+    },
+    {
+      "case_index": 0,
+      "action_index": 20,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 0.30100000000000005,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 6.599999999999999,
+        "baseline_completed_at": 6.469999999999999,
+        "cut_at": 6.599999999999999,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 6.199999999999998,
+          "receiver": 6.599999999999999
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 0,
+      "action_index": 21,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 0.30100000000000005,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 6.599999999999999,
+        "baseline_completed_at": 6.469999999999999,
+        "cut_at": 6.599999999999999,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 6.199999999999998,
+          "receiver": 6.599999999999999
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": [
+        20
+      ]
+    },
+    {
+      "case_index": 0,
+      "action_index": 22,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 0.30100000000000005,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 6.599999999999999,
+        "baseline_completed_at": 6.469999999999999,
+        "cut_at": 6.599999999999999,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 6.199999999999998,
+          "receiver": 6.599999999999999
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 0,
+      "action_index": 23,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 0.30100000000000005,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 6.599999999999999,
+        "baseline_completed_at": 6.469999999999999,
+        "cut_at": 6.599999999999999,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 6.199999999999998,
+          "receiver": 6.599999999999999
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": [
+        22
+      ]
+    },
+    {
+      "case_index": 0,
+      "action_index": 24,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 2.201,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 8.001,
+        "baseline_completed_at": 6.469999999999999,
+        "cut_at": 8.001,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 6.199999999999998,
+          "receiver": 8.001
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 0,
+      "action_index": 25,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 2.201,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 8.001,
+        "baseline_completed_at": 6.469999999999999,
+        "cut_at": 8.001,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 6.199999999999998,
+          "receiver": 8.001
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": [
+        24
+      ]
+    },
+    {
+      "case_index": 0,
+      "action_index": 26,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 2.201,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 8.001,
+        "baseline_completed_at": 6.469999999999999,
+        "cut_at": 8.001,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 6.199999999999998,
+          "receiver": 8.001
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 0,
+      "action_index": 27,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 2.201,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 8.001,
+        "baseline_completed_at": 6.469999999999999,
+        "cut_at": 8.001,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 6.199999999999998,
+          "receiver": 8.001
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": [
+        26
+      ]
+    },
+    {
+      "case_index": 0,
+      "action_index": 28,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 8.01,
+        "baseline_completed_at": 6.469999999999999,
+        "cut_at": 8.01,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 6.199999999999998,
+          "receiver": 8.01
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 0,
+      "action_index": 29,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 8.01,
+        "baseline_completed_at": 6.469999999999999,
+        "cut_at": 8.01,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 6.199999999999998,
+          "receiver": 8.01
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": [
+        28
+      ]
+    },
+    {
+      "case_index": 0,
+      "action_index": 30,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 8.01,
+        "baseline_completed_at": 6.469999999999999,
+        "cut_at": 8.01,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 6.199999999999998,
+          "receiver": 8.01
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 0,
+      "action_index": 31,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 8.01,
+        "baseline_completed_at": 6.469999999999999,
+        "cut_at": 8.01,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 6.199999999999998,
+          "receiver": 8.01
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": [
+        30
+      ]
+    },
+    {
+      "case_index": 1,
+      "action_index": 0,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 0.11,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 1,
+      "action_index": 1,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 0.11,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 1,
+      "action_index": 2,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 0.11,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "reuse1",
+        "candidate_completed_at": 16.211,
+        "baseline_completed_at": 15.720999999999995,
+        "cut_at": 16.211,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "receiver": 8.469999999999999,
+          "loaded": 10.270999999999999,
+          "reuse1": 16.211
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 1,
+      "action_index": 3,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 0.11,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "reuse1",
+        "candidate_completed_at": 16.211,
+        "baseline_completed_at": 15.720999999999995,
+        "cut_at": 16.211,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "receiver": 8.469999999999999,
+          "loaded": 10.270999999999999,
+          "reuse1": 16.211
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 1,
+      "action_index": 4,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 0.30100000000000005,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 1,
+      "action_index": 5,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 0.30100000000000005,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 1,
+      "action_index": 6,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 0.30100000000000005,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "reuse1",
+        "candidate_completed_at": 15.841999999999993,
+        "baseline_completed_at": 15.720999999999995,
+        "cut_at": 15.841999999999993,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "receiver": 8.100999999999999,
+          "loaded": 9.901999999999997,
+          "reuse1": 15.841999999999993
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 1,
+      "action_index": 7,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 0.30100000000000005,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "reuse1",
+        "candidate_completed_at": 15.841999999999993,
+        "baseline_completed_at": 15.720999999999995,
+        "cut_at": 15.841999999999993,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "receiver": 8.100999999999999,
+          "loaded": 9.901999999999997,
+          "reuse1": 15.841999999999993
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 1,
+      "action_index": 8,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 2.201,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 10.001,
+        "baseline_completed_at": 8.469999999999999,
+        "cut_at": 10.001,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 5.199999999999999,
+          "receiver": 10.001
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 1,
+      "action_index": 9,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 2.201,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 10.001,
+        "baseline_completed_at": 8.469999999999999,
+        "cut_at": 10.001,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 5.199999999999999,
+          "receiver": 10.001
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 1,
+      "action_index": 10,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 2.201,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 10.001,
+        "baseline_completed_at": 8.469999999999999,
+        "cut_at": 10.001,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 5.199999999999999,
+          "receiver": 10.001
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 1,
+      "action_index": 11,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 2.201,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 10.001,
+        "baseline_completed_at": 8.469999999999999,
+        "cut_at": 10.001,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 5.199999999999999,
+          "receiver": 10.001
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 1,
+      "action_index": 12,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 10.01,
+        "baseline_completed_at": 8.469999999999999,
+        "cut_at": 10.01,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 5.199999999999999,
+          "receiver": 10.01
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 1,
+      "action_index": 13,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 10.01,
+        "baseline_completed_at": 8.469999999999999,
+        "cut_at": 10.01,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 5.199999999999999,
+          "receiver": 10.01
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 1,
+      "action_index": 14,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 10.01,
+        "baseline_completed_at": 8.469999999999999,
+        "cut_at": 10.01,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 5.199999999999999,
+          "receiver": 10.01
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 1,
+      "action_index": 15,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 10.01,
+        "baseline_completed_at": 8.469999999999999,
+        "cut_at": 10.01,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 5.199999999999999,
+          "receiver": 10.01
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 1,
+      "action_index": 16,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 0.11,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 1,
+      "action_index": 17,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 0.11,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 1,
+      "action_index": 18,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 0.11,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 1,
+      "action_index": 19,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 0.11,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 1,
+      "action_index": 20,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 0.30100000000000005,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 1,
+      "action_index": 21,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 0.30100000000000005,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 1,
+      "action_index": 22,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 0.30100000000000005,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 1,
+      "action_index": 23,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 0.30100000000000005,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 1,
+      "action_index": 24,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 2.201,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 10.001,
+        "baseline_completed_at": 8.469999999999999,
+        "cut_at": 10.001,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 6.199999999999998,
+          "receiver": 10.001
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 1,
+      "action_index": 25,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 2.201,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 10.001,
+        "baseline_completed_at": 8.469999999999999,
+        "cut_at": 10.001,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 6.199999999999998,
+          "receiver": 10.001
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 1,
+      "action_index": 26,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 2.201,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 10.001,
+        "baseline_completed_at": 8.469999999999999,
+        "cut_at": 10.001,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 6.199999999999998,
+          "receiver": 10.001
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 1,
+      "action_index": 27,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 2.201,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 10.001,
+        "baseline_completed_at": 8.469999999999999,
+        "cut_at": 10.001,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 6.199999999999998,
+          "receiver": 10.001
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 1,
+      "action_index": 28,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 10.01,
+        "baseline_completed_at": 8.469999999999999,
+        "cut_at": 10.01,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 6.199999999999998,
+          "receiver": 10.01
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 1,
+      "action_index": 29,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 10.01,
+        "baseline_completed_at": 8.469999999999999,
+        "cut_at": 10.01,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 6.199999999999998,
+          "receiver": 10.01
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 1,
+      "action_index": 30,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 10.01,
+        "baseline_completed_at": 8.469999999999999,
+        "cut_at": 10.01,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 6.199999999999998,
+          "receiver": 10.01
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 1,
+      "action_index": 31,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 10.01,
+        "baseline_completed_at": 8.469999999999999,
+        "cut_at": 10.01,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 6.199999999999998,
+          "receiver": 10.01
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 2,
+      "action_index": 0,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 0.11,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 2,
+      "action_index": 1,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 0.11,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "reuse1",
+        "candidate_completed_at": 17.721,
+        "baseline_completed_at": 17.720999999999997,
+        "cut_at": 17.721,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "receiver": 10.469999999999999,
+          "loaded": 12.270999999999997,
+          "reuse1": 17.721
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 2,
+      "action_index": 2,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 0.11,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "reuse1",
+        "candidate_completed_at": 18.211,
+        "baseline_completed_at": 17.720999999999997,
+        "cut_at": 18.211,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "receiver": 10.469999999999999,
+          "loaded": 12.270999999999997,
+          "reuse1": 18.211
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 2,
+      "action_index": 3,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 0.11,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "reuse1",
+        "candidate_completed_at": 18.211,
+        "baseline_completed_at": 17.720999999999997,
+        "cut_at": 18.211,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "receiver": 10.469999999999999,
+          "loaded": 12.270999999999997,
+          "reuse1": 18.211
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 2,
+      "action_index": 4,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 0.30100000000000005,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 2,
+      "action_index": 5,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 0.30100000000000005,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 2,
+      "action_index": 6,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 0.30100000000000005,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "reuse1",
+        "candidate_completed_at": 17.842,
+        "baseline_completed_at": 17.720999999999997,
+        "cut_at": 17.842,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "receiver": 10.100999999999997,
+          "loaded": 11.901999999999997,
+          "reuse1": 17.842
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 2,
+      "action_index": 7,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 0.30100000000000005,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "reuse1",
+        "candidate_completed_at": 17.842,
+        "baseline_completed_at": 17.720999999999997,
+        "cut_at": 17.842,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "receiver": 10.100999999999997,
+          "loaded": 11.901999999999997,
+          "reuse1": 17.842
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 2,
+      "action_index": 8,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 2.201,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 12.001,
+        "baseline_completed_at": 10.469999999999999,
+        "cut_at": 12.001,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 5.199999999999999,
+          "reuse1": 10.649999999999995,
+          "receiver": 12.001
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 2,
+      "action_index": 9,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 2.201,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 12.001,
+        "baseline_completed_at": 10.469999999999999,
+        "cut_at": 12.001,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 5.199999999999999,
+          "reuse1": 10.649999999999995,
+          "receiver": 12.001
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 2,
+      "action_index": 10,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 2.201,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 12.001,
+        "baseline_completed_at": 10.469999999999999,
+        "cut_at": 12.001,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 5.199999999999999,
+          "reuse1": 11.139999999999995,
+          "receiver": 12.001
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 2,
+      "action_index": 11,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 2.201,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 12.001,
+        "baseline_completed_at": 10.469999999999999,
+        "cut_at": 12.001,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 5.199999999999999,
+          "reuse1": 11.139999999999995,
+          "receiver": 12.001
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 2,
+      "action_index": 12,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 12.01,
+        "baseline_completed_at": 10.469999999999999,
+        "cut_at": 12.01,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 5.199999999999999,
+          "reuse1": 10.649999999999995,
+          "receiver": 12.01
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 2,
+      "action_index": 13,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 12.01,
+        "baseline_completed_at": 10.469999999999999,
+        "cut_at": 12.01,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 5.199999999999999,
+          "reuse1": 10.649999999999995,
+          "receiver": 12.01
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 2,
+      "action_index": 14,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 12.01,
+        "baseline_completed_at": 10.469999999999999,
+        "cut_at": 12.01,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 5.199999999999999,
+          "reuse1": 11.139999999999995,
+          "receiver": 12.01
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 2,
+      "action_index": 15,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 12.01,
+        "baseline_completed_at": 10.469999999999999,
+        "cut_at": 12.01,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 5.199999999999999,
+          "reuse1": 11.139999999999995,
+          "receiver": 12.01
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 2,
+      "action_index": 16,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 0.11,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 2,
+      "action_index": 17,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 0.11,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 2,
+      "action_index": 18,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 0.11,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 2,
+      "action_index": 19,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 0.11,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 2,
+      "action_index": 20,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 0.30100000000000005,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 2,
+      "action_index": 21,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 0.30100000000000005,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 2,
+      "action_index": 22,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 0.30100000000000005,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 2,
+      "action_index": 23,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 0.30100000000000005,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 2,
+      "action_index": 24,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 2.201,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 12.150999999999993,
+        "baseline_completed_at": 10.469999999999999,
+        "cut_at": 12.150999999999993,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 6.199999999999998,
+          "reuse1": 11.649999999999993,
+          "receiver": 12.150999999999993
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 2,
+      "action_index": 25,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 2.201,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 12.001,
+        "baseline_completed_at": 10.469999999999999,
+        "cut_at": 12.001,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 6.199999999999998,
+          "reuse1": 11.649999999999993,
+          "receiver": 12.001
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 2,
+      "action_index": 26,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 2.201,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 12.640999999999995,
+        "baseline_completed_at": 10.469999999999999,
+        "cut_at": 12.640999999999995,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 6.199999999999998,
+          "reuse1": 12.139999999999995,
+          "receiver": 12.640999999999995
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 2,
+      "action_index": 27,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 2.201,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 12.001,
+        "baseline_completed_at": 10.469999999999999,
+        "cut_at": 12.001,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 6.199999999999998,
+          "receiver": 12.001
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 2,
+      "action_index": 28,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 12.150999999999993,
+        "baseline_completed_at": 10.469999999999999,
+        "cut_at": 12.150999999999993,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 6.199999999999998,
+          "reuse1": 11.649999999999993,
+          "receiver": 12.150999999999993
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 2,
+      "action_index": 29,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 12.01,
+        "baseline_completed_at": 10.469999999999999,
+        "cut_at": 12.01,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 6.199999999999998,
+          "reuse1": 11.649999999999993,
+          "receiver": 12.01
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 2,
+      "action_index": 30,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 12.640999999999995,
+        "baseline_completed_at": 10.469999999999999,
+        "cut_at": 12.640999999999995,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 6.199999999999998,
+          "reuse1": 12.139999999999995,
+          "receiver": 12.640999999999995
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 2,
+      "action_index": 31,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "receiver",
+        "candidate_completed_at": 12.01,
+        "baseline_completed_at": 10.469999999999999,
+        "cut_at": 12.01,
+        "completed_prefix": {
+          "blocker": 1.5000000000000002,
+          "loaded": 6.199999999999998,
+          "receiver": 12.01
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 3,
+      "action_index": 0,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 0.11,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 3,
+      "action_index": 1,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 0.11,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 3,
+      "action_index": 2,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 0.11,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "reuse1",
+        "candidate_completed_at": 13.139999999999993,
+        "baseline_completed_at": 12.649999999999993,
+        "cut_at": 13.139999999999993,
+        "completed_prefix": {
+          "blocker": 4.299999999999999,
+          "loaded": 7.1999999999999975,
+          "receiver": 10.319999999999999,
+          "reuse1": 13.139999999999993
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 3,
+      "action_index": 3,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 0.11,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "reuse1",
+        "candidate_completed_at": 13.139999999999993,
+        "baseline_completed_at": 12.649999999999993,
+        "cut_at": 13.139999999999993,
+        "completed_prefix": {
+          "blocker": 4.299999999999999,
+          "loaded": 7.1999999999999975,
+          "receiver": 10.319999999999999,
+          "reuse1": 13.139999999999993
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 3,
+      "action_index": 4,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 3,
+      "action_index": 5,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 3,
+      "action_index": 6,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "reuse1",
+        "candidate_completed_at": 13.139999999999993,
+        "baseline_completed_at": 12.649999999999993,
+        "cut_at": 13.139999999999993,
+        "completed_prefix": {
+          "blocker": 4.299999999999999,
+          "loaded": 7.1999999999999975,
+          "receiver": 10.12,
+          "reuse1": 13.139999999999993
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 3,
+      "action_index": 7,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "reuse1",
+        "candidate_completed_at": 13.139999999999993,
+        "baseline_completed_at": 12.649999999999993,
+        "cut_at": 13.139999999999993,
+        "completed_prefix": {
+          "blocker": 4.299999999999999,
+          "loaded": 7.1999999999999975,
+          "receiver": 10.12,
+          "reuse1": 13.139999999999993
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 3,
+      "action_index": 8,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 3.101,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 3,
+      "action_index": 9,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 3.101,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 3,
+      "action_index": 10,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 3.101,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "reuse1",
+        "candidate_completed_at": 13.139999999999993,
+        "baseline_completed_at": 12.649999999999993,
+        "cut_at": 13.139999999999993,
+        "completed_prefix": {
+          "blocker": 4.299999999999999,
+          "loaded": 7.1999999999999975,
+          "receiver": 10.069999999999999,
+          "reuse1": 13.139999999999993
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 3,
+      "action_index": 11,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 3.101,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "reuse1",
+        "candidate_completed_at": 13.139999999999993,
+        "baseline_completed_at": 12.649999999999993,
+        "cut_at": 13.139999999999993,
+        "completed_prefix": {
+          "blocker": 4.299999999999999,
+          "loaded": 7.1999999999999975,
+          "receiver": 10.069999999999999,
+          "reuse1": 13.139999999999993
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 3,
+      "action_index": 12,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 4.201,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 3,
+      "action_index": 13,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 4.201,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 3,
+      "action_index": 14,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 4.201,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "reuse1",
+        "candidate_completed_at": 13.139999999999993,
+        "baseline_completed_at": 12.649999999999993,
+        "cut_at": 13.139999999999993,
+        "completed_prefix": {
+          "blocker": 4.299999999999999,
+          "loaded": 7.1999999999999975,
+          "receiver": 10.000999999999998,
+          "reuse1": 13.139999999999993
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 3,
+      "action_index": 15,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 4.201,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "reuse1",
+        "candidate_completed_at": 13.139999999999993,
+        "baseline_completed_at": 12.649999999999993,
+        "cut_at": 13.139999999999993,
+        "completed_prefix": {
+          "blocker": 4.299999999999999,
+          "loaded": 7.1999999999999975,
+          "receiver": 10.000999999999998,
+          "reuse1": 13.139999999999993
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 3,
+      "action_index": 16,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 0.11,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 3,
+      "action_index": 17,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 0.11,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 3,
+      "action_index": 18,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 0.11,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 3,
+      "action_index": 19,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 0.11,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 3,
+      "action_index": 20,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 3,
+      "action_index": 21,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 3,
+      "action_index": 22,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 3,
+      "action_index": 23,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 3,
+      "action_index": 24,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 3.101,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 3,
+      "action_index": 25,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 3.101,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 3,
+      "action_index": 26,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 3.101,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 3,
+      "action_index": 27,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 3.101,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 3,
+      "action_index": 28,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 4.201,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 3,
+      "action_index": 29,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 4.201,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 3,
+      "action_index": 30,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 4.201,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 3,
+      "action_index": 31,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 4.201,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 4,
+      "action_index": 0,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 0.11,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 4,
+      "action_index": 1,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 0.11,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 4,
+      "action_index": 2,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 0.11,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "reuse1",
+        "candidate_completed_at": 13.139999999999993,
+        "baseline_completed_at": 12.649999999999993,
+        "cut_at": 13.139999999999993,
+        "completed_prefix": {
+          "blocker": 4.299999999999999,
+          "loaded": 7.1999999999999975,
+          "receiver": 12.319999999999999,
+          "reuse1": 13.139999999999993
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 4,
+      "action_index": 3,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 0.11,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "reuse1",
+        "candidate_completed_at": 13.139999999999993,
+        "baseline_completed_at": 12.649999999999993,
+        "cut_at": 13.139999999999993,
+        "completed_prefix": {
+          "blocker": 4.299999999999999,
+          "loaded": 7.1999999999999975,
+          "receiver": 12.319999999999999,
+          "reuse1": 13.139999999999993
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 4,
+      "action_index": 4,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 4,
+      "action_index": 5,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 4,
+      "action_index": 6,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "reuse1",
+        "candidate_completed_at": 13.139999999999993,
+        "baseline_completed_at": 12.649999999999993,
+        "cut_at": 13.139999999999993,
+        "completed_prefix": {
+          "blocker": 4.299999999999999,
+          "loaded": 7.1999999999999975,
+          "receiver": 12.119999999999997,
+          "reuse1": 13.139999999999993
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 4,
+      "action_index": 7,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "reuse1",
+        "candidate_completed_at": 13.139999999999993,
+        "baseline_completed_at": 12.649999999999993,
+        "cut_at": 13.139999999999993,
+        "completed_prefix": {
+          "blocker": 4.299999999999999,
+          "loaded": 7.1999999999999975,
+          "receiver": 12.119999999999997,
+          "reuse1": 13.139999999999993
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 4,
+      "action_index": 8,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 3.101,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 4,
+      "action_index": 9,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 3.101,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 4,
+      "action_index": 10,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 3.101,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "reuse1",
+        "candidate_completed_at": 13.139999999999993,
+        "baseline_completed_at": 12.649999999999993,
+        "cut_at": 13.139999999999993,
+        "completed_prefix": {
+          "blocker": 4.299999999999999,
+          "loaded": 7.1999999999999975,
+          "receiver": 12.069999999999999,
+          "reuse1": 13.139999999999993
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 4,
+      "action_index": 11,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 3.101,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "reuse1",
+        "candidate_completed_at": 13.139999999999993,
+        "baseline_completed_at": 12.649999999999993,
+        "cut_at": 13.139999999999993,
+        "completed_prefix": {
+          "blocker": 4.299999999999999,
+          "loaded": 7.1999999999999975,
+          "receiver": 12.069999999999999,
+          "reuse1": 13.139999999999993
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 4,
+      "action_index": 12,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 4.201,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 4,
+      "action_index": 13,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 4.201,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 4,
+      "action_index": 14,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 4.201,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "reuse1",
+        "candidate_completed_at": 13.139999999999993,
+        "baseline_completed_at": 12.649999999999993,
+        "cut_at": 13.139999999999993,
+        "completed_prefix": {
+          "blocker": 4.299999999999999,
+          "loaded": 7.1999999999999975,
+          "receiver": 12.000999999999998,
+          "reuse1": 13.139999999999993
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 4,
+      "action_index": 15,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 4.201,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "reuse1",
+        "candidate_completed_at": 13.139999999999993,
+        "baseline_completed_at": 12.649999999999993,
+        "cut_at": 13.139999999999993,
+        "completed_prefix": {
+          "blocker": 4.299999999999999,
+          "loaded": 7.1999999999999975,
+          "receiver": 12.000999999999998,
+          "reuse1": 13.139999999999993
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 4,
+      "action_index": 16,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 0.11,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 4,
+      "action_index": 17,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 0.11,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 4,
+      "action_index": 18,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 0.11,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 4,
+      "action_index": 19,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 0.11,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 4,
+      "action_index": 20,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 4,
+      "action_index": 21,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 4,
+      "action_index": 22,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 4,
+      "action_index": 23,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 4,
+      "action_index": 24,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 3.101,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 4,
+      "action_index": 25,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 3.101,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 4,
+      "action_index": 26,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 3.101,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 4,
+      "action_index": 27,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 3.101,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 4,
+      "action_index": 28,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 4.201,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 4,
+      "action_index": 29,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 4.201,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 4,
+      "action_index": 30,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 4.201,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 4,
+      "action_index": 31,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 4.201,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 5,
+      "action_index": 0,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 0.11,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 5,
+      "action_index": 1,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 0.11,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 5,
+      "action_index": 2,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 0.11,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "reuse1",
+        "candidate_completed_at": 13.139999999999993,
+        "baseline_completed_at": 12.649999999999993,
+        "cut_at": 13.139999999999993,
+        "completed_prefix": {
+          "blocker": 4.299999999999999,
+          "loaded": 7.1999999999999975,
+          "reuse1": 13.139999999999993
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 5,
+      "action_index": 3,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 0.11,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "reuse1",
+        "candidate_completed_at": 13.139999999999993,
+        "baseline_completed_at": 12.649999999999993,
+        "cut_at": 13.139999999999993,
+        "completed_prefix": {
+          "blocker": 4.299999999999999,
+          "loaded": 7.1999999999999975,
+          "reuse1": 13.139999999999993
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 5,
+      "action_index": 4,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 5,
+      "action_index": 5,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 5,
+      "action_index": 6,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "reuse1",
+        "candidate_completed_at": 13.139999999999993,
+        "baseline_completed_at": 12.649999999999993,
+        "cut_at": 13.139999999999993,
+        "completed_prefix": {
+          "blocker": 4.299999999999999,
+          "loaded": 7.1999999999999975,
+          "reuse1": 13.139999999999993
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 5,
+      "action_index": 7,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "reuse1",
+        "candidate_completed_at": 13.139999999999993,
+        "baseline_completed_at": 12.649999999999993,
+        "cut_at": 13.139999999999993,
+        "completed_prefix": {
+          "blocker": 4.299999999999999,
+          "loaded": 7.1999999999999975,
+          "reuse1": 13.139999999999993
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 5,
+      "action_index": 8,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 3.101,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 5,
+      "action_index": 9,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 3.101,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 5,
+      "action_index": 10,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 3.101,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "reuse1",
+        "candidate_completed_at": 13.139999999999993,
+        "baseline_completed_at": 12.649999999999993,
+        "cut_at": 13.139999999999993,
+        "completed_prefix": {
+          "blocker": 4.299999999999999,
+          "loaded": 7.1999999999999975,
+          "reuse1": 13.139999999999993
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 5,
+      "action_index": 11,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 3.101,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "reuse1",
+        "candidate_completed_at": 13.139999999999993,
+        "baseline_completed_at": 12.649999999999993,
+        "cut_at": 13.139999999999993,
+        "completed_prefix": {
+          "blocker": 4.299999999999999,
+          "loaded": 7.1999999999999975,
+          "reuse1": 13.139999999999993
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 5,
+      "action_index": 12,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 4.201,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 5,
+      "action_index": 13,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 4.201,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 5,
+      "action_index": 14,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 4.201,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "reuse1",
+        "candidate_completed_at": 13.139999999999993,
+        "baseline_completed_at": 12.649999999999993,
+        "cut_at": 13.139999999999993,
+        "completed_prefix": {
+          "blocker": 4.299999999999999,
+          "loaded": 7.1999999999999975,
+          "reuse1": 13.139999999999993
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 5,
+      "action_index": 15,
+      "action": {
+        "initial_action": "native_default",
+        "empty_departure": 4.201,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "existing_strict_prefix_cut",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ],
+      "witness": {
+        "job": "reuse1",
+        "candidate_completed_at": 13.139999999999993,
+        "baseline_completed_at": 12.649999999999993,
+        "cut_at": 13.139999999999993,
+        "completed_prefix": {
+          "blocker": 4.299999999999999,
+          "loaded": 7.1999999999999975,
+          "reuse1": 13.139999999999993
+        },
+        "comparison": "strict >; no tolerance",
+        "observed_point": "original unload assignment before its post-unload notification"
+      },
+      "hypothetical_prior_matches": []
+    },
+    {
+      "case_index": 5,
+      "action_index": 16,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 0.11,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 5,
+      "action_index": 17,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 0.11,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 5,
+      "action_index": 18,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 0.11,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 5,
+      "action_index": 19,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 0.11,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 5,
+      "action_index": 20,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 5,
+      "action_index": 21,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 5,
+      "action_index": 22,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 5,
+      "action_index": 23,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 5,
+      "action_index": 24,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 3.101,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 5,
+      "action_index": 25,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 3.101,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 5,
+      "action_index": 26,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 3.101,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 5,
+      "action_index": 27,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 3.101,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 5,
+      "action_index": 28,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 4.201,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 5,
+      "action_index": 29,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 4.201,
+        "return_delay": 0.0,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 5,
+      "action_index": 30,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 4.201,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    },
+    {
+      "case_index": 5,
+      "action_index": 31,
+      "action": {
+        "initial_action": "prefer_2",
+        "empty_departure": 4.201,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      },
+      "status": "full_exact",
+      "read_keys": [
+        "empty_departure",
+        "initial_action",
+        "later_action",
+        "return_delay"
+      ]
+    }
+  ],
+  "full_candidates_separately_executed": 192,
+  "observed_cut_candidates_separately_executed": 192,
+  "full_baselines": 6,
+  "native_calls": 0,
+  "policy_changes": 0,
+  "new_cache_implemented": false,
+  "performance_claim": false,
+  "scope": "Potential within-request reuse only. Independent complete predictions are retrospective differential oracles; no saved outcome enters a policy. All 32 candidate queries would still be charged; unknown suffix remains unknown. No result applies to different snapshots, baseline, action domain, source, wire contract, or native decisions.",
+  "unproved_for_implementation": [
+    "Closed production guard+source binding for clause replay",
+    "Cost and full request effect",
+    "Independent hostile-input tests",
+    "Native model validity and joint-method advantage"
+  ],
+  "research_sources": [
+    {
+      "url": "https://arxiv.org/abs/cs/9308101",
+      "use": "Prior art: dependency-directed backtracking, no novelty claim"
+    },
+    {
+      "url": "https://www.cs.cmu.edu/~rwh/papers/sap/mlw05.pdf",
+      "use": "Prior art: dynamic dependencies and memoization; no transfer of their speed claims"
+    }
+  ],
+  "producer_sha256": "824bca4145637e425be499cb1dea35db3a0d1d55625b0e179a09c0c1800af762"
+}

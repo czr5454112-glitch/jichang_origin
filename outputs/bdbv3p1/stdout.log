@@ -1,0 +1,15 @@
+...F..........................                                           [100%]
+================================== FAILURES ===================================
+_______ test_instantiated_full_parser_accepts_exact42_and_calls_archive _______
+
+    def test_instantiated_full_parser_accepts_exact42_and_calls_archive():
+        parser, documents, xml, events = parser_fixture()
+        evidence = parser()
+        assert len(xml) == 42 and events and events[0][0] == 'archive'
+>       assert any(key.endswith('stdlib_fixture/__future__.py') for key in evidence)
+E       assert False
+E        +  where False = any(<generator object test_instantiated_full_parser_accepts_exact42_and_calls_archive.<locals>.<genexpr> at 0x000001B4E6E81000>)
+
+tests\test_g31_circulation_bound_source_proof_bind_v3_driver.py:97: AssertionError
+=========================== short test summary info ===========================
+FAILED tests/test_g31_circulation_bound_source_proof_bind_v3_driver.py::test_instantiated_full_parser_accepts_exact42_and_calls_archive

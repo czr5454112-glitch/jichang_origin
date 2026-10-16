@@ -1,0 +1,104 @@
+{
+  "output": "/mnt/data/g31_audit_20261014/independent_recomputation.json",
+  "policies": {
+    "periodic_reactive": {
+      "status": "reached",
+      "physical_clock": 86400.0,
+      "completed": 24,
+      "cost_seconds": 418514.27258099965,
+      "late": 19,
+      "empty_received": 23,
+      "route_requests": 0,
+      "forecasts": {},
+      "owner_samples": 0,
+      "owner_over_100ms": 0,
+      "owner_max_ms": null,
+      "receipt_clock_regressions": 0
+    },
+    "periodic_predictive": {
+      "status": "reached",
+      "physical_clock": 86400.0,
+      "completed": 24,
+      "cost_seconds": 414198.8675809981,
+      "late": 19,
+      "empty_received": 23,
+      "route_requests": 0,
+      "forecasts": {
+        "rejected": 16
+      },
+      "owner_samples": 0,
+      "owner_over_100ms": 0,
+      "owner_max_ms": null,
+      "receipt_clock_regressions": 0
+    },
+    "event_reactive": {
+      "status": "reached",
+      "physical_clock": 86400.0,
+      "completed": 24,
+      "cost_seconds": 414592.45958099817,
+      "late": 19,
+      "empty_received": 23,
+      "route_requests": 0,
+      "forecasts": {},
+      "owner_samples": 6215,
+      "owner_over_100ms": 0,
+      "owner_max_ms": 66.96269998792559,
+      "receipt_clock_regressions": 0
+    },
+    "event_predictive": {
+      "status": "reached",
+      "physical_clock": 86400.0,
+      "completed": 24,
+      "cost_seconds": 414170.4595809981,
+      "late": 19,
+      "empty_received": 23,
+      "route_requests": 0,
+      "forecasts": {
+        "rejected": 320,
+        "delivered": 204
+      },
+      "owner_samples": 7890,
+      "owner_over_100ms": 15,
+      "owner_max_ms": 128.08419996872544,
+      "receipt_clock_regressions": 0
+    },
+    "event_joint": {
+      "status": "reached",
+      "physical_clock": 86400.0,
+      "completed": 24,
+      "cost_seconds": 414170.4595809981,
+      "late": 19,
+      "empty_received": 23,
+      "route_requests": 0,
+      "forecasts": {
+        "rejected": 320,
+        "delivered": 204
+      },
+      "owner_samples": 7890,
+      "owner_over_100ms": 24,
+      "owner_max_ms": 199.57980001345277,
+      "receipt_clock_regressions": 0
+    }
+  },
+  "p5_domains": 8,
+  "p5_rows": 126,
+  "probes": {
+    "p5_versionless_interface": {
+      "original_status": "complete_finite_public_domain",
+      "raised": true,
+      "exception": "KeyError('version')",
+      "interpretation": "Finite evaluator uses a legacy projection. Directly wiring it to the versionless protocol observation is not supported; do not restore truth-derived version."
+    },
+    "same_stage_successful_forecast_refresh": {
+      "first_publications": 1,
+      "publications_after_time_1000": 0,
+      "scope": "Mock control-client API only; does not create or run a native physical scenario."
+    },
+    "terminal_cooldown_timer": {
+      "next_retry": 5.0,
+      "returned": "inf",
+      "is_infinite": true,
+      "scope": "Proves this timer index excludes terminal rows, not that every live scenario deadlocks."
+    }
+  }
+}

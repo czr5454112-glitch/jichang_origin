@@ -35,6 +35,15 @@ def main():
         default=ROOT / "build_lt_session_011/python/czr005_circulation.cp311-win_amd64.pyd",
         help="Frozen011 artifact for the retained epsilon-order historical counterexample; never substitutes for the current native")
     parser.add_argument("--output", type=Path, required=True)
+    parser.add_argument("--reuse-chain-evidence", type=Path,
+        default=ROOT / "outputs/experiments/g31_ics_lt2_20261014/synthetic_reuse_chain_003",
+        help="Explicit frozen native evidence for one read-only synthetic reuse-chain reassessment test")
+    parser.add_argument("--timing-reference-evidence", type=Path,
+        default=ROOT / "outputs/experiments/g31_ics_lt2_continued_20261014/reference_timing_003",
+        help="Explicit frozen96-branch timing evidence, including all35 unknown action outcomes")
+    parser.add_argument("--reuse-v2-evidence", type=Path,
+        default=ROOT / "outputs/experiments/g31_ics_lt2_sustained_20261014/reuse_v2_002",
+        help="Explicit frozen117-branch v2.1 evidence; all branches are reassessed without a missing-artifact skip")
     parser.add_argument("--timeout", type=float, default=300)
     args = parser.parse_args()
     args.output.mkdir(parents=True, exist_ok=False)
@@ -60,6 +69,9 @@ def main():
                "compiled_source_mismatch": compiled_mismatch, "source_before": before,
                "test_files": tests, "environment": {"G31_CIRCULATION_BINARY": str(binary),
                     "G31_HISTORICAL_ORDER_BINARY": str(historical),
+                    "G31_REUSE_CHAIN_EVIDENCE": str(args.reuse_chain_evidence.absolute()),
+                    "G31_TIMING_REFERENCE_EVIDENCE": str(args.timing_reference_evidence.absolute()),
+                    "G31_REUSE_V2_EVIDENCE": str(args.reuse_v2_evidence.absolute()),
                     "PYTHONPATH": "src;.", "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1"}}
     receipt["historical_order_regression"] = {
         "binary": str(historical), "expected_sha256": historical_expected,
@@ -67,6 +79,33 @@ def main():
         "current_model_claim": False}
     start = time.perf_counter()
     try:
+        evidence_files = [args.reuse_chain_evidence / "receipt.json",
+                          *sorted(args.reuse_chain_evidence.glob("gate*/input.json")),
+                          *sorted(args.reuse_chain_evidence.glob("gate*/route*.json.gz"))]
+        if len(evidence_files) != 28:
+            raise RuntimeError("reuse-chain saved evidence requires receipt, three inputs and all24 native cells")
+        evidence_hashes = {str(p.absolute()): sha(p) for p in evidence_files}
+        receipt["saved_native_evidence_reassessment"] = {
+            "source_before": evidence_hashes,
+            "scope": "One read-only test re-assesses frozen24 synthetic native branches; does not launch new native branches or certify original flow."}
+        timing_files = [args.timing_reference_evidence / name for name in
+                        ("receipt.json", "preregistered_protocol.json", "branch_ledger.json")]
+        timing_files += sorted(args.timing_reference_evidence.glob("gate*/input.json"))
+        timing_files += sorted(args.timing_reference_evidence.glob("gate*/*.json.gz"))
+        if len(timing_files) != 102:
+            raise RuntimeError("timing evidence requires receipt, protocol, ledger, three inputs and all96 raw branches")
+        timing_hashes = {str(p.absolute()): sha(p) for p in timing_files}
+        receipt["saved_timing_reference_reassessment"] = {"source_before": timing_hashes,
+            "scope": "One read-only test re-assesses all96 frozen branches, retaining35 unknowns. Not96 new native executions or a complete stronger reference."}
+        v2_files = [args.reuse_v2_evidence / name for name in
+                    ("receipt.json", "preregistered_protocol.json", "branch_ledger.json")]
+        v2_files += sorted(args.reuse_v2_evidence.glob("gate*/input.json"))
+        v2_files += sorted(args.reuse_v2_evidence.glob("gate*/*.json.gz"))
+        if len(v2_files) != 123:
+            raise RuntimeError("reuse v2 evidence requires receipt, protocol, ledger, three inputs and all117 raw branches")
+        v2_hashes = {str(p.absolute()): sha(p) for p in v2_files}
+        receipt["saved_reuse_v2_reassessment"] = {"source_before": v2_hashes,
+            "scope": "One read-only test re-assesses all117 frozen v2.1 branches and negative later-feedback contrasts; not new native executions or original-flow validation."}
         if build["status"] != "passed" or build["source_changed"] or compiled_mismatch:
             raise RuntimeError("source does not match a successful clean build")
         if binary_hash not in build["binary_sha256"].values():
@@ -96,6 +135,18 @@ def main():
             "current_model_claim": False}
         receipt["current_native_and_python_test_count"] = len(cases) - len(historical_cases) - len(identity_cases)
         receipt["counts_scope"] = "Aggregate includes the explicitly listed historical011 witness; current native, Python and identity checks are separately identified by JUnit names. Not all tests certify the current physical model."
+        saved_cases = [c for c in cases if c.get("name") == "test_saved_native_all_cells_reassess_and_keep_negative_regimes"]
+        receipt["saved_native_evidence_reassessment"]["test_count"] = len(saved_cases)
+        if len(saved_cases) != 1 or any(sha(Path(p)) != h for p, h in evidence_hashes.items()):
+            raise RuntimeError("saved native evidence was not tested exactly once or changed during verification")
+        timing_cases = [c for c in cases if c.get("name") == "test_saved_all96_branches_match_frozen_plan_and_reassessment"]
+        receipt["saved_timing_reference_reassessment"]["test_count"] = len(timing_cases)
+        if len(timing_cases) != 1 or any(sha(Path(p)) != h for p, h in timing_hashes.items()):
+            raise RuntimeError("saved timing evidence was not tested exactly once or changed during verification")
+        v2_cases = [c for c in cases if c.get("name") == "test_saved117_native_cells_reassess_and_retain_negative_causal_result"]
+        receipt["saved_reuse_v2_reassessment"]["test_count"] = len(v2_cases)
+        if len(v2_cases) != 1 or any(sha(Path(p)) != h for p, h in v2_hashes.items()):
+            raise RuntimeError("saved reuse v2 evidence was not tested exactly once or changed during verification")
         receipt["source_after"] = snapshot()
         receipt["source_changed"] = sorted(k for k in before.keys() | receipt["source_after"].keys()
                                            if before.get(k) != receipt["source_after"].get(k))

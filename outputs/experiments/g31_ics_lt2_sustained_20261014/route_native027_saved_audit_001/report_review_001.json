@@ -1,0 +1,217 @@
+{
+  "schema": "g31.route_phase.saved_audit_report_review.v1",
+  "status": "passed_report_and_bounded_evidence_binding",
+  "source": {
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\summarize_route_phase_saved_audit_001.py": "4a751cfee7d009a2dc51097125bb74da7710fce42a138420cf6d2713f94674c5"
+  },
+  "evidence": {
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\route_native027_saved_audit_001\\audit\\report.json": "fbb2cff19d93a02416aa54067d98ec714c901cd600fa447242f3ee3b2481cae7",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\route_native027_saved_audit_001\\bounded_execution.json": "32464728d2ceb3710febd0fedc911e1467bc76e65649de52e9f17bbf161620a3",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\route_native027_saved_audit_prepare_001\\external_application_wall.json": "1956745f66778da953acdd7fe29a6c1642524b44c98e625fb95d1e905f90b8a4",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\powershell_launch_receipt.json": "ccc3821062bd53271062678b115acd340191221f970f9e20b2293ab52b711df9",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\external_launch_receipt.json": "e62ba050bb399409fb6c2abd8e063051253375e3a3942e3a8f6b19f418fe773b"
+  },
+  "review_scope": "Read final report and bounded/external receipts, rehash reported audit outputs. Does not repeat all large raw tape decoding or create a new native state seal.",
+  "native_executions": 0,
+  "closed_roots": 4,
+  "open_roots": 2,
+  "cases": {
+    "plain/baseline": {
+      "status": "closed_finite_request",
+      "attempts": 1,
+      "request_api_rows": 8,
+      "native_call_count_within_root": 33,
+      "whole_child_wall_seconds": 24.9643931,
+      "producer_native_seal": "c41257b955faaf6d5bc4dbb704f174fd7820d7723a6ad8455283897f5d54c7ad",
+      "warm_elapsed_ms": 89.0496,
+      "closed": true
+    },
+    "plain/drop_first_ack": {
+      "status": "closed_finite_request",
+      "attempts": 2,
+      "request_api_rows": 79,
+      "native_call_count_within_root": 2019,
+      "whole_child_wall_seconds": 30.5189785,
+      "producer_native_seal": "425364a12ef280fc386907b79b15c9cb7b705d5cdc1b960ad4e3ed1c5390c6a7",
+      "warm_elapsed_ms": 1599.3227,
+      "closed": true
+    },
+    "plain/ack_withheld_in_window": {
+      "status": "open_censored_request",
+      "attempts": 5,
+      "request_api_rows": 977,
+      "native_call_count_within_root": 147653,
+      "whole_child_wall_seconds": 66.5096158,
+      "producer_native_seal": "f32a0efc994617f476088c4bf724a67b819c7c79bd480bc4ebdc4a1f8ee8586d",
+      "warm_elapsed_ms": 32676.3501,
+      "closed": false
+    },
+    "timed/baseline": {
+      "status": "closed_finite_request",
+      "attempts": 1,
+      "request_api_rows": 8,
+      "native_call_count_within_root": 33,
+      "whole_child_wall_seconds": 29.326006,
+      "producer_native_seal": "c41257b955faaf6d5bc4dbb704f174fd7820d7723a6ad8455283897f5d54c7ad",
+      "warm_elapsed_ms": 103.1931,
+      "closed": true,
+      "conserved_root_partition_ms": {
+        "root_native_envelope": 19.5,
+        "root_python_request_service_remainder": 49.5733,
+        "root_other_unclassified": 34.1198
+      },
+      "measured_request_invocation_max_ms": 18.2474,
+      "python_nested_bundles_ms_not_additive_to_partition": {
+        "request_service_invocation": 1.8263,
+        "request_public_observation_and_filter": 52.9744,
+        "candidate_and_intent_update": 1.4782
+      }
+    },
+    "timed/drop_first_ack": {
+      "status": "closed_finite_request",
+      "attempts": 2,
+      "request_api_rows": 79,
+      "native_call_count_within_root": 2019,
+      "whole_child_wall_seconds": 34.4662885,
+      "producer_native_seal": "425364a12ef280fc386907b79b15c9cb7b705d5cdc1b960ad4e3ed1c5390c6a7",
+      "warm_elapsed_ms": 1586.0818,
+      "closed": true,
+      "conserved_root_partition_ms": {
+        "root_native_envelope": 301.6784,
+        "root_python_request_service_remainder": 432.3103,
+        "root_other_unclassified": 852.0931
+      },
+      "measured_request_invocation_max_ms": 16.668,
+      "python_nested_bundles_ms_not_additive_to_partition": {
+        "request_service_invocation": 16.3417,
+        "request_public_observation_and_filter": 475.3526,
+        "candidate_and_intent_update": 2.9911
+      }
+    },
+    "timed/ack_withheld_in_window": {
+      "status": "open_censored_request",
+      "attempts": 5,
+      "request_api_rows": 977,
+      "native_call_count_within_root": 147653,
+      "whole_child_wall_seconds": 93.7698,
+      "producer_native_seal": "f32a0efc994617f476088c4bf724a67b819c7c79bd480bc4ebdc4a1f8ee8586d",
+      "warm_elapsed_ms": 38375.0117,
+      "closed": false,
+      "conserved_root_partition_ms": {
+        "root_native_envelope": 5296.7305,
+        "root_python_request_service_remainder": 4736.1089,
+        "root_other_unclassified": 28342.1723
+      },
+      "measured_request_invocation_max_ms": 32.5789,
+      "python_nested_bundles_ms_not_additive_to_partition": {
+        "request_service_invocation": 186.3529,
+        "request_public_observation_and_filter": 5277.1898,
+        "candidate_and_intent_update": 24.0038
+      }
+    }
+  },
+  "exact_plain_timed_semantic_parity": {
+    "baseline": {
+      "status": "ordered_all_warm_api_and_native_seal_exact",
+      "api_rows": 1273,
+      "producer_native_seal": "c41257b955faaf6d5bc4dbb704f174fd7820d7723a6ad8455283897f5d54c7ad"
+    },
+    "drop_first_ack": {
+      "status": "ordered_all_warm_api_and_native_seal_exact",
+      "api_rows": 6233,
+      "producer_native_seal": "425364a12ef280fc386907b79b15c9cb7b705d5cdc1b960ad4e3ed1c5390c6a7"
+    },
+    "ack_withheld_in_window": {
+      "status": "ordered_all_warm_api_and_native_seal_exact",
+      "api_rows": 147653,
+      "producer_native_seal": "f32a0efc994617f476088c4bf724a67b819c7c79bd480bc4ebdc4a1f8ee8586d"
+    }
+  },
+  "original_campaign": {
+    "status": "unknown_campaign_process",
+    "process_status": "hard_timeout",
+    "full_python_application_wall_seconds": 600.1512597,
+    "full_charge_policy": "Whole six-cell campaign, including Python startup/import, source checks, native workers, diagnostics and saved-evidence verification. One shared 600-second inner Windows Job deadline. Charge full campaign to each declared root without division as conservative sensitivity, not isolated service latency. Outer launch-to-exit includes launcher startup.",
+    "exclusions": "External PowerShell/tool startup before the measured clock; prelaunch PowerShell hash and command checks (included in measured_harness_and_campaign but outside application campaign); final evidence rehashes and writing this external receipt after application exit. These are experiment-harness work, not a certified platform cold-start measurement.",
+    "successful_campaign_completion_claim": false
+  },
+  "separate_saved_audit": {
+    "external_python_application_wall_seconds": 399.9602518,
+    "inner_pre_final_export_dispatch_seconds": 399.78099999999904,
+    "child_audit_seconds": 399.1086813999973,
+    "scope": "Includes full Python launcher startup/import, child audit, all launcher final hashes and receipt export through exit. Excludes outer PowerShell/tool startup, prelaunch ready/plan checks, postexit pin checks and this wrapper receipt write as experimental harness.",
+    "stages": [
+      {
+        "stage": "actual_six_cells_and_original_timeout_pinned",
+        "elapsed_seconds": 0.2572790999984136,
+        "stage_increment_seconds": 0.2572790999984136
+      },
+      {
+        "stage": "full_source_and_closed027_authority_verified",
+        "elapsed_seconds": 23.585288899997977,
+        "stage_increment_seconds": 23.328009799999563
+      },
+      {
+        "stage": "verified:plain/baseline",
+        "elapsed_seconds": 39.510596899999655,
+        "stage_increment_seconds": 15.925308000001678
+      },
+      {
+        "stage": "verified:plain/drop_first_ack",
+        "elapsed_seconds": 57.36323999999877,
+        "stage_increment_seconds": 17.852643099999113
+      },
+      {
+        "stage": "verified:plain/ack_withheld_in_window",
+        "elapsed_seconds": 158.17846019999706,
+        "stage_increment_seconds": 100.8152201999983
+      },
+      {
+        "stage": "verified:timed/baseline",
+        "elapsed_seconds": 176.3449944999993,
+        "stage_increment_seconds": 18.16653430000224
+      },
+      {
+        "stage": "verified:timed/drop_first_ack",
+        "elapsed_seconds": 195.2904826999984,
+        "stage_increment_seconds": 18.94548819999909
+      },
+      {
+        "stage": "verified:timed/ack_withheld_in_window",
+        "elapsed_seconds": 311.6551412999979,
+        "stage_increment_seconds": 116.36465859999953
+      },
+      {
+        "stage": "plain_timed_parity:baseline",
+        "elapsed_seconds": 321.3927984999973,
+        "stage_increment_seconds": 9.737657199999376
+      },
+      {
+        "stage": "plain_timed_parity:drop_first_ack",
+        "elapsed_seconds": 331.43351419999817,
+        "stage_increment_seconds": 10.040715700000874
+      },
+      {
+        "stage": "plain_timed_parity:ack_withheld_in_window",
+        "elapsed_seconds": 387.05115149999983,
+        "stage_increment_seconds": 55.61763730000166
+      },
+      {
+        "stage": "exit_all_evidence_sources_and_closed027_authority_verified",
+        "elapsed_seconds": 399.1038989999979,
+        "stage_increment_seconds": 12.052747499998077
+      }
+    ]
+  },
+  "interpretation": [
+    "Original six native workers exited zero; original shared600s campaign timed out during saved verification and remains failed/unknown.",
+    "New1800s pure audit passes all unchanged guards and exact ordered comparisons; it is separate research verification cost.",
+    "Native labels are broad bundles, not exemptions. All shared/background work and unclassified remainder remain charged.",
+    "The measured service maximum concerns request invocations only, not all executor/background services.",
+    "Timed versus plain instrumentation changes measured durations; this serial pair with concurrent work does not prove stable overhead or speedup.",
+    "Pending-ACK observation removal targets part of the measured request service; it cannot explain or remove the open case's28.3421723s unclassified remainder without new evidence."
+  ],
+  "complete_computation_available": false,
+  "complete_100ms_certified": false,
+  "physics_subtracted_ns": 0
+}

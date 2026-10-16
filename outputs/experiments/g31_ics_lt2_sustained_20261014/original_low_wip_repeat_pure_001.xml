@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="7" skipped="0" tests="31" time="9.040" timestamp="2026-10-15T14:45:49.149254+08:00" hostname="LAPTOP-M3GASC4G"><testcase classname="tests.test_g31_circulation_low_wip_repeat" name="test_actual_latest_delivered_permit_and_complete_action_barrier" time="1.068"><failure message="ValueError: original_low_wip:repeat:undeclared_physical_action">def test_actual_latest_delivered_permit_and_complete_action_barrier():
+        view, box, peer, owner, other, token, plan, _ = fixture()
+        permit = p.local_permit(view, box, owner, other, token, [])
+        assert permit['receipt']['business_bag_id'] == 'projected:1x:6'
+&gt;       barrier = p.physical_barrier(box, owner, peer, plan['parking'])
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_low_wip_repeat.py:35: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\research_original_low_wip_repeat.py:96: in physical_barrier
+    require(rid in parks or is_supply(rid, source), 'undeclared_physical_action')
+scripts\experiments\g31_ics_circulation\research_original_low_wip_repeat.py:28: in require
+    def require(ok, why): base.require(ok, 'repeat:' + why)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+value = False, reason = 'repeat:undeclared_physical_action'
+
+    def require(value, reason):
+&gt;       if not value: raise ValueError("original_low_wip:" + reason)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: original_low_wip:repeat:undeclared_physical_action
+
+scripts\experiments\g31_ics_circulation\research_original_low_wip.py:47: ValueError</failure></testcase><testcase classname="tests.test_g31_circulation_low_wip_repeat" name="test_actual_permit_missing_required_fact_cannot_reopen[holding]" time="0.068" /><testcase classname="tests.test_g31_circulation_low_wip_repeat" name="test_actual_permit_missing_required_fact_cannot_reopen[loaded]" time="0.067" /><testcase classname="tests.test_g31_circulation_low_wip_repeat" name="test_actual_permit_missing_required_fact_cannot_reopen[future_available]" time="0.067" /><testcase classname="tests.test_g31_circulation_low_wip_repeat" name="test_actual_permit_missing_required_fact_cannot_reopen[edge]" time="0.067" /><testcase classname="tests.test_g31_circulation_low_wip_repeat" name="test_actual_permit_missing_required_fact_cannot_reopen[reception]" time="0.088" /><testcase classname="tests.test_g31_circulation_low_wip_repeat" name="test_actual_permit_missing_required_fact_cannot_reopen[not_destination]" time="0.163" /><testcase classname="tests.test_g31_circulation_low_wip_repeat" name="test_actual_permit_missing_required_fact_cannot_reopen[missing_self_ack]" time="0.084" /><testcase classname="tests.test_g31_circulation_low_wip_repeat" name="test_actual_permit_missing_required_fact_cannot_reopen[expired_latest]" time="0.179" /><testcase classname="tests.test_g31_circulation_low_wip_repeat" name="test_peer_action_coverage_never_infers_received_from_absence[missing_park]" time="0.089" /><testcase classname="tests.test_g31_circulation_low_wip_repeat" name="test_peer_action_coverage_never_infers_received_from_absence[pending_peer]" time="0.080"><failure message="ValueError: original_low_wip:repeat:undeclared_physical_action">change = 'pending_peer'
+
+    @pytest.mark.parametrize('change', ['missing_park','pending_peer','pending_own','unknown_kind','unknown_identity','duplicate_action'])
+    def test_peer_action_coverage_never_infers_received_from_absence(change):
+        view, box, peer, owner, other, token, plan, _ = fixture()
+        actions = peer['capture']['extension']['submitted_physical_actions']
+        if change == 'missing_park': actions.pop()
+        elif change == 'pending_peer': actions[0]['last_delivered_ack'] = None
+        elif change == 'pending_own': next(r for r in box.values() if r['kind']=='transfer')['client_view']['last_delivered_ack'] = None
+        elif change == 'unknown_kind': actions[0]['kind'] = 'route'
+        elif change == 'unknown_identity': actions[0]['request_id'] = 'foreign_intent'
+        else: actions.append(deepcopy(actions[0]))
+        if change in ('unknown_kind','unknown_identity','duplicate_action'):
+            with pytest.raises(ValueError): p.physical_barrier(box, owner, peer, plan['parking'])
+&gt;       else: assert p.physical_barrier(box, owner, peer, plan['parking']) is None
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_low_wip_repeat.py:69: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\research_original_low_wip_repeat.py:96: in physical_barrier
+    require(rid in parks or is_supply(rid, source), 'undeclared_physical_action')
+scripts\experiments\g31_ics_circulation\research_original_low_wip_repeat.py:28: in require
+    def require(ok, why): base.require(ok, 'repeat:' + why)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+value = False, reason = 'repeat:undeclared_physical_action'
+
+    def require(value, reason):
+&gt;       if not value: raise ValueError("original_low_wip:" + reason)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: original_low_wip:repeat:undeclared_physical_action
+
+scripts\experiments\g31_ics_circulation\research_original_low_wip.py:47: ValueError</failure></testcase><testcase classname="tests.test_g31_circulation_low_wip_repeat" name="test_peer_action_coverage_never_infers_received_from_absence[pending_own]" time="0.093" /><testcase classname="tests.test_g31_circulation_low_wip_repeat" name="test_peer_action_coverage_never_infers_received_from_absence[unknown_kind]" time="0.092" /><testcase classname="tests.test_g31_circulation_low_wip_repeat" name="test_peer_action_coverage_never_infers_received_from_absence[unknown_identity]" time="0.086"><failure message="Failed: DID NOT RAISE ValueError">change = 'unknown_identity'
+
+    @pytest.mark.parametrize('change', ['missing_park','pending_peer','pending_own','unknown_kind','unknown_identity','duplicate_action'])
+    def test_peer_action_coverage_never_infers_received_from_absence(change):
+        view, box, peer, owner, other, token, plan, _ = fixture()
+        actions = peer['capture']['extension']['submitted_physical_actions']
+        if change == 'missing_park': actions.pop()
+        elif change == 'pending_peer': actions[0]['last_delivered_ack'] = None
+        elif change == 'pending_own': next(r for r in box.values() if r['kind']=='transfer')['client_view']['last_delivered_ack'] = None
+        elif change == 'unknown_kind': actions[0]['kind'] = 'route'
+        elif change == 'unknown_identity': actions[0]['request_id'] = 'foreign_intent'
+        else: actions.append(deepcopy(actions[0]))
+        if change in ('unknown_kind','unknown_identity','duplicate_action'):
+&gt;           with pytest.raises(ValueError): p.physical_barrier(box, owner, peer, plan['parking'])
+E           Failed: DID NOT RAISE ValueError
+
+tests\test_g31_circulation_low_wip_repeat.py:68: Failed</failure></testcase><testcase classname="tests.test_g31_circulation_low_wip_repeat" name="test_peer_action_coverage_never_infers_received_from_absence[duplicate_action]" time="0.092" /><testcase classname="tests.test_g31_circulation_low_wip_repeat" name="test_cap3_and_cap8_same_policy_through_third_supply" time="0.215"><failure message="ValueError: original_low_wip:repeat:undeclared_physical_action">def test_cap3_and_cap8_same_policy_through_third_supply():
+        a, _, _ = owner_fixture(3); b, _, _ = owner_fixture(8)
+&gt;       a.activate(); b.activate()
+        ^^^^^^^^^^^^
+
+tests\test_g31_circulation_low_wip_repeat.py:95: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\research_original_low_wip_repeat.py:142: in activate
+    barrier = physical_barrier(self.client.state['outbox'], self.owner, peer, self.plan['parking'])
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts\experiments\g31_ics_circulation\research_original_low_wip_repeat.py:96: in physical_barrier
+    require(rid in parks or is_supply(rid, source), 'undeclared_physical_action')
+scripts\experiments\g31_ics_circulation\research_original_low_wip_repeat.py:28: in require
+    def require(ok, why): base.require(ok, 'repeat:' + why)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+value = False, reason = 'repeat:undeclared_physical_action'
+
+    def require(value, reason):
+&gt;       if not value: raise ValueError("original_low_wip:" + reason)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: original_low_wip:repeat:undeclared_physical_action
+
+scripts\experiments\g31_ics_circulation\research_original_low_wip.py:47: ValueError</failure></testcase><testcase classname="tests.test_g31_circulation_low_wip_repeat" name="test_same_source_blocked_head_is_not_skipped" time="0.118"><failure message="ValueError: original_low_wip:repeat:undeclared_physical_action">def test_same_source_blocked_head_is_not_skipped():
+&gt;       a, _, _ = owner_fixture(); a.activate()
+                                   ^^^^^^^^^^^^
+
+tests\test_g31_circulation_low_wip_repeat.py:103: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\research_original_low_wip_repeat.py:142: in activate
+    barrier = physical_barrier(self.client.state['outbox'], self.owner, peer, self.plan['parking'])
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts\experiments\g31_ics_circulation\research_original_low_wip_repeat.py:96: in physical_barrier
+    require(rid in parks or is_supply(rid, source), 'undeclared_physical_action')
+scripts\experiments\g31_ics_circulation\research_original_low_wip_repeat.py:28: in require
+    def require(ok, why): base.require(ok, 'repeat:' + why)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+value = False, reason = 'repeat:undeclared_physical_action'
+
+    def require(value, reason):
+&gt;       if not value: raise ValueError("original_low_wip:" + reason)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: original_low_wip:repeat:undeclared_physical_action
+
+scripts\experiments\g31_ics_circulation\research_original_low_wip.py:47: ValueError</failure></testcase><testcase classname="tests.test_g31_circulation_low_wip_repeat" name="test_received_ack_relay_occurs_without_current_local_token" time="0.126"><failure message="ValueError: original_low_wip:repeat:undeclared_physical_action">def test_received_ack_relay_occurs_without_current_local_token():
+        a, view, _ = owner_fixture(); a.relayed = []; view['trays'] = []
+&gt;       a.activate()
+
+tests\test_g31_circulation_low_wip_repeat.py:113: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\research_original_low_wip_repeat.py:142: in activate
+    barrier = physical_barrier(self.client.state['outbox'], self.owner, peer, self.plan['parking'])
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts\experiments\g31_ics_circulation\research_original_low_wip_repeat.py:96: in physical_barrier
+    require(rid in parks or is_supply(rid, source), 'undeclared_physical_action')
+scripts\experiments\g31_ics_circulation\research_original_low_wip_repeat.py:28: in require
+    def require(ok, why): base.require(ok, 'repeat:' + why)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+value = False, reason = 'repeat:undeclared_physical_action'
+
+    def require(value, reason):
+&gt;       if not value: raise ValueError("original_low_wip:" + reason)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: original_low_wip:repeat:undeclared_physical_action
+
+scripts\experiments\g31_ics_circulation\research_original_low_wip.py:47: ValueError</failure></testcase><testcase classname="tests.test_g31_circulation_low_wip_repeat" name="test_expired_peer_does_not_deadlock_fresh_invitation" time="0.347" /><testcase classname="tests.test_g31_circulation_low_wip_repeat" name="test_rejection_consumes_receipt_without_replacement" time="0.127"><failure message="ValueError: original_low_wip:repeat:undeclared_physical_action">def test_rejection_consumes_receipt_without_replacement():
+&gt;       a, _, _ = owner_fixture(); a.activate(); rid = a.repeated[0]['request_id']
+                                   ^^^^^^^^^^^^
+
+tests\test_g31_circulation_low_wip_repeat.py:128: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\research_original_low_wip_repeat.py:142: in activate
+    barrier = physical_barrier(self.client.state['outbox'], self.owner, peer, self.plan['parking'])
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts\experiments\g31_ics_circulation\research_original_low_wip_repeat.py:96: in physical_barrier
+    require(rid in parks or is_supply(rid, source), 'undeclared_physical_action')
+scripts\experiments\g31_ics_circulation\research_original_low_wip_repeat.py:28: in require
+    def require(ok, why): base.require(ok, 'repeat:' + why)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+value = False, reason = 'repeat:undeclared_physical_action'
+
+    def require(value, reason):
+&gt;       if not value: raise ValueError("original_low_wip:" + reason)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: original_low_wip:repeat:undeclared_physical_action
+
+scripts\experiments\g31_ics_circulation\research_original_low_wip.py:47: ValueError</failure></testcase><testcase classname="tests.test_g31_circulation_low_wip_repeat" name="test_pending_previous_transfer_blocks_new_invitation_and_supply" time="0.127" /><testcase classname="tests.test_g31_circulation_low_wip_repeat" name="test_publication_budget_is_explicit_unknown_not_unlimited" time="0.120" /><testcase classname="tests.test_g31_circulation_low_wip_repeat" name="test_new_resource_owner_is_required_for_permit" time="0.094" /><testcase classname="tests.test_g31_circulation_low_wip_repeat" name="test_latest_receipt_never_uses_older_identity" time="0.127" /><testcase classname="tests.test_g31_circulation_low_wip_repeat" name="test_prefix_cannot_erase_invalid_clock[True]" time="0.001" /><testcase classname="tests.test_g31_circulation_low_wip_repeat" name="test_prefix_cannot_erase_invalid_clock[-1]" time="0.001" /><testcase classname="tests.test_g31_circulation_low_wip_repeat" name="test_prefix_cannot_erase_invalid_clock[nan]" time="0.001" /><testcase classname="tests.test_g31_circulation_low_wip_repeat" name="test_prefix_cannot_erase_invalid_clock[inf]" time="0.001" /><testcase classname="tests.test_g31_circulation_low_wip_repeat" name="test_prefix_only_removes_exact_outer_wall_field" time="0.001" /><testcase classname="tests.test_g31_circulation_low_wip_repeat" name="test_frozen_runtime_restored_on_exception" time="0.002" /><testcase classname="tests.test_g31_circulation_low_wip_repeat" name="test_closed_source_domain_includes_launcher_job_and_verifier" time="3.575" /></testsuite></testsuites>

@@ -1,0 +1,63 @@
+{
+  "schema": "g31.json_shards_failure_diagnosis.v1",
+  "status": "saved_pre_worker_campaign_wiring_failure",
+  "evidence": {
+    "failure.json": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\json_prediction_shards_RPC_prepare_001\\failure.json",
+      "sha256": "65f91b672a30cbce46cde9af300348fea3f99ae4c97dba26f23f036a0c2b35b6"
+    },
+    "ledger.json": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\json_prediction_shards_RPC_prepare_001\\ledger.json",
+      "sha256": "c0274d0fe2724deb5a98472a47aaa075c5ff102bd9a73737bdc282174dff800b"
+    },
+    "bounded_execution.json": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\json_prediction_shards_RPC_prepare_001\\bounded_execution.json",
+      "sha256": "1ba29a67dad6e4a182b59433d5742c4ccfba480490389f0da12b030654fb6aec"
+    },
+    "external_application_wall.json": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\json_prediction_shards_RPC_prepare_001\\external_application_wall.json",
+      "sha256": "cfe090e3409c0f43481772a88e84f363a21f5aeffd0d1c39934e4bcb09d5bf32"
+    },
+    "stderr.log": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\json_prediction_shards_RPC_prepare_001\\stderr.log",
+      "sha256": "ad5c9d8bcdb12637d7a333124cbde67d97ef1e8d7fdf65553e9b316c7ce58155"
+    },
+    "stdout.log": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\json_prediction_shards_RPC_prepare_001\\stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "preregistered_protocol.json": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\json_prediction_shards_RPC_prepare_001\\preregistered_protocol.json",
+      "sha256": "02be2c7b8e13ece2bce535558f9b64caecdee3961091ca6dfc0f89ad55382544"
+    },
+    "ready.json": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\json_prediction_shards_RPC_prepare_001\\ready.json",
+      "sha256": "2e41b18361118d756f85b4eb4c88e106920857b08adbdb8d2161ead6a3b3f815"
+    }
+  },
+  "source": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\json_prediction_shards_RPC_prepare_001\\source\\scripts\\experiments\\g31_ics_circulation\\measure_json_prediction_shards.py",
+    "sha256": "efed29ccec020951c52f9ec7c4f6d9264125a870535e702f886c5db280543033",
+    "failure_line": 208
+  },
+  "root_cause": "output[value['directory']] indexes a WindowsPath; required join is output / value['directory'].",
+  "execution_point": "After four unknown_unexecuted ledger rows, before the first round loop and any LogicalClient construction.",
+  "actual_prediction_work": {
+    "predictor_workers": 0,
+    "logical_requests": 0,
+    "physical_full_baselines": 0,
+    "candidate_queries": 0,
+    "unknown_unexecuted_rounds": 4
+  },
+  "denominator_basis": "Saved traceback, exact source execution order and missing per-worker/request artifacts; not an independent OS process census. Parent/campaign processes did execute.",
+  "parent_pre_final_export_wall_seconds": 18.458256700003403,
+  "whole_python_application_seconds": 18.7216475,
+  "test_gap": "Prior60 functional cases exercised LogicalClient but did not traverse campaign plan-to-image-path wiring.",
+  "proposed_fix": "One path-join expression plus a campaign-to-first-constructor regression using real Path and fixed plan; no model/policy/query change.",
+  "scope": "001 remains failed. No parallel speed, output equivalence or100ms result exists from this attempt.",
+  "new_native_calls": 0,
+  "new_predictions": 0,
+  "new_profile_or_benchmark": false,
+  "diagnostic_source_sha256": "8c8fabde12aff45ef377fb95cb66f77f4a2bcded79f16f713ea9651728278464",
+  "diagnostic_first_attempt": "Metadata helper first used exitcode instead of actual external exit_code and raised KeyError before writing a report; corrected schema access only. No predictor ran."
+}

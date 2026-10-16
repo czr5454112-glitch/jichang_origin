@@ -1,0 +1,777 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="20" skipped="0" tests="79" time="40.963" timestamp="2026-10-16T00:31:31.685962+08:00" hostname="LAPTOP-M3GASC4G"><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_private_native_function_keeps_old_bytecode_and_globals" time="0.001" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_complete_supplied_endpoint_and_physical_replay_fixture" time="0.402"><failure message="NameError: name 'prior' is not defined">def test_complete_supplied_endpoint_and_physical_replay_fixture():
+&gt;       result = saved.verify_saved(supplied_fixture())
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_live_obligation_recollection_campaign.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+raw = {'specification': {'case': 'mechanism', 'vector': {'initial_action': 'prefer_2', 'empty_departure': 3.101, 'return_del...6': '845486b745bc6e65a9988d1ef5429336b60fd472eb73c39e133e19ec93a7e7be'}, 'owner': 'B', 'retained_at': 0.11, ...}}, ...}
+
+    def verify_saved(raw):
+        # Initial-stage validation byte-for-byte through the original helper.
+        initial = dict(raw); initial['decisions'] = {}
+&gt;       prior.verify_saved_inputs(initial)
+        ^^^^^
+E       NameError: name 'prior' is not defined
+
+scripts\experiments\g31_ics_circulation\verify_live_obligation_recollection.py:185: NameError</failure></testcase><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_saved_audit_rejects_tampered_missing_or_misbound_evidence[missing_owner]" time="0.428"><failure message="NameError: name 'prior' is not defined">change = 'missing_owner'
+
+    @pytest.mark.parametrize('change', ['missing_owner', 'missing_attempt', 'third_attempt', 'bool_index',
+        'changed_information', 'changed_now', 'future_call', 'missing_decision', 'changed_target',
+        'fake_admission', 'missing_native_read', 'wrong_peer', 'wrong_quiet_start', 'fake_retry',
+        'missing_physical_job', 'changed_storage', 'changed_completion'])
+    def test_saved_audit_rejects_tampered_missing_or_misbound_evidence(change):
+        data = supplied_fixture(); a = data['collection_attempts']['B'][0]
+        if change == 'missing_owner': del data['collection_attempts']['A']
+        elif change == 'missing_attempt': data['collection_attempts']['A'] = []
+        elif change == 'third_attempt': data['collection_attempts']['B'] *= 3
+        elif change == 'bool_index': a['collection']['recollection_index'] = False
+        elif change == 'changed_information': a['information']['bundle']['trays']['P']['node'] = 99
+        elif change == 'changed_now': a['at'] += .01
+        elif change == 'future_call': data['calls'][0]['at'] = 100.
+        elif change == 'missing_decision': data['decisions']['B'] = []
+        elif change == 'changed_target': a['collection']['trigger_tray']['generation'] += 1
+        elif change == 'fake_admission': a['retry_admission'] = {'status': 'conditional_retry_admissible'}
+        elif change == 'missing_native_read': del a['information']['native_read']['actual_endpoints']
+        elif change == 'wrong_peer': a['collection']['peer_message'] = 'other'
+        elif change == 'wrong_quiet_start': a['collection']['policy_quiet_since'] += .01
+        elif change == 'fake_retry': a['disposition'] = 'one_fresh_pair_requested'; a['new_request_id'] = 'fake'
+        elif change == 'missing_physical_job': data['result']['jobs'].pop()
+        elif change == 'changed_storage':
+            next(x for x in data['result']['receipts'] if x['event'] == 'STORAGE_RELEASE')['time'] += .01
+        else: data['result']['jobs'][0]['completed_at'] += .001
+&gt;       with pytest.raises((ValueError, KeyError, AssertionError)): saved.verify_saved(data)
+                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_live_obligation_recollection_campaign.py:91: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+raw = {'specification': {'case': 'mechanism', 'vector': {'initial_action': 'prefer_2', 'empty_departure': 3.101, 'return_del...6': '845486b745bc6e65a9988d1ef5429336b60fd472eb73c39e133e19ec93a7e7be'}, 'owner': 'B', 'retained_at': 0.11, ...}}, ...}
+
+    def verify_saved(raw):
+        # Initial-stage validation byte-for-byte through the original helper.
+        initial = dict(raw); initial['decisions'] = {}
+&gt;       prior.verify_saved_inputs(initial)
+        ^^^^^
+E       NameError: name 'prior' is not defined
+
+scripts\experiments\g31_ics_circulation\verify_live_obligation_recollection.py:185: NameError</failure></testcase><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_saved_audit_rejects_tampered_missing_or_misbound_evidence[missing_attempt]" time="0.401"><failure message="NameError: name 'prior' is not defined">change = 'missing_attempt'
+
+    @pytest.mark.parametrize('change', ['missing_owner', 'missing_attempt', 'third_attempt', 'bool_index',
+        'changed_information', 'changed_now', 'future_call', 'missing_decision', 'changed_target',
+        'fake_admission', 'missing_native_read', 'wrong_peer', 'wrong_quiet_start', 'fake_retry',
+        'missing_physical_job', 'changed_storage', 'changed_completion'])
+    def test_saved_audit_rejects_tampered_missing_or_misbound_evidence(change):
+        data = supplied_fixture(); a = data['collection_attempts']['B'][0]
+        if change == 'missing_owner': del data['collection_attempts']['A']
+        elif change == 'missing_attempt': data['collection_attempts']['A'] = []
+        elif change == 'third_attempt': data['collection_attempts']['B'] *= 3
+        elif change == 'bool_index': a['collection']['recollection_index'] = False
+        elif change == 'changed_information': a['information']['bundle']['trays']['P']['node'] = 99
+        elif change == 'changed_now': a['at'] += .01
+        elif change == 'future_call': data['calls'][0]['at'] = 100.
+        elif change == 'missing_decision': data['decisions']['B'] = []
+        elif change == 'changed_target': a['collection']['trigger_tray']['generation'] += 1
+        elif change == 'fake_admission': a['retry_admission'] = {'status': 'conditional_retry_admissible'}
+        elif change == 'missing_native_read': del a['information']['native_read']['actual_endpoints']
+        elif change == 'wrong_peer': a['collection']['peer_message'] = 'other'
+        elif change == 'wrong_quiet_start': a['collection']['policy_quiet_since'] += .01
+        elif change == 'fake_retry': a['disposition'] = 'one_fresh_pair_requested'; a['new_request_id'] = 'fake'
+        elif change == 'missing_physical_job': data['result']['jobs'].pop()
+        elif change == 'changed_storage':
+            next(x for x in data['result']['receipts'] if x['event'] == 'STORAGE_RELEASE')['time'] += .01
+        else: data['result']['jobs'][0]['completed_at'] += .001
+&gt;       with pytest.raises((ValueError, KeyError, AssertionError)): saved.verify_saved(data)
+                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_live_obligation_recollection_campaign.py:91: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+raw = {'specification': {'case': 'mechanism', 'vector': {'initial_action': 'prefer_2', 'empty_departure': 3.101, 'return_del...6': '845486b745bc6e65a9988d1ef5429336b60fd472eb73c39e133e19ec93a7e7be'}, 'owner': 'B', 'retained_at': 0.11, ...}}, ...}
+
+    def verify_saved(raw):
+        # Initial-stage validation byte-for-byte through the original helper.
+        initial = dict(raw); initial['decisions'] = {}
+&gt;       prior.verify_saved_inputs(initial)
+        ^^^^^
+E       NameError: name 'prior' is not defined
+
+scripts\experiments\g31_ics_circulation\verify_live_obligation_recollection.py:185: NameError</failure></testcase><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_saved_audit_rejects_tampered_missing_or_misbound_evidence[third_attempt]" time="0.386"><failure message="NameError: name 'prior' is not defined">change = 'third_attempt'
+
+    @pytest.mark.parametrize('change', ['missing_owner', 'missing_attempt', 'third_attempt', 'bool_index',
+        'changed_information', 'changed_now', 'future_call', 'missing_decision', 'changed_target',
+        'fake_admission', 'missing_native_read', 'wrong_peer', 'wrong_quiet_start', 'fake_retry',
+        'missing_physical_job', 'changed_storage', 'changed_completion'])
+    def test_saved_audit_rejects_tampered_missing_or_misbound_evidence(change):
+        data = supplied_fixture(); a = data['collection_attempts']['B'][0]
+        if change == 'missing_owner': del data['collection_attempts']['A']
+        elif change == 'missing_attempt': data['collection_attempts']['A'] = []
+        elif change == 'third_attempt': data['collection_attempts']['B'] *= 3
+        elif change == 'bool_index': a['collection']['recollection_index'] = False
+        elif change == 'changed_information': a['information']['bundle']['trays']['P']['node'] = 99
+        elif change == 'changed_now': a['at'] += .01
+        elif change == 'future_call': data['calls'][0]['at'] = 100.
+        elif change == 'missing_decision': data['decisions']['B'] = []
+        elif change == 'changed_target': a['collection']['trigger_tray']['generation'] += 1
+        elif change == 'fake_admission': a['retry_admission'] = {'status': 'conditional_retry_admissible'}
+        elif change == 'missing_native_read': del a['information']['native_read']['actual_endpoints']
+        elif change == 'wrong_peer': a['collection']['peer_message'] = 'other'
+        elif change == 'wrong_quiet_start': a['collection']['policy_quiet_since'] += .01
+        elif change == 'fake_retry': a['disposition'] = 'one_fresh_pair_requested'; a['new_request_id'] = 'fake'
+        elif change == 'missing_physical_job': data['result']['jobs'].pop()
+        elif change == 'changed_storage':
+            next(x for x in data['result']['receipts'] if x['event'] == 'STORAGE_RELEASE')['time'] += .01
+        else: data['result']['jobs'][0]['completed_at'] += .001
+&gt;       with pytest.raises((ValueError, KeyError, AssertionError)): saved.verify_saved(data)
+                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_live_obligation_recollection_campaign.py:91: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+raw = {'specification': {'case': 'mechanism', 'vector': {'initial_action': 'prefer_2', 'empty_departure': 3.101, 'return_del...6': '845486b745bc6e65a9988d1ef5429336b60fd472eb73c39e133e19ec93a7e7be'}, 'owner': 'B', 'retained_at': 0.11, ...}}, ...}
+
+    def verify_saved(raw):
+        # Initial-stage validation byte-for-byte through the original helper.
+        initial = dict(raw); initial['decisions'] = {}
+&gt;       prior.verify_saved_inputs(initial)
+        ^^^^^
+E       NameError: name 'prior' is not defined
+
+scripts\experiments\g31_ics_circulation\verify_live_obligation_recollection.py:185: NameError</failure></testcase><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_saved_audit_rejects_tampered_missing_or_misbound_evidence[bool_index]" time="0.394"><failure message="NameError: name 'prior' is not defined">change = 'bool_index'
+
+    @pytest.mark.parametrize('change', ['missing_owner', 'missing_attempt', 'third_attempt', 'bool_index',
+        'changed_information', 'changed_now', 'future_call', 'missing_decision', 'changed_target',
+        'fake_admission', 'missing_native_read', 'wrong_peer', 'wrong_quiet_start', 'fake_retry',
+        'missing_physical_job', 'changed_storage', 'changed_completion'])
+    def test_saved_audit_rejects_tampered_missing_or_misbound_evidence(change):
+        data = supplied_fixture(); a = data['collection_attempts']['B'][0]
+        if change == 'missing_owner': del data['collection_attempts']['A']
+        elif change == 'missing_attempt': data['collection_attempts']['A'] = []
+        elif change == 'third_attempt': data['collection_attempts']['B'] *= 3
+        elif change == 'bool_index': a['collection']['recollection_index'] = False
+        elif change == 'changed_information': a['information']['bundle']['trays']['P']['node'] = 99
+        elif change == 'changed_now': a['at'] += .01
+        elif change == 'future_call': data['calls'][0]['at'] = 100.
+        elif change == 'missing_decision': data['decisions']['B'] = []
+        elif change == 'changed_target': a['collection']['trigger_tray']['generation'] += 1
+        elif change == 'fake_admission': a['retry_admission'] = {'status': 'conditional_retry_admissible'}
+        elif change == 'missing_native_read': del a['information']['native_read']['actual_endpoints']
+        elif change == 'wrong_peer': a['collection']['peer_message'] = 'other'
+        elif change == 'wrong_quiet_start': a['collection']['policy_quiet_since'] += .01
+        elif change == 'fake_retry': a['disposition'] = 'one_fresh_pair_requested'; a['new_request_id'] = 'fake'
+        elif change == 'missing_physical_job': data['result']['jobs'].pop()
+        elif change == 'changed_storage':
+            next(x for x in data['result']['receipts'] if x['event'] == 'STORAGE_RELEASE')['time'] += .01
+        else: data['result']['jobs'][0]['completed_at'] += .001
+&gt;       with pytest.raises((ValueError, KeyError, AssertionError)): saved.verify_saved(data)
+                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_live_obligation_recollection_campaign.py:91: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+raw = {'specification': {'case': 'mechanism', 'vector': {'initial_action': 'prefer_2', 'empty_departure': 3.101, 'return_del...6': '845486b745bc6e65a9988d1ef5429336b60fd472eb73c39e133e19ec93a7e7be'}, 'owner': 'B', 'retained_at': 0.11, ...}}, ...}
+
+    def verify_saved(raw):
+        # Initial-stage validation byte-for-byte through the original helper.
+        initial = dict(raw); initial['decisions'] = {}
+&gt;       prior.verify_saved_inputs(initial)
+        ^^^^^
+E       NameError: name 'prior' is not defined
+
+scripts\experiments\g31_ics_circulation\verify_live_obligation_recollection.py:185: NameError</failure></testcase><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_saved_audit_rejects_tampered_missing_or_misbound_evidence[changed_information]" time="0.439"><failure message="NameError: name 'prior' is not defined">change = 'changed_information'
+
+    @pytest.mark.parametrize('change', ['missing_owner', 'missing_attempt', 'third_attempt', 'bool_index',
+        'changed_information', 'changed_now', 'future_call', 'missing_decision', 'changed_target',
+        'fake_admission', 'missing_native_read', 'wrong_peer', 'wrong_quiet_start', 'fake_retry',
+        'missing_physical_job', 'changed_storage', 'changed_completion'])
+    def test_saved_audit_rejects_tampered_missing_or_misbound_evidence(change):
+        data = supplied_fixture(); a = data['collection_attempts']['B'][0]
+        if change == 'missing_owner': del data['collection_attempts']['A']
+        elif change == 'missing_attempt': data['collection_attempts']['A'] = []
+        elif change == 'third_attempt': data['collection_attempts']['B'] *= 3
+        elif change == 'bool_index': a['collection']['recollection_index'] = False
+        elif change == 'changed_information': a['information']['bundle']['trays']['P']['node'] = 99
+        elif change == 'changed_now': a['at'] += .01
+        elif change == 'future_call': data['calls'][0]['at'] = 100.
+        elif change == 'missing_decision': data['decisions']['B'] = []
+        elif change == 'changed_target': a['collection']['trigger_tray']['generation'] += 1
+        elif change == 'fake_admission': a['retry_admission'] = {'status': 'conditional_retry_admissible'}
+        elif change == 'missing_native_read': del a['information']['native_read']['actual_endpoints']
+        elif change == 'wrong_peer': a['collection']['peer_message'] = 'other'
+        elif change == 'wrong_quiet_start': a['collection']['policy_quiet_since'] += .01
+        elif change == 'fake_retry': a['disposition'] = 'one_fresh_pair_requested'; a['new_request_id'] = 'fake'
+        elif change == 'missing_physical_job': data['result']['jobs'].pop()
+        elif change == 'changed_storage':
+            next(x for x in data['result']['receipts'] if x['event'] == 'STORAGE_RELEASE')['time'] += .01
+        else: data['result']['jobs'][0]['completed_at'] += .001
+&gt;       with pytest.raises((ValueError, KeyError, AssertionError)): saved.verify_saved(data)
+                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_live_obligation_recollection_campaign.py:91: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+raw = {'specification': {'case': 'mechanism', 'vector': {'initial_action': 'prefer_2', 'empty_departure': 3.101, 'return_del...6': '845486b745bc6e65a9988d1ef5429336b60fd472eb73c39e133e19ec93a7e7be'}, 'owner': 'B', 'retained_at': 0.11, ...}}, ...}
+
+    def verify_saved(raw):
+        # Initial-stage validation byte-for-byte through the original helper.
+        initial = dict(raw); initial['decisions'] = {}
+&gt;       prior.verify_saved_inputs(initial)
+        ^^^^^
+E       NameError: name 'prior' is not defined
+
+scripts\experiments\g31_ics_circulation\verify_live_obligation_recollection.py:185: NameError</failure></testcase><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_saved_audit_rejects_tampered_missing_or_misbound_evidence[changed_now]" time="0.404"><failure message="NameError: name 'prior' is not defined">change = 'changed_now'
+
+    @pytest.mark.parametrize('change', ['missing_owner', 'missing_attempt', 'third_attempt', 'bool_index',
+        'changed_information', 'changed_now', 'future_call', 'missing_decision', 'changed_target',
+        'fake_admission', 'missing_native_read', 'wrong_peer', 'wrong_quiet_start', 'fake_retry',
+        'missing_physical_job', 'changed_storage', 'changed_completion'])
+    def test_saved_audit_rejects_tampered_missing_or_misbound_evidence(change):
+        data = supplied_fixture(); a = data['collection_attempts']['B'][0]
+        if change == 'missing_owner': del data['collection_attempts']['A']
+        elif change == 'missing_attempt': data['collection_attempts']['A'] = []
+        elif change == 'third_attempt': data['collection_attempts']['B'] *= 3
+        elif change == 'bool_index': a['collection']['recollection_index'] = False
+        elif change == 'changed_information': a['information']['bundle']['trays']['P']['node'] = 99
+        elif change == 'changed_now': a['at'] += .01
+        elif change == 'future_call': data['calls'][0]['at'] = 100.
+        elif change == 'missing_decision': data['decisions']['B'] = []
+        elif change == 'changed_target': a['collection']['trigger_tray']['generation'] += 1
+        elif change == 'fake_admission': a['retry_admission'] = {'status': 'conditional_retry_admissible'}
+        elif change == 'missing_native_read': del a['information']['native_read']['actual_endpoints']
+        elif change == 'wrong_peer': a['collection']['peer_message'] = 'other'
+        elif change == 'wrong_quiet_start': a['collection']['policy_quiet_since'] += .01
+        elif change == 'fake_retry': a['disposition'] = 'one_fresh_pair_requested'; a['new_request_id'] = 'fake'
+        elif change == 'missing_physical_job': data['result']['jobs'].pop()
+        elif change == 'changed_storage':
+            next(x for x in data['result']['receipts'] if x['event'] == 'STORAGE_RELEASE')['time'] += .01
+        else: data['result']['jobs'][0]['completed_at'] += .001
+&gt;       with pytest.raises((ValueError, KeyError, AssertionError)): saved.verify_saved(data)
+                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_live_obligation_recollection_campaign.py:91: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+raw = {'specification': {'case': 'mechanism', 'vector': {'initial_action': 'prefer_2', 'empty_departure': 3.101, 'return_del...6': '845486b745bc6e65a9988d1ef5429336b60fd472eb73c39e133e19ec93a7e7be'}, 'owner': 'B', 'retained_at': 0.11, ...}}, ...}
+
+    def verify_saved(raw):
+        # Initial-stage validation byte-for-byte through the original helper.
+        initial = dict(raw); initial['decisions'] = {}
+&gt;       prior.verify_saved_inputs(initial)
+        ^^^^^
+E       NameError: name 'prior' is not defined
+
+scripts\experiments\g31_ics_circulation\verify_live_obligation_recollection.py:185: NameError</failure></testcase><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_saved_audit_rejects_tampered_missing_or_misbound_evidence[future_call]" time="0.385"><failure message="NameError: name 'prior' is not defined">change = 'future_call'
+
+    @pytest.mark.parametrize('change', ['missing_owner', 'missing_attempt', 'third_attempt', 'bool_index',
+        'changed_information', 'changed_now', 'future_call', 'missing_decision', 'changed_target',
+        'fake_admission', 'missing_native_read', 'wrong_peer', 'wrong_quiet_start', 'fake_retry',
+        'missing_physical_job', 'changed_storage', 'changed_completion'])
+    def test_saved_audit_rejects_tampered_missing_or_misbound_evidence(change):
+        data = supplied_fixture(); a = data['collection_attempts']['B'][0]
+        if change == 'missing_owner': del data['collection_attempts']['A']
+        elif change == 'missing_attempt': data['collection_attempts']['A'] = []
+        elif change == 'third_attempt': data['collection_attempts']['B'] *= 3
+        elif change == 'bool_index': a['collection']['recollection_index'] = False
+        elif change == 'changed_information': a['information']['bundle']['trays']['P']['node'] = 99
+        elif change == 'changed_now': a['at'] += .01
+        elif change == 'future_call': data['calls'][0]['at'] = 100.
+        elif change == 'missing_decision': data['decisions']['B'] = []
+        elif change == 'changed_target': a['collection']['trigger_tray']['generation'] += 1
+        elif change == 'fake_admission': a['retry_admission'] = {'status': 'conditional_retry_admissible'}
+        elif change == 'missing_native_read': del a['information']['native_read']['actual_endpoints']
+        elif change == 'wrong_peer': a['collection']['peer_message'] = 'other'
+        elif change == 'wrong_quiet_start': a['collection']['policy_quiet_since'] += .01
+        elif change == 'fake_retry': a['disposition'] = 'one_fresh_pair_requested'; a['new_request_id'] = 'fake'
+        elif change == 'missing_physical_job': data['result']['jobs'].pop()
+        elif change == 'changed_storage':
+            next(x for x in data['result']['receipts'] if x['event'] == 'STORAGE_RELEASE')['time'] += .01
+        else: data['result']['jobs'][0]['completed_at'] += .001
+&gt;       with pytest.raises((ValueError, KeyError, AssertionError)): saved.verify_saved(data)
+                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_live_obligation_recollection_campaign.py:91: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+raw = {'specification': {'case': 'mechanism', 'vector': {'initial_action': 'prefer_2', 'empty_departure': 3.101, 'return_del...6': '845486b745bc6e65a9988d1ef5429336b60fd472eb73c39e133e19ec93a7e7be'}, 'owner': 'B', 'retained_at': 0.11, ...}}, ...}
+
+    def verify_saved(raw):
+        # Initial-stage validation byte-for-byte through the original helper.
+        initial = dict(raw); initial['decisions'] = {}
+&gt;       prior.verify_saved_inputs(initial)
+        ^^^^^
+E       NameError: name 'prior' is not defined
+
+scripts\experiments\g31_ics_circulation\verify_live_obligation_recollection.py:185: NameError</failure></testcase><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_saved_audit_rejects_tampered_missing_or_misbound_evidence[missing_decision]" time="0.442"><failure message="NameError: name 'prior' is not defined">change = 'missing_decision'
+
+    @pytest.mark.parametrize('change', ['missing_owner', 'missing_attempt', 'third_attempt', 'bool_index',
+        'changed_information', 'changed_now', 'future_call', 'missing_decision', 'changed_target',
+        'fake_admission', 'missing_native_read', 'wrong_peer', 'wrong_quiet_start', 'fake_retry',
+        'missing_physical_job', 'changed_storage', 'changed_completion'])
+    def test_saved_audit_rejects_tampered_missing_or_misbound_evidence(change):
+        data = supplied_fixture(); a = data['collection_attempts']['B'][0]
+        if change == 'missing_owner': del data['collection_attempts']['A']
+        elif change == 'missing_attempt': data['collection_attempts']['A'] = []
+        elif change == 'third_attempt': data['collection_attempts']['B'] *= 3
+        elif change == 'bool_index': a['collection']['recollection_index'] = False
+        elif change == 'changed_information': a['information']['bundle']['trays']['P']['node'] = 99
+        elif change == 'changed_now': a['at'] += .01
+        elif change == 'future_call': data['calls'][0]['at'] = 100.
+        elif change == 'missing_decision': data['decisions']['B'] = []
+        elif change == 'changed_target': a['collection']['trigger_tray']['generation'] += 1
+        elif change == 'fake_admission': a['retry_admission'] = {'status': 'conditional_retry_admissible'}
+        elif change == 'missing_native_read': del a['information']['native_read']['actual_endpoints']
+        elif change == 'wrong_peer': a['collection']['peer_message'] = 'other'
+        elif change == 'wrong_quiet_start': a['collection']['policy_quiet_since'] += .01
+        elif change == 'fake_retry': a['disposition'] = 'one_fresh_pair_requested'; a['new_request_id'] = 'fake'
+        elif change == 'missing_physical_job': data['result']['jobs'].pop()
+        elif change == 'changed_storage':
+            next(x for x in data['result']['receipts'] if x['event'] == 'STORAGE_RELEASE')['time'] += .01
+        else: data['result']['jobs'][0]['completed_at'] += .001
+&gt;       with pytest.raises((ValueError, KeyError, AssertionError)): saved.verify_saved(data)
+                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_live_obligation_recollection_campaign.py:91: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+raw = {'specification': {'case': 'mechanism', 'vector': {'initial_action': 'prefer_2', 'empty_departure': 3.101, 'return_del...6': '845486b745bc6e65a9988d1ef5429336b60fd472eb73c39e133e19ec93a7e7be'}, 'owner': 'B', 'retained_at': 0.11, ...}}, ...}
+
+    def verify_saved(raw):
+        # Initial-stage validation byte-for-byte through the original helper.
+        initial = dict(raw); initial['decisions'] = {}
+&gt;       prior.verify_saved_inputs(initial)
+        ^^^^^
+E       NameError: name 'prior' is not defined
+
+scripts\experiments\g31_ics_circulation\verify_live_obligation_recollection.py:185: NameError</failure></testcase><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_saved_audit_rejects_tampered_missing_or_misbound_evidence[changed_target]" time="0.368"><failure message="NameError: name 'prior' is not defined">change = 'changed_target'
+
+    @pytest.mark.parametrize('change', ['missing_owner', 'missing_attempt', 'third_attempt', 'bool_index',
+        'changed_information', 'changed_now', 'future_call', 'missing_decision', 'changed_target',
+        'fake_admission', 'missing_native_read', 'wrong_peer', 'wrong_quiet_start', 'fake_retry',
+        'missing_physical_job', 'changed_storage', 'changed_completion'])
+    def test_saved_audit_rejects_tampered_missing_or_misbound_evidence(change):
+        data = supplied_fixture(); a = data['collection_attempts']['B'][0]
+        if change == 'missing_owner': del data['collection_attempts']['A']
+        elif change == 'missing_attempt': data['collection_attempts']['A'] = []
+        elif change == 'third_attempt': data['collection_attempts']['B'] *= 3
+        elif change == 'bool_index': a['collection']['recollection_index'] = False
+        elif change == 'changed_information': a['information']['bundle']['trays']['P']['node'] = 99
+        elif change == 'changed_now': a['at'] += .01
+        elif change == 'future_call': data['calls'][0]['at'] = 100.
+        elif change == 'missing_decision': data['decisions']['B'] = []
+        elif change == 'changed_target': a['collection']['trigger_tray']['generation'] += 1
+        elif change == 'fake_admission': a['retry_admission'] = {'status': 'conditional_retry_admissible'}
+        elif change == 'missing_native_read': del a['information']['native_read']['actual_endpoints']
+        elif change == 'wrong_peer': a['collection']['peer_message'] = 'other'
+        elif change == 'wrong_quiet_start': a['collection']['policy_quiet_since'] += .01
+        elif change == 'fake_retry': a['disposition'] = 'one_fresh_pair_requested'; a['new_request_id'] = 'fake'
+        elif change == 'missing_physical_job': data['result']['jobs'].pop()
+        elif change == 'changed_storage':
+            next(x for x in data['result']['receipts'] if x['event'] == 'STORAGE_RELEASE')['time'] += .01
+        else: data['result']['jobs'][0]['completed_at'] += .001
+&gt;       with pytest.raises((ValueError, KeyError, AssertionError)): saved.verify_saved(data)
+                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_live_obligation_recollection_campaign.py:91: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+raw = {'specification': {'case': 'mechanism', 'vector': {'initial_action': 'prefer_2', 'empty_departure': 3.101, 'return_del...6': '845486b745bc6e65a9988d1ef5429336b60fd472eb73c39e133e19ec93a7e7be'}, 'owner': 'B', 'retained_at': 0.11, ...}}, ...}
+
+    def verify_saved(raw):
+        # Initial-stage validation byte-for-byte through the original helper.
+        initial = dict(raw); initial['decisions'] = {}
+&gt;       prior.verify_saved_inputs(initial)
+        ^^^^^
+E       NameError: name 'prior' is not defined
+
+scripts\experiments\g31_ics_circulation\verify_live_obligation_recollection.py:185: NameError</failure></testcase><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_saved_audit_rejects_tampered_missing_or_misbound_evidence[fake_admission]" time="0.405"><failure message="NameError: name 'prior' is not defined">change = 'fake_admission'
+
+    @pytest.mark.parametrize('change', ['missing_owner', 'missing_attempt', 'third_attempt', 'bool_index',
+        'changed_information', 'changed_now', 'future_call', 'missing_decision', 'changed_target',
+        'fake_admission', 'missing_native_read', 'wrong_peer', 'wrong_quiet_start', 'fake_retry',
+        'missing_physical_job', 'changed_storage', 'changed_completion'])
+    def test_saved_audit_rejects_tampered_missing_or_misbound_evidence(change):
+        data = supplied_fixture(); a = data['collection_attempts']['B'][0]
+        if change == 'missing_owner': del data['collection_attempts']['A']
+        elif change == 'missing_attempt': data['collection_attempts']['A'] = []
+        elif change == 'third_attempt': data['collection_attempts']['B'] *= 3
+        elif change == 'bool_index': a['collection']['recollection_index'] = False
+        elif change == 'changed_information': a['information']['bundle']['trays']['P']['node'] = 99
+        elif change == 'changed_now': a['at'] += .01
+        elif change == 'future_call': data['calls'][0]['at'] = 100.
+        elif change == 'missing_decision': data['decisions']['B'] = []
+        elif change == 'changed_target': a['collection']['trigger_tray']['generation'] += 1
+        elif change == 'fake_admission': a['retry_admission'] = {'status': 'conditional_retry_admissible'}
+        elif change == 'missing_native_read': del a['information']['native_read']['actual_endpoints']
+        elif change == 'wrong_peer': a['collection']['peer_message'] = 'other'
+        elif change == 'wrong_quiet_start': a['collection']['policy_quiet_since'] += .01
+        elif change == 'fake_retry': a['disposition'] = 'one_fresh_pair_requested'; a['new_request_id'] = 'fake'
+        elif change == 'missing_physical_job': data['result']['jobs'].pop()
+        elif change == 'changed_storage':
+            next(x for x in data['result']['receipts'] if x['event'] == 'STORAGE_RELEASE')['time'] += .01
+        else: data['result']['jobs'][0]['completed_at'] += .001
+&gt;       with pytest.raises((ValueError, KeyError, AssertionError)): saved.verify_saved(data)
+                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_live_obligation_recollection_campaign.py:91: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+raw = {'specification': {'case': 'mechanism', 'vector': {'initial_action': 'prefer_2', 'empty_departure': 3.101, 'return_del...6': '845486b745bc6e65a9988d1ef5429336b60fd472eb73c39e133e19ec93a7e7be'}, 'owner': 'B', 'retained_at': 0.11, ...}}, ...}
+
+    def verify_saved(raw):
+        # Initial-stage validation byte-for-byte through the original helper.
+        initial = dict(raw); initial['decisions'] = {}
+&gt;       prior.verify_saved_inputs(initial)
+        ^^^^^
+E       NameError: name 'prior' is not defined
+
+scripts\experiments\g31_ics_circulation\verify_live_obligation_recollection.py:185: NameError</failure></testcase><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_saved_audit_rejects_tampered_missing_or_misbound_evidence[missing_native_read]" time="0.402"><failure message="NameError: name 'prior' is not defined">change = 'missing_native_read'
+
+    @pytest.mark.parametrize('change', ['missing_owner', 'missing_attempt', 'third_attempt', 'bool_index',
+        'changed_information', 'changed_now', 'future_call', 'missing_decision', 'changed_target',
+        'fake_admission', 'missing_native_read', 'wrong_peer', 'wrong_quiet_start', 'fake_retry',
+        'missing_physical_job', 'changed_storage', 'changed_completion'])
+    def test_saved_audit_rejects_tampered_missing_or_misbound_evidence(change):
+        data = supplied_fixture(); a = data['collection_attempts']['B'][0]
+        if change == 'missing_owner': del data['collection_attempts']['A']
+        elif change == 'missing_attempt': data['collection_attempts']['A'] = []
+        elif change == 'third_attempt': data['collection_attempts']['B'] *= 3
+        elif change == 'bool_index': a['collection']['recollection_index'] = False
+        elif change == 'changed_information': a['information']['bundle']['trays']['P']['node'] = 99
+        elif change == 'changed_now': a['at'] += .01
+        elif change == 'future_call': data['calls'][0]['at'] = 100.
+        elif change == 'missing_decision': data['decisions']['B'] = []
+        elif change == 'changed_target': a['collection']['trigger_tray']['generation'] += 1
+        elif change == 'fake_admission': a['retry_admission'] = {'status': 'conditional_retry_admissible'}
+        elif change == 'missing_native_read': del a['information']['native_read']['actual_endpoints']
+        elif change == 'wrong_peer': a['collection']['peer_message'] = 'other'
+        elif change == 'wrong_quiet_start': a['collection']['policy_quiet_since'] += .01
+        elif change == 'fake_retry': a['disposition'] = 'one_fresh_pair_requested'; a['new_request_id'] = 'fake'
+        elif change == 'missing_physical_job': data['result']['jobs'].pop()
+        elif change == 'changed_storage':
+            next(x for x in data['result']['receipts'] if x['event'] == 'STORAGE_RELEASE')['time'] += .01
+        else: data['result']['jobs'][0]['completed_at'] += .001
+&gt;       with pytest.raises((ValueError, KeyError, AssertionError)): saved.verify_saved(data)
+                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_live_obligation_recollection_campaign.py:91: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+raw = {'specification': {'case': 'mechanism', 'vector': {'initial_action': 'prefer_2', 'empty_departure': 3.101, 'return_del...6': '845486b745bc6e65a9988d1ef5429336b60fd472eb73c39e133e19ec93a7e7be'}, 'owner': 'B', 'retained_at': 0.11, ...}}, ...}
+
+    def verify_saved(raw):
+        # Initial-stage validation byte-for-byte through the original helper.
+        initial = dict(raw); initial['decisions'] = {}
+&gt;       prior.verify_saved_inputs(initial)
+        ^^^^^
+E       NameError: name 'prior' is not defined
+
+scripts\experiments\g31_ics_circulation\verify_live_obligation_recollection.py:185: NameError</failure></testcase><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_saved_audit_rejects_tampered_missing_or_misbound_evidence[wrong_peer]" time="0.406"><failure message="NameError: name 'prior' is not defined">change = 'wrong_peer'
+
+    @pytest.mark.parametrize('change', ['missing_owner', 'missing_attempt', 'third_attempt', 'bool_index',
+        'changed_information', 'changed_now', 'future_call', 'missing_decision', 'changed_target',
+        'fake_admission', 'missing_native_read', 'wrong_peer', 'wrong_quiet_start', 'fake_retry',
+        'missing_physical_job', 'changed_storage', 'changed_completion'])
+    def test_saved_audit_rejects_tampered_missing_or_misbound_evidence(change):
+        data = supplied_fixture(); a = data['collection_attempts']['B'][0]
+        if change == 'missing_owner': del data['collection_attempts']['A']
+        elif change == 'missing_attempt': data['collection_attempts']['A'] = []
+        elif change == 'third_attempt': data['collection_attempts']['B'] *= 3
+        elif change == 'bool_index': a['collection']['recollection_index'] = False
+        elif change == 'changed_information': a['information']['bundle']['trays']['P']['node'] = 99
+        elif change == 'changed_now': a['at'] += .01
+        elif change == 'future_call': data['calls'][0]['at'] = 100.
+        elif change == 'missing_decision': data['decisions']['B'] = []
+        elif change == 'changed_target': a['collection']['trigger_tray']['generation'] += 1
+        elif change == 'fake_admission': a['retry_admission'] = {'status': 'conditional_retry_admissible'}
+        elif change == 'missing_native_read': del a['information']['native_read']['actual_endpoints']
+        elif change == 'wrong_peer': a['collection']['peer_message'] = 'other'
+        elif change == 'wrong_quiet_start': a['collection']['policy_quiet_since'] += .01
+        elif change == 'fake_retry': a['disposition'] = 'one_fresh_pair_requested'; a['new_request_id'] = 'fake'
+        elif change == 'missing_physical_job': data['result']['jobs'].pop()
+        elif change == 'changed_storage':
+            next(x for x in data['result']['receipts'] if x['event'] == 'STORAGE_RELEASE')['time'] += .01
+        else: data['result']['jobs'][0]['completed_at'] += .001
+&gt;       with pytest.raises((ValueError, KeyError, AssertionError)): saved.verify_saved(data)
+                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_live_obligation_recollection_campaign.py:91: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+raw = {'specification': {'case': 'mechanism', 'vector': {'initial_action': 'prefer_2', 'empty_departure': 3.101, 'return_del...6': '845486b745bc6e65a9988d1ef5429336b60fd472eb73c39e133e19ec93a7e7be'}, 'owner': 'B', 'retained_at': 0.11, ...}}, ...}
+
+    def verify_saved(raw):
+        # Initial-stage validation byte-for-byte through the original helper.
+        initial = dict(raw); initial['decisions'] = {}
+&gt;       prior.verify_saved_inputs(initial)
+        ^^^^^
+E       NameError: name 'prior' is not defined
+
+scripts\experiments\g31_ics_circulation\verify_live_obligation_recollection.py:185: NameError</failure></testcase><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_saved_audit_rejects_tampered_missing_or_misbound_evidence[wrong_quiet_start]" time="0.384"><failure message="NameError: name 'prior' is not defined">change = 'wrong_quiet_start'
+
+    @pytest.mark.parametrize('change', ['missing_owner', 'missing_attempt', 'third_attempt', 'bool_index',
+        'changed_information', 'changed_now', 'future_call', 'missing_decision', 'changed_target',
+        'fake_admission', 'missing_native_read', 'wrong_peer', 'wrong_quiet_start', 'fake_retry',
+        'missing_physical_job', 'changed_storage', 'changed_completion'])
+    def test_saved_audit_rejects_tampered_missing_or_misbound_evidence(change):
+        data = supplied_fixture(); a = data['collection_attempts']['B'][0]
+        if change == 'missing_owner': del data['collection_attempts']['A']
+        elif change == 'missing_attempt': data['collection_attempts']['A'] = []
+        elif change == 'third_attempt': data['collection_attempts']['B'] *= 3
+        elif change == 'bool_index': a['collection']['recollection_index'] = False
+        elif change == 'changed_information': a['information']['bundle']['trays']['P']['node'] = 99
+        elif change == 'changed_now': a['at'] += .01
+        elif change == 'future_call': data['calls'][0]['at'] = 100.
+        elif change == 'missing_decision': data['decisions']['B'] = []
+        elif change == 'changed_target': a['collection']['trigger_tray']['generation'] += 1
+        elif change == 'fake_admission': a['retry_admission'] = {'status': 'conditional_retry_admissible'}
+        elif change == 'missing_native_read': del a['information']['native_read']['actual_endpoints']
+        elif change == 'wrong_peer': a['collection']['peer_message'] = 'other'
+        elif change == 'wrong_quiet_start': a['collection']['policy_quiet_since'] += .01
+        elif change == 'fake_retry': a['disposition'] = 'one_fresh_pair_requested'; a['new_request_id'] = 'fake'
+        elif change == 'missing_physical_job': data['result']['jobs'].pop()
+        elif change == 'changed_storage':
+            next(x for x in data['result']['receipts'] if x['event'] == 'STORAGE_RELEASE')['time'] += .01
+        else: data['result']['jobs'][0]['completed_at'] += .001
+&gt;       with pytest.raises((ValueError, KeyError, AssertionError)): saved.verify_saved(data)
+                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_live_obligation_recollection_campaign.py:91: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+raw = {'specification': {'case': 'mechanism', 'vector': {'initial_action': 'prefer_2', 'empty_departure': 3.101, 'return_del...6': '845486b745bc6e65a9988d1ef5429336b60fd472eb73c39e133e19ec93a7e7be'}, 'owner': 'B', 'retained_at': 0.11, ...}}, ...}
+
+    def verify_saved(raw):
+        # Initial-stage validation byte-for-byte through the original helper.
+        initial = dict(raw); initial['decisions'] = {}
+&gt;       prior.verify_saved_inputs(initial)
+        ^^^^^
+E       NameError: name 'prior' is not defined
+
+scripts\experiments\g31_ics_circulation\verify_live_obligation_recollection.py:185: NameError</failure></testcase><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_saved_audit_rejects_tampered_missing_or_misbound_evidence[fake_retry]" time="0.391"><failure message="NameError: name 'prior' is not defined">change = 'fake_retry'
+
+    @pytest.mark.parametrize('change', ['missing_owner', 'missing_attempt', 'third_attempt', 'bool_index',
+        'changed_information', 'changed_now', 'future_call', 'missing_decision', 'changed_target',
+        'fake_admission', 'missing_native_read', 'wrong_peer', 'wrong_quiet_start', 'fake_retry',
+        'missing_physical_job', 'changed_storage', 'changed_completion'])
+    def test_saved_audit_rejects_tampered_missing_or_misbound_evidence(change):
+        data = supplied_fixture(); a = data['collection_attempts']['B'][0]
+        if change == 'missing_owner': del data['collection_attempts']['A']
+        elif change == 'missing_attempt': data['collection_attempts']['A'] = []
+        elif change == 'third_attempt': data['collection_attempts']['B'] *= 3
+        elif change == 'bool_index': a['collection']['recollection_index'] = False
+        elif change == 'changed_information': a['information']['bundle']['trays']['P']['node'] = 99
+        elif change == 'changed_now': a['at'] += .01
+        elif change == 'future_call': data['calls'][0]['at'] = 100.
+        elif change == 'missing_decision': data['decisions']['B'] = []
+        elif change == 'changed_target': a['collection']['trigger_tray']['generation'] += 1
+        elif change == 'fake_admission': a['retry_admission'] = {'status': 'conditional_retry_admissible'}
+        elif change == 'missing_native_read': del a['information']['native_read']['actual_endpoints']
+        elif change == 'wrong_peer': a['collection']['peer_message'] = 'other'
+        elif change == 'wrong_quiet_start': a['collection']['policy_quiet_since'] += .01
+        elif change == 'fake_retry': a['disposition'] = 'one_fresh_pair_requested'; a['new_request_id'] = 'fake'
+        elif change == 'missing_physical_job': data['result']['jobs'].pop()
+        elif change == 'changed_storage':
+            next(x for x in data['result']['receipts'] if x['event'] == 'STORAGE_RELEASE')['time'] += .01
+        else: data['result']['jobs'][0]['completed_at'] += .001
+&gt;       with pytest.raises((ValueError, KeyError, AssertionError)): saved.verify_saved(data)
+                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_live_obligation_recollection_campaign.py:91: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+raw = {'specification': {'case': 'mechanism', 'vector': {'initial_action': 'prefer_2', 'empty_departure': 3.101, 'return_del...6': '845486b745bc6e65a9988d1ef5429336b60fd472eb73c39e133e19ec93a7e7be'}, 'owner': 'B', 'retained_at': 0.11, ...}}, ...}
+
+    def verify_saved(raw):
+        # Initial-stage validation byte-for-byte through the original helper.
+        initial = dict(raw); initial['decisions'] = {}
+&gt;       prior.verify_saved_inputs(initial)
+        ^^^^^
+E       NameError: name 'prior' is not defined
+
+scripts\experiments\g31_ics_circulation\verify_live_obligation_recollection.py:185: NameError</failure></testcase><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_saved_audit_rejects_tampered_missing_or_misbound_evidence[missing_physical_job]" time="0.449"><failure message="NameError: name 'prior' is not defined">change = 'missing_physical_job'
+
+    @pytest.mark.parametrize('change', ['missing_owner', 'missing_attempt', 'third_attempt', 'bool_index',
+        'changed_information', 'changed_now', 'future_call', 'missing_decision', 'changed_target',
+        'fake_admission', 'missing_native_read', 'wrong_peer', 'wrong_quiet_start', 'fake_retry',
+        'missing_physical_job', 'changed_storage', 'changed_completion'])
+    def test_saved_audit_rejects_tampered_missing_or_misbound_evidence(change):
+        data = supplied_fixture(); a = data['collection_attempts']['B'][0]
+        if change == 'missing_owner': del data['collection_attempts']['A']
+        elif change == 'missing_attempt': data['collection_attempts']['A'] = []
+        elif change == 'third_attempt': data['collection_attempts']['B'] *= 3
+        elif change == 'bool_index': a['collection']['recollection_index'] = False
+        elif change == 'changed_information': a['information']['bundle']['trays']['P']['node'] = 99
+        elif change == 'changed_now': a['at'] += .01
+        elif change == 'future_call': data['calls'][0]['at'] = 100.
+        elif change == 'missing_decision': data['decisions']['B'] = []
+        elif change == 'changed_target': a['collection']['trigger_tray']['generation'] += 1
+        elif change == 'fake_admission': a['retry_admission'] = {'status': 'conditional_retry_admissible'}
+        elif change == 'missing_native_read': del a['information']['native_read']['actual_endpoints']
+        elif change == 'wrong_peer': a['collection']['peer_message'] = 'other'
+        elif change == 'wrong_quiet_start': a['collection']['policy_quiet_since'] += .01
+        elif change == 'fake_retry': a['disposition'] = 'one_fresh_pair_requested'; a['new_request_id'] = 'fake'
+        elif change == 'missing_physical_job': data['result']['jobs'].pop()
+        elif change == 'changed_storage':
+            next(x for x in data['result']['receipts'] if x['event'] == 'STORAGE_RELEASE')['time'] += .01
+        else: data['result']['jobs'][0]['completed_at'] += .001
+&gt;       with pytest.raises((ValueError, KeyError, AssertionError)): saved.verify_saved(data)
+                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_live_obligation_recollection_campaign.py:91: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+raw = {'specification': {'case': 'mechanism', 'vector': {'initial_action': 'prefer_2', 'empty_departure': 3.101, 'return_del...6': '845486b745bc6e65a9988d1ef5429336b60fd472eb73c39e133e19ec93a7e7be'}, 'owner': 'B', 'retained_at': 0.11, ...}}, ...}
+
+    def verify_saved(raw):
+        # Initial-stage validation byte-for-byte through the original helper.
+        initial = dict(raw); initial['decisions'] = {}
+&gt;       prior.verify_saved_inputs(initial)
+        ^^^^^
+E       NameError: name 'prior' is not defined
+
+scripts\experiments\g31_ics_circulation\verify_live_obligation_recollection.py:185: NameError</failure></testcase><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_saved_audit_rejects_tampered_missing_or_misbound_evidence[changed_storage]" time="0.387"><failure message="NameError: name 'prior' is not defined">change = 'changed_storage'
+
+    @pytest.mark.parametrize('change', ['missing_owner', 'missing_attempt', 'third_attempt', 'bool_index',
+        'changed_information', 'changed_now', 'future_call', 'missing_decision', 'changed_target',
+        'fake_admission', 'missing_native_read', 'wrong_peer', 'wrong_quiet_start', 'fake_retry',
+        'missing_physical_job', 'changed_storage', 'changed_completion'])
+    def test_saved_audit_rejects_tampered_missing_or_misbound_evidence(change):
+        data = supplied_fixture(); a = data['collection_attempts']['B'][0]
+        if change == 'missing_owner': del data['collection_attempts']['A']
+        elif change == 'missing_attempt': data['collection_attempts']['A'] = []
+        elif change == 'third_attempt': data['collection_attempts']['B'] *= 3
+        elif change == 'bool_index': a['collection']['recollection_index'] = False
+        elif change == 'changed_information': a['information']['bundle']['trays']['P']['node'] = 99
+        elif change == 'changed_now': a['at'] += .01
+        elif change == 'future_call': data['calls'][0]['at'] = 100.
+        elif change == 'missing_decision': data['decisions']['B'] = []
+        elif change == 'changed_target': a['collection']['trigger_tray']['generation'] += 1
+        elif change == 'fake_admission': a['retry_admission'] = {'status': 'conditional_retry_admissible'}
+        elif change == 'missing_native_read': del a['information']['native_read']['actual_endpoints']
+        elif change == 'wrong_peer': a['collection']['peer_message'] = 'other'
+        elif change == 'wrong_quiet_start': a['collection']['policy_quiet_since'] += .01
+        elif change == 'fake_retry': a['disposition'] = 'one_fresh_pair_requested'; a['new_request_id'] = 'fake'
+        elif change == 'missing_physical_job': data['result']['jobs'].pop()
+        elif change == 'changed_storage':
+            next(x for x in data['result']['receipts'] if x['event'] == 'STORAGE_RELEASE')['time'] += .01
+        else: data['result']['jobs'][0]['completed_at'] += .001
+&gt;       with pytest.raises((ValueError, KeyError, AssertionError)): saved.verify_saved(data)
+                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_live_obligation_recollection_campaign.py:91: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+raw = {'specification': {'case': 'mechanism', 'vector': {'initial_action': 'prefer_2', 'empty_departure': 3.101, 'return_del...6': '845486b745bc6e65a9988d1ef5429336b60fd472eb73c39e133e19ec93a7e7be'}, 'owner': 'B', 'retained_at': 0.11, ...}}, ...}
+
+    def verify_saved(raw):
+        # Initial-stage validation byte-for-byte through the original helper.
+        initial = dict(raw); initial['decisions'] = {}
+&gt;       prior.verify_saved_inputs(initial)
+        ^^^^^
+E       NameError: name 'prior' is not defined
+
+scripts\experiments\g31_ics_circulation\verify_live_obligation_recollection.py:185: NameError</failure></testcase><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_saved_audit_rejects_tampered_missing_or_misbound_evidence[changed_completion]" time="0.395"><failure message="NameError: name 'prior' is not defined">change = 'changed_completion'
+
+    @pytest.mark.parametrize('change', ['missing_owner', 'missing_attempt', 'third_attempt', 'bool_index',
+        'changed_information', 'changed_now', 'future_call', 'missing_decision', 'changed_target',
+        'fake_admission', 'missing_native_read', 'wrong_peer', 'wrong_quiet_start', 'fake_retry',
+        'missing_physical_job', 'changed_storage', 'changed_completion'])
+    def test_saved_audit_rejects_tampered_missing_or_misbound_evidence(change):
+        data = supplied_fixture(); a = data['collection_attempts']['B'][0]
+        if change == 'missing_owner': del data['collection_attempts']['A']
+        elif change == 'missing_attempt': data['collection_attempts']['A'] = []
+        elif change == 'third_attempt': data['collection_attempts']['B'] *= 3
+        elif change == 'bool_index': a['collection']['recollection_index'] = False
+        elif change == 'changed_information': a['information']['bundle']['trays']['P']['node'] = 99
+        elif change == 'changed_now': a['at'] += .01
+        elif change == 'future_call': data['calls'][0]['at'] = 100.
+        elif change == 'missing_decision': data['decisions']['B'] = []
+        elif change == 'changed_target': a['collection']['trigger_tray']['generation'] += 1
+        elif change == 'fake_admission': a['retry_admission'] = {'status': 'conditional_retry_admissible'}
+        elif change == 'missing_native_read': del a['information']['native_read']['actual_endpoints']
+        elif change == 'wrong_peer': a['collection']['peer_message'] = 'other'
+        elif change == 'wrong_quiet_start': a['collection']['policy_quiet_since'] += .01
+        elif change == 'fake_retry': a['disposition'] = 'one_fresh_pair_requested'; a['new_request_id'] = 'fake'
+        elif change == 'missing_physical_job': data['result']['jobs'].pop()
+        elif change == 'changed_storage':
+            next(x for x in data['result']['receipts'] if x['event'] == 'STORAGE_RELEASE')['time'] += .01
+        else: data['result']['jobs'][0]['completed_at'] += .001
+&gt;       with pytest.raises((ValueError, KeyError, AssertionError)): saved.verify_saved(data)
+                                                                    ^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_live_obligation_recollection_campaign.py:91: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+raw = {'specification': {'case': 'mechanism', 'vector': {'initial_action': 'prefer_2', 'empty_departure': 3.101, 'return_del...6': '845486b745bc6e65a9988d1ef5429336b60fd472eb73c39e133e19ec93a7e7be'}, 'owner': 'B', 'retained_at': 0.11, ...}}, ...}
+
+    def verify_saved(raw):
+        # Initial-stage validation byte-for-byte through the original helper.
+        initial = dict(raw); initial['decisions'] = {}
+&gt;       prior.verify_saved_inputs(initial)
+        ^^^^^
+E       NameError: name 'prior' is not defined
+
+scripts\experiments\g31_ics_circulation\verify_live_obligation_recollection.py:185: NameError</failure></testcase><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_unknown_row_cannot_complete_either16_or32_reference" time="0.026" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_small_positive_delta_is_not_relaxed_and_old_solver_mapping_absent" time="0.011" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_whole_history_and_terminal_identity_are_checked_after_decisions[late_changed_payload]" time="0.430" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_whole_history_and_terminal_identity_are_checked_after_decisions[late_reordered_clock]" time="0.385" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_whole_history_and_terminal_identity_are_checked_after_decisions[duplicate_terminal]" time="0.407"><failure message="NameError: name 'prior' is not defined">change = 'duplicate_terminal'
+
+    @pytest.mark.parametrize('change', ['late_changed_payload', 'late_reordered_clock', 'duplicate_terminal', 'bool_terminal'])
+    def test_whole_history_and_terminal_identity_are_checked_after_decisions(change):
+        data = supplied_fixture()
+        if change == 'late_changed_payload':
+            call = deepcopy(data['calls'][0]); call['at'] = 40.
+            call['request']['expiry'] = 99.; data['calls'].append(call)
+            with pytest.raises(ValueError, match='whole_immutable_request'): saved.verify_call_history(data)
+        elif change == 'late_reordered_clock':
+            data['calls'][-1]['at'] = -1.
+            with pytest.raises(ValueError, match='whole_call_chronology'): saved.verify_call_history(data)
+        elif change == 'duplicate_terminal':
+            receipt = next(r for r in data['result']['receipts'] if r['event'] == 'UNLOAD_COMPLETE')
+            data['result']['receipts'].append(deepcopy(receipt))
+&gt;           with pytest.raises(ValueError, match='actual_terminal_receipt'): saved.verify_terminal_receipts(data)
+                                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_live_obligation_recollection_campaign.py:128: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+raw = {'specification': {'case': 'mechanism', 'vector': {'initial_action': 'prefer_2', 'empty_departure': 3.101, 'return_del...6': '845486b745bc6e65a9988d1ef5429336b60fd472eb73c39e133e19ec93a7e7be'}, 'owner': 'B', 'retained_at': 0.11, ...}}, ...}
+
+    def verify_terminal_receipts(raw):
+        """Bind completion claims to actual native terminal receipts, exactly."""
+        rows = raw['result']['jobs']; jobs = {r['business_bag_id']: r for r in rows}
+&gt;       require(len(rows) == len(jobs) == 5 and set(jobs) == prior.model.JOBS, 'five_terminal_job_domain')
+                                                             ^^^^^
+E       NameError: name 'prior' is not defined
+
+scripts\experiments\g31_ics_circulation\verify_live_obligation_recollection.py:28: NameError</failure></testcase><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_whole_history_and_terminal_identity_are_checked_after_decisions[bool_terminal]" time="0.392"><failure message="NameError: name 'prior' is not defined">change = 'bool_terminal'
+
+    @pytest.mark.parametrize('change', ['late_changed_payload', 'late_reordered_clock', 'duplicate_terminal', 'bool_terminal'])
+    def test_whole_history_and_terminal_identity_are_checked_after_decisions(change):
+        data = supplied_fixture()
+        if change == 'late_changed_payload':
+            call = deepcopy(data['calls'][0]); call['at'] = 40.
+            call['request']['expiry'] = 99.; data['calls'].append(call)
+            with pytest.raises(ValueError, match='whole_immutable_request'): saved.verify_call_history(data)
+        elif change == 'late_reordered_clock':
+            data['calls'][-1]['at'] = -1.
+            with pytest.raises(ValueError, match='whole_call_chronology'): saved.verify_call_history(data)
+        elif change == 'duplicate_terminal':
+            receipt = next(r for r in data['result']['receipts'] if r['event'] == 'UNLOAD_COMPLETE')
+            data['result']['receipts'].append(deepcopy(receipt))
+            with pytest.raises(ValueError, match='actual_terminal_receipt'): saved.verify_terminal_receipts(data)
+        else:
+            data['result']['jobs'][0]['completed_at'] = True
+&gt;           with pytest.raises(ValueError, match='actual_terminal_receipt'): saved.verify_terminal_receipts(data)
+                                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_live_obligation_recollection_campaign.py:131: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+raw = {'specification': {'case': 'mechanism', 'vector': {'initial_action': 'prefer_2', 'empty_departure': 3.101, 'return_del...6': '845486b745bc6e65a9988d1ef5429336b60fd472eb73c39e133e19ec93a7e7be'}, 'owner': 'B', 'retained_at': 0.11, ...}}, ...}
+
+    def verify_terminal_receipts(raw):
+        """Bind completion claims to actual native terminal receipts, exactly."""
+        rows = raw['result']['jobs']; jobs = {r['business_bag_id']: r for r in rows}
+&gt;       require(len(rows) == len(jobs) == 5 and set(jobs) == prior.model.JOBS, 'five_terminal_job_domain')
+                                                             ^^^^^
+E       NameError: name 'prior' is not defined
+
+scripts\experiments\g31_ics_circulation\verify_live_obligation_recollection.py:28: NameError</failure></testcase><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_all96_order_and_actions_are_closed[missing]" time="0.003" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_all96_order_and_actions_are_closed[extra]" time="0.003" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_all96_order_and_actions_are_closed[reorder]" time="0.003" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_all96_order_and_actions_are_closed[action]" time="0.003" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_all96_order_and_actions_are_closed[case]" time="0.003" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_success_export_is_json_only_even_when_values_have_capability_attributes" time="0.001" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_exception_exports_actual_prefix_without_result_at_or_reconstruction" time="0.003" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_one_unserializable_attempt_preserves_other_owner_and_stays_unknown" time="0.010" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_owned_shared_budget_failure_or_missing_receipt_never_claims_completed[hard_timeout--1-False]" time="0.017" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_owned_shared_budget_failure_or_missing_receipt_never_claims_completed[exited-1-False]" time="0.014" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_owned_shared_budget_failure_or_missing_receipt_never_claims_completed[exited-0-False]" time="0.015" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_owned_job_dispatch_error_keeps_claim_and_failure" time="0.015" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_worker_requires_closed_plan_before_native_load" time="0.016" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_shared_deadline_is_fixed_not_extended_by_rows_or_errors" time="0.003" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_two_real_crossed_unloading_shapes_admit_only_a_new_pair[insufficient_advance/vector_16]" time="0.186" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_two_real_crossed_unloading_shapes_admit_only_a_new_pair[insufficient_advance/vector_17]" time="0.143" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_unloading_eligibility_rejects_missing_changed_future_stale_and_exhausted[no_unloading]" time="0.144" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_unloading_eligibility_rejects_missing_changed_future_stale_and_exhausted[wrong_job]" time="0.144" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_unloading_eligibility_rejects_missing_changed_future_stale_and_exhausted[wrong_node]" time="0.163" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_unloading_eligibility_rejects_missing_changed_future_stale_and_exhausted[wrong_prefix]" time="0.133" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_unloading_eligibility_rejects_missing_changed_future_stale_and_exhausted[committed_edge]" time="0.147" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_unloading_eligibility_rejects_missing_changed_future_stale_and_exhausted[missing_known]" time="0.169" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_unloading_eligibility_rejects_missing_changed_future_stale_and_exhausted[wrong_kind]" time="0.203" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_unloading_eligibility_rejects_missing_changed_future_stale_and_exhausted[future_end]" time="0.153" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_unloading_eligibility_rejects_missing_changed_future_stale_and_exhausted[end_at_capture]" time="0.159" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_unloading_eligibility_rejects_missing_changed_future_stale_and_exhausted[past_start_bound]" time="0.138" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_unloading_eligibility_rejects_missing_changed_future_stale_and_exhausted[wrong_duration]" time="0.170" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_unloading_eligibility_rejects_missing_changed_future_stale_and_exhausted[missing_tray]" time="0.145" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_unloading_eligibility_rejects_missing_changed_future_stale_and_exhausted[missing_job]" time="0.140" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_unloading_eligibility_rejects_missing_changed_future_stale_and_exhausted[duplicate_tray]" time="0.155" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_unloading_eligibility_rejects_missing_changed_future_stale_and_exhausted[generation_bool]" time="0.156" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_unloading_eligibility_rejects_missing_changed_future_stale_and_exhausted[traversal_negative]" time="0.167" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_unloading_eligibility_rejects_missing_changed_future_stale_and_exhausted[unresigned_generation]" time="0.153" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_unloading_eligibility_rejects_missing_changed_future_stale_and_exhausted[unresigned_traversal]" time="0.149" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_unloading_eligibility_rejects_missing_changed_future_stale_and_exhausted[future_delivery]" time="0.140" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_unloading_eligibility_rejects_missing_changed_future_stale_and_exhausted[expired_source]" time="0.157" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_unloading_eligibility_rejects_missing_changed_future_stale_and_exhausted[wrong_source]" time="0.162" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_unloading_eligibility_rejects_missing_changed_future_stale_and_exhausted[wrong_target_job]" time="0.141" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_unloading_eligibility_rejects_missing_changed_future_stale_and_exhausted[wrong_target_generation]" time="0.141" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_unloading_eligibility_rejects_missing_changed_future_stale_and_exhausted[wrong_target_traversal]" time="0.157" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_unloading_eligibility_rejects_missing_changed_future_stale_and_exhausted[target_committed]" time="0.141" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_unloading_eligibility_rejects_missing_changed_future_stale_and_exhausted[fresh_used]" time="0.160" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_unloading_eligibility_rejects_missing_changed_future_stale_and_exhausted[fresh_bool]" time="0.154" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_unloading_eligibility_rejects_missing_changed_future_stale_and_exhausted[missing_current_ack]" time="0.149" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_unloading_eligibility_rejects_missing_changed_future_stale_and_exhausted[pending_physical]" time="0.157" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_unloading_eligibility_rejects_missing_changed_future_stale_and_exhausted[changed_physical_set]" time="0.143" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_unloading_eligibility_rejects_missing_changed_future_stale_and_exhausted[wire_equal]" time="0.156" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_unloading_eligibility_rejects_missing_changed_future_stale_and_exhausted[wire_after]" time="0.192" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_unloading_eligibility_rejects_missing_changed_future_stale_and_exhausted[own_known_missing]" time="0.156" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_unloading_eligibility_rejects_missing_changed_future_stale_and_exhausted[future_physical_ack]" time="0.164" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_all224_old_screens_preserved_except_exact_two_new_eligibilities" time="23.363" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_actual_adapter_seal_retained_and_unloading_cannot_be_promoted" time="0.251" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_fresh_read_still_unloading_or_missing_terminal_never_has_physical_authority" time="0.146" /><testcase classname="tests.test_g31_circulation_unloading_native_campaign" name="test_old91_source_and_history_archives_immutable_and_policy_scope_only" time="0.081" /></testsuite></testsuites>

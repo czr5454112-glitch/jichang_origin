@@ -1,0 +1,664 @@
+{
+  "schema": "g31.circulation.input.v1",
+  "model_scope": "NEW fixed live-obligation mechanism; five jobs/three trays; source-only, unexecuted",
+  "node_records": [
+    [
+      0,
+      1,
+      1.0,
+      0,
+      0,
+      [
+        1,
+        2
+      ]
+    ],
+    [
+      1,
+      1,
+      0.1,
+      1,
+      0,
+      [
+        3,
+        9
+      ]
+    ],
+    [
+      2,
+      1,
+      0.1,
+      2,
+      0,
+      [
+        3
+      ]
+    ],
+    [
+      3,
+      1,
+      0.1,
+      3,
+      0,
+      [
+        4,
+        10
+      ]
+    ],
+    [
+      4,
+      3,
+      0.1,
+      4,
+      0,
+      [
+        6
+      ]
+    ],
+    [
+      5,
+      1,
+      0.1,
+      5,
+      0,
+      [
+        1
+      ]
+    ],
+    [
+      6,
+      1,
+      0.1,
+      6,
+      0,
+      [
+        7
+      ]
+    ],
+    [
+      7,
+      1,
+      0.1,
+      7,
+      0,
+      [
+        3,
+        8
+      ]
+    ],
+    [
+      8,
+      1,
+      0.1,
+      8,
+      0,
+      [
+        4
+      ]
+    ],
+    [
+      9,
+      1,
+      0.1,
+      9,
+      0,
+      [
+        3
+      ]
+    ],
+    [
+      10,
+      1,
+      0.1,
+      10,
+      0,
+      []
+    ]
+  ],
+  "edge_records": [
+    [
+      0,
+      1,
+      1.0,
+      1.0
+    ],
+    [
+      0,
+      2,
+      2.5,
+      1.0
+    ],
+    [
+      1,
+      3,
+      1.0,
+      1.0
+    ],
+    [
+      2,
+      3,
+      1.0,
+      1.0
+    ],
+    [
+      3,
+      4,
+      1.0,
+      1.0
+    ],
+    [
+      5,
+      1,
+      0.2,
+      1.0
+    ],
+    [
+      4,
+      6,
+      0.5,
+      1.0
+    ],
+    [
+      6,
+      7,
+      2.0,
+      1.0
+    ],
+    [
+      7,
+      3,
+      1.0,
+      1.0
+    ],
+    [
+      7,
+      8,
+      2.8,
+      1.0
+    ],
+    [
+      8,
+      4,
+      0.5,
+      1.0
+    ],
+    [
+      1,
+      9,
+      1.0,
+      1.0
+    ],
+    [
+      9,
+      3,
+      1.0,
+      1.0
+    ],
+    [
+      3,
+      10,
+      1.0,
+      1.0
+    ]
+  ],
+  "node_contracts": [
+    {
+      "node": 0,
+      "zone": "A",
+      "resource_owner": "A",
+      "control_partition": "partition_A",
+      "capacity": 1,
+      "allow_export": true,
+      "allow_receive": true,
+      "export_min_stock": 0
+    },
+    {
+      "node": 1,
+      "zone": "A",
+      "resource_owner": "A",
+      "control_partition": "partition_A",
+      "capacity": 1,
+      "allow_export": true,
+      "allow_receive": true,
+      "export_min_stock": 0
+    },
+    {
+      "node": 2,
+      "zone": "A",
+      "resource_owner": "A",
+      "control_partition": "partition_A",
+      "capacity": 1,
+      "allow_export": true,
+      "allow_receive": true,
+      "export_min_stock": 0
+    },
+    {
+      "node": 3,
+      "zone": "A",
+      "resource_owner": "B",
+      "control_partition": "partition_B",
+      "capacity": 1,
+      "allow_export": true,
+      "allow_receive": true,
+      "export_min_stock": 0
+    },
+    {
+      "node": 4,
+      "zone": "A",
+      "resource_owner": "A",
+      "control_partition": "partition_A",
+      "capacity": 2,
+      "allow_export": false,
+      "allow_receive": true,
+      "export_min_stock": 0
+    },
+    {
+      "node": 5,
+      "zone": "B",
+      "resource_owner": "B",
+      "control_partition": "partition_B",
+      "capacity": 1,
+      "allow_export": true,
+      "allow_receive": true,
+      "export_min_stock": 0
+    },
+    {
+      "node": 6,
+      "zone": "A",
+      "resource_owner": "A",
+      "control_partition": "partition_A",
+      "capacity": 1,
+      "allow_export": true,
+      "allow_receive": true,
+      "export_min_stock": 0
+    },
+    {
+      "node": 7,
+      "zone": "B",
+      "resource_owner": "B",
+      "control_partition": "partition_B",
+      "capacity": 1,
+      "allow_export": true,
+      "allow_receive": true,
+      "export_min_stock": 0
+    },
+    {
+      "node": 8,
+      "zone": "B",
+      "resource_owner": "B",
+      "control_partition": "partition_B",
+      "capacity": 1,
+      "allow_export": true,
+      "allow_receive": true,
+      "export_min_stock": 0
+    },
+    {
+      "node": 9,
+      "zone": "A",
+      "resource_owner": "A",
+      "control_partition": "partition_A",
+      "capacity": 1,
+      "allow_export": false,
+      "allow_receive": true,
+      "export_min_stock": 0
+    },
+    {
+      "node": 10,
+      "zone": "B",
+      "resource_owner": "B",
+      "control_partition": "partition_B",
+      "capacity": 1,
+      "allow_export": false,
+      "allow_receive": true,
+      "export_min_stock": 0
+    }
+  ],
+  "edge_contracts": [
+    {
+      "from": 0,
+      "to": 1,
+      "capacity": 1,
+      "entry_headway": 0.5
+    },
+    {
+      "from": 0,
+      "to": 2,
+      "capacity": 1,
+      "entry_headway": 0.5
+    },
+    {
+      "from": 1,
+      "to": 3,
+      "capacity": 1,
+      "entry_headway": 0.5
+    },
+    {
+      "from": 2,
+      "to": 3,
+      "capacity": 1,
+      "entry_headway": 0.5
+    },
+    {
+      "from": 3,
+      "to": 4,
+      "capacity": 1,
+      "entry_headway": 0.5
+    },
+    {
+      "from": 5,
+      "to": 1,
+      "capacity": 1,
+      "entry_headway": 0.5
+    },
+    {
+      "from": 4,
+      "to": 6,
+      "capacity": 1,
+      "entry_headway": 0.5
+    },
+    {
+      "from": 6,
+      "to": 7,
+      "capacity": 1,
+      "entry_headway": 0.5
+    },
+    {
+      "from": 7,
+      "to": 3,
+      "capacity": 1,
+      "entry_headway": 0.5
+    },
+    {
+      "from": 7,
+      "to": 8,
+      "capacity": 1,
+      "entry_headway": 0.5
+    },
+    {
+      "from": 8,
+      "to": 4,
+      "capacity": 1,
+      "entry_headway": 0.5
+    },
+    {
+      "from": 1,
+      "to": 9,
+      "capacity": 1,
+      "entry_headway": 0.5
+    },
+    {
+      "from": 9,
+      "to": 3,
+      "capacity": 1,
+      "entry_headway": 0.5
+    },
+    {
+      "from": 3,
+      "to": 10,
+      "capacity": 1,
+      "entry_headway": 0.5
+    }
+  ],
+  "trays": [
+    {
+      "tray_id": "L",
+      "node": 0
+    },
+    {
+      "tray_id": "E",
+      "node": 5
+    },
+    {
+      "tray_id": "P",
+      "node": 1
+    }
+  ],
+  "jobs": [
+    {
+      "business_bag_id": "loaded",
+      "origin": 0,
+      "destination": 6,
+      "arrival": 0.0,
+      "deadline": 40.0,
+      "storage_node": 4,
+      "storage_release_at": 0.0,
+      "storage_min_dwell": 0.0,
+      "load_seconds": 0.1,
+      "unload_seconds": 0.1,
+      "hold_seconds": 0.1,
+      "allow_suffix_reroute": true
+    },
+    {
+      "business_bag_id": "receiver",
+      "origin": 1,
+      "destination": 4,
+      "arrival": 0.05,
+      "deadline": 40.0,
+      "storage_node": -1,
+      "storage_release_at": 0.0,
+      "storage_min_dwell": 0.0,
+      "load_seconds": 3.0,
+      "unload_seconds": 0.1,
+      "hold_seconds": 0.1,
+      "allow_suffix_reroute": true
+    },
+    {
+      "business_bag_id": "reuse1",
+      "origin": 7,
+      "destination": 6,
+      "arrival": 0.02,
+      "deadline": 40.0,
+      "storage_node": -1,
+      "storage_release_at": 0.0,
+      "storage_min_dwell": 0.0,
+      "load_seconds": 0.1,
+      "unload_seconds": 0.1,
+      "hold_seconds": 0.1,
+      "allow_suffix_reroute": true
+    },
+    {
+      "business_bag_id": "reuse2",
+      "origin": 7,
+      "destination": 6,
+      "arrival": 0.03,
+      "deadline": 40.0,
+      "storage_node": -1,
+      "storage_release_at": 0.0,
+      "storage_min_dwell": 0.0,
+      "load_seconds": 0.1,
+      "unload_seconds": 0.1,
+      "hold_seconds": 0.1,
+      "allow_suffix_reroute": true
+    },
+    {
+      "business_bag_id": "blocker",
+      "origin": 1,
+      "destination": 10,
+      "arrival": 0.0,
+      "deadline": 40.0,
+      "storage_node": 9,
+      "storage_release_at": 8.95,
+      "storage_min_dwell": 0.0,
+      "load_seconds": 3.0,
+      "unload_seconds": 0.1,
+      "hold_seconds": 0.1,
+      "allow_suffix_reroute": true
+    }
+  ],
+  "transfers": [],
+  "faults": [],
+  "owner_protocol": {
+    "enabled": true,
+    "timeout": 1.0,
+    "ack_delay": 0.02
+  },
+  "options": {
+    "max_simulation_time": 40.0,
+    "max_events": 100000,
+    "trace_limit": 2000
+  },
+  "heuristic_time": [
+    [
+      0.0,
+      2.0,
+      3.5,
+      3.1,
+      4.2,
+      19.5,
+      4.800000000000001,
+      6.9,
+      9.799999999999999,
+      3.1,
+      4.2
+    ],
+    [
+      19.5,
+      0.0,
+      19.5,
+      1.1,
+      2.2,
+      19.5,
+      2.8000000000000003,
+      4.9,
+      7.799999999999999,
+      1.1,
+      2.2
+    ],
+    [
+      19.5,
+      19.5,
+      0.0,
+      1.1,
+      2.2,
+      19.5,
+      2.8000000000000003,
+      4.9,
+      7.799999999999999,
+      19.5,
+      2.2
+    ],
+    [
+      19.5,
+      19.5,
+      19.5,
+      0.0,
+      1.1,
+      19.5,
+      1.7000000000000002,
+      3.8000000000000003,
+      6.699999999999999,
+      19.5,
+      1.1
+    ],
+    [
+      19.5,
+      19.5,
+      19.5,
+      3.8000000000000003,
+      0.0,
+      19.5,
+      0.6,
+      2.7,
+      5.6,
+      19.5,
+      4.8999999999999995
+    ],
+    [
+      19.5,
+      0.30000000000000004,
+      19.5,
+      1.4000000000000001,
+      2.5000000000000004,
+      0.0,
+      3.1000000000000005,
+      5.2,
+      8.1,
+      1.4000000000000001,
+      2.5000000000000004
+    ],
+    [
+      19.5,
+      19.5,
+      19.5,
+      3.2,
+      4.3,
+      19.5,
+      0.0,
+      2.1,
+      5.0,
+      19.5,
+      4.3
+    ],
+    [
+      19.5,
+      19.5,
+      19.5,
+      1.1,
+      2.2,
+      19.5,
+      2.8000000000000003,
+      0.0,
+      2.9,
+      19.5,
+      2.2
+    ],
+    [
+      19.5,
+      19.5,
+      19.5,
+      4.4,
+      0.6,
+      19.5,
+      1.2000000000000002,
+      3.3000000000000003,
+      0.0,
+      19.5,
+      5.499999999999999
+    ],
+    [
+      19.5,
+      19.5,
+      19.5,
+      1.1,
+      2.2,
+      19.5,
+      2.8000000000000003,
+      4.9,
+      7.799999999999999,
+      0.0,
+      2.2
+    ],
+    [
+      19.5,
+      19.5,
+      19.5,
+      19.5,
+      19.5,
+      19.5,
+      19.5,
+      19.5,
+      19.5,
+      19.5,
+      0.0
+    ]
+  ],
+  "potential_contract": {
+    "mode": "SERVICE_AWARE_STATIC_LOCAL_POTENTIAL",
+    "formula": "H(g,g)=0; H(u,g)=service_duration(u)+min_(u,v)(travel(u,v)+H(v,g))",
+    "service_duration": "max(map_node_service,minimum_service_seconds)",
+    "minimum_service_seconds": 0.001,
+    "candidate_score_identity": "travel(current,candidate)+H(candidate,goal) includes candidate and later non-goal service",
+    "precomputation": "reverse_dijkstra_once_per_goal",
+    "node_count": 11,
+    "directed_edge_count": 14,
+    "unreachable_finite_value_seconds": 19.5,
+    "runtime_read_scope": "direct_outgoing_candidates_and_one_scalar_each",
+    "runtime_decision_complexity": "O(outdegree)",
+    "runtime_full_astar_required": false,
+    "future_route_materialized": false,
+    "global_reservation_table_required": false
+  },
+  "owner_notifications": {
+    "enabled": true
+  }
+}

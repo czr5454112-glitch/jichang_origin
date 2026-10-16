@@ -1,0 +1,51 @@
+{
+  "schema": "g31.spool.actual_process_identity.v1",
+  "observed_at_utc": "2026-10-15T10:37:28.0696316Z",
+  "observer_pid": 22112,
+  "observer_excluded": true,
+  "initial_sandbox_cim_failed": true,
+  "ready": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_spool_prepare_002\\ready.json",
+    "sha256": "921b9b8bc3f1ad5079fc8f45f5eaba7d58fb5a569dc49540a4bdbaed662e6cd5"
+  },
+  "process_count": 3,
+  "processes": [
+    {
+      "ProcessId": 35660,
+      "ParentProcessId": 18088,
+      "Name": "pwsh.exe",
+      "CreationDate": "2026-10-15T10:35:32.1061690Z",
+      "ExecutablePath": "C:\\Users\\38908\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe",
+      "CommandLine": "\"C:\\Users\\38908\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe\" -Command \"try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}\n& 'outputs/experiments/g31_ics_lt2_sustained_20261014/user_resume_20261015_001/invoke_route_spool_measured.ps1' -ReadyPath 'outputs/experiments/g31_ics_lt2_sustained_20261014/original_route_spool_prepare_002/ready.json' -ExpectedReadySha256 '921b9b8bc3f1ad5079fc8f45f5eaba7d58fb5a569dc49540a4bdbaed662e6cd5' -ExternalReceipt 'outputs/experiments/g31_ics_lt2_sustained_20261014/original_route_spool_prepare_002/powershell_launch_receipt.json'\"",
+      "ParentCommandLine": "C:\\Users\\38908\\AppData\\Local\\OpenAI\\Codex\\bin\\9614f1d9b40d9c4f\\codex.exe -c features.code_mode_host=true app-server --analytics-default-enabled -c features.prefer_mxc=true -c plugins.codex-app-tools@openai-bundled.mcp_servers.codex_app.enabled=true -c plugins.code-review@openai-bundled.mcp_servers.code-review.enabled=true",
+      "ParentCreationDate": "2026-10-15T01:51:47.6641910Z"
+    },
+    {
+      "ProcessId": 35548,
+      "ParentProcessId": 35660,
+      "Name": "python.exe",
+      "CreationDate": "2026-10-15T10:35:32.9218570Z",
+      "ExecutablePath": "C:\\PROGRAMING\\python3.11.9\\python.exe",
+      "CommandLine": "\"C:\\PROGRAMING\\python3.11.9\\python.exe\" -m scripts.experiments.g31_ics_circulation.launch_original_route_update_spool --output C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_spool_prepare_002 --campaign-sha256 7234a93a57f07170dd9691157d440b54ea4c719cab8df2225f9b4599186e5143",
+      "ParentCommandLine": "\"C:\\Users\\38908\\.cache\\codex-runtimes\\codex-primary-runtime\\dependencies\\native\\powershell\\pwsh.exe\" -Command \"try { [Console]::OutputEncoding=[System.Text.Encoding]::UTF8 } catch {}\n& 'outputs/experiments/g31_ics_lt2_sustained_20261014/user_resume_20261015_001/invoke_route_spool_measured.ps1' -ReadyPath 'outputs/experiments/g31_ics_lt2_sustained_20261014/original_route_spool_prepare_002/ready.json' -ExpectedReadySha256 '921b9b8bc3f1ad5079fc8f45f5eaba7d58fb5a569dc49540a4bdbaed662e6cd5' -ExternalReceipt 'outputs/experiments/g31_ics_lt2_sustained_20261014/original_route_spool_prepare_002/powershell_launch_receipt.json'\"",
+      "ParentCreationDate": "2026-10-15T10:35:32.1061690Z"
+    },
+    {
+      "ProcessId": 10436,
+      "ParentProcessId": 35548,
+      "Name": "python.exe",
+      "CreationDate": "2026-10-15T10:35:33.1806300Z",
+      "ExecutablePath": "C:\\PROGRAMING\\python3.11.9\\python.exe",
+      "CommandLine": "C:\\PROGRAMING\\python3.11.9\\python.exe -m scripts.experiments.g31_ics_circulation.probe_original_route_update_spool --output C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_spool_prepare_002 --campaign --admission 7234a93a57f07170dd9691157d440b54ea4c719cab8df2225f9b4599186e5143",
+      "ParentCommandLine": "\"C:\\PROGRAMING\\python3.11.9\\python.exe\" -m scripts.experiments.g31_ics_circulation.launch_original_route_update_spool --output C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_spool_prepare_002 --campaign-sha256 7234a93a57f07170dd9691157d440b54ea4c719cab8df2225f9b4599186e5143",
+      "ParentCreationDate": "2026-10-15T10:35:32.9218570Z"
+    }
+  ],
+  "shared_hard_seconds": 600,
+  "actual_job_deadline_basis": "Owned launcher BOOT+600 seconds. BOOT monotonic point is after Python process creation and before external_launch_claim creation; exact UTC BOOT is not exported while running.",
+  "deadline_utc_earliest": "2026-10-15T10:45:32.9218570Z",
+  "deadline_utc_latest": "2026-10-15T10:45:33.1732701Z",
+  "deadline_window_kind": "OS creation/claim timestamps bracket actual enforced launcher BOOT deadline; no rounded exact deadline invented",
+  "native_session_created_by_observer": false,
+  "processes_killed_or_restarted": false
+}

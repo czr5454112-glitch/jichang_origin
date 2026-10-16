@@ -1,0 +1,81 @@
+{
+  "schema": "g31.planning_v2.C_encoder.source_design.v1",
+  "status": "design_only_not_implemented_built_loaded_or_measured",
+  "author": "control_timers",
+  "decision": "A separate data-only C typed encoder is a justified next hypothesis. Preserve the original digest call position and every caller guard. Do not install or launch an all-day audit from this design.",
+  "source_pins": {
+    "scripts/experiments/g31_ics_circulation/planning_capture_v2_digest.py": "01fc49cbded5ba70851f1294fce9f5aaa06b66e82bfb5b9862740c310faf9fd5",
+    "scripts/experiments/g31_ics_circulation/planning_capture_v2_batched_digest.py": "d0380cd8dfd523331b7a8a5f3e4586c67c470b7c56a79c71a8e5f93f56121691",
+    "scripts/experiments/g31_ics_circulation/complete_tree_normalizer_candidate.py": "a2d36b55065ae040f249fc1864196ed26cb9d4ae9e650bab27df80b3b455d9a6",
+    "cpp/experimental/complete_tree_normalizer/normalizer.cpp": "0621d204a43723f55ff2f9a89d703e92250b801a54a8f4dd9e1abbade00d9320",
+    "cpp/experimental/complete_tree_normalizer/CMakeLists.txt": "3f0ee7513997d29953be222af8de86fdd3bb275daf9883eaa50756c0f3c4f433"
+  },
+  "actual_evidence": {
+    "result": "delivered_peer_cost_prepare_004/result.json",
+    "result_sha256": "c4c82e9883d727fdfe335eae26437c4764bfca04c60b418e5d09be1bb62b28bc",
+    "review": "Read only the small result and hash. No real input gzip or saved outcome reread.",
+    "calls": 32,
+    "dispositions": {"27212": {"absent": 16}, "27215": {"absent": 16}},
+    "27212_ms": {"original_A": 37.1643, "instrumented_B": 31.5551, "nested_original_digest_B": 31.5186, "outside_digest_B": 0.0365},
+    "27215_ms": {"original_A": 58.45875, "instrumented_B": 46.70925, "nested_original_digest_B": 46.68265, "outside_digest_B": 0.0265},
+    "interpretation": "B is the original validator with instrumentation, not an optimization. These two absent paths support investigating encoding cost; they do not establish successful full-coverage guard cost, activation frequency, whole-audit attribution or a speedup from A/B differences.",
+    "prior_negative": "Python batched writer retained exact bytes but whole-tree preflight made fixed inputs slower: 27212 A28.7789/B70.9182 ms;27215 A48.73495/B115.8761 ms. Keep this negative; do not remove safety checks to improve numbers."
+  },
+  "minimal_interface": {
+    "new_files_proposed_not_created": [
+      "cpp/experimental/planning_v2_typed_encoder/encoder.cpp",
+      "cpp/experimental/planning_v2_typed_encoder/CMakeLists.txt",
+      "scripts/experiments/g31_ics_circulation/planning_capture_v2_c_encoder.py",
+      "tests/test_g31_circulation_planning_capture_v2_c_encoder.py"
+    ],
+    "extension": "A distinct CPython3.11.9 extension exposing try_typed_bytes(body) and a closed ABI/domain contract. Return fresh bytes, or NotImplemented only after a hook-free unsupported attempt. Never return partial bytes.",
+    "python_wrapper": "Verify extension identity and frozen original code identities. If the result is NotImplemented, call the original capture_digest_v2 exactly once. Otherwise apply the existing Python hashlib.sha256(...).hexdigest(); keep SHA and wrapper costs in the measured call. A separate diagnostic bytes oracle exposes complete original bytes for conformance.",
+    "no_authority": "Bytes or digest equality grant no capture provenance, freshness, owner, native session, routing or simulator authority. No native simulation library is linked.",
+    "no_state_cache": "No input, snapshot, digest, candidate or label persists between calls. Only fixed field-name constants and executable code may persist."
+  },
+  "single_pass_algorithm": [
+    "Follow both frozen writer functions in exact source consumption order: namespace strings, outer schema, all local fields and arrays, extension receipts/completion/action coverage and ACK presence. Preserve every array order and length prefix, including duplicate identities.",
+    "At each visited mapping require exact dict, then scan that mapping's key types with PyDict_Next before any lookup. Every key must be exact str on the fast path. This prevents a stored custom key's equality/hash callback during lookup. Do not recursively preflight all values or unused subtrees.",
+    "Use exact list for fast-path sequences and exact dictionary entries. Tuples, subclasses and arbitrary iterators are unsupported and fall back without invoking len/iteration/getitem hooks. The declared fast domain is stable input with the GIL held; concurrent mutation and arbitrary runtime callbacks are not claimed equivalent.",
+    "Process one field before gathering later fields. On missing field or unsupported representation, discard the private buffer and return NotImplemented without a pending exception. The original traversal then determines the precise error order. Do not clear a real encoding/allocation error and retry.",
+    "Append bytes to a private checked-size buffer, using fixed-width stack scratch for numbers. No Python struct.pack call or per-number Python bytes object is needed. Check addition/growth overflow before every append; catch C++ allocation/length exceptions and convert to a failing Python exception, never C++ unwinding through the C ABI.",
+    "Finish with one owned bytes result. Keep all partial-buffer cleanup local. Do not release the GIL, return input references, or maintain a request cache."
+  ],
+  "wire_primitives": {
+    "text": "Exact str only. Strict UTF-8 once per consumed field, then unsigned 64-bit big-endian byte length and exact bytes. Embedded NUL and astral codepoints are legal. A surrogate encoding error propagates; no replacement, normalization or ensure_ascii transformation.",
+    "uint64": "Exact int and bool only. Use a 64-bit unsigned-long-long mask conversion after type checks; emit eight explicit big-endian bytes. Negative and arbitrarily large integers retain the original modulo 2^64 behavior. Verify sizeof/CHAR_BIT assumptions in the extension contract.",
+    "double": "Exact float, bool, and a conservative exact-int range only. For floats use the same PyFloat_Pack8(...,0) routine as CPython3.11.9 _struct's >d. Preserve -0, NaN payload/sign as produced by that same routine, and infinities. For ints first prove a signed64 range without supplied hooks, then use PyLong_AsDouble and PyFloat_Pack8. Larger ints return NotImplemented before conversion. This avoids silently changing _struct's conversion-error rewriting into a raw OverflowError.",
+    "boolean": "Minimal fast path accepts exact bool, writing 0 or1. Other truthy/falsy values fall back before __bool__ or __len__ can run. The original's more permissive truthiness is not replaced by a new rejection.",
+    "ACK_presence": "Preserve the original identity check ack is not None, then the exact dictionary fast path for a present ACK. Do not replace it with truthiness."
+  },
+  "fallback_and_errors": [
+    "Check types through exact C type predicates, not Python equality, isinstance protocols or conversions. Never call supplied __and__, __index__, __float__, __bool__, __len__, __iter__, __getitem__, encode, hash or equality on an unsupported object before fallback.",
+    "The no-hook property applies to all supplied objects encountered before unsupported, including dictionary keys. Scanning a later custom key early is permitted only because it triggers no hook and the original function will then run once from its true beginning.",
+    "Unused values are not traversed. An unused custom object or alias may remain ignored exactly as in the original finite-field writer. Do not claim this proves a fully validated JSON tree. Shared consumed aliases are read repeatedly and remain legal; no generic cycle rejection is added to a writer that does not have one.",
+    "Unsupported is the sole fallback trigger. Unicode errors, MemoryError, pending exceptions, buffer overflow and unexpected internal errors remain failures/unknown. Fallback must not mask these or produce an accepted digest from a partial buffer.",
+    "Successful bytes and original unsupported-path effects are conformance targets. Memory pressure, recursion/interrupt timing, allocation points and arbitrary mutation schedules are not promised identical; every such failure remains retained unknown."
+  ],
+  "required_focused_gate_before_cost": [
+    "Complete bytes equality against the unchanged original outer/local code with only the final SHA facade replaced; hashing alone is insufficient. Also require digest equality.",
+    "All fields populated; empty/nonempty lists; both ACK cases; repeated identities; reordered arrays; per-field mutations; missing fields at early and late positions; negative/arbitrary-size integer masks; bool in integer/double positions; supported and unsupported truthy slots.",
+    "Double boundary/rounding cases, positive and negative zero, subnormals, infinities and multiple NaN bit patterns. Huge-int double fields must take one original fallback and preserve its exception class/message/order.",
+    "Unicode ASCII/multibyte/NUL/astral and paired/unpaired surrogate failures. Earlier bad encoding versus later missing field must preserve the original first failure.",
+    "Custom scalar/str/int/container subclasses and dictionary keys with hook counters/raising hooks: zero hooks in the C attempt and exactly original effects in one fallback. Include ignored extra custom values, stored custom keys, cycles in unused values and consumed malformed positions.",
+    "No mutable input or buffer alias escapes; unchanged input identity/content; no persisted request references; failure cleanup; injected allocation/resource failure is unknown and is not retried.",
+    "Bind actual extension binary, compiler/runtime/header/source closure, source function/code identity and contract. Test the staged prepare-to-execute lifecycle, not only isolated helper functions.",
+    "Only after source and synthetic gates, a separately approved fixed-two-actual-input test must verify every envelope in original order and full bytes before any ABBA timing. Startup, safe-key scans, encode, wrapper fallback, SHA, outputs and reread all remain inside the owned budget."
+  ],
+  "integration_constraints": [
+    "Preserve research_original_low_wip.delivered_peer's schema/owner checks, then complete digest, then finite/causality/expiry checks, then coverage/authority checks. In particular do not move expiry ahead of digest.",
+    "Do not edit frozen writer, batched candidate, original C normalizer, native026/027 archives, policy modules or simulator build. Use a new stand-alone extension/build directory and an explicit private binder only after independent review.",
+    "A source-derived descriptor/inventory of every text/integer/float/bool/loop operation should be frozen against the original AST so a handwritten C loop cannot silently omit a field. This is additional evidence; complete byte conformance remains required.",
+    "The measured validator result justifies a local C experiment; it does not justify another full600 bridge audit or any claim that an all-day certificate will close."
+  ],
+  "primary_sources_consulted": [
+    {"url":"https://github.com/python/cpython/blob/v3.11.9/Modules/_struct.c","relevance":"Pinned bp_double converts with PyFloat_AsDouble, replaces conversion failure with StructError, and packs using PyFloat_Pack8 with big-endian flag0. This is why unrestricted integer conversion cannot silently substitute a different error."},
+    {"url":"https://docs.python.org/3.11/c-api/long.html#c.PyLong_AsUnsignedLongLongMask","relevance":"Documents modulo conversion and potential __index__ use. Exact-type checks are required before calling it. The rolling3.11 documentation is API context, not proof of the future3.11.9 binary identity."},
+    {"url":"https://docs.python.org/3.11/c-api/float.html#c.PyFloat_Pack8","relevance":"Documents byte order, IEEE-format packing and platform limitations. The future prototype must remain pinned to the original interpreter/runtime rather than claim all-platform bit equivalence."}
+  ],
+  "execution_in_this_task": {"source_reads":true,"small_result_read":true,"new_extension_source_written":false,"builds":0,"C_loads":0,"pure_runs":0,"raw_decodes":0,"model_runs":0,"native_runs":0,"benchmarks":0},
+  "gain_claim": null
+}

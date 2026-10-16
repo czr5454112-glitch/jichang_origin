@@ -4,6 +4,94 @@
 
 namespace czr005::ics {
 
+// Capture-body digest excludes delivery bookkeeping and its own digest field.
+// The exact same typed serializer seals the body in a native checkpoint.
+template <typename Writer>
+void fingerprint_planning_capture(Writer& w,const CirculationPlanningSnapshot& m) {
+  w.string("g31.planning_capture.v1");
+  w.string(m.message_id);w.string(m.source_owner);w.string(m.target_owner);
+  w.u64(m.publication_sequence);w.floating(m.captured_at);w.floating(m.valid_until);
+  w.string(m.static_contract_sha256);w.string(m.queue_discipline);w.string(m.resource_semantics);
+  w.string(m.event_semantics);w.string(m.scorer_mode);w.string(m.merge_grant_rule);
+  w.string(m.merge_grant_timing_mode);w.floating(m.minimum_service_seconds);
+  w.u64(m.jobs.size());for(const auto& row:m.jobs) {
+    const auto& j=row.contract;
+    w.string(j.business_bag_id);w.i64(j.origin);w.i64(j.destination);w.floating(j.arrival);w.floating(j.deadline);
+    w.i64(j.storage_node);w.floating(j.storage_release_at);w.floating(j.storage_min_dwell);
+    w.floating(j.load_seconds);w.floating(j.unload_seconds);w.floating(j.hold_seconds);
+    w.boolean(j.protected_service);w.boolean(j.allow_suffix_reroute);w.string(row.status);
+    w.floating(row.loaded_at);w.floating(row.storage_entered_at);w.floating(row.storage_released_at);
+  }
+  w.u64(m.trays.size());for(const auto& t:m.trays) {
+    w.string(t.tray_id);w.string(t.business_bag_id);w.string(t.mode);w.string(t.ready_kind);
+    w.i64(t.node);w.i64(t.edge_from);w.i64(t.edge_to);w.i64(t.reception_node);
+    w.u64(t.generation);w.u64(t.traversal_id);w.floating(t.available_at);w.floating(t.service_ready_at);
+    w.floating(t.load_complete_at);w.boolean(t.service_ready_known);
+    w.u64(t.committed_prefix.size());for(int node:t.committed_prefix) w.i64(node);
+  }
+  w.u64(m.nodes.size());for(const auto& n:m.nodes) {
+    w.i64(n.node);w.i64(n.occupancy);w.i64(n.actual_available);w.i64(n.unrepresented_occupancy);
+  }
+  w.u64(m.known_faults.size());for(const auto& f:m.known_faults) {
+    w.i64(f.from);w.i64(f.to);w.boolean(f.active);w.floating(f.received_at);
+  }
+  // Bind the derived coverage fields rendered to the receiver as well.
+  w.string("source_waiting_or_locally_carried_released_jobs_and_local_trays");w.boolean(true);
+  w.u64(m.nodes.size());int unrepresented=0;
+  for(const auto& n:m.nodes) {w.i64(n.node);unrepresented+=n.unrepresented_occupancy;}
+  w.u64(m.trays.size());for(const auto& t:m.trays) w.string(t.tray_id);
+  w.u64(m.jobs.size());for(const auto& j:m.jobs) w.string(j.contract.business_bag_id);
+  w.i64(unrepresented);w.boolean(false);
+}
+
+// V2 deliberately nests the exact v1 local-capture serializer. No v1-only
+// session or capture gains an extra byte from this opt-in extension.
+template <typename Writer>
+void fingerprint_planning_capture_v2(Writer& w,const CirculationPlanningSnapshotV2& m) {
+  w.string("g31.planning_capture.v2");fingerprint_planning_capture(w,m);
+  w.string("g31.planning_extension.v2");w.string(m.source_owner);w.floating(m.captured_at);
+  w.u64(m.terminal_receipts.size());for(const auto& r:m.terminal_receipts) {
+    w.string(r.receipt_id);w.u64(r.source_local_sequence);w.string(r.source_owner);
+    w.string("UNLOAD_COMPLETE");w.string("completed");w.string(r.business_bag_id);
+    w.i64(r.destination);w.string(r.tray_id);w.floating(r.completed_at);
+  }
+  w.string("all_source_owned_destination_unload_completions_through_capture");w.boolean(true);
+  w.floating(m.captured_at);w.u64(m.nodes.size());for(const auto& n:m.nodes) w.i64(n.node);
+  w.boolean(false);w.u64(m.terminal_receipts.size());
+  for(const auto& r:m.terminal_receipts) w.string(r.business_bag_id);
+  w.u64(m.submitted_physical_actions.size());for(const auto& a:m.submitted_physical_actions) {
+    w.string(a.request_id);w.string(a.kind);w.string(a.source_owner);w.boolean(a.has_delivered_ack);
+    if(a.has_delivered_ack) {w.u64(a.ack_sequence);w.floating(a.ack_delivered_at);w.string(a.ack_status);}
+  }
+  w.string("all_source_submitted_physical_operations_last_delivered_ack");w.floating(m.captured_at);
+  w.boolean(true);w.boolean(false);w.boolean(false);
+  w.u64(m.submitted_physical_actions.size());std::size_t unresolved=0;
+  for(const auto& a:m.submitted_physical_actions) {w.string(a.request_id);unresolved+=!a.terminal;}
+  w.u64(unresolved);for(const auto& a:m.submitted_physical_actions) if(!a.terminal) w.string(a.request_id);
+}
+
+// V3 binds the COMPUTED unchanged v2 typed digest string, not inline v2 bytes
+// or a caller-supplied cached digest. Recompute from the immutable base body
+// whenever sealing, so the complete nested state is bound as well.
+template <typename Writer>
+void fingerprint_planning_capture_v3(Writer& w,const CirculationPlanningSnapshotV3& m) {
+  w.string("g31.planning_capture.v3");
+  Writer nested("g31.planning_capture_digest.v2");fingerprint_planning_capture_v2(nested,m);
+  w.string("nested_unchanged_v2_typed_digest");w.string(nested.sha256());
+  w.string("g31.planning_inflight_receipts.v1");w.string(m.source_owner);w.floating(m.captured_at);
+  w.u64(m.source_observed_inflight.size());
+  for(const auto& row:m.source_observed_inflight) {
+    w.string(row.source_owner);w.string("EDGE_ENTER");w.string(row.tray_id);w.string(row.business_bag_id);
+    w.u64(row.generation);w.u64(row.traversal_id);w.i64(row.edge_from);w.i64(row.edge_to);
+    w.floating(row.entered_at);w.floating(row.static_edge_travel_seconds);w.floating(row.derived_edge_exit_at);
+  }
+  w.string("all_current_source_owned_committed_edges_with_matching_observed_entries");w.floating(m.captured_at);
+  w.boolean(m.unmatched_inflight_tray_ids.empty());w.boolean(false);
+  std::size_t committed=0;for(const auto& tray:m.trays) committed+=tray.edge_to>=0;
+  w.u64(committed);for(const auto& tray:m.trays) if(tray.edge_to>=0) w.string(tray.tray_id);
+  w.u64(m.unmatched_inflight_tray_ids.size());for(const auto& id:m.unmatched_inflight_tray_ids) w.string(id);
+}
+
 // Versioned, deterministic in-process inventory. This is not a deserialize
 // interface: only immutable StateCheckpoint objects minted by the runtime may
 // restore capabilities. Future environment entries belong in this seal, never
@@ -82,7 +170,8 @@ void fingerprint_circulation_state(Writer& w, const CirculationState& s) {
     w.u64(m.publication_sequence);
     w.floating(m.observed_at); w.floating(m.delivered_at); w.boolean(m.delivered);
     w.u64(m.jobs.size());
-    for (const auto& j : m.jobs) {
+    for (const auto index : m.jobs) {
+      const auto& j=s.input.jobs.at(index);
       w.string(j.business_bag_id); w.i64(j.origin); w.floating(j.arrival); w.floating(j.deadline);
     }
   }
@@ -180,6 +269,29 @@ void fingerprint_circulation_state(Writer& w, const CirculationState& s) {
     w.u64(s.owner_notifications.size());
     for(const auto& [owner,n]:s.owner_notifications) {
       w.string(owner);w.u64(n.sequence);w.floating(n.observed_at);w.u64(n.change_mask);
+    }
+  }
+  // Existing sessions with no planning publication retain their exact seal.
+  if(!s.planning_snapshots.empty()) {
+    w.string("native_planning_snapshots.v1");w.u64(s.planning_snapshots.size());
+    for(const auto& m:s.planning_snapshots) {
+      fingerprint_planning_capture(w,m);w.string(m.payload_sha256);
+      w.floating(m.delivered_at);w.boolean(m.delivered);
+    }
+  }
+  if(!s.planning_snapshots_v2.empty()) {
+    w.string("native_planning_snapshots.v2");w.u64(s.planning_snapshots_v2.size());
+    for(const auto& m:s.planning_snapshots_v2) {
+      fingerprint_planning_capture_v2(w,m);w.string(m.payload_sha256);
+      w.floating(m.delivered_at);w.boolean(m.delivered);
+    }
+  }
+  // Opt-in only: no extra tag/count/byte for an empty v3 history.
+  if(!s.planning_snapshots_v3.empty()) {
+    w.string("native_planning_snapshots.v3");w.u64(s.planning_snapshots_v3.size());
+    for(const auto& m:s.planning_snapshots_v3) {
+      fingerprint_planning_capture_v3(w,m);w.string(m.payload_sha256);
+      w.floating(m.delivered_at);w.boolean(m.delivered);
     }
   }
 }

@@ -44,12 +44,81 @@ def decode_route(payload: str) -> RoutePacket:
     return packet
 
 
-def public_astar(observation: dict[str, Any], source: int, goal: int) -> tuple[int, ...]:
+class _ObservationRouting:
+    """Read-only routing work scoped to one service-publication observation.
+
+    Graph construction is lazy, so a no-route activation preserves the old
+    validation behavior. Neither this object nor its caches enter policy state.
+    Callers must leave the supplied observation unchanged during its lifetime.
+    """
+
+    def __init__(self, observation: dict[str, Any]):
+        self._observation = observation
+        self._now = observation["now"]
+        self._graph = None
+        self._lower_bounds = {}
+        self._paths = {}
+
+    def path(self, observation: dict[str, Any], source: int, goal: int) -> tuple[int, ...]:
+        if observation is not self._observation or observation["now"] != self._now:
+            raise ValueError("route:routing_observation_mismatch")
+        key = source, goal
+        if key in self._paths:
+            return self._paths[key]
+        if self._graph is None:
+            contracts={n["node"]:n for n in observation["node_contracts"]}
+            service={n[0]:max(n[2],.001) for n in observation["node_records"]}
+            closed={(e["from"],e["to"]) for e in observation["edge_contracts"] if e["capacity"]==0}
+            closed.update((f["from"],f["to"]) for f in observation.get("known_faults",[]) if f["active"])
+            outgoing={n:[] for n in contracts}; incoming={n:[] for n in contracts}
+            for u,v,length,speed in observation["edge_records"]:
+                if (u,v) in closed: continue
+                cost=service[u]+max(length/speed,.001)
+                outgoing[u].append((v,cost));incoming[v].append((u,cost))
+            self._graph = contracts, service, outgoing, incoming
+        contracts, service, outgoing, incoming = self._graph
+        h = self._lower_bounds.get(goal)
+        if h is None:
+            h={goal:0.};queue=[(0.,goal)]
+            while queue:
+                cost,node=heapq.heappop(queue)
+                if cost!=h[node]:continue
+                for predecessor,weight in incoming[node]:
+                    new=cost+weight
+                    if new<h.get(predecessor,math.inf):
+                        h[predecessor]=new;heapq.heappush(queue,(new,predecessor))
+            self._lower_bounds[goal] = h
+        if source not in h:
+            self._paths[key] = ()
+            return ()
+        queue=[(h[source],0.,(source,),source)];best={source:0.}
+        while queue:
+            _,cost,path,node=heapq.heappop(queue)
+            if cost!=best[node]:continue
+            if node==goal:
+                self._paths[key] = path
+                return path
+            for successor,weight in outgoing[node]:
+                if successor not in h:continue
+                local=contracts[successor]
+                penalty=max(0,local.get("occupancy",0))*service[successor]
+                new=cost+weight+penalty
+                if new<best.get(successor,math.inf):
+                    best[successor]=new
+                    heapq.heappush(queue,(new+h[successor],new,path+(successor,),successor))
+        self._paths[key] = ()
+        return ()
+
+
+def public_astar(observation: dict[str, Any], source: int, goal: int,
+                 *, _routing: _ObservationRouting | None = None) -> tuple[int, ...]:
     """A* with exact static lower bound and declared local berth penalty.
 
     Dynamic penalties use local occupancy only. Remote live queues do not exist
     in this projection. This is a deterministic strong baseline, not novelty.
     """
+    if _routing is not None:
+        return _routing.path(observation, source, goal)
     contracts={n["node"]:n for n in observation["node_contracts"]}
     service={n[0]:max(n[2],.001) for n in observation["node_records"]}
     closed={(e["from"],e["to"]) for e in observation["edge_contracts"] if e["capacity"]==0}
@@ -84,7 +153,8 @@ def public_astar(observation: dict[str, Any], source: int, goal: int) -> tuple[i
     return ()
 
 
-def make_route_packet(observation: dict[str, Any], tray_id: str) -> RoutePacket:
+def make_route_packet(observation: dict[str, Any], tray_id: str,
+                      *, _routing: _ObservationRouting | None = None) -> RoutePacket:
     tray=next((t for t in observation["trays"] if t["tray_id"]==tray_id),None)
     if tray is None:raise ValueError("route:tray_not_visible")
     if tray["edge_to"]>=0:raise ValueError("route:committed_edge_cannot_be_replaced")
@@ -94,7 +164,7 @@ def make_route_packet(observation: dict[str, Any], tray_id: str) -> RoutePacket:
     storage=job.get("storage_node",-1)
     before_storage=storage>=0 and job.get("storage_released_at",-1)<0
     goal=storage if before_storage else job["destination"]
-    path=public_astar(observation,tray["node"],goal)
+    path=public_astar(observation,tray["node"],goal,_routing=_routing)
     if len(path)<2:raise ValueError("route:no_safe_public_continuation")
     return RoutePacket("g31.route_intent.v1",job["business_bag_id"],tray_id,observation["owner_id"],
                        tray["generation"],tray["traversal_id"],"storage_in" if before_storage else "storage_out_or_direct",

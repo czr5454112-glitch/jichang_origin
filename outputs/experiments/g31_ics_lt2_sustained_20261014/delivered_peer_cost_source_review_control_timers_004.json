@@ -1,0 +1,36 @@
+{
+  "schema": "g31.delivered_peer.source_review.control_timers.v4",
+  "status": "no_concrete_blocker_in_narrow_scope",
+  "plan": {
+    "sha256": "904afc076ef0d94d5a55356715473cedf9469715358debb473b2721b64e4cd62",
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\delivered_peer_cost_prepare_004\\plan.json"
+  },
+  "selected_live_pins": {
+    "scripts/experiments/g31_ics_circulation/measure_delivered_peer_cost_v4.py": "11e58366df48b3b10c71c26edaf177fb84b5d555bca0c432747eb0ce1bc8cfbf",
+    "tests/test_g31_circulation_delivered_peer_cost_harness_v4.py": "fcc3745bf06b764b1c532f370f2a5d830cacaffe145519305e37edc38e53c768"
+  },
+  "declared_source_count": 78,
+  "pure": {
+    "failures": 0,
+    "errors": 0,
+    "tests": 57,
+    "xml": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\delivered_peer_cost_pure_004\\tests.xml",
+      "sha256": "24a08fdd05f62e8aa85a18b08aa8263e4decdb953910106d187aa599497e36f2"
+    },
+    "skipped": 0
+  },
+  "checks": [
+    "Exactly one internal child-stage flag selects distinct prepare/pure/execute exclusive log names; no reuse of prior stage logs.",
+    "New synthetic tests cover all three log domains, same-stage duplicate rejection, prepare then execute preserving both, and unknown-stage refusal.",
+    "v4 execute privately clones v3/v2 full globals, retaining v2.audit_records for both original in-memory and saved-journal check sites.",
+    "main/pure/prepare route to v4 run_child; v4 explicit source entries retain core plus all three harness test generations.",
+    "Budget remains shared120; no retry of failed003 or alteration of its claim/logs."
+  ],
+  "limitations": [
+    "Only source and two current source pins plus small plan/XML inspected; no complete source/archive rehash, imports, tests, raw decode or actual validator/model/native calls.",
+    "003 outer validator_calls=32 is a declaration, not actual count; producer-before-launch source and absent worker indicate zero calls. Old receipt unchanged.",
+    "This source review is not actual execution or timing acceptance."
+  ],
+  "reviewer_active_child": false
+}

@@ -1,0 +1,568 @@
+{
+  "schema": "g31.single_capture.owned_C18.root_review.v1",
+  "status": "one_original18_campaign_authorized",
+  "review_script_sha256": "4ea024d664963904e0458a23c5e0d572328be2239d5088e93ff1c21efaa1c536",
+  "campaign_sha256": "4ac4569ad5145ccf62e83a39d29ad238077bf00fa0657c130fb12916cfb91bdc",
+  "command": [
+    "C:\\PROGRAMING\\python3.11.9\\python.exe",
+    "-m",
+    "scripts.experiments.g31_ics_circulation.launch_initial_owner_route_single_capture_owned_codec_campaign",
+    "--output",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\single_owned_C18_prepare_002",
+    "--campaign-sha256",
+    "4ac4569ad5145ccf62e83a39d29ad238077bf00fa0657c130fb12916cfb91bdc"
+  ],
+  "verified_current_independent_archive_sources": 218,
+  "old_reference_domains": {
+    "frozen_entry_codec_campaign": 169,
+    "frozen_codec_plan": 135,
+    "single_capture_integration_source": 153,
+    "single_capture_endpoint_source": 131,
+    "frozen_single_capture_campaign": 190,
+    "owned_C_binding_source": 156,
+    "same_C_owned_decoder_plan": 153
+  },
+  "compiled_native_archive_files_verified": 67,
+  "C_toolchain_files_declared": 6124,
+  "C_toolchain_files_rehashed_in_this_root_review": false,
+  "pure_tests": 38,
+  "pure_seconds": 17.8191388,
+  "metadata_seconds": 38.3158153,
+  "maximum_archive_path_chars": 243,
+  "source_proof": {
+    "schema": "g31.single_capture.owned_C_campaign_source.v1",
+    "original_worker_inverse_AST_exact": true,
+    "provider_open_after_original_clock_and_plan": true,
+    "original_branch_call_uses_local_bound_function": true,
+    "provider_close_after_native_RPC_cleanup_before_saved_audit": true,
+    "original_saved_status_gate_retained": true,
+    "original_clock_locations_and_unknowns_unchanged": true,
+    "binding": {
+      "schema": "g31.single_capture.verified_C_owned_publisher_binding.v1",
+      "single_capture": {
+        "schema": "g31.initial_owner.single_capture_integration.v1",
+        "previous_entry_codec": {
+          "schema": "g31.initial_root.entry_complete_codec_integration.v1",
+          "entry": {
+            "schema": "g31.initial_root.entry_integration_source.v1",
+            "previous_gated_evidence_proof": {
+              "schema": "g31.initial_root.gated_evidence_source.v2",
+              "scheduler": {
+                "scheduler_advance_sites": [
+                  "session.advance_until_owner_notification",
+                  "session.advance_to"
+                ],
+                "root_drain_sites": [
+                  "self.session.advance_to"
+                ],
+                "admission_ast": "Expr(value=Call(func=Attribute(value=Attribute(value=Name(id='root', ctx=Load()), attr='client', ctx=Load()), attr='activate', ctx=Load()), args=[Constant(value='A'), Dict(keys=[Constant(value='kind'), Constant(value='root_id')], values=[Constant(value='initial_A_continuation'), Attribute(value=Name(id='root', ctx=Load()), attr='request_id', ctx=Load())])], keywords=[]))",
+                "original_root_block_ast": "If(test=Compare(left=Attribute(value=Name(id='root', ctx=Load()), attr='state', ctx=Load()), ops=[Eq()], comparators=[Constant(value='pending_first_hop_and_ack')]), body=[Expr(value=Call(func=Attribute(value=Name(id='root', ctx=Load()), attr='observe_after_boundary', ctx=Load()), args=[Name(id='response', ctx=Load())], keywords=[])), Assign(targets=[Name(id='verdict', ctx=Store())], value=Call(func=Attribute(value=Name(id='root', ctx=Load()), attr='drain_and_finish_if_closed', ctx=Load()), args=[], keywords=[])), If(test=Subscript(value=Name(id='verdict', ctx=Load()), slice=Constant(value='closed'), ctx=Load()), body=[Expr(value=Call(func=Name(id='publish_root', ctx=Load()), args=[Name(id='root', ctx=Load()), Name(id='root_records', ctx=Load())], keywords=[]))], orelse=[])], orelse=[])",
+                "actual_boundary_assignment_ast": "Assign(targets=[Attribute(value=Name(id='root', ctx=Load()), attr='last_boundary', ctx=Store())], value=Call(func=Attribute(value=Name(id='copy', ctx=Load()), attr='deepcopy', ctx=Load()), args=[Name(id='response', ctx=Load())], keywords=[]))",
+                "exact_full_ast_restoration": true,
+                "original_scheduler_ast_sha256": "913d85cc322590c4d9b8588c864de1790362820e249e030b91e4515dc21251dc",
+                "background_tick_policy_or_activations_modified": false,
+                "runtime_dispatch_ready": false,
+                "original_refresh_sites": 2,
+                "refresh_AST_restored": true,
+                "complete_outbox_trace": true,
+                "firsthop_detector_changed": false
+              },
+              "refresh_sites": {
+                "initial_collection": 1,
+                "root_observe": 1,
+                "owner_activate": 1,
+                "scheduler_fallback_and_final": 2
+              },
+              "actual_client_and_session_type_preserved": true,
+              "global_monkeypatch": false,
+              "firsthop_detector": {
+                "module": "scripts.experiments.g31_ics_circulation.initial_owner_route_contract",
+                "source_sha256": "20936a2a52bd8ee82e4e2a3686196a9af48b1343306b4431fb3f602ecb9599ef"
+              },
+              "onebuild_proof_added_before_encoding": true,
+              "runtime_dispatched": false
+            },
+            "first_hop_predicate": {
+              "schema": "g31.initial_entry_hop.source_proof.v1",
+              "source_sha256": {
+                "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\initial_owner_route_contract.py": "1dc8d45abbf547401232faca189c4fc111feab95db47654eee508854569b619f",
+                "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\native027_build_001\\source\\cpp\\ics_core\\bindings\\circulation_session_binding.hpp": "66cbba8a046c5ee863241a6b449731be430caae37c046ec9e392ac232d380f66",
+                "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\native027_build_001\\source\\cpp\\ics_core\\runtime\\circulation_runtime_impl.hpp": "3af08de9a344698fb70dc1c718abc94fd6c6a9429427848f4c3d06a246154edc"
+              },
+              "binding": "edge_exit_at is emitted from an actual EDGE_ENTER receipt matching the current private traversal. The binding computes a public exit bound from that already observed start; it does not inspect a future event.",
+              "reservation": "Current edge fields alone are insufficient; reserve_enter sets them before EDGE_ENTER. Missing edge_exit_at cannot prove entry.",
+              "identity": "Public traversal_id is not the internal receipt traversal. No equality between them and no inverse floating subtraction is used.",
+              "integration_required": "Accepted actual NativeSession027 and fresh owner-A observe_protocol; original command query, ACK closure and complete same-time drain remain required.",
+              "comparison_limit": "Earlier root closure removes later root admissions and can change background request IDs. No unchanged-ID or tape-prefix claim transfers from the notification gate.",
+              "native_dispatched": false,
+              "data_alone_grants_authority": false
+            },
+            "observation_contract": {
+              "schema": "g31.initial_root.actual_entry_observation.v1",
+              "native_binding": "accepted_native027_actual_EDGE_ENTER_matching_current_traversal",
+              "source_prefix": [
+                0
+              ],
+              "reservation_without_actual_entry_receipt_sufficient": false,
+              "original_ACK_and_complete_drain_required": true,
+              "later_admission_or_ID_equality_claimed": false
+            },
+            "scheduler": {
+              "scheduler_advance_sites": [
+                "session.advance_until_owner_notification",
+                "session.advance_to"
+              ],
+              "root_drain_sites": [
+                "self.session.advance_to"
+              ],
+              "admission_ast": "Expr(value=Call(func=Attribute(value=Attribute(value=Name(id='root', ctx=Load()), attr='client', ctx=Load()), attr='activate', ctx=Load()), args=[Constant(value='A'), Dict(keys=[Constant(value='kind'), Constant(value='root_id')], values=[Constant(value='initial_A_continuation'), Attribute(value=Name(id='root', ctx=Load()), attr='request_id', ctx=Load())])], keywords=[]))",
+              "original_root_block_ast": "If(test=Compare(left=Attribute(value=Name(id='root', ctx=Load()), attr='state', ctx=Load()), ops=[Eq()], comparators=[Constant(value='pending_first_hop_and_ack')]), body=[Expr(value=Call(func=Attribute(value=Name(id='root', ctx=Load()), attr='observe_after_boundary', ctx=Load()), args=[Name(id='response', ctx=Load())], keywords=[])), Assign(targets=[Name(id='verdict', ctx=Store())], value=Call(func=Attribute(value=Name(id='root', ctx=Load()), attr='drain_and_finish_if_closed', ctx=Load()), args=[], keywords=[])), If(test=Subscript(value=Name(id='verdict', ctx=Load()), slice=Constant(value='closed'), ctx=Load()), body=[Expr(value=Call(func=Name(id='publish_root', ctx=Load()), args=[Name(id='root', ctx=Load()), Name(id='root_records', ctx=Load())], keywords=[]))], orelse=[])], orelse=[])",
+              "actual_boundary_assignment_ast": "Assign(targets=[Attribute(value=Name(id='root', ctx=Load()), attr='last_boundary', ctx=Store())], value=Call(func=Attribute(value=Name(id='copy', ctx=Load()), attr='deepcopy', ctx=Load()), args=[Name(id='response', ctx=Load())], keywords=[]))",
+              "exact_full_ast_restoration": true,
+              "original_scheduler_ast_sha256": "913d85cc322590c4d9b8588c864de1790362820e249e030b91e4515dc21251dc",
+              "background_tick_policy_or_activations_modified": false,
+              "runtime_dispatch_ready": false,
+              "original_refresh_sites": 2,
+              "refresh_AST_restored": true,
+              "complete_outbox_trace": true,
+              "firsthop_detector_changed": true,
+              "original_scheduler_statements_retained": true,
+              "resulting_admission_or_ID_equality_claimed": false
+            },
+            "live_observe_and_post_drain_share_same_new_predicate": true,
+            "original_closure_and_ACK_code_unchanged": true,
+            "actual_session_and_transport_required": true,
+            "all_runtime_proof_encoded_inside_root": true,
+            "imported_global_or_class_monkeypatch": false,
+            "native_or_predictor_dispatched": false
+          },
+          "codec": {
+            "schema": "g31.complete_root_evidence_candidate.v1",
+            "evidence_inverse_AST_exact": true,
+            "runtime_query_proof_unchanged": true,
+            "original_body_timestamp_position": true,
+            "strict_check_before_evidence_return": true,
+            "finisher_inverse_AST_exact": true,
+            "ledger_encode_unchanged": true,
+            "original_evidence_method_identity_check": true,
+            "codec": {
+              "schema": "g31.complete_root_evidence_codec.v1",
+              "original_encoder_source_sha256": "35dd044ef6cd6acacb68bd731e7fc111a68431affe82a5f99e1fccfa2abd3d92",
+              "encoder_inverse_AST_exact": true,
+              "removed_expression": "_tree(value, node_limit=MAX_ARTIFACT_NODES)",
+              "original_encode_parameters_and_byte_limit": true,
+              "normalizer_source_sha256": "0e01655f08beb659189352915db323c2383e754ff3084dc4e8b8e7a416739c3a",
+              "strict_decoder_source_sha256": "7127e897fcdbd0e836c94c4b8400ef619a3795c2f9781732cf3c324415cc9b4a",
+              "normalization_unchanged": true,
+              "strict_decode_and_tree_validation_unchanged": true,
+              "comparison": "same original compact JSON encoding, ordered keys, strict UTF-8, finite builtins",
+              "ensure_ascii_true_not_supported": true,
+              "owned_tree_returned_only_after_roundtrip": true,
+              "external_encoded_input_authority": false,
+              "native_or_performance_run": false
+            },
+            "frozen_factory_source_sha256": "58a3cb466737d3f025aab08dc9f90f6ae66fd6934eab1408a65d96d929070fce",
+            "original_publication_code_identical": true,
+            "dynamic_native_authority_added": false,
+            "scheduler_installed": false,
+            "firsthop_changed": false,
+            "cost_scope": "All normalization/first encoding/strict decode/re-encoding/hash/ledger/publication remain inside root."
+          },
+          "original_collection_observer_drain_and_final_revalidation_unchanged": true,
+          "original_accepted_native_and_exact_transport_authority_unchanged": true,
+          "actual_entry_marker_and_complete_query_proof_encoded": true,
+          "strict_decode_reencode_inside_complete_root": true,
+          "original_scheduler_policy_and_publisher_code_unchanged": true,
+          "frozen_modules_or_classes_modified": false,
+          "native_or_predictor_dispatched": false,
+          "universal100ms_or_business_superiority_claimed": false
+        },
+        "collection": {
+          "original_authority_and_advance_inventory": {
+            "collectors": {
+              "scripts.experiments.g31_ics_circulation.native_preexisting_v3_bound_adapter.collect_initial_ledger": {
+                "source_sha256": "47135cc34648e87f03607422edf580f663b9a4e8a212f8d087b8ff6d2b3a9ec0",
+                "native_advance_sites": []
+              },
+              "scripts.experiments.g31_ics_circulation.native_preexisting_v3_bound_adapter.collect_native": {
+                "source_sha256": "aceaf1bea92b5674276c1204060585a123e4ecd7c1cdee0f4d6eaf1910a265df",
+                "native_advance_sites": []
+              },
+              "scripts.experiments.g31_ics_circulation.native_preexisting_rolling_adapter.collect_initial_ledger": {
+                "source_sha256": "e803afa02cef48370b9f8743ecf35e1dcd5abaf77fb42b368fbd05f1f174057d",
+                "native_advance_sites": []
+              },
+              "scripts.experiments.g31_ics_circulation.native_preexisting_initial_adapter.collect_native": {
+                "source_sha256": "fe942040c4a76799c23e4b99a4cb767fac63eba07b9ff908c2bf89e236e596a9",
+                "native_advance_sites": []
+              },
+              "scripts.experiments.g31_ics_circulation.initial_owner_route_request.fixed_B_first_action": {
+                "source_sha256": "52e9d86a81efe9f4f140c0d4808221e04daad261ebfe5d9706c0e7d844757618",
+                "native_advance_sites": []
+              }
+            },
+            "pre_chain_collection_advances": [
+              "self.session.advance_to"
+            ],
+            "pre_chain_resets_continuity": true,
+            "runtime_callback_plugins_supported": false
+          },
+          "frozen_prototype_source_proof": {
+            "native_AST_sha256": "eac5d6212b3c1d4fb57c2fc51f3d906c5927b13838585a1750b4a91515872147",
+            "inverse_AST_exact": true,
+            "inserted_before_after_hooks": 6,
+            "schema": "g31.initial_owner.single_capture.source_proof.v1",
+            "native_authority_checks_removed": 0,
+            "ledger_constructor_and_token_unchanged": true,
+            "private_namespaces_only": true,
+            "old_frozen_sources_changed": false,
+            "AST_compilation": "Input-independent module startup only; no request data cached.",
+            "final_revalidation_requirement_unchanged": true,
+            "campaign_installed": false
+          },
+          "prototype_campaign_installed_field_is_historical_not_current_wiring": true,
+          "private_integration_wired": true,
+          "actual_campaign_ready": false,
+          "additional_functions": {
+            "scripts.experiments.g31_ics_circulation.initial_owner_route_single_capture._compile_native_template": {
+              "source_sha256": "1cf7bf86dfcebbcbfcdfad9f4aca47c7a13fcab9496363a41a9b691f7f047846",
+              "code_sha256": "cfb8814c2aed6a0a20aa6662ace6e1b50e269f9850ebc3fd1104cb3cd9a2181f",
+              "native_advance_sites": []
+            },
+            "scripts.experiments.g31_ics_circulation.initial_owner_route_single_capture.clone": {
+              "source_sha256": "a7ad94e0146d9e04e92561fc250905848f22eb2fe3873e571857bb2c2231955f",
+              "code_sha256": "3813c68533a25ac78abab9e558e2050ca94bd7ac9136bcc19044a5f03219d6c9",
+              "native_advance_sites": []
+            },
+            "scripts.experiments.g31_ics_circulation.initial_owner_route_single_capture.require": {
+              "source_sha256": "405a639b3427df1f61855f28a931bd269b17d875ae29523b72d5159cd3a6ac1e",
+              "code_sha256": "77bbd8e6c1792c523b65099352009634847679686fb3830c530299c5ce5e515d",
+              "native_advance_sites": []
+            },
+            "scripts.experiments.g31_ics_circulation.initial_owner_route_single_capture.source_proof": {
+              "source_sha256": "fc39bdd91d12a4c4955945e154f3c3250cc843d5d47c8557b0fd0dd1259ac787",
+              "code_sha256": "55e52b1e1f14817f2b82571b69ae7a7324997e8858e1a0f6a6d4685ab3547fd4",
+              "native_advance_sites": []
+            },
+            "scripts.experiments.g31_ics_circulation.initial_owner_route_single_capture.instrument_native": {
+              "source_sha256": "f5eef05f2ba8a44edb9a2457d945ebc69dc0c3ef4c2a8cfd9f98298b8e70555e",
+              "code_sha256": "ce352ea50b19e63cc9974b8b5a8fb42b60c05f2257bfafcda51981ed0518eb2b",
+              "native_advance_sites": []
+            },
+            "scripts.experiments.g31_ics_circulation.initial_owner_route_single_capture.collector": {
+              "source_sha256": "54ee4d3d5cad8d8fc4199e41c30d023468aa930e0d25b62398a96558c368bd26",
+              "code_sha256": "92a5e755f6862b23ae0b9614c4fd287a482d301a3adaa4416646123779b021cc",
+              "native_advance_sites": []
+            },
+            "scripts.experiments.g31_ics_circulation.initial_owner_route_single_capture.captured_collection": {
+              "source_sha256": "dd9661a1187b1a9d1150f361b350c5fff401407a972387e931a8b41d4e056128",
+              "code_sha256": "fd8c2f73e41983530fa82b20a8c2b63068f74c595de7b2dad86e8ee83a2088a8",
+              "native_advance_sites": []
+            },
+            "scripts.experiments.g31_ics_circulation.initial_owner_route_single_capture._Capture.__init__": {
+              "source_sha256": "946abc8d5c72ff17bac1810fd92697d8fec329b2d4b8462e8a4c53e48588fe74",
+              "code_sha256": "3298271c790ad0ced1061ae63207b10e8911d6a01a448d6efb23efbd5060b880",
+              "native_advance_sites": []
+            },
+            "scripts.experiments.g31_ics_circulation.initial_owner_route_single_capture._Capture.before": {
+              "source_sha256": "8cab38a715b74586492936bb745ed40070b579acafcaff42af8ad5993a0794ae",
+              "code_sha256": "6b122515ab97836d4a3825027672b1a231e84095926e9e787c757df08e7863a9",
+              "native_advance_sites": []
+            },
+            "scripts.experiments.g31_ics_circulation.initial_owner_route_single_capture._Capture.after": {
+              "source_sha256": "72fcf4488e8bc43608936a0a9c6d73479b6afba145be46f47be8cd0f8fb4281f",
+              "code_sha256": "f159c71df17ff29919d70e6fa51866bf462a59cde23031fc043acf22c0b5246c",
+              "native_advance_sites": []
+            },
+            "scripts.experiments.g31_ics_circulation.initial_owner_route_single_capture._Capture.endpoints": {
+              "source_sha256": "e44ca3a9db1f5440b519e05fd930a45aeb03ff7ff66a382d0b1dafaaf32e5100",
+              "code_sha256": "6f47341cb286911cf5b561a2903dec9bd76fadc4c4307f846a8ec17df91dce3f",
+              "native_advance_sites": []
+            },
+            "scripts.experiments.g31_ics_circulation.initial_owner_route_json_v3.normalize": {
+              "source_sha256": "0e01655f08beb659189352915db323c2383e754ff3084dc4e8b8e7a416739c3a",
+              "code_sha256": "f83b2200ea918b4a438d86841cd37239bcad28099a093cbe0bea5905424c559b",
+              "native_advance_sites": []
+            },
+            "scripts.experiments.g31_ics_circulation.initial_owner_route_json_v3.typed_failure_snapshot": {
+              "source_sha256": "5be7fe80539088a4a3c9d9b9f5e0f3c5b961949b8f70197710004240ced84506",
+              "code_sha256": "5d1d419ed99503113fd7f7906b300fb08605dbb62ef4f17d031b8be2360b12f4",
+              "native_advance_sites": []
+            },
+            "scripts.experiments.g31_ics_circulation.initial_owner_route_campaign_v3.call_with_recorded_collection": {
+              "source_sha256": "4920c427e209ac7905f47da11461263c815098f90b8597524d82003919397d41",
+              "code_sha256": "b97a6f4559be5674bf65bdeb95a92930352e987cc3223cdc458a37b0ffdbda18",
+              "native_advance_sites": []
+            }
+          },
+          "generated_template": {
+            "generated_code_sha256": "07f7167425cd1786c5d0c450274c5ed6728dfad880f6e250c2097d4bf632e7b3",
+            "proof": {
+              "native_AST_sha256": "eac5d6212b3c1d4fb57c2fc51f3d906c5927b13838585a1750b4a91515872147",
+              "inverse_AST_exact": true,
+              "inserted_before_after_hooks": 6
+            },
+            "ordered_code_hooks": [
+              "before",
+              "after",
+              "before",
+              "after",
+              "before",
+              "after"
+            ],
+            "source_lookup_for_generated_function_used": false,
+            "factory_source_sha256": "1cf7bf86dfcebbcbfcdfad9f4aca47c7a13fcab9496363a41a9b691f7f047846",
+            "native_advance_names": []
+          },
+          "three_roles": [
+            "A_initial",
+            "A_fresh_final",
+            "B_fixed_participant"
+          ],
+          "each_invocation_fresh": true,
+          "session_or_native_proxy": false
+        },
+        "same_scheduler_code_and_background_admissions": true,
+        "same_complete_evidence_codec_and_firsthop_ACK_drain": true,
+        "constructor_class_cell_and_exact_native_checks_preserved": true,
+        "A_initial_A_final_B_same_fresh_wrapper": true,
+        "all_endpoint_query_side_effect_equivalence_claimed": false,
+        "old_frozen_modules_modified": false,
+        "campaign_ready": false,
+        "failure_aware_saved_verifier_included": false,
+        "native_or_predictor_dispatched": false,
+        "performance_or_100ms_claim": false
+      },
+      "owned_C_publisher": {
+        "schema": "g31.complete_root_evidence_owned_decode.C_binding.v1",
+        "owned_decoder": {
+          "schema": "g31.complete_root_evidence_owned_decode.v2",
+          "decoder_inverse_AST_exact": true,
+          "removed_decoder_expression": "_tree(value, node_limit=MAX_ARTIFACT_NODES)",
+          "original_strict_parser_and_byte_bound": true,
+          "evidence_inverse_AST_exact": true,
+          "complete_owned_entry": true,
+          "normalization_first_and_no_escape_before_check": true,
+          "original_body_timestamp_position": true,
+          "encoded_bytes_decoder_API_created": false,
+          "original_evidence_AST_sha256": "d889a662c234c813796daca6237dbf4cafa6893856750b5942af2659afc17628",
+          "candidate_evidence_AST_sha256": "72d23c7a1493bb82311e958935a25078d2c243c63ec177dc3be1b9d06428aad2",
+          "upstream_compiler": {
+            "evidence_inverse_AST_exact": true,
+            "runtime_query_proof_unchanged": true,
+            "original_body_timestamp_position": true,
+            "strict_check_before_evidence_return": true
+          },
+          "original_normalizer_source_sha256": "0e01655f08beb659189352915db323c2383e754ff3084dc4e8b8e7a416739c3a",
+          "original_decoder_source_sha256": "7127e897fcdbd0e836c94c4b8400ef619a3795c2f9781732cf3c324415cc9b4a",
+          "public_artifact_decoder_unchanged": true,
+          "ledger_tree_validation_unchanged": true,
+          "original_complete_runtime_query_and_entry_marker": true,
+          "original_finisher_publisher_code_and_cost_boundary": true,
+          "external_bytes_authorized": false,
+          "general_decoder_created": false,
+          "C_normalizer_bound_or_loaded": false,
+          "native_or_performance_dispatched": false,
+          "all_resource_failures_equivalent": false,
+          "scope": "Only internally normalized, canonically encoded complete evidence before first escape; immutable source image, no adversarial monkeypatch.",
+          "cost": "Normalization, first encode, strict parse, canonical reencode, hash, ledger encode, append and outside-return all remain charged."
+        },
+        "reference_C_contract": {
+          "schema": "g31.complete_root_evidence.C_normalizer_binding.v1",
+          "reference_entry_codec": {
+            "schema": "g31.initial_root.entry_complete_codec_integration.v1",
+            "entry": {
+              "schema": "g31.initial_root.entry_integration_source.v1",
+              "previous_gated_evidence_proof": {
+                "schema": "g31.initial_root.gated_evidence_source.v2",
+                "scheduler": {
+                  "scheduler_advance_sites": [
+                    "session.advance_until_owner_notification",
+                    "session.advance_to"
+                  ],
+                  "root_drain_sites": [
+                    "self.session.advance_to"
+                  ],
+                  "admission_ast": "Expr(value=Call(func=Attribute(value=Attribute(value=Name(id='root', ctx=Load()), attr='client', ctx=Load()), attr='activate', ctx=Load()), args=[Constant(value='A'), Dict(keys=[Constant(value='kind'), Constant(value='root_id')], values=[Constant(value='initial_A_continuation'), Attribute(value=Name(id='root', ctx=Load()), attr='request_id', ctx=Load())])], keywords=[]))",
+                  "original_root_block_ast": "If(test=Compare(left=Attribute(value=Name(id='root', ctx=Load()), attr='state', ctx=Load()), ops=[Eq()], comparators=[Constant(value='pending_first_hop_and_ack')]), body=[Expr(value=Call(func=Attribute(value=Name(id='root', ctx=Load()), attr='observe_after_boundary', ctx=Load()), args=[Name(id='response', ctx=Load())], keywords=[])), Assign(targets=[Name(id='verdict', ctx=Store())], value=Call(func=Attribute(value=Name(id='root', ctx=Load()), attr='drain_and_finish_if_closed', ctx=Load()), args=[], keywords=[])), If(test=Subscript(value=Name(id='verdict', ctx=Load()), slice=Constant(value='closed'), ctx=Load()), body=[Expr(value=Call(func=Name(id='publish_root', ctx=Load()), args=[Name(id='root', ctx=Load()), Name(id='root_records', ctx=Load())], keywords=[]))], orelse=[])], orelse=[])",
+                  "actual_boundary_assignment_ast": "Assign(targets=[Attribute(value=Name(id='root', ctx=Load()), attr='last_boundary', ctx=Store())], value=Call(func=Attribute(value=Name(id='copy', ctx=Load()), attr='deepcopy', ctx=Load()), args=[Name(id='response', ctx=Load())], keywords=[]))",
+                  "exact_full_ast_restoration": true,
+                  "original_scheduler_ast_sha256": "913d85cc322590c4d9b8588c864de1790362820e249e030b91e4515dc21251dc",
+                  "background_tick_policy_or_activations_modified": false,
+                  "runtime_dispatch_ready": false,
+                  "original_refresh_sites": 2,
+                  "refresh_AST_restored": true,
+                  "complete_outbox_trace": true,
+                  "firsthop_detector_changed": false
+                },
+                "refresh_sites": {
+                  "initial_collection": 1,
+                  "root_observe": 1,
+                  "owner_activate": 1,
+                  "scheduler_fallback_and_final": 2
+                },
+                "actual_client_and_session_type_preserved": true,
+                "global_monkeypatch": false,
+                "firsthop_detector": {
+                  "module": "scripts.experiments.g31_ics_circulation.initial_owner_route_contract",
+                  "source_sha256": "20936a2a52bd8ee82e4e2a3686196a9af48b1343306b4431fb3f602ecb9599ef"
+                },
+                "onebuild_proof_added_before_encoding": true,
+                "runtime_dispatched": false
+              },
+              "first_hop_predicate": {
+                "schema": "g31.initial_entry_hop.source_proof.v1",
+                "source_sha256": {
+                  "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\initial_owner_route_contract.py": "1dc8d45abbf547401232faca189c4fc111feab95db47654eee508854569b619f",
+                  "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\native027_build_001\\source\\cpp\\ics_core\\bindings\\circulation_session_binding.hpp": "66cbba8a046c5ee863241a6b449731be430caae37c046ec9e392ac232d380f66",
+                  "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\native027_build_001\\source\\cpp\\ics_core\\runtime\\circulation_runtime_impl.hpp": "3af08de9a344698fb70dc1c718abc94fd6c6a9429427848f4c3d06a246154edc"
+                },
+                "binding": "edge_exit_at is emitted from an actual EDGE_ENTER receipt matching the current private traversal. The binding computes a public exit bound from that already observed start; it does not inspect a future event.",
+                "reservation": "Current edge fields alone are insufficient; reserve_enter sets them before EDGE_ENTER. Missing edge_exit_at cannot prove entry.",
+                "identity": "Public traversal_id is not the internal receipt traversal. No equality between them and no inverse floating subtraction is used.",
+                "integration_required": "Accepted actual NativeSession027 and fresh owner-A observe_protocol; original command query, ACK closure and complete same-time drain remain required.",
+                "comparison_limit": "Earlier root closure removes later root admissions and can change background request IDs. No unchanged-ID or tape-prefix claim transfers from the notification gate.",
+                "native_dispatched": false,
+                "data_alone_grants_authority": false
+              },
+              "observation_contract": {
+                "schema": "g31.initial_root.actual_entry_observation.v1",
+                "native_binding": "accepted_native027_actual_EDGE_ENTER_matching_current_traversal",
+                "source_prefix": [
+                  0
+                ],
+                "reservation_without_actual_entry_receipt_sufficient": false,
+                "original_ACK_and_complete_drain_required": true,
+                "later_admission_or_ID_equality_claimed": false
+              },
+              "scheduler": {
+                "scheduler_advance_sites": [
+                  "session.advance_until_owner_notification",
+                  "session.advance_to"
+                ],
+                "root_drain_sites": [
+                  "self.session.advance_to"
+                ],
+                "admission_ast": "Expr(value=Call(func=Attribute(value=Attribute(value=Name(id='root', ctx=Load()), attr='client', ctx=Load()), attr='activate', ctx=Load()), args=[Constant(value='A'), Dict(keys=[Constant(value='kind'), Constant(value='root_id')], values=[Constant(value='initial_A_continuation'), Attribute(value=Name(id='root', ctx=Load()), attr='request_id', ctx=Load())])], keywords=[]))",
+                "original_root_block_ast": "If(test=Compare(left=Attribute(value=Name(id='root', ctx=Load()), attr='state', ctx=Load()), ops=[Eq()], comparators=[Constant(value='pending_first_hop_and_ack')]), body=[Expr(value=Call(func=Attribute(value=Name(id='root', ctx=Load()), attr='observe_after_boundary', ctx=Load()), args=[Name(id='response', ctx=Load())], keywords=[])), Assign(targets=[Name(id='verdict', ctx=Store())], value=Call(func=Attribute(value=Name(id='root', ctx=Load()), attr='drain_and_finish_if_closed', ctx=Load()), args=[], keywords=[])), If(test=Subscript(value=Name(id='verdict', ctx=Load()), slice=Constant(value='closed'), ctx=Load()), body=[Expr(value=Call(func=Name(id='publish_root', ctx=Load()), args=[Name(id='root', ctx=Load()), Name(id='root_records', ctx=Load())], keywords=[]))], orelse=[])], orelse=[])",
+                "actual_boundary_assignment_ast": "Assign(targets=[Attribute(value=Name(id='root', ctx=Load()), attr='last_boundary', ctx=Store())], value=Call(func=Attribute(value=Name(id='copy', ctx=Load()), attr='deepcopy', ctx=Load()), args=[Name(id='response', ctx=Load())], keywords=[]))",
+                "exact_full_ast_restoration": true,
+                "original_scheduler_ast_sha256": "913d85cc322590c4d9b8588c864de1790362820e249e030b91e4515dc21251dc",
+                "background_tick_policy_or_activations_modified": false,
+                "runtime_dispatch_ready": false,
+                "original_refresh_sites": 2,
+                "refresh_AST_restored": true,
+                "complete_outbox_trace": true,
+                "firsthop_detector_changed": true,
+                "original_scheduler_statements_retained": true,
+                "resulting_admission_or_ID_equality_claimed": false
+              },
+              "live_observe_and_post_drain_share_same_new_predicate": true,
+              "original_closure_and_ACK_code_unchanged": true,
+              "actual_session_and_transport_required": true,
+              "all_runtime_proof_encoded_inside_root": true,
+              "imported_global_or_class_monkeypatch": false,
+              "native_or_predictor_dispatched": false
+            },
+            "codec": {
+              "schema": "g31.complete_root_evidence_candidate.v1",
+              "evidence_inverse_AST_exact": true,
+              "runtime_query_proof_unchanged": true,
+              "original_body_timestamp_position": true,
+              "strict_check_before_evidence_return": true,
+              "finisher_inverse_AST_exact": true,
+              "ledger_encode_unchanged": true,
+              "original_evidence_method_identity_check": true,
+              "codec": {
+                "schema": "g31.complete_root_evidence_codec.v1",
+                "original_encoder_source_sha256": "35dd044ef6cd6acacb68bd731e7fc111a68431affe82a5f99e1fccfa2abd3d92",
+                "encoder_inverse_AST_exact": true,
+                "removed_expression": "_tree(value, node_limit=MAX_ARTIFACT_NODES)",
+                "original_encode_parameters_and_byte_limit": true,
+                "normalizer_source_sha256": "0e01655f08beb659189352915db323c2383e754ff3084dc4e8b8e7a416739c3a",
+                "strict_decoder_source_sha256": "7127e897fcdbd0e836c94c4b8400ef619a3795c2f9781732cf3c324415cc9b4a",
+                "normalization_unchanged": true,
+                "strict_decode_and_tree_validation_unchanged": true,
+                "comparison": "same original compact JSON encoding, ordered keys, strict UTF-8, finite builtins",
+                "ensure_ascii_true_not_supported": true,
+                "owned_tree_returned_only_after_roundtrip": true,
+                "external_encoded_input_authority": false,
+                "native_or_performance_run": false
+              },
+              "frozen_factory_source_sha256": "58a3cb466737d3f025aab08dc9f90f6ae66fd6934eab1408a65d96d929070fce",
+              "original_publication_code_identical": true,
+              "dynamic_native_authority_added": false,
+              "scheduler_installed": false,
+              "firsthop_changed": false,
+              "cost_scope": "All normalization/first encoding/strict decode/re-encoding/hash/ledger/publication remain inside root."
+            },
+            "original_collection_observer_drain_and_final_revalidation_unchanged": true,
+            "original_accepted_native_and_exact_transport_authority_unchanged": true,
+            "actual_entry_marker_and_complete_query_proof_encoded": true,
+            "strict_decode_reencode_inside_complete_root": true,
+            "original_scheduler_policy_and_publisher_code_unchanged": true,
+            "frozen_modules_or_classes_modified": false,
+            "native_or_predictor_dispatched": false,
+            "universal100ms_or_business_superiority_claimed": false
+          },
+          "reference_normalization_unchanged_claim_is_historical_only": true,
+          "changed": "Private evidence global normalization.normalize is the verified Candidate bound method.",
+          "unchanged": [
+            "complete evidence fields and order",
+            "actual runtime proof provider",
+            "original body timestamp position",
+            "original owned encoder and strict decoder/reencode",
+            "full hash/ledger/return codec",
+            "publisher append/outside-return/closure code"
+          ],
+          "original_fallback_retained": true,
+          "direct_C_support_required_separately_for_fixed_inputs": true,
+          "new_campaign_or_native_authority": false,
+          "ABI_scope": "Independently pinned CPython3.11.9 extension and stable private input only.",
+          "cost_scope": "Complete data construction through publisher return; binding/load/setup also charged in whole campaign.",
+          "performance_or_100ms_claim": false
+        },
+        "public_bind_uses_original_verified_C_binder": true,
+        "proof_scope": "Source composition only; this call does not load C or establish actual C execution.",
+        "fair_comparison": "A=current verified C publisher; B=identical C provider plus internal owned decoder.",
+        "binding_startup_and_complete_publisher_cost_charged": true,
+        "fixture_direct_C_support_check_still_required": true,
+        "C_binary_or_ABI_acceptance_replaced": false,
+        "C_loaded_by_this_module": false,
+        "native_or_performance_dispatched": false,
+        "latency_or_full_day_claim": false
+      },
+      "explicit_verified_candidate_required": true,
+      "C_load_or_build_implicit": false,
+      "complete_collection_inventory_and_generated_hooks_retained": true,
+      "exact_native_type_or_classcell_changed": false,
+      "frozen_source_or_imported_globals_modified": false,
+      "binding_setup_and_all_complete_publisher_costs_must_be_charged": true,
+      "per_sample_cycle_cleanup_certified": false,
+      "resource_failure_points_equivalent": false,
+      "actual_campaign_or_performance_claim": false
+    },
+    "same18_same600_same60ms_decision_cutoff": true,
+    "same_collection_model_native_and_complete_root_code": true,
+    "original_python_import_inventory_retained": true,
+    "separate_exact_C_runtime_identity_required": true,
+    "C_setup_and_close_inside_shared_campaign": true,
+    "C_provider_original_fallback_retained": true,
+    "actual_direct_support_count": null,
+    "actual_C_loaded_on_source_proof": false,
+    "performance_or_complete100ms_claim": false
+  },
+  "owned600_required": true,
+  "exclusive_performance_window_required": true,
+  "requirements": [
+    "Exactly original18 rows/inputs/faults/finite2 with same60ms decision cutoff and100ms complete request boundary. Full startup, provider andnative/RPC setup, all roots, cleanup, sources, three full6124 checks, export and saved verification belong to600.",
+    "Actual accepted004 module file/spec/ExtensionFileLoader, bound builtin and DLL files at entry/exit. Original exact Python inventory separately retained. Direct C support/fallback count unknown; original fallback retained.",
+    "Original failure-aware saved verification through both replay levels; unknowns remain in18 denominator, failure must not mint success. All5 physical/strict normal protection, source/current/ACK/firsthop/drain checks unchanged.",
+    "External launch-to-exit clock with exact command/plan/runner/wrapper/output binding; no automatic retry or extension. Use distinct actual external receipt filename because metadata external_application_wall.json already exists."
+  ],
+  "limits": [
+    "Root read all runtime/campaign/verifier/launcher/test/pure/preparer code, plus original worker and launcher. Only test fixture changed after37pass/1fail; strengthened38 pass; old failure frozen.",
+    "Long-path metadata001 failure retained. Short002 same source and gates passed,218 contained paths max243.",
+    "No actual C/native/model loaded in review. Earlier finite2 baseline16closed/2unknown/0under100 remains until separately interpreted actual result. No full32 or all-day/joint-method claim."
+  ]
+}

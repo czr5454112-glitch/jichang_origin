@@ -1,0 +1,69 @@
+{
+  "schema": "g31.planning_v2.C_encoder.independent_narrow_source_review.v1",
+  "reviewer": "legal_context",
+  "status": "no_concrete_source_blocker_in_declared_stable_builtin_domain",
+  "plan_sha256": "f644e09943a967e9daf43ff377c6e8ba8a57416186e8ad1c966fa2ac7b6f2592",
+  "sources": [
+    {
+      "path": "cpp/experimental/planning_v2_typed_encoder/encoder.cpp",
+      "sha256": "c8bcba1854d64103d45a4ed4a069fa1a3baf09734990f0354c2108c0c845a20e",
+      "current_archive_match": true
+    },
+    {
+      "path": "cpp/experimental/planning_v2_typed_encoder/CMakeLists.txt",
+      "sha256": "a55a227aa357751dea411ed697e4ab7db87e4164018aae8413fb11577d2ad292",
+      "current_archive_match": true
+    },
+    {
+      "path": "scripts/experiments/g31_ics_circulation/planning_capture_v2_c_encoder.py",
+      "sha256": "fe63f97cce9d26d0220f25a29bc2a9a78d9b956bff982cef0762f6b0e2bc7574",
+      "current_archive_match": true
+    },
+    {
+      "path": "tests/test_g31_circulation_planning_capture_v2_c_encoder.py",
+      "sha256": "3cbe3c19b8b3c03e5eeb6f8d47204aa29ec73a530d5f95df3bee5ec2aa960053",
+      "current_archive_match": true
+    },
+    {
+      "path": "scripts/experiments/g31_ics_circulation/planning_capture_v2_digest.py",
+      "sha256": "01fc49cbded5ba70851f1294fce9f5aaa06b66e82bfb5b9862740c310faf9fd5",
+      "current_archive_match": true
+    },
+    {
+      "path": "scripts/experiments/g31_ics_circulation/planning_capture_v2_batched_digest.py",
+      "sha256": "d0380cd8dfd523331b7a8a5f3e4586c67c470b7c56a79c71a8e5f93f56121691",
+      "current_archive_match": true
+    },
+    {
+      "path": "tests/test_g31_circulation_planning_v2_batched_digest.py",
+      "sha256": "f377f85bf9ec217ebff6ab63307cacb7471437024b3ca6c81a43ce526161c14d",
+      "current_archive_match": true
+    }
+  ],
+  "read_scope": [
+    "Full handwritten C encoder, wrapper, CMake and new test source; original Python writer compared field by field. Prior batched candidate and fixture hashes bound, not new independent functional execution."
+  ],
+  "conclusions": [
+    "Ordered local capture, extension, receipt, coverage and optional ACK traversal matches the original typed writer; no field omitted or reordered in the inspected implementation.",
+    "Exact dictionary keys are checked without supplied hashing or equality before lookup. Unsupported values/containers return NotImplemented without supplied hooks; only that marker invokes the original once. Encoding/resource exceptions propagate without fallback.",
+    "uint64 uses exact integer/bool modulo-2^64 semantics. Binary64 uses PyFloat_Pack8 in big endian; NaN/Inf/signed zero are not rejected. Exact integer doubles outside signed64 defer to original struct behavior.",
+    "Exact Unicode uses strict UTF8 at the original consumed text position; surrogate failures propagate. Unconsumed values and aliases are ignored or revisited as the original does.",
+    "Borrowed input references remain under the declared stable rooted input. New UTF8 references use RAII; module state retains interned keys; no input, observation or result cache and no simulator authority.",
+    "Draft functional tests cover complete bytes, all consumed scalar positions, errors/hooks, large integers, binary64 special values, Unicode and failure recovery; these tests have not been run by this reviewer."
+  ],
+  "limits": [
+    "Source review is not compiled C acceptance, functional parity, performance evidence or capture authenticity.",
+    "CPython 3.11.9 and stable private input only. Allocation, signal/interrupt and concurrent mutation timing are not equivalent claims.",
+    "Seven-source snapshot is not the future executable build/test dependency closure; toolchain, headers, binary and fixture closure still need independent build and functional gates.",
+    "Future real-fixture validation must establish direct C supported counts; wrapper equality alone could be original fallback."
+  ],
+  "reviewer_execution": {
+    "build": 0,
+    "extension_load": 0,
+    "tests": 0,
+    "actual_fixture_decode": 0,
+    "native": 0,
+    "model": 0,
+    "benchmark": 0
+  }
+}

@@ -1,0 +1,59 @@
+{
+  "schema": "g31.independent_carrier_bound_review.v1",
+  "status": "passed_independent_numerical_recalculation",
+  "new_native_executions": 0,
+  "producer_analyzer_imported": false,
+  "method": "Bitset all-pairs positive-capacity transitive closure and exact physical-loader-prefix knapsack.",
+  "evidence": {
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_carrier_bound_002\\receipt.json": "75e0e2b03c8ff7e648f033647ca71ef8617ebb71eb54c0d73fc0305357280eaa",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_carrier_bound_002\\analysis.json.gz": "d8425de32b66fc129e5e5b133c0b3335228e0c102d8047b8726babaddad4e8e4",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_carrier_bound_002\\analyzer.py": "be33477405f74221b28b57f8647820edd46bc15e4c4b2f011fcfe6b3a80dac16",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\full_stream_native024_001\\full1x\\input.json.gz": "d37118333de2aa60fb5e9b9d41bab53cccb7ddbab5842862b88a2818e08709a1"
+  },
+  "input_sha256": "d37118333de2aa60fb5e9b9d41bab53cccb7ddbab5842862b88a2818e08709a1",
+  "analyzer_sha256": "be33477405f74221b28b57f8647820edd46bc15e4c4b2f011fcfe6b3a80dac16",
+  "checked_stages": 496,
+  "checked_loader_prefix_rows": 28506,
+  "checked_dp_layers": 11,
+  "carriers": 22,
+  "topologically_reachable": 24505,
+  "zero_unreachable_load_prefix_bound": 39,
+  "completion_upper_bound": 371,
+  "one_relaxed_bad_allocation": {
+    "0": 0,
+    "24": 1,
+    "26": 0,
+    "49": 0,
+    "57": 0,
+    "92": 0,
+    "95": 0,
+    "134": 0,
+    "136": 0,
+    "138": 20,
+    "149": 0
+  },
+  "same_origin_arrival_tie_groups": 0,
+  "physical_source_review": {
+    "status": "read_only_conditional_review",
+    "facts": [
+      "Loaded leg failure retains tray.job and quarantines the loaded tray.",
+      "Empty recovery rejects tray.job>=0; only destination unload followed by hold completion clears tray.job.",
+      "Each actual arrival immediately runs loading; this input has no equal-arrival pairs per origin.",
+      "At the last counted completion at least its carrier has not been permanently trapped; at most N-1 permanently unreachable loads precede it."
+    ],
+    "counterexample_conditions": [
+      "A loaded job can release its tray before required destination completion.",
+      "A later same-origin job can bypass an earlier released FIFO head, including unproved equal-arrival event order.",
+      "The fixed positive-capacity graph or mandatory service goals are enlarged or changed.",
+      "New trays are admitted or existing carriers are omitted from the denominator."
+    ],
+    "archived_source": {
+      "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\native024_build_001\\source\\cpp\\ics_core\\runtime\\circulation_runtime_impl.hpp": "047910a664eef7d0e068a16c81991ca2e819e657098aee276ad85d7e6b0bf809"
+    }
+  },
+  "online_use": false,
+  "realizable_schedule_proved": false,
+  "strict_protection_proved": false,
+  "scope": "Only the pinned original1x fixed-contract input. No inference for different ties,2x,capacity/body models,or changed admission rules.",
+  "verifier_sha256": "64f4dc34e476fc1eb1eea09a9279869619e36365321c73b34959559398b2fcb3"
+}

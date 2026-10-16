@@ -1,0 +1,331 @@
+{
+  "schema": "g31.original_occupancy_independent_review.v1",
+  "audit_report_sha256": "56dbcfc8b4938f96fb6186cf31c85751d291f4016a203a052c5b8acbbe106123",
+  "source_bindings": {
+    "outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_tie_streamed_native_002\\input.json.gz": true,
+    "outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_tie_streamed_native_002\\control.json.gz": true,
+    "outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_tie_streamed_native_002\\candidate.json.gz": true,
+    "control_saved_audit_exact_match": true,
+    "control_all_recorded_traversal_identities_match": true,
+    "candidate_saved_audit_exact_match": true,
+    "candidate_all_recorded_traversal_identities_match": true
+  },
+  "arms": {
+    "control": {
+      "saved_receipt_reconstruction_exact": true,
+      "edge_pairs": 238,
+      "chain_at19500_001": [],
+      "waiting_examples": [
+        {
+          "job": "projected:1x:4",
+          "arrival_at112": {
+            "time": 9553.737986,
+            "event": "EDGE_EXIT",
+            "business_bag_id": "projected:1x:4",
+            "transport_leg_id": "projected:1x:4:storage_in:4",
+            "tray_id": "initial:0:1",
+            "traversal_id": 53,
+            "node": 112,
+            "from": 29,
+            "to": 112,
+            "reason": ""
+          },
+          "first_recorded_wait112": {
+            "time": 9555.237986,
+            "event": "RESOURCE_WAIT",
+            "business_bag_id": "projected:1x:4",
+            "transport_leg_id": "projected:1x:4:storage_in:4",
+            "tray_id": "initial:0:1",
+            "traversal_id": 53,
+            "node": 112,
+            "from": 112,
+            "to": -1,
+            "reason": "committed_resource_change_required"
+          },
+          "departures112": []
+        },
+        {
+          "job": "projected:1x:5",
+          "arrival_at112": {
+            "time": 9649.181484,
+            "event": "EDGE_EXIT",
+            "business_bag_id": "projected:1x:5",
+            "transport_leg_id": "projected:1x:5:storage_in:5",
+            "tray_id": "initial:24:1",
+            "traversal_id": 65,
+            "node": 112,
+            "from": 29,
+            "to": 112,
+            "reason": ""
+          },
+          "first_recorded_wait112": null,
+          "departures112": []
+        }
+      ],
+      "physical_audit": {
+        "status": "passed",
+        "completed_traversals": 238,
+        "open_traversals": 0,
+        "tray_count": 22,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "actual_storage_in_112to113_edges": [],
+      "route_commands": []
+    },
+    "candidate": {
+      "saved_receipt_reconstruction_exact": true,
+      "edge_pairs": 278,
+      "chain_at19500_001": [
+        {
+          "time": 19500.001,
+          "event": "EDGE_ENTER",
+          "business_bag_id": "projected:1x:2",
+          "transport_leg_id": "projected:1x:2:storage_out:26",
+          "tray_id": "initial:26:0",
+          "traversal_id": 263,
+          "node": 53,
+          "from": 53,
+          "to": 49,
+          "reason": ""
+        },
+        {
+          "time": 19500.001,
+          "event": "EDGE_ENTER",
+          "business_bag_id": "projected:1x:4",
+          "transport_leg_id": "projected:1x:4:storage_in:4",
+          "tray_id": "initial:0:1",
+          "traversal_id": 264,
+          "node": 112,
+          "from": 112,
+          "to": 53,
+          "reason": ""
+        },
+        {
+          "time": 19500.001,
+          "event": "EDGE_ENTER",
+          "business_bag_id": "projected:1x:8",
+          "transport_leg_id": "projected:1x:8:storage_in:8",
+          "tray_id": "initial:49:0",
+          "traversal_id": 265,
+          "node": 29,
+          "from": 29,
+          "to": 112,
+          "reason": ""
+        },
+        {
+          "time": 19500.001,
+          "event": "EDGE_ENTER",
+          "business_bag_id": "projected:1x:15",
+          "transport_leg_id": "projected:1x:15:storage_in:21",
+          "tray_id": "initial:92:1",
+          "traversal_id": 266,
+          "node": 28,
+          "from": 28,
+          "to": 29,
+          "reason": ""
+        }
+      ],
+      "waiting_examples": [
+        {
+          "job": "projected:1x:4",
+          "arrival_at112": {
+            "time": 9553.737986,
+            "event": "EDGE_EXIT",
+            "business_bag_id": "projected:1x:4",
+            "transport_leg_id": "projected:1x:4:storage_in:4",
+            "tray_id": "initial:0:1",
+            "traversal_id": 77,
+            "node": 112,
+            "from": 29,
+            "to": 112,
+            "reason": ""
+          },
+          "first_recorded_wait112": {
+            "time": 9555.237986,
+            "event": "RESOURCE_WAIT",
+            "business_bag_id": "projected:1x:4",
+            "transport_leg_id": "projected:1x:4:storage_in:4",
+            "tray_id": "initial:0:1",
+            "traversal_id": 77,
+            "node": 112,
+            "from": 112,
+            "to": -1,
+            "reason": "committed_resource_change_required"
+          },
+          "departures112": [
+            {
+              "time": 19500.001,
+              "event": "EDGE_ENTER",
+              "business_bag_id": "projected:1x:4",
+              "transport_leg_id": "projected:1x:4:storage_in:4",
+              "tray_id": "initial:0:1",
+              "traversal_id": 264,
+              "node": 112,
+              "from": 112,
+              "to": 53,
+              "reason": ""
+            }
+          ]
+        },
+        {
+          "job": "projected:1x:5",
+          "arrival_at112": {
+            "time": 9649.181484,
+            "event": "EDGE_EXIT",
+            "business_bag_id": "projected:1x:5",
+            "transport_leg_id": "projected:1x:5:storage_in:5",
+            "tray_id": "initial:24:1",
+            "traversal_id": 89,
+            "node": 112,
+            "from": 29,
+            "to": 112,
+            "reason": ""
+          },
+          "first_recorded_wait112": {
+            "time": 19500.251,
+            "event": "RESOURCE_WAIT",
+            "business_bag_id": "projected:1x:5",
+            "transport_leg_id": "projected:1x:5:storage_in:5",
+            "tray_id": "initial:24:1",
+            "traversal_id": 89,
+            "node": 112,
+            "from": 112,
+            "to": -1,
+            "reason": "committed_resource_change_required"
+          },
+          "departures112": []
+        }
+      ],
+      "physical_audit": {
+        "status": "passed",
+        "completed_traversals": 278,
+        "open_traversals": 0,
+        "tray_count": 22,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "actual_storage_in_112to113_edges": [],
+      "route_commands": []
+    }
+  },
+  "static113to53_path": [
+    113,
+    114,
+    117,
+    118,
+    121,
+    122,
+    125,
+    127,
+    128,
+    97,
+    61,
+    62,
+    65,
+    66,
+    67,
+    70,
+    71,
+    74,
+    75,
+    133,
+    149,
+    150,
+    112,
+    53
+  ],
+  "static113to53_avoiding112_path": [
+    113,
+    114,
+    117,
+    118,
+    121,
+    122,
+    125,
+    127,
+    128,
+    97,
+    61,
+    62,
+    65,
+    66,
+    67,
+    70,
+    71,
+    74,
+    75,
+    133,
+    149,
+    150,
+    94,
+    25,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    53
+  ],
+  "source_static_contracts": [
+    {
+      "node": 53,
+      "zone": "international",
+      "control_partition": "partition:system_international",
+      "resource_owner": "owner:system_international",
+      "capacity": 4,
+      "export_min_stock": 0,
+      "allow_export": true,
+      "allow_receive": true
+    },
+    {
+      "node": 112,
+      "zone": "domestic",
+      "control_partition": "partition:system_domestic",
+      "resource_owner": "owner:system_domestic",
+      "capacity": 4,
+      "export_min_stock": 0,
+      "allow_export": true,
+      "allow_receive": true
+    },
+    {
+      "node": 113,
+      "zone": "domestic",
+      "control_partition": "partition:system_domestic",
+      "resource_owner": "owner:system_domestic",
+      "capacity": 4,
+      "export_min_stock": 0,
+      "allow_export": true,
+      "allow_receive": true
+    }
+  ],
+  "conclusions": [
+    "All saved parked reconstruction output and immutable raw hashes reproduced; all entered/exited traversal identities additionally matched.",
+    "At19500.001 candidate actual chain is53to49,112to53,29to112,28to29; same-timestamp native reservations refill receiving occupancy before downstream edge exits.",
+    "A2s command reacting at19500 cannot reroute bag4 which enters112to53 at19500.001; earlier recorded waiting interval from9555.237986 is a different feasible-to-test observation epoch.",
+    "No-chain control actually reaches the same long waiting112 state; no independent new simulation needed to identify the candidate opportunity.",
+    "Static113to53 reachability does not prove installed intent, actual112to113edge, unchanged complete suffix, terminal completion or strict all-job protection.",
+    "Current protocol revalidates actualowner/tray/job/generation/traversal/activegoal/deadline/receiving capacity. Preference remains shield/FIFO controlled; new current-owner native gate required."
+  ],
+  "limitations": [
+    "Parked history is not identified receiving-lease history or an online observation.",
+    "Native events and detailed decision traces are absent in these saved results; RESOURCE_WAIT alone does not reveal a complete hidden arbitration state.",
+    "Read-only review found no material error in current saved parked counts; generic audit helper could additionally reject nonfinite time and bind traversal IDs itself."
+  ],
+  "new_native_calls": 0,
+  "new_business_gain_or_protection_claim": false,
+  "third_tray_gate_freeze": {
+    "plan_sha256": "ad23373197695ca48a5707f145f466276af71d40822dc1515906ab8b59b5558f",
+    "source_count": 40,
+    "changed_sources": []
+  }
+}

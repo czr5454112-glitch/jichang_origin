@@ -1,0 +1,37 @@
+{
+  "schema": "g31.live_communication_source_boundary_review.v2",
+  "status": "source_candidate_not_full_model_conformance",
+  "initial_input_origin": {
+    "extractor": "validate_live_communication_projection.public_initial",
+    "allowed": "One owner's initial_owners[owner].raw_endpoints plus its unique own immutable initial publication with call.at<=0.11.",
+    "excluded": ["saved specification/case key", "result", "future calls", "future collection attempts", "completion targets", "other owner's private endpoint"],
+    "selection_scope": "Verifier reads saved raw bytes but passes only the explicit initial envelope. Both owner checks are offline consistency checks, not an atomic online agreement."
+  },
+  "initial_time_guards": {
+    "source": "live_obligation_domain_guard.validate_pair",
+    "capture_delivery": "0.05<=captured_at<=delivered_at<=view.now==0.11<valid_until, capture age<=0.06; delivered selfACK must be<=now.",
+    "self_copy": "Own capture time equals ACK.executed_at; envelope delivery equals ACK.completed_at; own ACK.result_id equals capture.message_id.",
+    "observed_job_history": "arrival, loaded_at, storage_entered_at and storage_released_at may not exceed source captured_at. All source scopes, exact coverage, native semantics and digests are revalidated.",
+    "typed_future_bounds": "A known LOAD_START plus public duration may yield a future load completion bound. A deadline/storage release is a public obligation contract. These are not future observed completions. L is projected from captured loading through its known completion<=0.11 only when its earliest source dispatch is still>0.11.",
+    "finite_initial_assumption": "The closed input fixes the underlying initial tray availability epoch0. The current P loading observation separately reports its future load completion. This remains a conditional finite-domain assumption, not inferred hidden arbitrary history."
+  },
+  "future_projection": {
+    "source": "live_obligation_projected_captures.CaptureWorld",
+    "facts": "Rows use the pure engine's already processed modeled events. Future event-heap entries and saved future outcomes are not queried to build a capture.",
+    "authority": "Projected captures are conditional forecasts even when their supplied-data digest/schema passes. No actual NativeSession, message delivery, source authority or protection certificate is minted."
+  },
+  "test_scope": {
+    "frozen_38": "Actual supplied initial/later guard tests plus isolated event helper tests and fake context rejection. They did not run a complete physical candidate.",
+    "new_driver_tests": "Recursive LOAD_GLOBAL resolution for the compiled run, intentional missing-global rejection, one-tick fake engine executing the whole generated body through output construction, recomputed-digest future capture and future observed job epoch rejection, and shared budget boundaries.",
+    "fake_smoke_limit": "This catches compiled global wiring and common result construction only. It does not certify all event branches, physical semantics, all96 or native conformance."
+  },
+  "budget": {
+    "fixed_seconds": 180,
+    "parent": "BOOT recorded before heavy imports; parent does only lightweight plan/interpreter binding and owned Job launch.",
+    "child": "Model imports, full source/evidence/raw entry pins, all96 rows and all actual collection target checks, result files and exit pins are inside a single kill-on-close owned child.",
+    "remaining": "Child receives180 minus parent elapsed minus1s finalization reserve. Parent checks charged elapsed after receipt; overrun returns unknown/nonzero. External Python launch-to-exit wall is required separately."
+  },
+  "native_executions": 0,
+  "full_candidate_model_evaluations": 0,
+  "old_prepare001": "Preserved unexecuted; this note and v2 launcher do not edit its four sources, plan or archived evidence."
+}

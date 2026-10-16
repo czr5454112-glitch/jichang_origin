@@ -1,0 +1,107 @@
+{
+  "status": "negative_cost_mechanism_diagnosed_no_tuning_or_promotion",
+  "report_sha256": "bd4df86bacec4a26b594810ff18f5bd3621ecfad288561addc14d9ad96a0ac02",
+  "components": {
+    "A": {
+      "wall_with_profiler_seconds": 0.5302445000015723,
+      "selected_components": [
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_native_preference_projection.py",
+          "line": 330,
+          "function": "run",
+          "primitive_calls": 32,
+          "total_calls": 32,
+          "self_seconds": 0.0651602,
+          "cumulative_seconds": 0.3154755
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_preference_request_context.py",
+          "line": 64,
+          "function": "compile_guards",
+          "primitive_calls": 1,
+          "total_calls": 1,
+          "self_seconds": 0.0004621,
+          "cumulative_seconds": 0.1262229
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_native_preference_projection.py",
+          "line": 315,
+          "function": "tick",
+          "primitive_calls": 28312,
+          "total_calls": 28312,
+          "self_seconds": 0.0245538,
+          "cumulative_seconds": 0.025617200000000003
+        }
+      ]
+    },
+    "B": {
+      "wall_with_profiler_seconds": 0.6405000000013388,
+      "selected_components": [
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_preference_quiet_context.py:exact_tick_tail",
+          "line": 1,
+          "function": "run",
+          "primitive_calls": 32,
+          "total_calls": 32,
+          "self_seconds": 0.060109100000000006,
+          "cumulative_seconds": 0.33707970000000004
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_preference_request_context.py",
+          "line": 64,
+          "function": "compile_guards",
+          "primitive_calls": 1,
+          "total_calls": 1,
+          "self_seconds": 0.0005056,
+          "cumulative_seconds": 0.11727380000000001
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_preference_quiet_context.py",
+          "line": 58,
+          "function": "compile_quiet_run",
+          "primitive_calls": 1,
+          "total_calls": 1,
+          "self_seconds": 0.0002134,
+          "cumulative_seconds": 0.09526960000000001
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_preference_quiet_context.py",
+          "line": 26,
+          "function": "quiet_suffix",
+          "primitive_calls": 96,
+          "total_calls": 96,
+          "self_seconds": 0.0004904,
+          "cumulative_seconds": 0.0213804
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_native_preference_projection.py",
+          "line": 315,
+          "function": "tick",
+          "primitive_calls": 13994,
+          "total_calls": 13994,
+          "self_seconds": 0.0139404,
+          "cumulative_seconds": 0.015051600000000002
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_preference_quiet_context.py",
+          "line": 46,
+          "function": "consume_quiet_suffix",
+          "primitive_calls": 32,
+          "total_calls": 32,
+          "self_seconds": 0.0089531,
+          "cumulative_seconds": 0.014713100000000002
+        }
+      ]
+    }
+  },
+  "native_calls": 0,
+  "new_projection_calls": 0,
+  "findings": [
+    "Under this fixed-case profiler, tick calls fall28312\u219213994 but tick cumulative time falls only0.0256172\u21920.0150516s. The eliminated handler work is a small fraction of baseline0.5302445s.",
+    "Quiet eligibility scans add0.0213804s and exact remaining-heap consumption0.0147131s; the full modified event run is0.3370797s versus original0.3154755s, even before new constructor codegen. These cumulative times overlap, so they are not additive independent cost fractions.",
+    "Per-request quiet AST codegen adds0.0952696s under profiling; context construction rises0.1369224\u21920.2244307s. Complete profiled batch rises0.5302445\u21920.6405000s.",
+    "Thus removing only codegen does not establish a useful warm-path improvement: the instrumented evaluate body itself is slower0.4152396 versus0.3924772s. No additional tuning/repeats are performed.",
+    "Together with prefix clones/output copies and separate static-guard negative measurements, these results reject promotion of these current wrappers. They do not prove every possible exact optimized implementation impossible. Future changes need a source-supported different bottleneck and fresh bounded equal-output/equal-budget evidence."
+  ],
+  "limits": "One profiler-instrumented retrospective case; not a benchmark, native observation or100ms claim. The six-case uninstrumented ABBA remains the speed outcome. No cross-campaign baseline differences are attributed to an optimization."
+}

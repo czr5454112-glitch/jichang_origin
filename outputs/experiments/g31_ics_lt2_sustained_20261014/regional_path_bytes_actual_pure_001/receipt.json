@@ -1,0 +1,829 @@
+{
+  "status": "pure_three_arm_complete",
+  "native_executions": 0,
+  "gc_enabled": true,
+  "source_before": {
+    "benchmark_saved_path_bytes.py": "e697b31ac0a9271b211863e4a2fe7088544392c46d057486deb6a094d3406aef",
+    "profile_saved_regional_paths.py": "f9a415d5034f67e003b42cac8bf600ee4d13969839c000c52dfc18cd13acff38",
+    "scripts\\experiments\\g31_ics_circulation\\__init__.py": "495b29212f548915ec02a3c29999151b9ba4a24e455fc8df58fca68473e23f38",
+    "scripts\\experiments\\g31_ics_circulation\\analytic_control.py": "a895b79a0adb93dcb61e08da97f68510b0c8e454fb7f69e419952ca7a0854115",
+    "scripts\\experiments\\g31_ics_circulation\\event_protocol_control.py": "3f8b73b663d44f0d07ba8f5298500b619944fd325a4a103ac30aef531b4276b0",
+    "scripts\\experiments\\g31_ics_circulation\\protocol_control.py": "3ff5770e11de5c20b203455546829986d8c3e22e6d4a4189bf0214f14fe1da2f",
+    "scripts\\experiments\\g31_ics_circulation\\regional_control.py": "78bc3e2723dfb4b66863b6c599ae7752b5fb7a697b3b8eb2f8d4332c207e6997",
+    "scripts\\experiments\\g31_ics_circulation\\regional_path_bytes.py": "7b0d3f402d2832fd68caf3de1c4bfd1222a11e330e2ef6a7e35c939ca2db8f12",
+    "scripts\\experiments\\g31_ics_circulation\\regional_path_pool.py": "5085f459348dd58756ceba24b1502d1ca6d705af952300236f866883deb2affd",
+    "scripts\\experiments\\g31_ics_circulation\\verify_regional_path_pool.py": "fdde23840e00ea6853246ae718d4f4bdb05c90303c35bb905943c32a50a9ad6f",
+    "tests\\test_g31_circulation_regional_path_bytes.py": "1baea06065bbbe09e0e76d8cdc2cf553589be4b3c7213dcfeb4e6c24decf63f8",
+    "tests\\test_g31_circulation_regional_path_pool.py": "4497a3d612db73d20107dcb2856aaccb06465ab34768be6e4b4c5af650e62956"
+  },
+  "source_after": {
+    "benchmark_saved_path_bytes.py": "e697b31ac0a9271b211863e4a2fe7088544392c46d057486deb6a094d3406aef",
+    "profile_saved_regional_paths.py": "f9a415d5034f67e003b42cac8bf600ee4d13969839c000c52dfc18cd13acff38",
+    "scripts\\experiments\\g31_ics_circulation\\__init__.py": "495b29212f548915ec02a3c29999151b9ba4a24e455fc8df58fca68473e23f38",
+    "scripts\\experiments\\g31_ics_circulation\\analytic_control.py": "a895b79a0adb93dcb61e08da97f68510b0c8e454fb7f69e419952ca7a0854115",
+    "scripts\\experiments\\g31_ics_circulation\\event_protocol_control.py": "3f8b73b663d44f0d07ba8f5298500b619944fd325a4a103ac30aef531b4276b0",
+    "scripts\\experiments\\g31_ics_circulation\\protocol_control.py": "3ff5770e11de5c20b203455546829986d8c3e22e6d4a4189bf0214f14fe1da2f",
+    "scripts\\experiments\\g31_ics_circulation\\regional_control.py": "78bc3e2723dfb4b66863b6c599ae7752b5fb7a697b3b8eb2f8d4332c207e6997",
+    "scripts\\experiments\\g31_ics_circulation\\regional_path_bytes.py": "7b0d3f402d2832fd68caf3de1c4bfd1222a11e330e2ef6a7e35c939ca2db8f12",
+    "scripts\\experiments\\g31_ics_circulation\\regional_path_pool.py": "5085f459348dd58756ceba24b1502d1ca6d705af952300236f866883deb2affd",
+    "scripts\\experiments\\g31_ics_circulation\\verify_regional_path_pool.py": "fdde23840e00ea6853246ae718d4f4bdb05c90303c35bb905943c32a50a9ad6f",
+    "tests\\test_g31_circulation_regional_path_bytes.py": "1baea06065bbbe09e0e76d8cdc2cf553589be4b3c7213dcfeb4e6c24decf63f8",
+    "tests\\test_g31_circulation_regional_path_pool.py": "4497a3d612db73d20107dcb2856aaccb06465ab34768be6e4b4c5af650e62956"
+  },
+  "source_changed": [],
+  "plan_sha256": "3a48aacce97c3b12d49a253563287d3bd7eb98158c1deb2c0d2b85e4500a16c5",
+  "samples": [
+    {
+      "repeat": 0,
+      "arm": "original",
+      "outer_wall_ns": 287043600,
+      "outer_cpu_ns": 265625000,
+      "kernel": {
+        "pooled": false,
+        "wall_ns": 287001800,
+        "cpu_ns": 265625000,
+        "calls": 7158,
+        "pool": null
+      }
+    },
+    {
+      "repeat": 0,
+      "arm": "tuple_pool",
+      "outer_wall_ns": 696541000,
+      "outer_cpu_ns": 671875000,
+      "kernel": {
+        "pooled": true,
+        "wall_ns": 696334000,
+        "cpu_ns": 671875000,
+        "calls": 7158,
+        "pool": {
+          "handles": 1000,
+          "key_builds": 1000,
+          "fallback_calls": 0,
+          "local_hits": 4579,
+          "cross_activation_hits": 2574,
+          "path_misses": 5,
+          "graph_evictions": 0,
+          "path_evictions": 0,
+          "resident_graphs": 2,
+          "resident_paths": 5
+        }
+      }
+    },
+    {
+      "repeat": 0,
+      "arm": "bytes_pool",
+      "outer_wall_ns": 579079700,
+      "outer_cpu_ns": 562500000,
+      "kernel": {
+        "pooled": true,
+        "wall_ns": 578968300,
+        "cpu_ns": 562500000,
+        "calls": 7158,
+        "pool": {
+          "handles": 1000,
+          "key_builds": 1000,
+          "fallback_calls": 0,
+          "local_hits": 4579,
+          "cross_activation_hits": 2574,
+          "path_misses": 5,
+          "graph_evictions": 0,
+          "path_evictions": 0,
+          "resident_graphs": 2,
+          "resident_paths": 5
+        }
+      }
+    },
+    {
+      "repeat": 1,
+      "arm": "tuple_pool",
+      "outer_wall_ns": 952651000,
+      "outer_cpu_ns": 937500000,
+      "kernel": {
+        "pooled": true,
+        "wall_ns": 952240200,
+        "cpu_ns": 937500000,
+        "calls": 7158,
+        "pool": {
+          "handles": 1000,
+          "key_builds": 1000,
+          "fallback_calls": 0,
+          "local_hits": 4579,
+          "cross_activation_hits": 2574,
+          "path_misses": 5,
+          "graph_evictions": 0,
+          "path_evictions": 0,
+          "resident_graphs": 2,
+          "resident_paths": 5
+        }
+      }
+    },
+    {
+      "repeat": 1,
+      "arm": "bytes_pool",
+      "outer_wall_ns": 633144400,
+      "outer_cpu_ns": 625000000,
+      "kernel": {
+        "pooled": true,
+        "wall_ns": 633035900,
+        "cpu_ns": 625000000,
+        "calls": 7158,
+        "pool": {
+          "handles": 1000,
+          "key_builds": 1000,
+          "fallback_calls": 0,
+          "local_hits": 4579,
+          "cross_activation_hits": 2574,
+          "path_misses": 5,
+          "graph_evictions": 0,
+          "path_evictions": 0,
+          "resident_graphs": 2,
+          "resident_paths": 5
+        }
+      }
+    },
+    {
+      "repeat": 1,
+      "arm": "original",
+      "outer_wall_ns": 351791200,
+      "outer_cpu_ns": 343750000,
+      "kernel": {
+        "pooled": false,
+        "wall_ns": 351748700,
+        "cpu_ns": 343750000,
+        "calls": 7158,
+        "pool": null
+      }
+    },
+    {
+      "repeat": 2,
+      "arm": "bytes_pool",
+      "outer_wall_ns": 592127100,
+      "outer_cpu_ns": 593750000,
+      "kernel": {
+        "pooled": true,
+        "wall_ns": 591998700,
+        "cpu_ns": 593750000,
+        "calls": 7158,
+        "pool": {
+          "handles": 1000,
+          "key_builds": 1000,
+          "fallback_calls": 0,
+          "local_hits": 4579,
+          "cross_activation_hits": 2574,
+          "path_misses": 5,
+          "graph_evictions": 0,
+          "path_evictions": 0,
+          "resident_graphs": 2,
+          "resident_paths": 5
+        }
+      }
+    },
+    {
+      "repeat": 2,
+      "arm": "original",
+      "outer_wall_ns": 359091900,
+      "outer_cpu_ns": 359375000,
+      "kernel": {
+        "pooled": false,
+        "wall_ns": 359058600,
+        "cpu_ns": 359375000,
+        "calls": 7158,
+        "pool": null
+      }
+    },
+    {
+      "repeat": 2,
+      "arm": "tuple_pool",
+      "outer_wall_ns": 896834000,
+      "outer_cpu_ns": 890625000,
+      "kernel": {
+        "pooled": true,
+        "wall_ns": 896460400,
+        "cpu_ns": 890625000,
+        "calls": 7158,
+        "pool": {
+          "handles": 1000,
+          "key_builds": 1000,
+          "fallback_calls": 0,
+          "local_hits": 4579,
+          "cross_activation_hits": 2574,
+          "path_misses": 5,
+          "graph_evictions": 0,
+          "path_evictions": 0,
+          "resident_graphs": 2,
+          "resident_paths": 5
+        }
+      }
+    }
+  ],
+  "profiles": {
+    "original": {
+      "measurement": {
+        "arm": "original",
+        "outer_wall_ns": 1160820600,
+        "outer_cpu_ns": 1125000000,
+        "kernel": {
+          "pooled": false,
+          "wall_ns": 1160734200,
+          "cpu_ns": 1125000000,
+          "calls": 7158,
+          "pool": null
+        }
+      },
+      "functions": [
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\benchmark_saved_path_bytes.py",
+          "line": 22,
+          "function": "measure",
+          "primitive_calls": 1,
+          "total_calls": 1,
+          "own_seconds": 8.09e-05,
+          "cumulative_seconds": 1.1608397000000001
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\profile_saved_regional_paths.py",
+          "line": 108,
+          "function": "route_run",
+          "primitive_calls": 1,
+          "total_calls": 1,
+          "own_seconds": 0.043355500000000005,
+          "cumulative_seconds": 1.1607528
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_control.py",
+          "line": 62,
+          "function": "path",
+          "primitive_calls": 7158,
+          "total_calls": 7158,
+          "own_seconds": 0.6749357,
+          "cumulative_seconds": 1.1146154000000001
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_control.py",
+          "line": 70,
+          "function": "<dictcomp>",
+          "primitive_calls": 1000,
+          "total_calls": 1000,
+          "own_seconds": 0.0587796,
+          "cumulative_seconds": 0.09388750000000001
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_control.py",
+          "line": 69,
+          "function": "<dictcomp>",
+          "primitive_calls": 1000,
+          "total_calls": 1000,
+          "own_seconds": 0.026946900000000003,
+          "cumulative_seconds": 0.026946900000000003
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_control.py",
+          "line": 71,
+          "function": "<setcomp>",
+          "primitive_calls": 1000,
+          "total_calls": 1000,
+          "own_seconds": 0.025862700000000002,
+          "cumulative_seconds": 0.025862700000000002
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_control.py",
+          "line": 73,
+          "function": "<dictcomp>",
+          "primitive_calls": 1000,
+          "total_calls": 1000,
+          "own_seconds": 0.0169699,
+          "cumulative_seconds": 0.0169699
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\profile_saved_regional_paths.py",
+          "line": 34,
+          "function": "need",
+          "primitive_calls": 7159,
+          "total_calls": 7159,
+          "own_seconds": 0.0014278000000000001,
+          "cumulative_seconds": 0.0014278000000000001
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_control.py",
+          "line": 55,
+          "function": "__init__",
+          "primitive_calls": 1000,
+          "total_calls": 1000,
+          "own_seconds": 0.0013449,
+          "cumulative_seconds": 0.0013449
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_control.py",
+          "line": 72,
+          "function": "<genexpr>",
+          "primitive_calls": 1000,
+          "total_calls": 1000,
+          "own_seconds": 0.0002927,
+          "cumulative_seconds": 0.0002927
+        }
+      ]
+    },
+    "tuple_pool": {
+      "measurement": {
+        "arm": "tuple_pool",
+        "outer_wall_ns": 3733128100,
+        "outer_cpu_ns": 3718750000,
+        "kernel": {
+          "pooled": true,
+          "wall_ns": 3732886900,
+          "cpu_ns": 3718750000,
+          "calls": 7158,
+          "pool": {
+            "handles": 1000,
+            "key_builds": 1000,
+            "fallback_calls": 0,
+            "local_hits": 4579,
+            "cross_activation_hits": 2574,
+            "path_misses": 5,
+            "graph_evictions": 0,
+            "path_evictions": 0,
+            "resident_graphs": 2,
+            "resident_paths": 5
+          }
+        }
+      },
+      "functions": [
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\benchmark_saved_path_bytes.py",
+          "line": 22,
+          "function": "measure",
+          "primitive_calls": 1,
+          "total_calls": 1,
+          "own_seconds": 0.0001017,
+          "cumulative_seconds": 3.7331423000000004
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\profile_saved_regional_paths.py",
+          "line": 108,
+          "function": "route_run",
+          "primitive_calls": 1,
+          "total_calls": 1,
+          "own_seconds": 0.047756400000000004,
+          "cumulative_seconds": 3.7330328
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_path_pool.py",
+          "line": 141,
+          "function": "path",
+          "primitive_calls": 7158,
+          "total_calls": 7158,
+          "own_seconds": 0.0250505,
+          "cumulative_seconds": 3.6782383000000003
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_path_pool.py",
+          "line": 38,
+          "function": "public_routing_key",
+          "primitive_calls": 1000,
+          "total_calls": 1000,
+          "own_seconds": 1.6509095,
+          "cumulative_seconds": 3.5069350000000004
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_path_pool.py",
+          "line": 31,
+          "function": "_number",
+          "primitive_calls": 983000,
+          "total_calls": 983000,
+          "own_seconds": 0.7568787,
+          "cumulative_seconds": 1.0261606
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_path_pool.py",
+          "line": 26,
+          "function": "_node",
+          "primitive_calls": 1210000,
+          "total_calls": 1210000,
+          "own_seconds": 0.42791470000000004,
+          "cumulative_seconds": 0.42791470000000004
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_path_pool.py",
+          "line": 106,
+          "function": "_graph",
+          "primitive_calls": 1000,
+          "total_calls": 1000,
+          "own_seconds": 0.0027534,
+          "cumulative_seconds": 0.14226260000000002
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_path_pool.py",
+          "line": 21,
+          "function": "_sequence",
+          "primitive_calls": 383000,
+          "total_calls": 383000,
+          "own_seconds": 0.1353301,
+          "cumulative_seconds": 0.1353301
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_path_pool.py",
+          "line": 60,
+          "function": "<genexpr>",
+          "primitive_calls": 152000,
+          "total_calls": 152000,
+          "own_seconds": 0.029437300000000003,
+          "cumulative_seconds": 0.029437300000000003
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_path_pool.py",
+          "line": 61,
+          "function": "<setcomp>",
+          "primitive_calls": 1000,
+          "total_calls": 1000,
+          "own_seconds": 0.0146987,
+          "cumulative_seconds": 0.0146987
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_path_pool.py",
+          "line": 102,
+          "function": "handle",
+          "primitive_calls": 1000,
+          "total_calls": 1000,
+          "own_seconds": 0.0021163,
+          "cumulative_seconds": 0.0053363
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_path_pool.py",
+          "line": 133,
+          "function": "__init__",
+          "primitive_calls": 1000,
+          "total_calls": 1000,
+          "own_seconds": 0.0018769000000000001,
+          "cumulative_seconds": 0.00322
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_control.py",
+          "line": 62,
+          "function": "path",
+          "primitive_calls": 5,
+          "total_calls": 5,
+          "own_seconds": 0.0012382,
+          "cumulative_seconds": 0.0022161
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\profile_saved_regional_paths.py",
+          "line": 34,
+          "function": "need",
+          "primitive_calls": 7159,
+          "total_calls": 7159,
+          "own_seconds": 0.0015745000000000002,
+          "cumulative_seconds": 0.0015745000000000002
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_control.py",
+          "line": 55,
+          "function": "__init__",
+          "primitive_calls": 1000,
+          "total_calls": 1000,
+          "own_seconds": 0.0013431,
+          "cumulative_seconds": 0.0013431
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_control.py",
+          "line": 70,
+          "function": "<dictcomp>",
+          "primitive_calls": 2,
+          "total_calls": 2,
+          "own_seconds": 0.0001006,
+          "cumulative_seconds": 0.00016700000000000002
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_path_pool.py",
+          "line": 124,
+          "function": "snapshot",
+          "primitive_calls": 1,
+          "total_calls": 1,
+          "own_seconds": 1.3100000000000002e-05,
+          "cumulative_seconds": 9.730000000000001e-05
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_path_pool.py",
+          "line": 126,
+          "function": "<genexpr>",
+          "primitive_calls": 3,
+          "total_calls": 3,
+          "own_seconds": 8e-05,
+          "cumulative_seconds": 8.020000000000001e-05
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_control.py",
+          "line": 71,
+          "function": "<setcomp>",
+          "primitive_calls": 2,
+          "total_calls": 2,
+          "own_seconds": 4.71e-05,
+          "cumulative_seconds": 4.71e-05
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_control.py",
+          "line": 69,
+          "function": "<dictcomp>",
+          "primitive_calls": 2,
+          "total_calls": 2,
+          "own_seconds": 4.33e-05,
+          "cumulative_seconds": 4.33e-05
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_control.py",
+          "line": 73,
+          "function": "<dictcomp>",
+          "primitive_calls": 2,
+          "total_calls": 2,
+          "own_seconds": 4.19e-05,
+          "cumulative_seconds": 4.19e-05
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_path_pool.py",
+          "line": 94,
+          "function": "__init__",
+          "primitive_calls": 1,
+          "total_calls": 1,
+          "own_seconds": 9.100000000000001e-06,
+          "cumulative_seconds": 2.18e-05
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_path_pool.py",
+          "line": 119,
+          "function": "_store",
+          "primitive_calls": 5,
+          "total_calls": 5,
+          "own_seconds": 1.09e-05,
+          "cumulative_seconds": 1.36e-05
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_path_pool.py",
+          "line": 95,
+          "function": "<genexpr>",
+          "primitive_calls": 3,
+          "total_calls": 3,
+          "own_seconds": 8.5e-06,
+          "cumulative_seconds": 8.5e-06
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_control.py",
+          "line": 72,
+          "function": "<genexpr>",
+          "primitive_calls": 2,
+          "total_calls": 2,
+          "own_seconds": 5.000000000000001e-07,
+          "cumulative_seconds": 5.000000000000001e-07
+        }
+      ]
+    },
+    "bytes_pool": {
+      "measurement": {
+        "arm": "bytes_pool",
+        "outer_wall_ns": 2083484900,
+        "outer_cpu_ns": 2062500000,
+        "kernel": {
+          "pooled": true,
+          "wall_ns": 2083327100,
+          "cpu_ns": 2062500000,
+          "calls": 7158,
+          "pool": {
+            "handles": 1000,
+            "key_builds": 1000,
+            "fallback_calls": 0,
+            "local_hits": 4579,
+            "cross_activation_hits": 2574,
+            "path_misses": 5,
+            "graph_evictions": 0,
+            "path_evictions": 0,
+            "resident_graphs": 2,
+            "resident_paths": 5
+          }
+        }
+      },
+      "functions": [
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\benchmark_saved_path_bytes.py",
+          "line": 22,
+          "function": "measure",
+          "primitive_calls": 1,
+          "total_calls": 1,
+          "own_seconds": 3.12e-05,
+          "cumulative_seconds": 2.0835073
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\profile_saved_regional_paths.py",
+          "line": 108,
+          "function": "route_run",
+          "primitive_calls": 1,
+          "total_calls": 1,
+          "own_seconds": 0.015509400000000001,
+          "cumulative_seconds": 2.0833703000000003
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_path_pool.py",
+          "line": 141,
+          "function": "path",
+          "primitive_calls": 7158,
+          "total_calls": 7158,
+          "own_seconds": 0.0383691,
+          "cumulative_seconds": 2.0615599000000002
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_path_bytes.py",
+          "line": 16,
+          "function": "public_routing_bytes",
+          "primitive_calls": 1000,
+          "total_calls": 1000,
+          "own_seconds": 1.5124901000000002,
+          "cumulative_seconds": 2.0089525
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_path_pool.py",
+          "line": 106,
+          "function": "_graph",
+          "primitive_calls": 1000,
+          "total_calls": 1000,
+          "own_seconds": 0.0024311000000000003,
+          "cumulative_seconds": 0.0105375
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_path_pool.py",
+          "line": 102,
+          "function": "handle",
+          "primitive_calls": 1000,
+          "total_calls": 1000,
+          "own_seconds": 0.0020022,
+          "cumulative_seconds": 0.004954500000000001
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_path_pool.py",
+          "line": 133,
+          "function": "__init__",
+          "primitive_calls": 1000,
+          "total_calls": 1000,
+          "own_seconds": 0.0017261000000000002,
+          "cumulative_seconds": 0.0029523
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_control.py",
+          "line": 62,
+          "function": "path",
+          "primitive_calls": 5,
+          "total_calls": 5,
+          "own_seconds": 0.0012514000000000002,
+          "cumulative_seconds": 0.0019405000000000002
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\profile_saved_regional_paths.py",
+          "line": 34,
+          "function": "need",
+          "primitive_calls": 7159,
+          "total_calls": 7159,
+          "own_seconds": 0.0013127,
+          "cumulative_seconds": 0.0013127
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_control.py",
+          "line": 55,
+          "function": "__init__",
+          "primitive_calls": 1000,
+          "total_calls": 1000,
+          "own_seconds": 0.0012262,
+          "cumulative_seconds": 0.0012262
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_control.py",
+          "line": 70,
+          "function": "<dictcomp>",
+          "primitive_calls": 2,
+          "total_calls": 2,
+          "own_seconds": 7.960000000000001e-05,
+          "cumulative_seconds": 0.00012910000000000002
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_path_bytes.py",
+          "line": 69,
+          "function": "installed_regional_path_bytes",
+          "primitive_calls": 2,
+          "total_calls": 2,
+          "own_seconds": 8.000000000000001e-06,
+          "cumulative_seconds": 7.730000000000001e-05
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_path_pool.py",
+          "line": 179,
+          "function": "installed_regional_path_pool",
+          "primitive_calls": 2,
+          "total_calls": 2,
+          "own_seconds": 1.09e-05,
+          "cumulative_seconds": 5.14e-05
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_control.py",
+          "line": 71,
+          "function": "<setcomp>",
+          "primitive_calls": 2,
+          "total_calls": 2,
+          "own_seconds": 3.96e-05,
+          "cumulative_seconds": 3.96e-05
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_control.py",
+          "line": 69,
+          "function": "<dictcomp>",
+          "primitive_calls": 2,
+          "total_calls": 2,
+          "own_seconds": 3.52e-05,
+          "cumulative_seconds": 3.52e-05
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_control.py",
+          "line": 73,
+          "function": "<dictcomp>",
+          "primitive_calls": 2,
+          "total_calls": 2,
+          "own_seconds": 2.5900000000000003e-05,
+          "cumulative_seconds": 2.5900000000000003e-05
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_path_pool.py",
+          "line": 124,
+          "function": "snapshot",
+          "primitive_calls": 1,
+          "total_calls": 1,
+          "own_seconds": 1.54e-05,
+          "cumulative_seconds": 2.15e-05
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_path_pool.py",
+          "line": 119,
+          "function": "_store",
+          "primitive_calls": 5,
+          "total_calls": 5,
+          "own_seconds": 1.08e-05,
+          "cumulative_seconds": 1.41e-05
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_path_pool.py",
+          "line": 94,
+          "function": "__init__",
+          "primitive_calls": 2,
+          "total_calls": 2,
+          "own_seconds": 7.4e-06,
+          "cumulative_seconds": 1.4000000000000001e-05
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_path_pool.py",
+          "line": 128,
+          "function": "clear",
+          "primitive_calls": 1,
+          "total_calls": 1,
+          "own_seconds": 2.8000000000000003e-06,
+          "cumulative_seconds": 3.6000000000000003e-06
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_path_pool.py",
+          "line": 95,
+          "function": "<genexpr>",
+          "primitive_calls": 6,
+          "total_calls": 6,
+          "own_seconds": 3.6000000000000003e-06,
+          "cumulative_seconds": 3.6000000000000003e-06
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_path_pool.py",
+          "line": 126,
+          "function": "<genexpr>",
+          "primitive_calls": 3,
+          "total_calls": 3,
+          "own_seconds": 2.3e-06,
+          "cumulative_seconds": 2.6e-06
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_path_pool.py",
+          "line": 191,
+          "function": "InstalledRouting",
+          "primitive_calls": 1,
+          "total_calls": 1,
+          "own_seconds": 1.4000000000000001e-06,
+          "cumulative_seconds": 1.4000000000000001e-06
+        },
+        {
+          "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_control.py",
+          "line": 72,
+          "function": "<genexpr>",
+          "primitive_calls": 2,
+          "total_calls": 2,
+          "own_seconds": 5.000000000000001e-07,
+          "cumulative_seconds": 5.000000000000001e-07
+        }
+      ]
+    }
+  },
+  "median_wall_ms": {
+    "original": 351.7912,
+    "tuple_pool": 896.834,
+    "bytes_pool": 592.1271
+  },
+  "complete_business_100ms_certified": false
+}

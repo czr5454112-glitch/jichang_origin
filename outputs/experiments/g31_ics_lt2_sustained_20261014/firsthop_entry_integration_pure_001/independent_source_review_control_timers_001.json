@@ -1,0 +1,48 @@
+{
+  "schema": "g31.initial_entry_integration.independent_narrow_source_review.v1",
+  "reviewed_at_utc": "2026-10-15T16:59:10.791162+00:00",
+  "reviewer": "control_timers",
+  "result": "no_concrete_blocker_found_in_declared_source_only_integration",
+  "inspected_source_pins": {
+    "scripts/experiments/g31_ics_circulation/initial_owner_route_entry_integration.py": "619e73199a642e5c3acc4d3a9dcec070ecf306efc44b8806d1f24aa7338df6f8",
+    "tests/test_g31_circulation_initial_owner_route_entry_integration.py": "3e8d4656e48866cbbddb819ab4fab868e74c76cfbccf916cd5290ffd8d56e41c",
+    "scripts/experiments/g31_ics_circulation/initial_owner_route_entry_hop.py": "c5a5bf553379f1c844f8d01b0b58f53ca6632c990b26488a8b59f52d62bf3be2",
+    "scripts/experiments/g31_ics_circulation/initial_owner_route_gated_evidence_v2.py": "916822d38b15dd06d40f9b96bf5340eb2ec68a9f5866d1644608d64aca6989a1",
+    "scripts/experiments/g31_ics_circulation/initial_owner_route_gate_adapter.py": "02aff6252d4b8051405aa153016b2cbf4477c55600b7a5ff34e23865ed8bd106",
+    "scripts/experiments/g31_ics_circulation/initial_owner_route_request.py": "6d57c6d3d9b9ba679d05208cba5f696e8cb73db7fcd99a4f6f274f183ee0990c",
+    "scripts/experiments/g31_ics_circulation/initial_owner_route_contract.py": "1dc8d45abbf547401232faca189c4fc111feab95db47654eee508854569b619f",
+    "scripts/experiments/g31_ics_circulation/single_root_evidence.py": "e5f925b7e97ed4def3352778b29bb9fa99458939e4528b796fccd2bbca546a0e"
+  },
+  "saved_evidence": {
+    "receipt.json": "142749c46544b933723d1d4543f29a247cbb8328b0ad1314cf070b81aed6bb0a",
+    "plan.json": "cd83db213fe9ba93114e07a37fd5c70d46bfd33cd73bf5926ba46fcf33e37eee",
+    "tests.xml": "8a25c2f786d23663dee85f8ab226eeed40334a9596b4a2ccab0ebaa15cc69891"
+  },
+  "saved_pure": {
+    "tests": 177,
+    "old_gate_tests": 130,
+    "entry_predicate_tests": 32,
+    "new_integration_tests": 15,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "reviewer_reran_tests": false
+  },
+  "findings": [
+    "The private helper preserves function code/defaults/kwdefaults/closure. Only this new module owns the contract SimpleNamespace, subclass and rebound function globals. Imported class attributes and module globals remain unchanged.",
+    "Cloned ActualAdvanceChain.__init__ retains the original __class__ closure. The new class subclasses the original ActualAdvanceChain, so zero-argument super proceeds after the original class to _RecordedChain once, after the unchanged accepted-session/client/exact method/source checks. Inherited decide/after_step use the same valid MRO.",
+    "Normal observe and post-drain observe both use the same new first-hop predicate facade. The facade closure function remains the original ACK/terminal logic. Observation cannot close before the real same-timestamp drain; the tracked drain validates its exact new chain and retains the original complete-boundary and post-drain query sequence.",
+    "ActualAdvanceChain still requires the accepted native handle, exact original LocalTransport and exact v2 OutboxTrace instance, original collection and recorder, fixed A/B continuation instances, and unchanged inventory checks. Synthetic test fixtures do not establish a runtime authority.",
+    "The marker is appended to runtime_query_proof before the one fresh normalize/encode and body timestamp. The finisher, ledger, publish/outside-return path retains original code; the marker has a copied mutable subtree and is included in the encoded root, not a deferred uncharged sidecar.",
+    "The integration explicitly changes earlier closure and disclaims unchanged later admission IDs/tape-prefix equivalence. It does not import prior performance results as an integration result."
+  ],
+  "limitations": [
+    "No native/predictor execution, fresh test run, large saved raw read, independent seal replay or actual18 campaign review.",
+    "Only the eight listed live/archive source files were independently rehashed here; this is not a full transitive closure or binary-authority audit.",
+    "The positive native chain construction and actual integrated ENTRY/ACK/drain outcome remain for a separately frozen campaign. Saved pure tests intentionally use an untracked synthetic drain for behavior checks and separately reject non-native authority."
+  ],
+  "native_calls": 0,
+  "new_predictions": 0,
+  "large_saved_raw_reads": 0,
+  "new_tests_run": 0
+}

@@ -1,0 +1,39 @@
+{
+  "schema": "g31.bridge.C_digest.driver_pure_wrapper_revision.v1",
+  "status": "source_only_unexecuted",
+  "template": {
+    "path": "outputs/experiments/g31_ics_lt2_sustained_20261014/control_timers_bcp2_pure_001.ps1",
+    "sha256": "9150c283af1df06c502b81a79e98d05ab1336923110d1482a54f6738f9816ff7"
+  },
+  "wrapper": {
+    "path": "outputs/experiments/g31_ics_lt2_sustained_20261014/control_timers_bcdp1_pure_001.ps1",
+    "sha256": "a0d0833b565128173542a4dd7fdd8d45942e9c06e6befd359b30a6b057859895"
+  },
+  "source_sha256": {
+    "scripts/experiments/g31_ics_circulation/audit_bridge_saved_c_digest.py": "3481b5eba5a0b55dfd82fb6ab193881198c699e35b2c1c543c25c5a54e3af15a",
+    "tests/test_g31_circulation_bridge_saved_c_digest_driver.py": "2f790f0560b8f60164074a180a5d008cb0276bc88287a8ad4c6a18411365b21f",
+    "scripts/experiments/g31_ics_circulation/run_bridge_saved_c_digest_driver_pure.py": "b6bbfc4fc73dc038349d7ffbfde4ca0fe69586bb0c442f8db35b5861174c752d"
+  },
+  "inverse_template_text_exact": true,
+  "changes": [
+    "Replace five bcp2 source pins with this gate's three new source pins.",
+    "Replace bcp2 output and failure-report label with bcdp1.",
+    "Replace the executable module with run_bridge_saved_c_digest_driver_pure.",
+    "Replace external receipt schema and declared37 test count with driver12."
+  ],
+  "unchanged": [
+    "PowerShell7 launch/exception/cleanup/exit path and CreateNew receipts.",
+    "Integer elapsed_ticks <=120*frequency and full Python startup-through-exit scope.",
+    "PYTHONPATH=src;.;tests; PYTEST_DISABLE_PLUGIN_AUTOLOAD=1; PYTHONIOENCODING=utf-8.",
+    "No additions to other inherited environment variables.",
+    "Original inner owned Windows Job runner code; source/domain/archive/loaded checks preserved."
+  ],
+  "PowerShell_syntax_errors": 0,
+  "synthetic_gate_executed": false,
+  "extension_loads": 0,
+  "native_calls": 0,
+  "actual_saved_stream_reads": 0,
+  "prepare_executed": false,
+  "full_audit_executed": false,
+  "scope": "Source and wrapper preparation only. The original12 driver tests are not yet executed; bcp2's37 result remains a separate accepted routing gate. prepare now requires both gates and cannot use this metadata as a passing pure receipt."
+}

@@ -1,0 +1,8 @@
+{
+  "status": "first_reader_failed_before_report",
+  "script_sha256": "33461014851f17964f3e3f13762427eb0594a7cd06fbdd2447b1d64f82d7fbb3",
+  "failure": "Assertion at audit_status==passed on initial_ack_drop3 retained unknown row; no report written.",
+  "cause": "Independent root reader incorrectly assumed every branch audit label was passed, whereas original explicit unknown label is passed_with_retained_unknown.",
+  "correction": "New reader002 requires exact unknown label and closed=false only for original initial_ack_drop3 keys, exact passed and closed=true elsewhere. No producer/source/data/status changed or failures removed.",
+  "new_script_sha256": "c147efd5ff6d6458205938a18ca0eba652432ef40b35b00af5de42b9a548c679"
+}

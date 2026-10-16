@@ -1,0 +1,89 @@
+{
+  "schema": "g31.planning_v2.C_encoder.build_failure_readback.v1",
+  "status": "failed_build_preserved",
+  "producer_author_review": true,
+  "references": {
+    "receipt.json": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\planning_v2_C_encoder_build_001\\receipt.json",
+      "sha256": "7024bc068d52648deb36236647942cf360dc3a3329db05bcdd4cd9304b703363"
+    },
+    "bounded_execution.json": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\planning_v2_C_encoder_build_001\\bounded_execution.json",
+      "sha256": "8858cdd4f7c10f086c3786e21077be1d43f7b34b44cd848643b5bc7c6012a9a8"
+    },
+    "external_application_wall.json": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\planning_v2_C_encoder_build_001\\external_application_wall.json",
+      "sha256": "8a92b3bda91b677f220c96740bc751a6c61a8c6c3bde9111a0f5dbef9bbf1777"
+    },
+    "exception.txt": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\planning_v2_C_encoder_build_001\\exception.txt",
+      "sha256": "90e290c0e1337414a2e15de80130cbc72ac48027e3dc0e4fcbd2c2ddd4cab90a"
+    },
+    "configure.command.json": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\planning_v2_C_encoder_build_001\\configure.command.json",
+      "sha256": "ddd8cbcb820fb10407a1b131fe278eba637480f45b2518d5842419cd4c77f3d6"
+    },
+    "configure.stdout.log": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\planning_v2_C_encoder_build_001\\configure.stdout.log",
+      "sha256": "c351d72954024d93872b82203aa35300f657dabada9583d2647eff7ac0cbb7de"
+    },
+    "configure.stderr.log": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\planning_v2_C_encoder_build_001\\configure.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "build.stdout.log": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\planning_v2_C_encoder_build_001\\build.stdout.log",
+      "sha256": "2bfbceb31f45d36c246f39ef28dfec824f9bd0a9db3b404e49f651e4acef18db"
+    },
+    "build.stderr.log": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\planning_v2_C_encoder_build_001\\build.stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "observed": {
+    "worker_status": "failed",
+    "error": {
+      "type": "FileExistsError",
+      "message": "[Errno 17] File exists: 'C:\\\\PROGRAMING\\\\czr005\\\\.g31_ics_circulation_worktree\\\\outputs\\\\experiments\\\\g31_ics_lt2_sustained_20261014\\\\planning_v2_C_encoder_build_001\\\\build.stdout.log'"
+    },
+    "bounded_status": "exited",
+    "bounded_exitcode": 1,
+    "whole_python_seconds": 109.8570487,
+    "outer_timeout": false,
+    "source_changed": [],
+    "identity_verified_on_exit": true,
+    "completed_commands": [
+      {
+        "command": [
+          "C:\\Program Files\\CMake\\bin\\cmake.exe",
+          "-S",
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\experimental\\planning_v2_typed_encoder",
+          "-B",
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_planning_v2_typed_encoder_001",
+          "-G",
+          "Ninja",
+          "-DCMAKE_MAKE_PROGRAM=C:\\Users\\38908\\.conda\\envs\\czr005\\Library\\bin\\ninja.exe",
+          "-DCMAKE_BUILD_TYPE=Release",
+          "-DCMAKE_TRY_COMPILE_CONFIGURATION=Release",
+          "-DPython3_EXECUTABLE=C:\\PROGRAMING\\python3.11.9\\python.exe",
+          "-DCMAKE_CXX_COMPILER=C:\\PROGRAMING\\visual studio\\Visual studio\\VC\\Tools\\MSVC\\14.41.34120\\bin\\Hostx64\\x64\\cl.exe"
+        ],
+        "exit_code": 0,
+        "wall_ns": 4353031000
+      }
+    ]
+  },
+  "causal_source": {
+    "parent": "Frozen v1 main opens output/(args.mode + .stdout.log) and .stderr.log; mode is build.",
+    "worker": "Frozen v1 build calls run(...,name=build); run opens output/(name + .stdout.log) with xb before subprocess.run.",
+    "failure_point": "The worker failed opening the already-open parent stdout path. Only configure is present in commands; target build subprocess was never invoked.",
+    "configure_scope": "CMake configure succeeded and may compile compiler-identification probes; this is not a successful typed-encoder target build."
+  },
+  "C_extension_loads": 0,
+  "typed_encoder_target_compile_commands": 0,
+  "functional_runs": 0,
+  "actual_fixture_reads": 0,
+  "retry_performed": false,
+  "preserve": "No old source, binary or failed output modified. Any repair requires versioned runner and fresh output/build directory.",
+  "proposed_narrow_repair": "Give all worker subprocess logs a command_ prefix distinct from parent mode logs; simulate prepare, build and functional parent-plus-child stage names before another build. Keep all source/toolchain/runtime checks and both 120s bounds."
+}

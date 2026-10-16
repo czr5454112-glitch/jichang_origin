@@ -1,0 +1,41 @@
+{
+  "schema": "g31.static_proof_literature.root_note.v1",
+  "status": "primary_source_design_context_only_no_runtime_change",
+  "sources": [
+    {
+      "title": "Safe Kernel Extensions Without Run-Time Checking — Proof-Carrying Code",
+      "authors": ["George C. Necula", "Peter Lee"],
+      "year": 1996,
+      "url": "https://www.usenix.org/legacy/publications/library/proceedings/osdi96/full_papers/necula/html/node2.html",
+      "location": "Section Proof-Carrying Code, first two paragraphs",
+      "source_claim_paraphrase": "The consumer specifies a policy and code interface. The producer supplies code with a formal safety proof; the consumer validates that proof before executing the associated code.",
+      "local_inference": "Separate generation of static evidence from checking that a particular executable and its dependencies are still the evidence subject. A reusable Python source audit must state its limited policy and bind the exact implementation; a cached success boolean alone is insufficient.",
+      "non_transferable_claim": "Our AST checks, hashes and finite regression tests are not a formal PCC safety proof. The paper does not establish our Python mutable-global or private-state assumptions. It cannot justify removing any dynamic tray, ACK, source freshness, wire or deadline guard."
+    },
+    {
+      "title": "An Introduction to Partial Evaluation",
+      "author": "Neil D. Jones",
+      "year": 1996,
+      "venue": "ACM Computing Surveys 28(3)",
+      "url": "https://web.cs.ucdavis.edu/~devanbu/teaching/260/jones-survey.pdf",
+      "location": "Sections1.1–1.2, printed480–482; Section2.3, printed485; PDF pages0–2 and5",
+      "source_claim_paraphrase": "Specialization evaluates computations determined by static input and retains operations that depend on dynamic input. Correctness requires the specialized and original computations to agree. Static input changes require a new specialization. Binding-time analysis must justify which operations can be eliminated, and specialization must terminate.",
+      "local_inference": "Treat source-derived action-use analysis and control-flow reconstruction as possible static work only after measuring it and enumerating all code, defaults, closures, MRO and global dependencies. Live continuation, supplied observations and timing remain dynamic. Charge specialization and invalidation checks to their actual lifecycle rather than hiding setup in a warm-call number.",
+      "non_transferable_claim": "This project currently performs manual source transformations, not a verified automatic partial evaluator. The survey is design motivation, not proof of conformance, a claimed speedup or a complete100ms certificate."
+    }
+  ],
+  "planned_use": [
+    "First execute the already drafted fixed65 uncached source_proof attribution under its separate120 budget; no runtime modification in this note.",
+    "Only if measured cost warrants it, design a versioned batch-owned static proof with explicit invalidation and cheap exact dependency checks at original boundaries.",
+    "Retain dynamic checks and whole32 candidate denominator; require negative mutation/revocation tests and original96 complete-output conformance for any later implementation.",
+    "Preserve all setup, validation and cleanup costs in complete request or separately reported process lifecycle as applicable; no amortization-based100ms claim."
+  ],
+  "limitations": {
+    "formal_PCC_implemented": false,
+    "automatic_partial_evaluator_implemented": false,
+    "static_proof_cache_implemented": false,
+    "speedup_measured": false,
+    "native_or_C_calls": 0,
+    "overall_goals_completed": false
+  }
+}

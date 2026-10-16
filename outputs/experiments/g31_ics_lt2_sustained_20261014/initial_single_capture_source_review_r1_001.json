@@ -1,0 +1,100 @@
+{
+  "schema": "g31.initial.single_capture.r1_source_review.v1",
+  "status": "core_source_no_concrete_authority_blocker_integration_failure_verifier_required",
+  "plan": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\initial_single_capture_source_prepare_001\\plan.json",
+    "sha256": "ac5461efa4fbf7f097b05cb873a5be949f03fb5b88a912f9b27cf3fa4e38a51d"
+  },
+  "source": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\initial_owner_route_single_capture.py",
+    "sha256": "7836823bce6e05c92a3a4113b7a38780c9700b4c7e28f3c4ee076fddfe4b16ea"
+  },
+  "test": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\tests\\test_g31_circulation_initial_owner_route_single_capture.py",
+    "sha256": "f06e4c66048ae8cf2087060ee82b524076c87d274ca7917709c695cffb0729a6"
+  },
+  "saved_xml": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\initial_single_capture_pure_002\\tests.xml",
+    "sha256": "034c8b46c5116affe902024bbbd4ceab1ce20041a8ce68cd9ee7e4a04d6781dc"
+  },
+  "saved_pure_counts": [
+    24,
+    0,
+    0,
+    0
+  ],
+  "read_source_pins": [
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\initial_owner_route_single_capture.py",
+      "sha256": "7836823bce6e05c92a3a4113b7a38780c9700b4c7e28f3c4ee076fddfe4b16ea"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\native_preexisting_v3_bound_adapter.py",
+      "sha256": "19e7b1534995b6bd8759edd8a37733c0f11c9a68cae143978905f9509dd15330"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\native_preexisting_rolling_adapter.py",
+      "sha256": "3d1f47a543e3fb04693fc1b8d3bda2b17cebe8691b8c4964b0f9cd5df73d8c41"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\native_preexisting_initial_adapter.py",
+      "sha256": "6165d2afcfd86dcf9b45200424a7b64ca100a24bc196a9d972e1edc384dd9ea1"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\initial_owner_route_json_v3.py",
+      "sha256": "e2b5ac243b0722905b60ef36d7bd9d2a7afca95a24c97a98b020a0eef1724353"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_preexisting_model.py",
+      "sha256": "2b8f2f7f633f48b3840dbc35137e0d153c442c635b51c0bc7a55332afeeeccc5"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_reuse_model.py",
+      "sha256": "bb1bf8bc35822b671e9db5844e136ff91f187c4d92d465190f5d630f7cb739d1"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\initial_owner_route_campaign_v3.py",
+      "sha256": "b9a649649e8f4fe332fcbcea70d0b30d136b17129015965a41962bdd375375f0"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\verify_initial_owner_route_campaign.py",
+      "sha256": "d26367d059a86fbd92fb8e68690f8d097ca5460904e8d4cf8fb34c51bed251f9"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\verify_initial_owner_route_campaign_v3.py",
+      "sha256": "934f2076f31c6f253150182ab764336b628150ad58e95f8cbfd2da63eca3e357"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\native027_build_001\\source\\cpp\\ics_core\\bindings\\circulation_session_binding.hpp",
+      "sha256": "66cbba8a046c5ee863241a6b449731be430caae37c046ec9e392ac232d380f66"
+    }
+  ],
+  "new_test_runs": 0,
+  "new_native_calls": 0,
+  "new_model_evaluations": 0,
+  "full128_closure_independent_rehash": false,
+  "findings": [
+    {
+      "severity": "integration_required",
+      "locations": [
+        "verify_initial_owner_route_campaign.py:217",
+        "verify_initial_owner_route_campaign.py:28",
+        "initial_owner_route_single_capture.py:133"
+      ],
+      "issue": "The new collector preserves a failed/incomplete endpoint record. The inherited saved verifier unconditionally calls endpoint_replay for every record and immediately reads endpoints.at and full view/command/received. Query failure records lack some of these fields and information remains None, so that old verifier cannot close the preserved failure ledger.",
+      "required_resolution": "New versioned integration verifier must strictly validate capture_failure and the actually returned typed prefix, retain unknown root/business status and full timing/denominator; complete records retain original endpoint_replay. Do not skip records or fabricate at/endpoints."
+    }
+  ],
+  "reviewed_boundaries": [
+    "Original exact NativeSession/native accepted-run checks and NativeJobLedger token/constructor remain unchanged in private function namespaces.",
+    "validate_pair copies mutable job/tray rows before edits; public_contract, capture_digest and assemble read/copy source endpoints. The new normalizer produces a fresh JSON tree; record information is a separate deep copy. No reviewed validator mutates the original returned endpoint objects.",
+    "Accepted027 getters do not advance physical time or physical events. They do update request timing and derived binding/observation/digest caches. Fewer calls therefore have different instrumentation/cache work, intentionally charged; never claim identical six-call timing tape.",
+    "at moves from before old second triplet to after validation/normalization. In the exact single-threaded NativeSession path, no native mutation/advance occurs between, so physical epoch is unchanged. This is not a guarantee for arbitrary proxies/concurrent mutators.",
+    "Success information/endpoints/ledger field order remains compatible with the old endpoint replay. Synthetic24 covers scope/wiring/alias/failure-prefix examples but not actual native conformance.",
+    "A fresh private Capture is allocated for every invocation, including final revalidation. No previous actual endpoint cache is reused."
+  ],
+  "claim_limits": [
+    "Source/pure-only prototype is not yet an actual campaign or latency result.",
+    "Actual integration needs query/physical-seal and owner-output conformance, altered query-count accounting, strict incomplete-prefix replay and source/run closure."
+  ]
+}

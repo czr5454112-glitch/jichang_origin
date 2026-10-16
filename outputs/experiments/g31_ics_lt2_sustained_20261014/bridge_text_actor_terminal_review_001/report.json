@@ -1,0 +1,143 @@
+{
+  "schema": "g31.bridge.same_text_actor.terminal_review.v1",
+  "status": "unknown_full_saved_audit_timeout_preserved",
+  "recorded_utc": "2026-10-15T19:14:47.548156+00:00",
+  "references": {
+    "plan.json": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\bridge_saved_text_actor_prepare_001\\plan.json",
+      "sha256": "6a56cee53dc46444a96815210076863e37738f449f73b50e845c48d39e887f4a"
+    },
+    "external_application_wall.json": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\bridge_saved_text_actor_prepare_001\\external_application_wall.json",
+      "sha256": "8215f25b11efe738bece294b5c9fc98d05a66d28095f5ba2eed44770979940b1"
+    },
+    "bounded_execution.json": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\bridge_saved_text_actor_prepare_001\\bounded_execution.json",
+      "sha256": "76d3bdce5b7775a7cbfa53658a98f3cbbfe3b8ffbd32dbe65e248c35e3510b56"
+    },
+    "progress.jsonl": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\bridge_saved_text_actor_prepare_001\\progress.jsonl",
+      "sha256": "7c4da24ecc7dff5365243d557997410f819bb4cfa2b891e4faa6dd521a5489ac"
+    },
+    "stdout.log": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\bridge_saved_text_actor_prepare_001\\stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stderr.log": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\bridge_saved_text_actor_prepare_001\\stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "live_archive_source_count": 96,
+  "whole_python_application_seconds": 600.2124356,
+  "owned_process_status": "hard_timeout",
+  "budget_seconds": 600,
+  "journal_count": 275,
+  "journal_limit": 1024,
+  "journal_limit_exhausted": false,
+  "last_logged_tape_progress": {
+    "record": 274,
+    "at_ns": 62822105607300,
+    "event": "api_replay_progress",
+    "completed": 19712,
+    "old_prefix_completed": 19712,
+    "ordinal": 19711,
+    "endpoint": "protocol_planning_snapshots_v2"
+  },
+  "tape_checked_and_actor_constructed_through_lower_bound": 19712,
+  "required_new_rows": 37270,
+  "required_old_prefix_rows": 27218,
+  "completed_stages": [
+    {
+      "stage": "entry_plan_source_artifact_and_runtime_checks",
+      "seconds": 0.6840686
+    },
+    {
+      "stage": "old_complete_prefix_manifest",
+      "seconds": 0.1155994
+    },
+    {
+      "stage": "original_source_and_reference_pins",
+      "seconds": 18.713149
+    },
+    {
+      "stage": "decode:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_bridge_serialize_once_prepare_001\\bridge\\raw_final.json.gz",
+      "seconds": 22.2436668
+    },
+    {
+      "stage": "decode:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_bridge_serialize_once_prepare_001\\bridge\\input.json.gz",
+      "seconds": 0.1479937
+    },
+    {
+      "stage": "original_source_and_reference_pins",
+      "seconds": 24.3882797
+    },
+    {
+      "stage": "new_manifest_and_all_compressed_hashes",
+      "seconds": 20.9999873
+    }
+  ],
+  "slowest_logged256_intervals": [
+    {
+      "through_before": 19456,
+      "through_after": 19712,
+      "seconds": 24.5945053
+    },
+    {
+      "through_before": 19200,
+      "through_after": 19456,
+      "seconds": 24.4704663
+    },
+    {
+      "through_before": 18944,
+      "through_after": 19200,
+      "seconds": 22.0686802
+    },
+    {
+      "through_before": 18688,
+      "through_after": 18944,
+      "seconds": 21.8875386
+    },
+    {
+      "through_before": 18432,
+      "through_after": 18688,
+      "seconds": 21.1998357
+    },
+    {
+      "through_before": 18176,
+      "through_after": 18432,
+      "seconds": 20.2544029
+    },
+    {
+      "through_before": 17408,
+      "through_after": 17664,
+      "seconds": 19.3900009
+    },
+    {
+      "through_before": 17920,
+      "through_after": 18176,
+      "seconds": 18.9247825
+    }
+  ],
+  "progress_semantics_correction": "The marker is emitted in actor retain before returning to the outer ObservedTape and policy. It proves tape guards, old-prefix comparison and actor construction through N only; it does NOT establish completion of the Nth observer/policy consumption, full replay, or the exact final in-flight call. This qualification also applies to earlier linear progress reports.",
+  "missing_terminal_files": [
+    "report.json",
+    "failure.json",
+    "instrumentation_failure.json",
+    "all_job_states.json.gz"
+  ],
+  "interpretation": "Measured local C comparison and same-text copy improvement did not close full audit under600. The aggregate replay interval contains decode/hash/comparison/copy plus observer/policy guards/history work and cannot attribute the residual to one function.",
+  "next_gate": "Source review identifies call-site discarded refresh result copies and transient latest-own capture copies as hypotheses, plus repeated history scans/digests. Isolate costs and prove private alias/guard semantics on representative saved data before any new full audit. No automatic retry or budget extension.",
+  "big_raw_or_API_reads": 0,
+  "native_calls": 0,
+  "model_calls": 0,
+  "full_saved_audit_certified": false,
+  "all28506_business_goal_achieved": false,
+  "producer39_claim_upgraded": false,
+  "old_failures_rewritten": false,
+  "prelaunch_packaging_failure": "Root prelaunch001 reached wrapper creation after pin checks but collided with agent-created same filename; FileExistsError, no fullaudit dispatch. Retained original source/template, new root wrapper002 used after fresh source review.",
+  "producer_script": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\user_resume_20261015_001\\review_bridge_text_actor_terminal_001.py",
+    "sha256": "7e17473ee71d9d81674e643a6dd5b8f4586d09bc8707dd0d9e8f607a4bafb268"
+  }
+}

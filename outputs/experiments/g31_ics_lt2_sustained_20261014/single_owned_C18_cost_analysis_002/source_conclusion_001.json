@@ -1,0 +1,128 @@
+{
+  "schema": "g31.single_owned_C18.cost_source_conclusion.v1",
+  "status": "saved_clock_analysis_and_source_proposal_only",
+  "analysis_report_sha256": "a5ac730be202fd8b3452bfd5935965d967d1d034f9ad15b400896bcf83a0c7ad",
+  "analysis_external_sha256": "c6f1e0aa65e9f5b583282206fe1dc89b0052936b0a3282080274e9f1751ba5f9",
+  "analysis_whole_seconds": 3.7579922,
+  "earlier_failed_attempt": {
+    "directory": "single_owned_C18_cost_analysis_001",
+    "reason": "Analysis initially omitted the artifact encoder's final LF; the first complete-bytes assertion failed. Original failed source/logs retained.",
+    "raw_reads": 1,
+    "successful_v2_raw_reads": 18,
+    "first_raw_read_twice_across_attempts": true
+  },
+  "main_finding": "The remaining complete-root cost is chiefly before publication, not inside the two-choice predictor. Current saved clocks do not isolate the responsible Python function.",
+  "closed16": {
+    "root_median_ms": 579.4566,
+    "root_sum_ms": 9459.3004,
+    "exact_disjoint_sums_ms": {
+      "recorded_native_advance_including_response_copy": 41.7151,
+      "refresh_including_queries_and_trace": 773.2795,
+      "RPC_attempt_including_result_validation": 276.8263,
+      "unclassified_before_finalization": 6975.4491,
+      "complete_finalization": 1392.0304
+    },
+    "fractions_of_closed_root_sum": {
+      "native_advance": 0.004409956152782716,
+      "refresh": 0.08174806458202764,
+      "RPC": 0.029264986657998513,
+      "unclassified_before_finalization": 0.7374170187046813,
+      "finalization": 0.1471599739025097
+    },
+    "query_ms_nested_in_refresh_not_additive": 102.8097,
+    "median_adjacent_intervals_ms": {
+      "admission_through_A_collection": 28.40535,
+      "A_collection_through_final_local_check": 41.9829,
+      "final_local_check_through_last_event": 406.2383,
+      "last_event_to_finalization": 0.04195,
+      "complete_evidence_build_through_first_encode": 29.9121,
+      "strict_parse_reencode_hash_ledger_return": 47.89935
+    },
+    "medians_do_not_sum_to_root_median": true,
+    "even_zero_finalization_saved_prefinal_ms": {
+      "min": 378.9076,
+      "median": 495.30505000000005,
+      "max": 744.1078
+    },
+    "zero_finalization_is_diagnostic_arithmetic_not_a_permitted_removal": true
+  },
+  "payload_and_clock_limits": {
+    "complete_root_bytes_sum": 16007063,
+    "events_value_bytes_sum": 10337827,
+    "initial_endpoint_records_value_bytes_sum": 1863904,
+    "runtime_query_proof_value_bytes_sum": 3789297,
+    "refreshes": 2535,
+    "queries": 8336,
+    "new_ACK_bodies": 123,
+    "reused_ACK_body_reads": 8095,
+    "reused_ACK_payload_bytes_proxy": 9563290,
+    "root_observation_gate_interarrival_sum_ms": 6286.79,
+    "interpretation": "The gate interarrival aggregate includes previous-event deepcopy, fixed B collection, constructor/source inventories, scheduler/background work and gate work. It is not gate-function CPU time. Payload size and invocation count do not establish a measured bottleneck.",
+    "missing_isolated_clocks": [
+      "ActualAdvanceChain construction and source inventories",
+      "B initial collection",
+      "background OwnerPolicy.activate excluding already timed refresh",
+      "root _record deepcopy",
+      "gate decide/after_step and project_outbox",
+      "C normalization versus fallback",
+      "first encode versus runtime proof assembly",
+      "strict JSON parse versus reencode and hash"
+    ]
+  },
+  "next_candidate": {
+    "name": "Compile and attest fixed advance/collection source inventory once at charged campaign initialization",
+    "priority": "High source-based candidate; exact current savings remain unknown.",
+    "actual_call_path": [
+      "initial_owner_route_campaign_v3.run_branch performs real A collect/choose/final check and fixed B collect before run_continuation",
+      "initial_owner_route_gate_adapter.continuation inserts ActualAdvanceChain(session, client, root, policies) before the original scheduler loop",
+      "initial_owner_route_gated_evidence_v2.ActualAdvanceChain.__init__ calls inventory(policies, client) and the current collection_inventory on every root",
+      "inventory walks both owner MROs and transport methods, invokes native_advance_sites (inspect/getsource, dedent, ast.parse/walk) and hashes source",
+      "initial_owner_route_single_capture_integration.collection_inventory repeats original collector AST scans plus 14 concrete _binding_record checks/code-tree JSON hashes and generated-template disassembly"
+    ],
+    "new_version_only_design": [
+      "At one source-pinned initialization, run the complete original source/AST/hidden-advance inventory over the exact fixed method/classes and generated template; record all original proof output and binding locations. Charge this in cold setup.",
+      "Keep a private immutable table of exact classes/MROs, method objects, code/default/closure identities and the relevant original globals/facade bindings. No observation, ACK, current input, resource state or prediction is cached.",
+      "At every chain construction still validate the actual NativeSession/accepted handle, same client/root/session, exact transport and policy instances, owner identities, method/closure/global bindings, fresh chain, actual trace and unmodified template identities. Reject mismatch before any skip or authority use.",
+      "Reuse only the already checked static source/AST/digest records, with a fresh per-chain immutable/reference-safe inventory view if required by output ownership. Preserve actual calls, cursor continuity, complete outbox replay, retry schedule, admission IDs, first-hop entry and final drain unchanged.",
+      "Do not add per-request sys.modules enumeration, full file rehash or source parse as a substitute. Full source/archive/import and C module/spec/loader/DLL entry/exit checks remain in the campaign's declared boundary. Explicitly document the same closed immutable-program boundary and reject changed live bindings.",
+      "Do not implement this by overwriting old module globals or reusing a fake NativeSession. A new privately bound constructor must preserve the original __class__ cell and exact-type drain chain; adjust source-bound verification only for the declared constructor change."
+    ],
+    "must_preserve_dynamic_protection": [
+      "real current A initial and final collections, current own/receiver checks, exact native ledger/session capabilities",
+      "original every-request typed input and action guards, two-choice baseline/candidate validation, strict per-job protections and original deadline overrides",
+      "actual B fixed participant and all background owner activation/ACK/retry/admission behavior",
+      "actual first-hop entry evidence and complete timestamp drain",
+      "all 18 outcomes, all failed/invalid/unknown endpoint and RPC rows, complete encoded runtime query proof"
+    ],
+    "minimal_falsification_plan_not_executed": [
+      "Before performance, focused synthetic tests change one method/code/default/closure/global facade/MRO/template hook at a time; each must reject. Wrong native handle/session/transport/owner/current data must still reject via original dynamic predicates. Negative gates cannot be replaced by trusted serialized booleans.",
+      "Use source inverse proof that only the two fixed-source inventory providers are privately replaced; original scheduler/publisher/collector/body methods and every native advance remain identical.",
+      "Compare full fixed18 saved endpoint/outbox/physical/RPC evidence and strict all-five outcomes in a new bounded campaign; add explicit constructor entry/exit clocks so an observed gain can be tied to the intended interval. These new clocks and cold attestation are fully charged.",
+      "Keep original 60ms choice cutoff and 100ms complete boundary. A faster constructor occurs after selection/finalcheck in this current path; nevertheless later publication, GC and serial cross-branch effects can alter deadline-dependent choices, so retain all changed-choice cases and do not promise raw wall-clock equality.",
+      "If the constructor interval is not substantial or the full request remains slow, preserve that result. No parameter grid or inferred speedup from eliminated AST-call counts."
+    ]
+  },
+  "relationship_to_verified_models": {
+    "owned_runtime_and_initial_scope": "The full96 conformance results justify their declared model-output and ownership domains. They do not authorize caching native observations or skipping dynamic guards, nor establish this initial-A complete-root speed.",
+    "current_request_predictor": "Only 8 actual two-choice RPCs are present. Their complete attempt span is 2.93% of all closed-root cost; defaults have no RPC yet remain slow. Replacing the model alone cannot remove the present pre-publication cost.",
+    "future_all32_provider": "Retain a separately audited actual initial-source adapter, equal 32-candidate accounting and current/final native revalidation when using owned-runtime/initial-scope improvements. Do not combine that larger semantic change with this static source-inventory candidate.",
+    "typed_encoder": "Still separately validated; this run has no isolated digest timer. It must not be credited for the unclassified residual or mixed into the next constructor-only comparison."
+  },
+  "cold_and_unknown": {
+    "C_setup_ms": 4691.7507,
+    "C_close_identity_ms": 4210.2906,
+    "RPC_startup_ms": 876.9131,
+    "RPC_close_cleanup_ms": 318.9342,
+    "toolchain_checks": "Original three complete 6124-file passes retained in 222.5240049s launch-to-exit.",
+    "unknown_initial_ack_drop3": "Both roots remain unknown through the explicit horizon; their 1639 refreshes per root and complete evidence are charged, not censored away to create a faster denominator.",
+    "GC": "Default GC; no per-request cycle reclamation guarantee or deduction.",
+    "actual_direct_C_and_fallback_count": null
+  },
+  "baseline_comparison": {
+    "scope": "Different serial campaigns, descriptive only. Previous compact report binds both verification files.",
+    "changed_case": "normal/block0_load2/budget_two changed recorded initial edge2 to default1; 612.4918ms to885.403ms; previous normal2improve/4equal becomes1improve/5equal.",
+    "remaining17": "Same recorded initial edge and later choices is weaker than full instruction/event/clock equivalence; no causal speed claim or selective same-choice-only overall denominator."
+  },
+  "new_model_native_C_profile_test_calls": 0,
+  "implementation_or_performance_dispatch_authorized_by_this_report": false
+}

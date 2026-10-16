@@ -1,0 +1,437 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="17" skipped="0" tests="25" time="4.656" timestamp="2026-10-16T06:40:28.615803+08:00" hostname="LAPTOP-M3GASC4G"><testcase classname="tests.test_g31_circulation_owned_initial_bundle_cost" name="test_worker_code_full_namespace_and_only_five_bindings" time="0.001"><failure message="ValueError: scoped_v2_cost:whole_worker_code_and_globals">def test_worker_code_full_namespace_and_only_five_bindings():
+&gt;       proof=m.source_proof(); old=m.prior.worker_function(); new=m.worker_function()
+              ^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_owned_initial_bundle_cost.py:36: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\measure_owned_initial_bundle_six.py:52: in source_proof
+    require(new.__code__ is old.__code__ and new.__defaults__ is old.__defaults__
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+value = False, reason = 'whole_worker_code_and_globals'
+
+    def require(value, reason):
+&gt;       if not value: raise ValueError('scoped_v2_cost:'+reason)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: scoped_v2_cost:whole_worker_code_and_globals
+
+scripts\experiments\g31_ics_circulation\measure_scoped_public_inputs_v2_six.py:43: ValueError</failure></testcase><testcase classname="tests.test_g31_circulation_owned_initial_bundle_cost" name="test_frozen_globals_and_sources_not_mutated_by_binding" time="0.001"><failure message="ValueError: scoped_v2_cost:whole_worker_code_and_globals">def test_frozen_globals_and_sources_not_mutated_by_binding():
+        old=m.prior.worker_function(); before=dict(m.prior.frozen.worker.__globals__)
+&gt;       m.worker_function(); m.source_proof()
+                             ^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_owned_initial_bundle_cost.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\measure_owned_initial_bundle_six.py:52: in source_proof
+    require(new.__code__ is old.__code__ and new.__defaults__ is old.__defaults__
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+value = False, reason = 'whole_worker_code_and_globals'
+
+    def require(value, reason):
+&gt;       if not value: raise ValueError('scoped_v2_cost:'+reason)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: scoped_v2_cost:whole_worker_code_and_globals
+
+scripts\experiments\g31_ics_circulation\measure_scoped_public_inputs_v2_six.py:43: ValueError</failure></testcase><testcase classname="tests.test_g31_circulation_owned_initial_bundle_cost" name="test_fake24_exact_all_fields_status_denominator_and_versions" time="0.088"><failure message="TypeError: fake_worker() missing 3 required keyword-only arguments: 'fail_at', 'gc_enabled', and 'fail_final_pins'">fixture = namespace(output=WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_lt2_susta...61014/owned_initial_bundle_cost_pure_001/tmp/test_fake24_exact_all_fields_s0/lazy/insufficient_advance/vector_00.gz')})
+
+    def test_fake24_exact_all_fields_status_denominator_and_versions(fixture):
+&gt;       report,ledger,calls,reads,pins=execute(fixture)
+                                       ^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_owned_initial_bundle_cost.py:66: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_g31_circulation_owned_initial_bundle_cost.py:30: in execute
+    function,calls,reads,pins=fake_worker(fixture,**kwargs)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+fixture = namespace(output=WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_lt2_susta...61014/owned_initial_bundle_cost_pure_001/tmp/test_fake24_exact_all_fields_s0/lazy/insufficient_advance/vector_00.gz')})
+kwargs = {}
+
+    def fake_worker(fixture, **kwargs):
+        old=previous_tests.fake_worker
+        private=FunctionType(old.__code__,{**old.__globals__,'m':m},old.__name__,old.__defaults__,old.__closure__)
+&gt;       return private(fixture,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: fake_worker() missing 3 required keyword-only arguments: 'fail_at', 'gc_enabled', and 'fail_final_pins'
+
+tests\test_g31_circulation_owned_initial_bundle_cost.py:26: TypeError</failure></testcase><testcase classname="tests.test_g31_circulation_owned_initial_bundle_cost" name="test_all_component_work_between_sample_clocks_and_no_cleanup_claim" time="0.101"><failure message="TypeError: fake_worker() missing 3 required keyword-only arguments: 'fail_at', 'gc_enabled', and 'fail_final_pins'">fixture = namespace(output=WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_lt2_susta...tained_20261014/owned_initial_bundle_cost_pure_001/tmp/test_all_component_work_betwee0/lazy/no_overlap/vector_00.gz')})
+
+    def test_all_component_work_between_sample_clocks_and_no_cleanup_claim(fixture):
+&gt;       report,ledger,calls,*_=execute(fixture)
+                               ^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_owned_initial_bundle_cost.py:80: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_g31_circulation_owned_initial_bundle_cost.py:30: in execute
+    function,calls,reads,pins=fake_worker(fixture,**kwargs)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+fixture = namespace(output=WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_lt2_susta...tained_20261014/owned_initial_bundle_cost_pure_001/tmp/test_all_component_work_betwee0/lazy/no_overlap/vector_00.gz')})
+kwargs = {}
+
+    def fake_worker(fixture, **kwargs):
+        old=previous_tests.fake_worker
+        private=FunctionType(old.__code__,{**old.__globals__,'m':m},old.__name__,old.__defaults__,old.__closure__)
+&gt;       return private(fixture,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: fake_worker() missing 3 required keyword-only arguments: 'fail_at', 'gc_enabled', and 'fail_final_pins'
+
+tests\test_g31_circulation_owned_initial_bundle_cost.py:26: TypeError</failure></testcase><testcase classname="tests.test_g31_circulation_owned_initial_bundle_cost" name="test_arm_receives_same_public_and_action_and_no_target[_reference-reference]" time="0.001" /><testcase classname="tests.test_g31_circulation_owned_initial_bundle_cost" name="test_arm_receives_same_public_and_action_and_no_target[_candidate-predict]" time="0.001" /><testcase classname="tests.test_g31_circulation_owned_initial_bundle_cost" name="test_other_equal_action_is_rejected[_reference]" time="0.001" /><testcase classname="tests.test_g31_circulation_owned_initial_bundle_cost" name="test_other_equal_action_is_rejected[_candidate]" time="0.001" /><testcase classname="tests.test_g31_circulation_owned_initial_bundle_cost" name="test_component_failure_retains24_unknown_and_no_speed_summary[0]" time="0.120"><failure message="TypeError: fake_worker() missing 2 required keyword-only arguments: 'gc_enabled' and 'fail_final_pins'">fixture = namespace(output=WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_lt2_susta...stained_20261014/owned_initial_bundle_cost_pure_001/tmp/test_component_failure_retains0/lazy/mechanism/vector_00.gz')})
+index = 0
+
+    @pytest.mark.parametrize('index',[0,1,12,23])
+    def test_component_failure_retains24_unknown_and_no_speed_summary(fixture,index):
+&gt;       report,ledger,calls,*_=execute(fixture,fail_at=index)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_owned_initial_bundle_cost.py:101: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_g31_circulation_owned_initial_bundle_cost.py:30: in execute
+    function,calls,reads,pins=fake_worker(fixture,**kwargs)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+fixture = namespace(output=WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_lt2_susta...stained_20261014/owned_initial_bundle_cost_pure_001/tmp/test_component_failure_retains0/lazy/mechanism/vector_00.gz')})
+kwargs = {'fail_at': 0}
+
+    def fake_worker(fixture, **kwargs):
+        old=previous_tests.fake_worker
+        private=FunctionType(old.__code__,{**old.__globals__,'m':m},old.__name__,old.__defaults__,old.__closure__)
+&gt;       return private(fixture,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: fake_worker() missing 2 required keyword-only arguments: 'gc_enabled' and 'fail_final_pins'
+
+tests\test_g31_circulation_owned_initial_bundle_cost.py:26: TypeError</failure></testcase><testcase classname="tests.test_g31_circulation_owned_initial_bundle_cost" name="test_component_failure_retains24_unknown_and_no_speed_summary[1]" time="0.097"><failure message="TypeError: fake_worker() missing 2 required keyword-only arguments: 'gc_enabled' and 'fail_final_pins'">fixture = namespace(output=WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_lt2_susta...stained_20261014/owned_initial_bundle_cost_pure_001/tmp/test_component_failure_retains1/lazy/mechanism/vector_00.gz')})
+index = 1
+
+    @pytest.mark.parametrize('index',[0,1,12,23])
+    def test_component_failure_retains24_unknown_and_no_speed_summary(fixture,index):
+&gt;       report,ledger,calls,*_=execute(fixture,fail_at=index)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_owned_initial_bundle_cost.py:101: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_g31_circulation_owned_initial_bundle_cost.py:30: in execute
+    function,calls,reads,pins=fake_worker(fixture,**kwargs)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+fixture = namespace(output=WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_lt2_susta...stained_20261014/owned_initial_bundle_cost_pure_001/tmp/test_component_failure_retains1/lazy/mechanism/vector_00.gz')})
+kwargs = {'fail_at': 1}
+
+    def fake_worker(fixture, **kwargs):
+        old=previous_tests.fake_worker
+        private=FunctionType(old.__code__,{**old.__globals__,'m':m},old.__name__,old.__defaults__,old.__closure__)
+&gt;       return private(fixture,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: fake_worker() missing 2 required keyword-only arguments: 'gc_enabled' and 'fail_final_pins'
+
+tests\test_g31_circulation_owned_initial_bundle_cost.py:26: TypeError</failure></testcase><testcase classname="tests.test_g31_circulation_owned_initial_bundle_cost" name="test_component_failure_retains24_unknown_and_no_speed_summary[12]" time="0.107"><failure message="TypeError: fake_worker() missing 2 required keyword-only arguments: 'gc_enabled' and 'fail_final_pins'">fixture = namespace(output=WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_lt2_susta...tained_20261014/owned_initial_bundle_cost_pure_001/tmp/test_component_failure_retains2/lazy/no_overlap/vector_00.gz')})
+index = 12
+
+    @pytest.mark.parametrize('index',[0,1,12,23])
+    def test_component_failure_retains24_unknown_and_no_speed_summary(fixture,index):
+&gt;       report,ledger,calls,*_=execute(fixture,fail_at=index)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_owned_initial_bundle_cost.py:101: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_g31_circulation_owned_initial_bundle_cost.py:30: in execute
+    function,calls,reads,pins=fake_worker(fixture,**kwargs)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+fixture = namespace(output=WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_lt2_susta...tained_20261014/owned_initial_bundle_cost_pure_001/tmp/test_component_failure_retains2/lazy/no_overlap/vector_00.gz')})
+kwargs = {'fail_at': 12}
+
+    def fake_worker(fixture, **kwargs):
+        old=previous_tests.fake_worker
+        private=FunctionType(old.__code__,{**old.__globals__,'m':m},old.__name__,old.__defaults__,old.__closure__)
+&gt;       return private(fixture,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: fake_worker() missing 2 required keyword-only arguments: 'gc_enabled' and 'fail_final_pins'
+
+tests\test_g31_circulation_owned_initial_bundle_cost.py:26: TypeError</failure></testcase><testcase classname="tests.test_g31_circulation_owned_initial_bundle_cost" name="test_component_failure_retains24_unknown_and_no_speed_summary[23]" time="0.103"><failure message="TypeError: fake_worker() missing 2 required keyword-only arguments: 'gc_enabled' and 'fail_final_pins'">fixture = namespace(output=WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_lt2_susta...stained_20261014/owned_initial_bundle_cost_pure_001/tmp/test_component_failure_retains3/lazy/mechanism/vector_00.gz')})
+index = 23
+
+    @pytest.mark.parametrize('index',[0,1,12,23])
+    def test_component_failure_retains24_unknown_and_no_speed_summary(fixture,index):
+&gt;       report,ledger,calls,*_=execute(fixture,fail_at=index)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_owned_initial_bundle_cost.py:101: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_g31_circulation_owned_initial_bundle_cost.py:30: in execute
+    function,calls,reads,pins=fake_worker(fixture,**kwargs)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+fixture = namespace(output=WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_lt2_susta...stained_20261014/owned_initial_bundle_cost_pure_001/tmp/test_component_failure_retains3/lazy/mechanism/vector_00.gz')})
+kwargs = {'fail_at': 23}
+
+    def fake_worker(fixture, **kwargs):
+        old=previous_tests.fake_worker
+        private=FunctionType(old.__code__,{**old.__globals__,'m':m},old.__name__,old.__defaults__,old.__closure__)
+&gt;       return private(fixture,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: fake_worker() missing 2 required keyword-only arguments: 'gc_enabled' and 'fail_final_pins'
+
+tests\test_g31_circulation_owned_initial_bundle_cost.py:26: TypeError</failure></testcase><testcase classname="tests.test_g31_circulation_owned_initial_bundle_cost" name="test_initial_scope_target_checks_all_fields_and_final_receipt_counts[type]" time="0.128"><failure message="TypeError: fake_worker() missing 3 required keyword-only arguments: 'fail_at', 'gc_enabled', and 'fail_final_pins'">fixture = namespace(output=WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_lt2_susta...stained_20261014/owned_initial_bundle_cost_pure_001/tmp/test_initial_scope_target_chec0/lazy/mechanism/vector_25.gz')})
+change = 'type'
+
+    @pytest.mark.parametrize('change',['type','signed_zero','key_order','extra_field','list_order'])
+    def test_initial_scope_target_checks_all_fields_and_final_receipt_counts(fixture,change):
+        value=copy.deepcopy(fixture.prediction)
+        if change=='type': value['completion']['j']=1
+        elif change=='signed_zero': value['completion']['j']=-0.0
+        elif change=='key_order': value=dict(reversed(list(value.items())))
+        elif change=='extra_field': value['extra']=False
+        else: value['projected_collections']=[2,1]
+        row=fixture.plan['rows'][m.ORDER[0]]; path=Path(row['comparison_only_initial_scope_prediction']['path'])
+        path.write_bytes(gzip.compress(m.frozen.base.bytes_of(value),mtime=0))
+        row['comparison_only_initial_scope_prediction']=m.ref(path);previous_tests.write(fixture.output/'plan.json',fixture.plan)
+&gt;       report,ledger,calls,*_=execute(fixture);receipt=m.read(fixture.output/'receipt.json')
+                               ^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_owned_initial_bundle_cost.py:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_g31_circulation_owned_initial_bundle_cost.py:30: in execute
+    function,calls,reads,pins=fake_worker(fixture,**kwargs)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+fixture = namespace(output=WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_lt2_susta...stained_20261014/owned_initial_bundle_cost_pure_001/tmp/test_initial_scope_target_chec0/lazy/mechanism/vector_25.gz')})
+kwargs = {}
+
+    def fake_worker(fixture, **kwargs):
+        old=previous_tests.fake_worker
+        private=FunctionType(old.__code__,{**old.__globals__,'m':m},old.__name__,old.__defaults__,old.__closure__)
+&gt;       return private(fixture,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: fake_worker() missing 3 required keyword-only arguments: 'fail_at', 'gc_enabled', and 'fail_final_pins'
+
+tests\test_g31_circulation_owned_initial_bundle_cost.py:26: TypeError</failure></testcase><testcase classname="tests.test_g31_circulation_owned_initial_bundle_cost" name="test_initial_scope_target_checks_all_fields_and_final_receipt_counts[signed_zero]" time="0.118"><failure message="TypeError: fake_worker() missing 3 required keyword-only arguments: 'fail_at', 'gc_enabled', and 'fail_final_pins'">fixture = namespace(output=WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_lt2_susta...61014/owned_initial_bundle_cost_pure_001/tmp/test_initial_scope_target_chec1/lazy/insufficient_advance/vector_17.gz')})
+change = 'signed_zero'
+
+    @pytest.mark.parametrize('change',['type','signed_zero','key_order','extra_field','list_order'])
+    def test_initial_scope_target_checks_all_fields_and_final_receipt_counts(fixture,change):
+        value=copy.deepcopy(fixture.prediction)
+        if change=='type': value['completion']['j']=1
+        elif change=='signed_zero': value['completion']['j']=-0.0
+        elif change=='key_order': value=dict(reversed(list(value.items())))
+        elif change=='extra_field': value['extra']=False
+        else: value['projected_collections']=[2,1]
+        row=fixture.plan['rows'][m.ORDER[0]]; path=Path(row['comparison_only_initial_scope_prediction']['path'])
+        path.write_bytes(gzip.compress(m.frozen.base.bytes_of(value),mtime=0))
+        row['comparison_only_initial_scope_prediction']=m.ref(path);previous_tests.write(fixture.output/'plan.json',fixture.plan)
+&gt;       report,ledger,calls,*_=execute(fixture);receipt=m.read(fixture.output/'receipt.json')
+                               ^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_owned_initial_bundle_cost.py:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_g31_circulation_owned_initial_bundle_cost.py:30: in execute
+    function,calls,reads,pins=fake_worker(fixture,**kwargs)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+fixture = namespace(output=WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_lt2_susta...61014/owned_initial_bundle_cost_pure_001/tmp/test_initial_scope_target_chec1/lazy/insufficient_advance/vector_17.gz')})
+kwargs = {}
+
+    def fake_worker(fixture, **kwargs):
+        old=previous_tests.fake_worker
+        private=FunctionType(old.__code__,{**old.__globals__,'m':m},old.__name__,old.__defaults__,old.__closure__)
+&gt;       return private(fixture,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: fake_worker() missing 3 required keyword-only arguments: 'fail_at', 'gc_enabled', and 'fail_final_pins'
+
+tests\test_g31_circulation_owned_initial_bundle_cost.py:26: TypeError</failure></testcase><testcase classname="tests.test_g31_circulation_owned_initial_bundle_cost" name="test_initial_scope_target_checks_all_fields_and_final_receipt_counts[key_order]" time="0.115"><failure message="TypeError: fake_worker() missing 3 required keyword-only arguments: 'fail_at', 'gc_enabled', and 'fail_final_pins'">fixture = namespace(output=WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_lt2_susta...61014/owned_initial_bundle_cost_pure_001/tmp/test_initial_scope_target_chec2/lazy/insufficient_advance/vector_17.gz')})
+change = 'key_order'
+
+    @pytest.mark.parametrize('change',['type','signed_zero','key_order','extra_field','list_order'])
+    def test_initial_scope_target_checks_all_fields_and_final_receipt_counts(fixture,change):
+        value=copy.deepcopy(fixture.prediction)
+        if change=='type': value['completion']['j']=1
+        elif change=='signed_zero': value['completion']['j']=-0.0
+        elif change=='key_order': value=dict(reversed(list(value.items())))
+        elif change=='extra_field': value['extra']=False
+        else: value['projected_collections']=[2,1]
+        row=fixture.plan['rows'][m.ORDER[0]]; path=Path(row['comparison_only_initial_scope_prediction']['path'])
+        path.write_bytes(gzip.compress(m.frozen.base.bytes_of(value),mtime=0))
+        row['comparison_only_initial_scope_prediction']=m.ref(path);previous_tests.write(fixture.output/'plan.json',fixture.plan)
+&gt;       report,ledger,calls,*_=execute(fixture);receipt=m.read(fixture.output/'receipt.json')
+                               ^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_owned_initial_bundle_cost.py:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_g31_circulation_owned_initial_bundle_cost.py:30: in execute
+    function,calls,reads,pins=fake_worker(fixture,**kwargs)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+fixture = namespace(output=WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_lt2_susta...61014/owned_initial_bundle_cost_pure_001/tmp/test_initial_scope_target_chec2/lazy/insufficient_advance/vector_17.gz')})
+kwargs = {}
+
+    def fake_worker(fixture, **kwargs):
+        old=previous_tests.fake_worker
+        private=FunctionType(old.__code__,{**old.__globals__,'m':m},old.__name__,old.__defaults__,old.__closure__)
+&gt;       return private(fixture,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: fake_worker() missing 3 required keyword-only arguments: 'fail_at', 'gc_enabled', and 'fail_final_pins'
+
+tests\test_g31_circulation_owned_initial_bundle_cost.py:26: TypeError</failure></testcase><testcase classname="tests.test_g31_circulation_owned_initial_bundle_cost" name="test_initial_scope_target_checks_all_fields_and_final_receipt_counts[extra_field]" time="0.120"><failure message="TypeError: fake_worker() missing 3 required keyword-only arguments: 'fail_at', 'gc_enabled', and 'fail_final_pins'">fixture = namespace(output=WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_lt2_susta...stained_20261014/owned_initial_bundle_cost_pure_001/tmp/test_initial_scope_target_chec3/lazy/mechanism/vector_25.gz')})
+change = 'extra_field'
+
+    @pytest.mark.parametrize('change',['type','signed_zero','key_order','extra_field','list_order'])
+    def test_initial_scope_target_checks_all_fields_and_final_receipt_counts(fixture,change):
+        value=copy.deepcopy(fixture.prediction)
+        if change=='type': value['completion']['j']=1
+        elif change=='signed_zero': value['completion']['j']=-0.0
+        elif change=='key_order': value=dict(reversed(list(value.items())))
+        elif change=='extra_field': value['extra']=False
+        else: value['projected_collections']=[2,1]
+        row=fixture.plan['rows'][m.ORDER[0]]; path=Path(row['comparison_only_initial_scope_prediction']['path'])
+        path.write_bytes(gzip.compress(m.frozen.base.bytes_of(value),mtime=0))
+        row['comparison_only_initial_scope_prediction']=m.ref(path);previous_tests.write(fixture.output/'plan.json',fixture.plan)
+&gt;       report,ledger,calls,*_=execute(fixture);receipt=m.read(fixture.output/'receipt.json')
+                               ^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_owned_initial_bundle_cost.py:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_g31_circulation_owned_initial_bundle_cost.py:30: in execute
+    function,calls,reads,pins=fake_worker(fixture,**kwargs)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+fixture = namespace(output=WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_lt2_susta...stained_20261014/owned_initial_bundle_cost_pure_001/tmp/test_initial_scope_target_chec3/lazy/mechanism/vector_25.gz')})
+kwargs = {}
+
+    def fake_worker(fixture, **kwargs):
+        old=previous_tests.fake_worker
+        private=FunctionType(old.__code__,{**old.__globals__,'m':m},old.__name__,old.__defaults__,old.__closure__)
+&gt;       return private(fixture,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: fake_worker() missing 3 required keyword-only arguments: 'fail_at', 'gc_enabled', and 'fail_final_pins'
+
+tests\test_g31_circulation_owned_initial_bundle_cost.py:26: TypeError</failure></testcase><testcase classname="tests.test_g31_circulation_owned_initial_bundle_cost" name="test_initial_scope_target_checks_all_fields_and_final_receipt_counts[list_order]" time="0.121"><failure message="TypeError: fake_worker() missing 3 required keyword-only arguments: 'fail_at', 'gc_enabled', and 'fail_final_pins'">fixture = namespace(output=WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_lt2_susta...61014/owned_initial_bundle_cost_pure_001/tmp/test_initial_scope_target_chec4/lazy/insufficient_advance/vector_17.gz')})
+change = 'list_order'
+
+    @pytest.mark.parametrize('change',['type','signed_zero','key_order','extra_field','list_order'])
+    def test_initial_scope_target_checks_all_fields_and_final_receipt_counts(fixture,change):
+        value=copy.deepcopy(fixture.prediction)
+        if change=='type': value['completion']['j']=1
+        elif change=='signed_zero': value['completion']['j']=-0.0
+        elif change=='key_order': value=dict(reversed(list(value.items())))
+        elif change=='extra_field': value['extra']=False
+        else: value['projected_collections']=[2,1]
+        row=fixture.plan['rows'][m.ORDER[0]]; path=Path(row['comparison_only_initial_scope_prediction']['path'])
+        path.write_bytes(gzip.compress(m.frozen.base.bytes_of(value),mtime=0))
+        row['comparison_only_initial_scope_prediction']=m.ref(path);previous_tests.write(fixture.output/'plan.json',fixture.plan)
+&gt;       report,ledger,calls,*_=execute(fixture);receipt=m.read(fixture.output/'receipt.json')
+                               ^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_owned_initial_bundle_cost.py:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_g31_circulation_owned_initial_bundle_cost.py:30: in execute
+    function,calls,reads,pins=fake_worker(fixture,**kwargs)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+fixture = namespace(output=WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_lt2_susta...61014/owned_initial_bundle_cost_pure_001/tmp/test_initial_scope_target_chec4/lazy/insufficient_advance/vector_17.gz')})
+kwargs = {}
+
+    def fake_worker(fixture, **kwargs):
+        old=previous_tests.fake_worker
+        private=FunctionType(old.__code__,{**old.__globals__,'m':m},old.__name__,old.__defaults__,old.__closure__)
+&gt;       return private(fixture,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: fake_worker() missing 3 required keyword-only arguments: 'fail_at', 'gc_enabled', and 'fail_final_pins'
+
+tests\test_g31_circulation_owned_initial_bundle_cost.py:26: TypeError</failure></testcase><testcase classname="tests.test_g31_circulation_owned_initial_bundle_cost" name="test_extra_audit_rejects_denominator_tamper[remove]" time="0.099" /><testcase classname="tests.test_g31_circulation_owned_initial_bundle_cost" name="test_extra_audit_rejects_denominator_tamper[reverse]" time="0.104" /><testcase classname="tests.test_g31_circulation_owned_initial_bundle_cost" name="test_extra_audit_rejects_denominator_tamper[arm]" time="0.098" /><testcase classname="tests.test_g31_circulation_owned_initial_bundle_cost" name="test_disabled_GC_prevents_any_component" time="0.116"><failure message="TypeError: fake_worker() missing 2 required keyword-only arguments: 'fail_at' and 'fail_final_pins'">fixture = namespace(output=WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_lt2_susta...tained_20261014/owned_initial_bundle_cost_pure_001/tmp/test_disabled_GC_prevents_any_0/lazy/no_overlap/vector_25.gz')})
+
+    def test_disabled_GC_prevents_any_component(fixture):
+&gt;       function,calls,*_=fake_worker(fixture,gc_enabled=False)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_owned_initial_bundle_cost.py:135: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+fixture = namespace(output=WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_lt2_susta...tained_20261014/owned_initial_bundle_cost_pure_001/tmp/test_disabled_GC_prevents_any_0/lazy/no_overlap/vector_25.gz')})
+kwargs = {'gc_enabled': False}
+
+    def fake_worker(fixture, **kwargs):
+        old=previous_tests.fake_worker
+        private=FunctionType(old.__code__,{**old.__globals__,'m':m},old.__name__,old.__defaults__,old.__closure__)
+&gt;       return private(fixture,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: fake_worker() missing 2 required keyword-only arguments: 'fail_at' and 'fail_final_pins'
+
+tests\test_g31_circulation_owned_initial_bundle_cost.py:26: TypeError</failure></testcase><testcase classname="tests.test_g31_circulation_owned_initial_bundle_cost" name="test_last_pin_failure_is_not_promoted" time="0.109"><failure message="TypeError: fake_worker() missing 2 required keyword-only arguments: 'fail_at' and 'gc_enabled'">fixture = namespace(output=WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_lt2_susta...61014/owned_initial_bundle_cost_pure_001/tmp/test_last_pin_failure_is_not_p0/lazy/insufficient_advance/vector_17.gz')})
+
+    def test_last_pin_failure_is_not_promoted(fixture):
+&gt;       function,calls,reads,pins=fake_worker(fixture,fail_final_pins=True)
+                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_owned_initial_bundle_cost.py:141: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+fixture = namespace(output=WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_lt2_susta...61014/owned_initial_bundle_cost_pure_001/tmp/test_last_pin_failure_is_not_p0/lazy/insufficient_advance/vector_17.gz')})
+kwargs = {'fail_final_pins': True}
+
+    def fake_worker(fixture, **kwargs):
+        old=previous_tests.fake_worker
+        private=FunctionType(old.__code__,{**old.__globals__,'m':m},old.__name__,old.__defaults__,old.__closure__)
+&gt;       return private(fixture,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: fake_worker() missing 2 required keyword-only arguments: 'fail_at' and 'gc_enabled'
+
+tests\test_g31_circulation_owned_initial_bundle_cost.py:26: TypeError</failure></testcase><testcase classname="tests.test_g31_circulation_owned_initial_bundle_cost" name="test_failed_input_retains_all_four_rows" time="0.109"><failure message="TypeError: fake_worker() missing 3 required keyword-only arguments: 'fail_at', 'gc_enabled', and 'fail_final_pins'">fixture = namespace(output=WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_lt2_susta...tained_20261014/owned_initial_bundle_cost_pure_001/tmp/test_failed_input_retains_all_0/lazy/no_overlap/vector_00.gz')})
+
+    def test_failed_input_retains_all_four_rows(fixture):
+        Path(fixture.plan['rows'][m.ORDER[0]]['input']['path']).write_text('{broken',encoding='utf8')
+&gt;       report,ledger,calls,*_=execute(fixture)
+                               ^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_owned_initial_bundle_cost.py:148: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+tests\test_g31_circulation_owned_initial_bundle_cost.py:30: in execute
+    function,calls,reads,pins=fake_worker(fixture,**kwargs)
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+fixture = namespace(output=WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_lt2_susta...tained_20261014/owned_initial_bundle_cost_pure_001/tmp/test_failed_input_retains_all_0/lazy/no_overlap/vector_00.gz')})
+kwargs = {}
+
+    def fake_worker(fixture, **kwargs):
+        old=previous_tests.fake_worker
+        private=FunctionType(old.__code__,{**old.__globals__,'m':m},old.__name__,old.__defaults__,old.__closure__)
+&gt;       return private(fixture,**kwargs)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^
+E       TypeError: fake_worker() missing 3 required keyword-only arguments: 'fail_at', 'gc_enabled', and 'fail_final_pins'
+
+tests\test_g31_circulation_owned_initial_bundle_cost.py:26: TypeError</failure></testcase><testcase classname="tests.test_g31_circulation_owned_initial_bundle_cost" name="test_no_returned_output_cannot_become_exact" time="0.125"><failure message="ValueError: scoped_v2_cost:whole_worker_code_and_globals">fixture = namespace(output=WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_lt2_susta...stained_20261014/owned_initial_bundle_cost_pure_001/tmp/test_no_returned_output_cannot0/lazy/mechanism/vector_25.gz')})
+
+    def test_no_returned_output_cannot_become_exact(fixture):
+        ledger=[{**row,'status':'unknown_unexecuted'} for row in m.frozen.declaration()]
+&gt;       report=m._extend_report(fixture.output,fixture.plan,ledger,{'exact':24,'unknown':0})
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_owned_initial_bundle_cost.py:155: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\measure_owned_initial_bundle_six.py:81: in _extend_report
+    result.update(schema=SCHEMA,source_proof=source_proof(),initial_scope_full_output_checks=checks,
+                                             ^^^^^^^^^^^^^^
+scripts\experiments\g31_ics_circulation\measure_owned_initial_bundle_six.py:52: in source_proof
+    require(new.__code__ is old.__code__ and new.__defaults__ is old.__defaults__
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+value = False, reason = 'whole_worker_code_and_globals'
+
+    def require(value, reason):
+&gt;       if not value: raise ValueError('scoped_v2_cost:'+reason)
+                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: scoped_v2_cost:whole_worker_code_and_globals
+
+scripts\experiments\g31_ics_circulation\measure_scoped_public_inputs_v2_six.py:43: ValueError</failure></testcase><testcase classname="tests.test_g31_circulation_owned_initial_bundle_cost" name="test_owned_launcher_keeps_full_globals_and_only_explicit_rebindings" time="0.002" /></testsuite></testsuites>

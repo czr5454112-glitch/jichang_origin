@@ -1,0 +1,679 @@
+{
+  "schema": "g31.live_obligation_native_saved_review.v1",
+  "status": "verified_three_assessed_fixed_native_branches",
+  "producer_receipt": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\live_obligation_native_probe_prepare_004\\receipt.json",
+    "sha256": "75021a527186f35879a94e45bcfdabc8dd5c882524c181c1ed48a4086244b0ab"
+  },
+  "plan": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\live_obligation_native_probe_prepare_004\\preregistered_protocol.json",
+    "sha256": "7f5b1937a44efb2c7fe9b376765a1b9ddb44a9ad93575cadf48f6e0dc06acabc"
+  },
+  "ledger": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\live_obligation_native_probe_prepare_004\\branch_ledger.json",
+    "sha256": "1e584b5a526b460acdd1e8dee18c6b55a98c7b8116858479d20ff7fae33d4834"
+  },
+  "runtime_acceptance": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\live_obligation_native_probe_prepare_004\\run_acceptance.json",
+    "sha256": "9ecfb7b6f77be821201a44c1d98a3551e12a9e0a282941cbebe6641946ebe7fd"
+  },
+  "external_wall": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\live_obligation_native_probe_prepare_004\\external_application_wall.json",
+    "sha256": "414e43bc136d24d225b82b6c62e2f0efbf8fb05a79b22d0e9688dc7d59a7f781"
+  },
+  "pure96_receipt": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\live_obligation_projection_prepare_003\\receipt.json",
+    "sha256": "45b8664e2b2563e9cdfc28b5d9a33361e712360c1a108cb957b8c3a3137da215"
+  },
+  "source_pins": 73,
+  "closure_pins": 557,
+  "all_pins_entry_exit_match": true,
+  "denominator": 3,
+  "assessed": 3,
+  "unknown": 0,
+  "all_per_job_times_exactly_match_corresponding_saved_pure003": true,
+  "rows": {
+    "mechanism/vector_12": {
+      "raw_artifact": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\live_obligation_native_probe_prepare_004\\mechanism\\vector_12.json.gz",
+        "sha256": "aff6b39c68799a2f9a023ef1d31af0163f06cb682a9a030e5c87d20657648fe3"
+      },
+      "producer_status": "assessed",
+      "assessment_preserved": "assessed",
+      "endpoint_replay": "passed",
+      "physical_replay": {
+        "status": "passed",
+        "completed_traversals": 18,
+        "open_traversals": 0,
+        "tray_count": 3,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "whole_five_complete": true,
+      "initial_inputs_verified": true,
+      "stages": [
+        {
+          "owner": "A",
+          "phase": "first_return",
+          "collection_start": 7.299999999999997,
+          "capture_times": {
+            "A": 7.309999999999997,
+            "B": 7.3299999999999965
+          },
+          "capture_union_floor": 7.309999999999997,
+          "decision_at": 7.339999999999996,
+          "verified": true,
+          "reasons": null,
+          "model_reasons": null,
+          "fallback_used": false,
+          "selected_action_admitted": true,
+          "actual_request_id": "live:1:A:return-0",
+          "route_ack": null,
+          "physical_ACKs_before_floor": [
+            {
+              "owner": "B",
+              "request_id": "live:1:B:initial-supply",
+              "status": "received",
+              "delivered_at": 4.6899999999999995
+            }
+          ],
+          "future_available_captures": [
+            {
+              "source": "A",
+              "tray_id": "E",
+              "mode": "loading",
+              "available_at": 7.600999999999999,
+              "service_ready_at": 7.600999999999999,
+              "load_complete_at": 7.600999999999999,
+              "ready_kind": "observed_load_completion"
+            }
+          ]
+        },
+        {
+          "owner": "B",
+          "phase": "first_reuse_route",
+          "collection_start": 9.649999999999995,
+          "capture_times": {
+            "B": 9.659999999999995,
+            "A": 9.679999999999994
+          },
+          "capture_union_floor": 9.659999999999995,
+          "decision_at": 9.689999999999994,
+          "verified": true,
+          "reasons": null,
+          "model_reasons": null,
+          "fallback_used": false,
+          "selected_action_admitted": true,
+          "actual_request_id": null,
+          "route_ack": null,
+          "physical_ACKs_before_floor": [
+            {
+              "owner": "B",
+              "request_id": "live:1:B:initial-supply",
+              "status": "received",
+              "delivered_at": 4.6899999999999995
+            },
+            {
+              "owner": "A",
+              "request_id": "live:1:A:return-0",
+              "status": "received",
+              "delivered_at": 9.599999999999994
+            }
+          ],
+          "future_available_captures": []
+        }
+      ],
+      "preflight": {
+        "local_loading": 9.549999999999995,
+        "captured_at": 9.559999999999995,
+        "delivered_and_retry_at": 9.569999999999995,
+        "received_ack": {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 9.579999999999995,
+          "delivered_at": 9.599999999999994,
+          "status": "received",
+          "reason": "",
+          "received_at": 9.549999999999995
+        },
+        "reply_at": 9.599999999999994
+      },
+      "initial_actual_edge": {
+        "time": 3.1,
+        "from": 0,
+        "to": 1
+      },
+      "first_reuse_actual_edges": [
+        {
+          "time": 10.149999999999999,
+          "from": 7,
+          "to": 3
+        },
+        {
+          "time": 11.249999999999998,
+          "from": 3,
+          "to": 4
+        },
+        {
+          "time": 12.349999999999998,
+          "from": 4,
+          "to": 6
+        }
+      ],
+      "P_storage": {
+        "enter": 4.199999999999999,
+        "release": 8.95,
+        "path": [
+          [
+            1,
+            9
+          ],
+          [
+            9,
+            3
+          ],
+          [
+            3,
+            10
+          ]
+        ],
+        "edges": [
+          {
+            "time": 3.1,
+            "from": 1,
+            "to": 9
+          },
+          {
+            "time": 9.049999999999999,
+            "from": 9,
+            "to": 3
+          },
+          {
+            "time": 10.149999999999999,
+            "from": 3,
+            "to": 10
+          }
+        ]
+      },
+      "actual_completion": {
+        "loaded": 7.1999999999999975,
+        "receiver": 10.000999999999998,
+        "reuse1": 13.049999999999997,
+        "reuse2": 18.46,
+        "blocker": 11.349999999999998
+      },
+      "pure_completion": {
+        "blocker": 11.349999999999998,
+        "loaded": 7.1999999999999975,
+        "receiver": 10.000999999999998,
+        "reuse1": 13.049999999999997,
+        "reuse2": 18.46
+      },
+      "per_job_actual_minus_pure": {
+        "loaded": 0.0,
+        "receiver": 0.0,
+        "reuse1": 0.0,
+        "reuse2": 0.0,
+        "blocker": 0.0
+      },
+      "actual_completion_sum": 60.06099999999999,
+      "pure_completion_sum": 60.060999999999986,
+      "sum_difference_only": 7.105427357601002e-15,
+      "reported_strict_protection": true,
+      "observed_only_delta_vs_executed_baseline": {
+        "loaded": 0.0,
+        "receiver": 0.0,
+        "reuse1": 0.0,
+        "reuse2": 0.0,
+        "blocker": 0.0
+      },
+      "observed_only_all_jobs_nondegraded": true
+    },
+    "mechanism/vector_24": {
+      "raw_artifact": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\live_obligation_native_probe_prepare_004\\mechanism\\vector_24.json.gz",
+        "sha256": "cdf034e8271078a2b7266f7737b4b7882205aa896c5b1d916a9dcb1f95c49eab"
+      },
+      "producer_status": "assessed",
+      "assessment_preserved": "assessed",
+      "endpoint_replay": "passed",
+      "physical_replay": {
+        "status": "passed",
+        "completed_traversals": 18,
+        "open_traversals": 0,
+        "tray_count": 3,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "whole_five_complete": true,
+      "initial_inputs_verified": true,
+      "stages": [
+        {
+          "owner": "A",
+          "phase": "first_return",
+          "collection_start": 6.299999999999998,
+          "capture_times": {
+            "A": 6.309999999999998,
+            "B": 6.329999999999997
+          },
+          "capture_union_floor": 6.309999999999998,
+          "decision_at": 6.339999999999997,
+          "verified": true,
+          "reasons": null,
+          "model_reasons": null,
+          "fallback_used": false,
+          "selected_action_admitted": true,
+          "actual_request_id": "live:1:A:return-0",
+          "route_ack": null,
+          "physical_ACKs_before_floor": [
+            {
+              "owner": "A",
+              "request_id": "live:1:A:initial-route",
+              "status": "updated",
+              "delivered_at": 0.13999999999999999
+            },
+            {
+              "owner": "B",
+              "request_id": "live:1:B:initial-supply",
+              "status": "received",
+              "delivered_at": 3.69
+            }
+          ],
+          "future_available_captures": [
+            {
+              "source": "A",
+              "tray_id": "E",
+              "mode": "loading",
+              "available_at": 6.501,
+              "service_ready_at": 6.501,
+              "load_complete_at": 6.501,
+              "ready_kind": "observed_load_completion"
+            }
+          ]
+        },
+        {
+          "owner": "B",
+          "phase": "first_reuse_route",
+          "collection_start": 8.649999999999995,
+          "capture_times": {
+            "B": 8.659999999999995,
+            "A": 8.679999999999994
+          },
+          "capture_union_floor": 8.659999999999995,
+          "decision_at": 8.689999999999994,
+          "verified": true,
+          "reasons": null,
+          "model_reasons": null,
+          "fallback_used": false,
+          "selected_action_admitted": true,
+          "actual_request_id": null,
+          "route_ack": null,
+          "physical_ACKs_before_floor": [
+            {
+              "owner": "B",
+              "request_id": "live:1:B:initial-supply",
+              "status": "received",
+              "delivered_at": 3.69
+            },
+            {
+              "owner": "A",
+              "request_id": "live:1:A:initial-route",
+              "status": "updated",
+              "delivered_at": 0.13999999999999999
+            },
+            {
+              "owner": "A",
+              "request_id": "live:1:A:return-0",
+              "status": "received",
+              "delivered_at": 8.599999999999994
+            }
+          ],
+          "future_available_captures": []
+        }
+      ],
+      "preflight": {
+        "local_loading": 8.549999999999995,
+        "captured_at": 8.559999999999995,
+        "delivered_and_retry_at": 8.569999999999995,
+        "received_ack": {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 8.579999999999995,
+          "delivered_at": 8.599999999999994,
+          "status": "received",
+          "reason": "",
+          "received_at": 8.549999999999995
+        },
+        "reply_at": 8.599999999999994
+      },
+      "initial_actual_edge": {
+        "time": 1.1,
+        "from": 0,
+        "to": 2
+      },
+      "first_reuse_actual_edges": [
+        {
+          "time": 8.749999999999995,
+          "from": 7,
+          "to": 3
+        },
+        {
+          "time": 9.849999999999994,
+          "from": 3,
+          "to": 4
+        },
+        {
+          "time": 10.949999999999994,
+          "from": 4,
+          "to": 6
+        }
+      ],
+      "P_storage": {
+        "enter": 4.199999999999999,
+        "release": 8.95,
+        "path": [
+          [
+            1,
+            9
+          ],
+          [
+            9,
+            3
+          ],
+          [
+            3,
+            10
+          ]
+        ],
+        "edges": [
+          {
+            "time": 3.1,
+            "from": 1,
+            "to": 9
+          },
+          {
+            "time": 9.849999999999994,
+            "from": 9,
+            "to": 3
+          },
+          {
+            "time": 10.949999999999994,
+            "from": 3,
+            "to": 10
+          }
+        ]
+      },
+      "actual_completion": {
+        "loaded": 6.199999999999998,
+        "receiver": 8.901,
+        "reuse1": 11.649999999999993,
+        "reuse2": 17.059999999999995,
+        "blocker": 12.149999999999993
+      },
+      "pure_completion": {
+        "blocker": 12.149999999999993,
+        "loaded": 6.199999999999998,
+        "receiver": 8.901,
+        "reuse1": 11.649999999999993,
+        "reuse2": 17.059999999999995
+      },
+      "per_job_actual_minus_pure": {
+        "loaded": 0.0,
+        "receiver": 0.0,
+        "reuse1": 0.0,
+        "reuse2": 0.0,
+        "blocker": 0.0
+      },
+      "actual_completion_sum": 55.96099999999998,
+      "pure_completion_sum": 55.96099999999998,
+      "sum_difference_only": 0.0,
+      "reported_strict_protection": false,
+      "observed_only_delta_vs_executed_baseline": {
+        "loaded": -0.9999999999999991,
+        "receiver": -1.0999999999999979,
+        "reuse1": -1.400000000000004,
+        "reuse2": -1.4000000000000057,
+        "blocker": 0.7999999999999954
+      },
+      "observed_only_all_jobs_nondegraded": false
+    },
+    "mechanism/vector_25": {
+      "raw_artifact": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\live_obligation_native_probe_prepare_004\\mechanism\\vector_25.json.gz",
+        "sha256": "58ae5a981258174f62e0205711ee6a2d7805d3e98b4a4c9d2e83ff3f9bd1eeae"
+      },
+      "producer_status": "assessed",
+      "assessment_preserved": "assessed",
+      "endpoint_replay": "passed",
+      "physical_replay": {
+        "status": "passed",
+        "completed_traversals": 18,
+        "open_traversals": 0,
+        "tray_count": 3,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "whole_five_complete": true,
+      "initial_inputs_verified": true,
+      "stages": [
+        {
+          "owner": "A",
+          "phase": "first_return",
+          "collection_start": 6.299999999999998,
+          "capture_times": {
+            "A": 6.309999999999998,
+            "B": 6.329999999999997
+          },
+          "capture_union_floor": 6.309999999999998,
+          "decision_at": 6.339999999999997,
+          "verified": true,
+          "reasons": null,
+          "model_reasons": null,
+          "fallback_used": false,
+          "selected_action_admitted": true,
+          "actual_request_id": "live:1:A:return-0",
+          "route_ack": null,
+          "physical_ACKs_before_floor": [
+            {
+              "owner": "A",
+              "request_id": "live:1:A:initial-route",
+              "status": "updated",
+              "delivered_at": 0.13999999999999999
+            },
+            {
+              "owner": "B",
+              "request_id": "live:1:B:initial-supply",
+              "status": "received",
+              "delivered_at": 3.69
+            }
+          ],
+          "future_available_captures": [
+            {
+              "source": "A",
+              "tray_id": "E",
+              "mode": "loading",
+              "available_at": 6.501,
+              "service_ready_at": 6.501,
+              "load_complete_at": 6.501,
+              "ready_kind": "observed_load_completion"
+            }
+          ]
+        },
+        {
+          "owner": "B",
+          "phase": "first_reuse_route",
+          "collection_start": 8.649999999999995,
+          "capture_times": {
+            "B": 8.659999999999995,
+            "A": 8.679999999999994
+          },
+          "capture_union_floor": 8.659999999999995,
+          "decision_at": 8.689999999999994,
+          "verified": true,
+          "reasons": null,
+          "model_reasons": null,
+          "fallback_used": false,
+          "selected_action_admitted": true,
+          "actual_request_id": "live:1:B:later-route-0",
+          "route_ack": {
+            "sequence": 1,
+            "attempt": 1,
+            "observed_at": 8.699999999999994,
+            "delivered_at": 8.719999999999994,
+            "executed_at": 8.699999999999994,
+            "completed_at": 8.699999999999994,
+            "status": "updated",
+            "reason": "allowed",
+            "result_id": "live:1:B:later-route-0"
+          },
+          "physical_ACKs_before_floor": [
+            {
+              "owner": "B",
+              "request_id": "live:1:B:initial-supply",
+              "status": "received",
+              "delivered_at": 3.69
+            },
+            {
+              "owner": "A",
+              "request_id": "live:1:A:initial-route",
+              "status": "updated",
+              "delivered_at": 0.13999999999999999
+            },
+            {
+              "owner": "A",
+              "request_id": "live:1:A:return-0",
+              "status": "received",
+              "delivered_at": 8.599999999999994
+            }
+          ],
+          "future_available_captures": []
+        }
+      ],
+      "preflight": {
+        "local_loading": 8.549999999999995,
+        "captured_at": 8.559999999999995,
+        "delivered_and_retry_at": 8.569999999999995,
+        "received_ack": {
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 8.579999999999995,
+          "delivered_at": 8.599999999999994,
+          "status": "received",
+          "reason": "",
+          "received_at": 8.549999999999995
+        },
+        "reply_at": 8.599999999999994
+      },
+      "initial_actual_edge": {
+        "time": 1.1,
+        "from": 0,
+        "to": 2
+      },
+      "first_reuse_actual_edges": [
+        {
+          "time": 8.749999999999995,
+          "from": 7,
+          "to": 8
+        },
+        {
+          "time": 11.649999999999993,
+          "from": 8,
+          "to": 4
+        },
+        {
+          "time": 12.249999999999993,
+          "from": 4,
+          "to": 6
+        }
+      ],
+      "P_storage": {
+        "enter": 4.199999999999999,
+        "release": 8.95,
+        "path": [
+          [
+            1,
+            9
+          ],
+          [
+            9,
+            3
+          ],
+          [
+            3,
+            10
+          ]
+        ],
+        "edges": [
+          {
+            "time": 3.1,
+            "from": 1,
+            "to": 9
+          },
+          {
+            "time": 9.049999999999999,
+            "from": 9,
+            "to": 3
+          },
+          {
+            "time": 10.149999999999999,
+            "from": 3,
+            "to": 10
+          }
+        ]
+      },
+      "actual_completion": {
+        "loaded": 6.199999999999998,
+        "receiver": 8.901,
+        "reuse1": 12.949999999999992,
+        "reuse2": 18.359999999999996,
+        "blocker": 11.349999999999998
+      },
+      "pure_completion": {
+        "blocker": 11.349999999999998,
+        "loaded": 6.199999999999998,
+        "receiver": 8.901,
+        "reuse1": 12.949999999999992,
+        "reuse2": 18.359999999999996
+      },
+      "per_job_actual_minus_pure": {
+        "loaded": 0.0,
+        "receiver": 0.0,
+        "reuse1": 0.0,
+        "reuse2": 0.0,
+        "blocker": 0.0
+      },
+      "actual_completion_sum": 57.76099999999998,
+      "pure_completion_sum": 57.76099999999998,
+      "sum_difference_only": 0.0,
+      "reported_strict_protection": true,
+      "observed_only_delta_vs_executed_baseline": {
+        "loaded": -0.9999999999999991,
+        "receiver": -1.0999999999999979,
+        "reuse1": -0.10000000000000497,
+        "reuse2": -0.10000000000000497,
+        "blocker": 0.0
+      },
+      "observed_only_all_jobs_nondegraded": true
+    }
+  },
+  "diagnosis": "Typed stationary E-loading availability now matches accepted native capture. All six initial owner inputs and all six later collections pass saved endpoint replay; no first-return fallback. Fifteen per-job completion times exactly match the prior saved pure003 actions.",
+  "next_causal_question": "Close the unchanged three-case32-action domain and both16-member references; current3 cannot establish a full native optimum or online search advantage.",
+  "limits": [
+    "Only three fixed vectors in mechanism; no complete16/32/96 native reference families",
+    "All three native fixed actions admitted under actual owned views and delivered captures, but source-state stability remains conditional, not a global synchronization proof",
+    "Five-job strict protection is established only for these actual completed trajectories against executed vector12",
+    "No native or predictor execution in this audit; saved endpoint/physical replay only",
+    "No novelty, online optimization, original-map applicability, or100ms claim"
+  ],
+  "audit_source": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\audit_live_obligation_native_assessed.py",
+    "sha256": "042f1e18c93cd8876cd8360e8ad7013cac8012f96199c26c7de2838ffe032be9"
+  },
+  "native_executions": 0,
+  "model_evaluations": 0,
+  "elapsed_wall_seconds": 0.8750069000016083,
+  "reused_saved_audit_source": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\audit_live_obligation_native_saved.py",
+    "sha256": "fdc225d1c02593c1d83b218d2c9864a9e8db642277efb5d15203aacf5ad50541"
+  }
+}

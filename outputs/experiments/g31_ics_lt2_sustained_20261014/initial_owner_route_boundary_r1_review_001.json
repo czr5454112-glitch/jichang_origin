@@ -1,0 +1,38 @@
+{
+  "schema": "g31.initial_owner_route_boundary_independent_review.v1",
+  "status": "v2_guard_findings_source_closed_in_independent_v3",
+  "reviewed_source_sha256": {
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\initial_owner_route_json_v2.py": "646fb63416df8c3ad10b7e04c4f008575b08b5252b99195c469e69f63757146c",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\initial_owner_route_campaign_v2.py": "db7adc57d92e3d64f2ad3b5d8995dd4c760521abbd7808e84a868f090f969fdd",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\verify_initial_owner_route_campaign_v2.py": "7085ef2a9bf6f0fa419758754329d3f6de6c6ae821eae46aad065d61f735e037",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\initial_owner_route_json_v3.py": "e2b5ac243b0722905b60ef36d7bd9d2a7afca95a24c97a98b020a0eef1724353",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\initial_owner_route_campaign_v3.py": "b9a649649e8f4fe332fcbcea70d0b30d136b17129015965a41962bdd375375f0",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\verify_initial_owner_route_campaign_v3.py": "934f2076f31c6f253150182ab764336b628150ad58e95f8cbfd2da63eca3e357"
+  },
+  "findings": [
+    {
+      "id": "clock_type",
+      "v2": "Pure minimal closed fixture accepted boolean lifetime clock fields and returned True.",
+      "v3": "clocks() requires exact nonnegative builtin integers on lifecycle/RPC/root failure/branch timing; no-READY path is also typed."
+    },
+    {
+      "id": "mixed_resource_keys",
+      "v2": "Disjoint mixed int and string resource keys were normalized despite the closed all-int or all-string boundary requested.",
+      "v3": "Resource dictionary rejects mixed key types before conversion; aliases/custom/nonfinite rejected."
+    },
+    {
+      "id": "missing_raw_failure_time",
+      "v2": "unknown_failed rows retained producer attempt clocks but verifier did not check or expose their elapsed envelope.",
+      "v3": "branch_attempt validates exact clock type/order and returns branch envelope; missing root warm_ms stays None, never substituted from branch duration."
+    }
+  ],
+  "authority_review": "Real native collector precedes data normalization; session/accepted/ledger identity remains untouched. Closed or aborted predictor is not restarted. close/abort errors and full18 denominator remain explicit unknowns. Private namespaces preserve original participant scheduling and physical validation.",
+  "limits": [
+    "Source-only review of v3 fixes; actual v3 native18 results were not independently reread here.",
+    "No native/predictor execution or benchmark; only two small pure counterexamples were executed against v2.",
+    "No full request100ms or universal protection certification."
+  ],
+  "native_executions": 0,
+  "model_evaluations": 0,
+  "pure_counterexamples": 2
+}

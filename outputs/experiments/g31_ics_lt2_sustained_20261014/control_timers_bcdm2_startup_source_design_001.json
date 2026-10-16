@@ -1,0 +1,86 @@
+{
+  "schema": "g31.bcdm2.startup_environment_source_design.v1",
+  "status": "source_only_not_executed",
+  "new_wrapper": {
+    "path": "outputs/experiments/g31_ics_lt2_sustained_20261014/control_timers_bcdm2_prepare_001.ps1",
+    "sha256": "2c8cc9103723ca9941d71c4271ae0f41e9d23d88ec5385818f9af1cef0c9e5c7",
+    "PowerShell_parse_errors": 0,
+    "execution_count": 0
+  },
+  "reference_wrapper": {
+    "path": "outputs/experiments/g31_ics_lt2_sustained_20261014/control_timers_bcdm1_prepare_001.ps1",
+    "sha256": "f6c972365c5c5cf14baab222361c853a8c316145821e43f28cd9da75b52b789f"
+  },
+  "failed_attempt_preserved": {
+    "summary_path": "outputs/experiments/g31_ics_lt2_sustained_20261014/control_timers_bcdm1_terminal_readback_001.json",
+    "summary_sha256": "6b8b01f7e4682a8a3aae4bf6f8fa9c4e5410eba69d70a350f3d4b7762680bb64",
+    "external_sha256": "0017ceb2d9ba71c81fe137cc164f9f3435167ed5d92845b757a14c51fad3d91e",
+    "whole_seconds": 51.430112,
+    "error": "typed_C_gate:python_startup_environment_changed",
+    "upgrade_or_retry_in_old_directory": false
+  },
+  "fixed_C_gate": {
+    "path": "outputs/experiments/g31_ics_lt2_sustained_20261014/planning_v2_C_encoder_gate_prepare_003/plan.json",
+    "sha256": "d6912d695e36707dbba6bd7a0359e5ec6c6ed1a964323e99c4aae4fecf28579b",
+    "python_startup_environment": {
+      "PYTHONPATH": null,
+      "PYTHONHOME": null,
+      "PYTHONNOUSERSITE": null,
+      "SETUPTOOLS_USE_DISTUTILS": null
+    },
+    "change": "No gate change. Each null maps to ProcessStartInfo.Environment.Remove before process start, with ContainsKey false checked and recorded. Empty strings are not used. No environment masking around C validation."
+  },
+  "other_explicit_environment": {
+    "PYTEST_DISABLE_PLUGIN_AUTOLOAD": "1",
+    "PYTHONIOENCODING": "utf-8"
+  },
+  "unchanged_command_form": "C:/PROGRAMING/python3.11.9/python.exe -m scripts.experiments.g31_ics_circulation.audit_bridge_saved_c_digest_v2 --prepare --output <workspace>/outputs/experiments/g31_ics_lt2_sustained_20261014/bcdm2 --pure-receipt <workspace>/outputs/experiments/g31_ics_lt2_sustained_20261014/bcdp2/receipt.json",
+  "working_directory": "C:/PROGRAMING/czr005/.g31_ics_circulation_worktree",
+  "import_source_evidence": {
+    "chain": [
+      "audit_bridge_saved_c_digest_v2",
+      "audit_bridge_saved_c_digest",
+      "audit_bridge_saved_text_actor",
+      "audit_bridge_saved_linear_v3",
+      "audit_bridge_saved_linear",
+      "audit_bridge_serialize_once_saved",
+      "research_original_bridge_serialize_once",
+      "research_original_cooperative_bridge",
+      "cooperative_bridge_policy",
+      "research_original_low_wip",
+      "native_host",
+      "scripts.eval.run_g4irsf28_service_potential"
+    ],
+    "existing_bootstrap": "run_g4irsf28_service_potential.py derives ROOT from __file__, adds ROOT and ROOT/src at lines33-36 before importing czr005 at38. This is unchanged source already in138pins, not a new launcher sys.path/runpy workaround. The -m scripts namespace starts in the unchanged repository cwd. Bare test helpers are source-closure roots, not pytest imports during prepare/actual audit.",
+    "pins_match_bcdp2_plan": {
+      "scripts/experiments/g31_ics_circulation/audit_bridge_saved_c_digest_v2.py": "1accbd24e4b0408c9c5cad63eaf06095eefb77d9d751d94e9161f577541055d3",
+      "scripts/experiments/g31_ics_circulation/audit_bridge_saved_c_digest.py": "3481b5eba5a0b55dfd82fb6ab193881198c699e35b2c1c543c25c5a54e3af15a",
+      "scripts/experiments/g31_ics_circulation/audit_bridge_saved_text_actor.py": "d4cd365e3c4585e39c05fd7eb284767bec30d05bf5950a1fd5af4727e5833e2d",
+      "scripts/experiments/g31_ics_circulation/audit_bridge_saved_linear_v3.py": "1d4a8236d5775f25255c6fc6714a51d4fee53bffa20525510633278a3fcb86a2",
+      "scripts/experiments/g31_ics_circulation/audit_bridge_saved_linear.py": "0f0ff6f55b0f8b61b2d6791d1e9584ab18ed51ad98bf59290697d6d5e823e46f",
+      "scripts/experiments/g31_ics_circulation/audit_bridge_serialize_once_saved.py": "8b65ca86ab17c90ac69de4fe0af8b89c5c2c59c814c6cc49139c3fa3bcf4af91",
+      "scripts/experiments/g31_ics_circulation/research_original_bridge_serialize_once.py": "97230fd04a3eebcb3b50c5e2ced838b8982c4902253047e8bc89b8f66c59d009",
+      "scripts/experiments/g31_ics_circulation/research_original_cooperative_bridge.py": "923248976e54d8f3d78f527e6631ee569a91ee944242933ace9d5900a8dea6a1",
+      "scripts/experiments/g31_ics_circulation/cooperative_bridge_policy.py": "4697a415538fae22cb7b6e472549178158f7f2de7f44faa4ae9a1341703cec90",
+      "scripts/experiments/g31_ics_circulation/research_original_low_wip.py": "729cbbdd03ecff3a85bd5324653db424bd601632a5fbecdc72c02bb83c3c7bc9",
+      "scripts/experiments/g31_ics_circulation/native_host.py": "03c33fbbaff5049b9068471edf7d7208f4921e977cc008e04461c515635bc48b",
+      "scripts/eval/run_g4irsf28_service_potential.py": "992ebc5b33f09acc5935e4c1724d8874da10dd46ca69390f72c74bd5bdd2b52f"
+    },
+    "limit": "Source reasoning, not a new interpreter import smoke or execution. The authorized metadata attempt will itself test the unchanged real -m startup under this exact environment. No synthetic37/27 rerun is needed or performed."
+  },
+  "new_artifact_boundary": {
+    "output": "outputs/experiments/g31_ics_lt2_sustained_20261014/bcdm2",
+    "driver_plan": "Created by the unchanged frozen driver. Since its metadata fields do not contain the output directory or launcher environment, identical plan bytes are possible; it remains a distinct new file/output, not a rewritten bcdm1 plan.",
+    "startup_sidecar": "startup_environment_plan.json: configured before launch in memory; CreateNew export after the child exits, because original prepare requires an absent output directory. It binds exact C plan, four expected values/actions/presence, two other explicit variables, command/cwd/wrapper and old failure. It is included in the metadata external output hashes.",
+    "failure_semantics": "Sidecar write/close failure is recorded separately and prevents accepted_metadata_launch_and_clock; it cannot overwrite an earlier child exception. All files use new paths/CreateNew. No successful C authority claim from metadata.",
+    "budget": "One metadata Python launch-through-exit typed integer120. PowerShell startup/prelaunch/source checks and post-exit sidecar/export are harness overhead, explicitly outside that Python envelope. Actual audit will separately retain owned600 and full outside Python600.",
+    "deferred_review": "Before actual600, a new independent helper must check new metadata command/pins, both138 current and new bcdm2 source archive plus bcdp2 archive, 27+37/root reviews, unchanged original_refs/full denominators, exact startup sidecar and actual wrapper Remove/Set mapping against the frozen C gate. No big raw/manifest decode during preflight. Actual600 still performs full original evidence and authority entry/exit.",
+    "unchanged": "All138 frozen Python/C source files, actual owned600 flow, C verification predicates, original source/compiled026/input/binary/manifest/row/policy/physical guards, 37270new/27218old/28506jobs/22trays and all prior failed attempts."
+  },
+  "new_tests_executed": 0,
+  "new_metadata_executed": false,
+  "C_loads": 0,
+  "native_calls": 0,
+  "large_raw_reads": 0,
+  "saved600_executed": false
+}

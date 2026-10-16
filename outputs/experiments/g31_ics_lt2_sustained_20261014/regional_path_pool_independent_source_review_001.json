@@ -1,0 +1,23 @@
+{
+  "schema": "g31.regional_path_pool.independent_source_review.v1",
+  "status": "no_concrete_source_semantic_blocker_found",
+  "native_executions": 0,
+  "tests_executed_by_reviewer": 0,
+  "source_sha256": {
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_path_pool.py": "5085f459348dd58756ceba24b1502d1ca6d705af952300236f866883deb2affd",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_control.py": "78bc3e2723dfb4b66863b6c599ae7752b5fb7a697b3b8eb2f8d4332c207e6997",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\tests\\test_g31_circulation_regional_path_pool.py": "4497a3d612db73d20107dcb2856aaccb06465ab34768be6e4b4c5af650e62956"
+  },
+  "checks": [
+    "Owner-isolated exact ordered keys cover original graph service/travel/local occupancy/edge-zero-capacity/active-fault dependencies; numeric type/float-bit preservation",
+    "Unsupported inputs retain original solver/failure; original identity/now handle guard retained",
+    "Only original solver chooses each immutable tuple; fresh observations/ACK/jobs not stored in persistent pool",
+    "Evicted bucket held by a live handle remains semantically isolated and is not reinserted; pool itself has no handle references",
+    "Context restores original factory on normal/exception exit; derived pool cleared outside checkpoint"
+  ],
+  "limits": [
+    "Same read-only observation lifetime requirement as OriginalRouting",
+    "resident_paths counts pool entries, not buckets still owned by caller-retained live handles or original handle-local storage",
+    "No performance certification; actual paired negative result must be retained and cache remains opt-in"
+  ]
+}

@@ -1,0 +1,175 @@
+{
+  "schema": "g31.primary_paper_applicability_review.v1",
+  "status": "read_only_research_complete_no_training_model_or_native_execution",
+  "paper": {
+    "title": "Learning Optimal Baggage Routing from Expert Demonstrations",
+    "authors": ["Keyu Tian", "Li Zeng"],
+    "venue": "2025 IEEE 21st International Conference on Automation Science and Engineering (CASE)",
+    "doi": "10.1109/CASE58245.2025.11163851",
+    "primary_reference": "https://doi.org/10.1109/CASE58245.2025.11163851",
+    "local_pdf": "C:/Users/38908/Downloads/Learning_Optimal_Baggage_Routing_from_Expert_Demonstrations.pdf",
+    "sha256": "cfdaebaa4ddf8cdfbb9412ffab3dd3b6516bff08afff9a365baad71a8cf7b818",
+    "bytes": 2188434,
+    "pdf_pages": 7,
+    "printed_pages": [1604, 1605, 1606, 1607, 1608, 1609, 1610],
+    "reading": "All seven pages, including methods, experiments, Appendix I/II and references were read. PDF pages4-7 were rendered and visually inspected for formulas, TableI, Fig4/Fig5 and network architecture. Extraction/rendering are read-only study intermediates; no PDF editing.",
+    "text_extraction": "tmp/pdfs/baggage_expert_review/paper.txt",
+    "rendered_evidence": {"TableI_and_Fig4": "tmp/pdfs/baggage_expert_review/page-5.png", "Fig5_and_results": "tmp/pdfs/baggage_expert_review/page-6.png", "method_equations": "tmp/pdfs/baggage_expert_review/page-4.png", "architecture_and_appendix": "tmp/pdfs/baggage_expert_review/page-7.png"},
+    "page_number_rule": "Every citation below uses printed proceedings page; PDF page equals printed page minus1603.",
+    "web_used": false
+  },
+  "main_conclusion": {
+    "useful_component": "Offline planner-generated demonstrations can train a cheap action scorer, proposal prior or search ordering heuristic. This could reduce expensive online exploration only in a separately designed budgeted evaluator; it does not itself predict future arrivals, empty-tray supply or return times.",
+    "g31_recommendation": "Borrow the teacher-to-small-policy idea at the conditional proposal/ranking layer. Do not replace actual owner-local current checks, immutable requests, message/ACK provenance, FIFO/receiving-capacity shield or strict per-job comparison with an inferred reward.",
+    "priority": "A small behavior-cloning/ranking control should precede a full VBIRL implementation because G31 already has explicit protection and cost objectives. The paper does not isolate a VBIRL-specific advantage over behavior cloning or the demonstration planner itself.",
+    "not_evidence_for": ["G31 R1-release to R2 tray supply to later-R1 necessity", "full original-map business success", "complete-request100ms", "collision-free or per-job protection guarantee", "strong equal-budget online method superiority"]
+  },
+  "method_evidence": [
+    {
+      "pages": [1606],
+      "section": "III.A",
+      "fact": "The simulator advances all bags by one location at fixed discrete time steps. The state is described as an E by M matrix containing positions and destinations of all bags. Actions represent the directions of all d diverters, normally two options each.",
+      "interpretation": "This is a fully observed system-wide state/action formulation. It is not the G31 contract of separate owners using delayed received captures and their own immutable ledgers. The text does not define a distributed observation or communication model."
+    },
+    {
+      "pages": [1605, 1606, 1607],
+      "section": "III.B and Fig3",
+      "fact": "An offline route planner starts with Dijkstra shortest paths. When simulated bags collide at a merger, it backtracks to a prior decision and changes a diverter, then returns to shortest-path choices. Expansion stops when collision count exceeds the historical minimum, no collisions occur, or all bags finish.",
+      "interpretation": "The expert incorporates future simulated consequences and can undo a past simulated choice. That is legitimate offline demonstration generation, not an executable online rollback. The paper calls solutions optimal, but does not provide a global objective bound or proof that the first collision-free branch globally minimizes all delivery times. Treat the planner as a heuristic expert unless independently certified."
+    },
+    {
+      "pages": [1607, 1610],
+      "section": "III.C, equations1-4 and AppendixI/II",
+      "fact": "A q-network estimates a Gaussian reward surrogate with mean/variance; a Q-network estimates cumulative reward. Training combines demonstration likelihood and prior regularization with a probabilistic Bellman-style consistency penalty. The appendix shows convolutional inputs E by1 byM, Q-network output d by2, and q-network output mean/variance.",
+      "interpretation": "The prediction is an action value/reward distribution. No network output is a future arrival, tray-release schedule, receiving reservation interval or demand forecast. Gaussian reward variance is not a calibrated bound on physical completion time or a safety certificate."
+    },
+    {
+      "pages": [1607, 1608, 1610],
+      "section": "reproducibility qualifications",
+      "fact": "The printed equations place beta differently in equation2 and AppendixA2; TableI sets beta=1, so that setting hides the distinction. The proposed-method discount entry is a dash although the consistency equation contains gamma. Output d by2 and the all-actions normalization do not fully specify joint-action aggregation.",
+      "interpretation": "These are implementation details to resolve from author code or clarification before reproducing VBIRL. They do not independently refute the reported experiments, but prevent treating the PDF alone as an exact implementation specification."
+    }
+  ],
+  "exact_experimental_setup": {
+    "pages": [1608],
+    "simulation": "Petri-net BHS models described as based on real airport systems; these experiments are simulations, not deployed airport trials.",
+    "case1": {"locations": 12, "diverters": 2, "unloading_areas": 2, "bags": 4, "arrival_description": "random nonuniform intervals"},
+    "case2": {"locations": 28, "diverters": 4, "unloading_areas": 2, "bags": 10},
+    "common": {"location_capacity_bags": 1, "adjacent_location_distance": 1, "bags_removed_at_destination": true, "random_checkin_and_destination": true},
+    "demonstrations_per_case": 400,
+    "training_runs": 20,
+    "epochs_per_run": 400,
+    "batch_size": 32,
+    "optimizer": "Adam",
+    "learning_rate": 0.0003,
+    "testing_every_epochs": 80,
+    "testing_episodes_per_evaluation": 50,
+    "proposed_beta": 1,
+    "proposed_lambda": 1,
+    "baselines": ["Dijkstra shortest path without collision planning", "Double DQN"],
+    "double_dqn": {"arrival_reward": 10, "collision_reward": -50, "discount": 0.9, "exploration_probability_start": 0.6, "exploration_probability_end": 0.01},
+    "fairness_present": "Each test trial uses the same fixed generated baggage sequence, check-in assignments and destinations across all three methods. The two learned methods share the listed training settings apart from learning-specific quantities.",
+    "fairness_not_reported": ["equal wall-clock/online computation budget", "offline expert generation cost", "matching or strong MPC/LNS/pair-repair reference", "behavior-cloning baseline", "demonstration planner as an evaluated expert baseline", "disjoint demonstration/test sequence identifiers", "held-out topology or transfer protocol", "hardware and complete inference/request latency"],
+    "metrics": {
+      "average_delivery_time": "sum of delivered bags' travel steps divided by N delivered bags; one step is one adjacent-location move",
+      "collision_rate": "total collision events Nc divided by delivered bag count N times100%",
+      "limits": "The collision metric is not a probability of any collision per episode. Average travel steps over delivered bags does not establish every admitted job's completion, lateness or non-regression. Exact collision resolution/queuing and the fate of unfinished bags are not specified sufficiently to map this denominator onto G31."
+    }
+  },
+  "results": {
+    "pages": [1609],
+    "source": "Fig5 and IV.B; no numeric final-results table or raw series is supplied in this PDF.",
+    "exact_qualitative_findings": [
+      "Dijkstra has the shortest mean delivery time in both cases but a higher collision rate than the learned methods at the final comparison.",
+      "In Case1 the proposed method improves average delivery time over conventional RL, but has a slightly higher collision rate.",
+      "In Case2 the proposed method improves both mean delivery time and collision rate over conventional RL.",
+      "Shading is described by the authors as one-sigma confidence bands, not95% confidence intervals; no significance test is reported."
+    ],
+    "figure_reading_only_approximate_at400_epochs": {
+      "numeric_status": "Approximate visual readings, not exact results, digitized raw data, or certified effect sizes.",
+      "case1": {"proposed_mean_steps_approx": 3.8, "double_dqn_mean_steps_approx": 4.7, "dijkstra_mean_steps_approx": 3.4, "proposed_collision_percent_visual_range": [4, 4.5], "double_dqn_collision_percent_visual_range": [3, 4], "dijkstra_collision_percent_visual_range": [5.5, 6]},
+      "case2": {"proposed_mean_steps_approx": 9.8, "double_dqn_mean_steps_approx": 10.6, "dijkstra_mean_steps_approx": 7.6, "proposed_collision_percent_visual_range": [13, 14], "double_dqn_collision_percent_visual_range": [17, 18], "dijkstra_collision_percent_visual_range": [23, 24]}
+    },
+    "no_claim": "Do not repeat the abstract/conclusion as uniform dominance: the simple-case collision result is worse than Double DQN, and Dijkstra remains faster in both examples. No inference-time measurement supports100ms."
+  },
+  "information_and_execution_gaps": [
+    {
+      "topic": "central global observation",
+      "paper_pages": [1606],
+      "gap": "A matrix of all bag positions/destinations is not lawfully available to each G31 owner. Unobserved or stale peer facts cannot be filled from the simulator, future captures, archived case identities or another owner's private endpoint.",
+      "admissible_transfer": "Use only the exact owner-local decision object, own delivered selfACK/immutable publication ledger and actually received validated peer captures. Include age/known/coverage masks; unknown is not an empty location."
+    },
+    {
+      "topic": "teacher hindsight and data leakage",
+      "paper_pages": [1607, 1608],
+      "gap": "Offline backtracking uses simulated future consequences. The paper does not disclose enough split/sequence details to certify that demonstration and evaluation scenarios are disjoint, nor to prove future arrivals are unnecessary for each label.",
+      "interpretation": "This is a risk/unspecified boundary, not evidence that the authors leaked test data. A privileged offline teacher is possible, but its extra information must be disclosed and cannot be credited to an equal-information online baseline. If identical legal observations admit different future-optimal labels, a deterministic student cannot reproduce both without added information.",
+      "admissible_transfer": "Generate labels from the declared public model/history and action permissions, or explicitly separate a privileged oracle upper bound. Split by scenario/arrival trace/seed before demonstrations; never include future event heaps, source hashes, case/vector names or opaque-ID string parsing as policy features."
+    },
+    {
+      "topic": "actions and immutable reservation",
+      "paper_pages": [1606, 1607],
+      "gap": "Changing all diverter directions in one synchronous step and undoing an earlier simulated choice is different from a delayed owner-local preference update. In G31 an updated ACK does not force the chosen physical edge, and an already committed reservation cannot be rerouted.",
+      "admissible_transfer": "A network may propose only the currently legal local component. Keep current job/generation/traversal, uncommitted prefix, service/wire deadline, receiving capacity and immutable command checks. Confirm actual ACK and EDGE_ENTER separately."
+    },
+    {
+      "topic": "finite reusable trays and R1/R2 feedback",
+      "paper_pages": [1608],
+      "gap": "Bags disappear at destination; the paper has no finite reusable tray identity, empty return, loading/unloading lifecycle, mandatory Storage release, ownership transfer or same-tray repeated service. Single-location capacity is not a source FIFO with downstream reservation/headway.",
+      "admissible_transfer": "Expert generation must use the existing G31 event model and every tray/queue/lease/return obligation. The paper cannot establish the R1-release -> R2 actual finite resource -> later-R1 protected continuation mechanism or fix original-map zero-capacity/unreachable destinations."
+    },
+    {
+      "topic": "scalar reward versus strict protection",
+      "paper_pages": [1607, 1608, 1609],
+      "gap": "The learned scalar reward trades aggregate travel time against collisions; reported collision rates remain nonzero. Neither likelihood regularization nor a Bellman penalty guarantees all five jobs are no worse than a reference.",
+      "admissible_transfer": "Retain the complete five-job vector, same-information incumbent and exact componentwise <= comparison; unknown predictions are not selectable as safe. Physical safety stays in the native shield. A lower scalar score never overrides per-job or execution guards."
+    },
+    {
+      "topic": "latency",
+      "paper_pages": [1605, 1608, 1609, 1610],
+      "gap": "The paper motivates fast execution after expensive training, but reports no CPU/GPU, network inference latency, tail latency, end-to-end request timing, message cost or deadline misses.",
+      "admissible_transfer": "Measure collection, feature construction, model load/cold bind, inference, candidate validation, source checks, native submit, ACK/descendants and evidence serialization in the complete request. A small neural forward pass alone cannot certify100ms."
+    }
+  ],
+  "g31_history_and_source_connection": {
+    "history": "Existing six-case/192 work already found strong methods tying, and an early4.1s protected difference had later default; later fixed live-obligation96 established a finite mechanism under additional resource timing, not an online learning advantage. These histories cannot be relabeled as unseen validation or as an explanation supplied by this paper.",
+    "original_map_feasibility": "The retained original-map trials keep R1 authorization false. Existing Storage53/FIFO and static-unreachable-head findings constrain the admissible action set; original026 has no job cancel/defer/goal-edit command. A learned ranking cannot create a legal R1 action, delete an unreachable FIFO head, enlarge zero-capacity edges or certify completion of a blocked job. These physical/permission barriers must be distinguished from the ranking problem; the paper supplies no remedy under the unchanged contract. See RESUMPTION lines47,86,141,193,296 at the read snapshot.",
+    "current_provider": {
+      "path": "scripts/experiments/g31_ics_circulation/live_obligation_owned_initial_provider.py",
+      "sha256": "91f34194b7b8857db27f05ab8a87647fd07a576f1bf19fb36ccb425eca7ade5b",
+      "line": 48,
+      "finding": "evaluate_declared32 already constructs and charges all32 forecasts/16 prefixes before selection. Merely sorting the finished table with a learned Q does not save model computation. A future budgeted proposal provider is a separate policy/evidence revision, not a free optimization of this full32 contract."
+    },
+    "selectors": {
+      "path": "scripts/experiments/g31_ics_circulation/live_obligation_same_information_search.py",
+      "sha256": "1ef2a98a09cb94f94e2ddd0be0814ca6cc7aff3cd35a719a05eec0202d649770",
+      "line": 29,
+      "finding": "Strict/plateau coordinate, pair repair and finite MPC share32 actions and the same full provider cost. Intermediate unprotected proposals may be searched; only final complete five-job protected estimates are selected. A learning comparison must not handicap these references by disallowing their internal repairs or providing fewer candidate/compute resources."
+    },
+    "dispatch": {
+      "path": "scripts/experiments/g31_ics_circulation/live_obligation_online_initial_dispatch.py",
+      "sha256": "23e50a67a508025e74cbca4d252b0885774c436c1f8a882d112ac61c16e558a0",
+      "line": 87,
+      "finding": "The source seam separates actual collection, common provider/selection, immediate current recollection and immutable local submission. It explicitly does not certify later re-estimation, peer consensus, actual physical outcome or100ms. A learned proposal must stay inside those boundaries."
+    },
+    "history_document": {"path": "docs/g31_ics_circulation/RESUMPTION_20261015.md", "read_sha256": "60389c6e1717a067dbacd8d711c5a05c8cafc433db5719f2450eeb22a11972fe", "scope": "Read snapshot only; not an immutable whole-project status claim."}
+  },
+  "minimal_next_research_if_authorized": [
+    "First define an observable owner-local feature contract with explicit missingness/age and immutable action availability. Audit observation aliases: the same legal input with different expert labels must not be resolved using future/private fields.",
+    "Use the already faithful public event model as the offline teacher and retain every candidate including rejected/unknown ones. Do not train and validate on the previously debugged96 and call it held-out; freeze a genuinely separate small validation set before any training.",
+    "Begin with a compact behavior-cloning/ranking baseline over the declared32 candidates or repair pairs. Compare it against a fixed heuristic ordering and the same coordinate/plateau/pair-repair/MPC methods. VBIRL is an additional ablation only if reward uncertainty itself provides measurable benefit.",
+    "The first diagnostic must retain all32 forecasts and the complete fixed-reference families to measure ranking quality against the strongest available choice. It does not change the current candidate budget or claim a timing gain. Grouped unseen splits and identical lawful observations take priority over model complexity.",
+    "If the purpose is latency reduction, define a new finite budgeted evaluation policy with the same wall budget, candidate universe, public context and validation requirements for all methods. Charge teacher-data generation/training separately and every online preprocessing/inference/validation cost. Do not claim savings while still precomputing full32.",
+    "The local actor commits only its currently legal first component; any later action requires fresh lawful information and the existing execution guards. A Q score cannot create an agreement between owners or certify a hidden state.",
+    "Evaluate complete admitted population, actual edge/ACK outcomes, full request latency/deadline misses, all per-job deltas and all unknowns. Include complete fixed-initial and later-default controls and strong search with learned guidance equally available in an ablation. A fast proposal with no extra protected gain remains a performance heuristic, not new R1/R2 joint necessity."
+  ],
+  "work_performed": {
+    "paper_text_and_render_read": true,
+    "current_source_small_reads": true,
+    "training": false,
+    "model_prediction": false,
+    "native_execution": false,
+    "engineering_source_edits": false,
+    "old_evidence_modified": false
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "schema": "g31.delivered_peer_cost.independent_source_review.v1",
+  "status": "saved_record_type_guard_finding_requires_versioned_fix",
+  "reviewer": "control_timers",
+  "source_sha256": {
+    "scripts/experiments/g31_ics_circulation/delivered_peer_cost_probe.py": "9b5d94131cdf127c04641761262aeb964dfe29fe312e96081d4003ebe037a754",
+    "scripts/experiments/g31_ics_circulation/measure_delivered_peer_cost.py": "955b91a3c8f99a4cbc1bc4f09afa9808eb78e657bf0ecd8d0c7541f68f257043",
+    "tests/test_g31_circulation_delivered_peer_cost_probe.py": "f67860aaf1727002f2721226559ded382e216a7870ce80f337e1afa28daa4022",
+    "tests/test_g31_circulation_delivered_peer_cost_harness.py": "8e780955f095f968f9563b2b56ac23eb6de5e8d3525221d97d98363f5f3ae652"
+  },
+  "scope": "Read complete core/harness/tests and original delivered_peer source. No real gzip decode, actual validator/digest call, model/native execution or reviewer pure run.",
+  "finding": {
+    "function": "measure_delivered_peer_cost.audit_records",
+    "problem": "Saved timing/count comparisons use Python numeric equality/order without exact types or nonnegative count guards.",
+    "source_derived_counterexamples": [
+      "The first synthetic row can use started_ns=False, finished_ns=50.0 and validator_ns=50.0; its arithmetic/order checks still hold.",
+      "A B row may replace entered/completed/raised 1/1/0 with True/True/False without failing the existing sum/count comparison.",
+      "entered=-1, completed=-1, raised=0 satisfies entered==completed+raised<=1; negative counts are not explicitly rejected."
+    ],
+    "actually_reproduced_by_reviewer": false,
+    "interpretation": "The producer normally emits exact integers. This is a saved-audit fail-closed gap, not evidence of a historical mutated measurement or native correctness defect.",
+    "requested_fix": "New version only: exact record/metrics field inventory and exact nonnegative int clocks/counts/indices, then execute the complete original checker. Preserve frozen001 and all original ordinary rejection outcomes."
+  },
+  "other_source_findings": {
+    "private_validator_code_defaults_closure_full_globals_retained": true,
+    "only_digest_global_timed": true,
+    "all_original_envelopes_static_contract_and_query_owner_time_used": true,
+    "ordinary_rejections_remain_in_denominator": true,
+    "resource_errors_not_success_fallback": true,
+    "nested_conservation_scope": "B inclusive digest span includes its timer bookkeeping; validator-minus-digest includes original remaining guards and timer/invoke overhead. It is not a counterfactual uninstrumented cost and overlapping cumulative values must not be summed.",
+    "metadata_checks_scope": "Argument/static-header checks and export/hash checks remain in whole120, outside the stated validator span.",
+    "not_certified": ["policy activation frequency", "late owner policy state", "full-day verification", "optimized speedup", "native authority"]
+  },
+  "disposition": "Parent accepted finding; new v2 checker planned. No authorization or recommendation to execute frozen prepared001."
+}

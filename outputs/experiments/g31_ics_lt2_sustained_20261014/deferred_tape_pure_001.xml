@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="34" time="1.816" timestamp="2026-10-15T18:03:30.134578+08:00" hostname="LAPTOP-M3GASC4G"><testcase classname="tests.test_g31_circulation_deferred_service_tape" name="test_unicode_complete_lines_exact_reference_and_idempotent_close[ram]" time="0.013" /><testcase classname="tests.test_g31_circulation_deferred_service_tape" name="test_unicode_complete_lines_exact_reference_and_idempotent_close[spool]" time="0.016" /><testcase classname="tests.test_g31_circulation_deferred_service_tape" name="test_exact_capacity_then_overflow_keeps_prefix_unknown[bytes-ram]" time="0.008" /><testcase classname="tests.test_g31_circulation_deferred_service_tape" name="test_exact_capacity_then_overflow_keeps_prefix_unknown[bytes-spool]" time="0.011" /><testcase classname="tests.test_g31_circulation_deferred_service_tape" name="test_exact_capacity_then_overflow_keeps_prefix_unknown[rows-ram]" time="0.008" /><testcase classname="tests.test_g31_circulation_deferred_service_tape" name="test_exact_capacity_then_overflow_keeps_prefix_unknown[rows-spool]" time="0.011" /><testcase classname="tests.test_g31_circulation_deferred_service_tape" name="test_bad_line_or_utf8_fails_closed[{}-ram]" time="0.009" /><testcase classname="tests.test_g31_circulation_deferred_service_tape" name="test_bad_line_or_utf8_fails_closed[{}-spool]" time="0.009" /><testcase classname="tests.test_g31_circulation_deferred_service_tape" name="test_bad_line_or_utf8_fails_closed[{}\n{}\n-ram]" time="0.008" /><testcase classname="tests.test_g31_circulation_deferred_service_tape" name="test_bad_line_or_utf8_fails_closed[{}\n{}\n-spool]" time="0.009" /><testcase classname="tests.test_g31_circulation_deferred_service_tape" name="test_bad_line_or_utf8_fails_closed[{}\r\n-ram]" time="0.008" /><testcase classname="tests.test_g31_circulation_deferred_service_tape" name="test_bad_line_or_utf8_fails_closed[{}\r\n-spool]" time="0.010" /><testcase classname="tests.test_g31_circulation_deferred_service_tape" name="test_bad_line_or_utf8_fails_closed[{}\n-ram]" time="0.007" /><testcase classname="tests.test_g31_circulation_deferred_service_tape" name="test_bad_line_or_utf8_fails_closed[{}\n-spool]" time="0.010" /><testcase classname="tests.test_g31_circulation_deferred_service_tape" name="test_bad_line_or_utf8_fails_closed[\ud800\n-ram]" time="0.007" /><testcase classname="tests.test_g31_circulation_deferred_service_tape" name="test_bad_line_or_utf8_fails_closed[\ud800\n-spool]" time="0.009" /><testcase classname="tests.test_g31_circulation_deferred_service_tape" name="test_original_invocation_alias_isolation_endpoint_and_role[ram]" time="0.009"><failure message="ValueError: original_route_update:unclassified_native_endpoint:unlisted">tmp_path = WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_lt2_sustained_20261014/deferred_tape_tmp_001/test_original_invocation_alias0')
+mode = 'ram'
+
+    @pytest.mark.parametrize('mode',d.MODES)
+    def test_original_invocation_alias_isolation_endpoint_and_role(tmp_path,mode):
+        native=Native();tape=d.DeferredServiceTape(native,mode=mode);path=tmp_path/'capture.gz';tape.begin(path)
+        args={'a':[1]};kwargs={'extra':{'b':[2]}}
+        with tape.role('request'):
+            result=tape.protocol_command(args,**kwargs)
+        assert result is native.result
+        result['nested']['items'][0]['x']='changed';args['a'].append(9);kwargs['extra']['b'].append(9)
+        assert tape.role_name=='controller';tape.close()
+        row=json.loads(gzip.decompress(path.read_bytes()))
+        assert row['result']['nested']['items'][0]['x']=='中文'
+        assert row['args']==[{'a':[1]}] and row['kwargs']=={'extra':{'b':[2]}}
+        assert row['role']=='request' and row['ordinal']==0 and row['before']==row['after']==1.
+        assert row['start_ns']&lt;=row['end_ns'] and tape.capture_report['evidence_complete']
+        assert d.unchanged_invocation_proof()['inherited_getattr_identical_function_and_bytecode']
+&gt;       with pytest.raises(AssertionError):tape.unlisted()
+                                           ^^^^^^^^^^^^^
+
+tests\test_g31_circulation_deferred_service_tape.py:74: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\probe_original_route_update.py:112: in __getattr__
+    require(name in ENDPOINTS, "unclassified_native_endpoint:" + name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+ok = False, why = 'unclassified_native_endpoint:unlisted'
+
+    def require(ok, why):
+&gt;       if not ok: raise ValueError("original_route_update:" + why)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: original_route_update:unclassified_native_endpoint:unlisted
+
+scripts\experiments\g31_ics_circulation\probe_original_route_update.py:41: ValueError</failure></testcase><testcase classname="tests.test_g31_circulation_deferred_service_tape" name="test_original_invocation_alias_isolation_endpoint_and_role[spool]" time="0.013"><failure message="ValueError: original_route_update:unclassified_native_endpoint:unlisted">tmp_path = WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_lt2_sustained_20261014/deferred_tape_tmp_001/test_original_invocation_alias1')
+mode = 'spool'
+
+    @pytest.mark.parametrize('mode',d.MODES)
+    def test_original_invocation_alias_isolation_endpoint_and_role(tmp_path,mode):
+        native=Native();tape=d.DeferredServiceTape(native,mode=mode);path=tmp_path/'capture.gz';tape.begin(path)
+        args={'a':[1]};kwargs={'extra':{'b':[2]}}
+        with tape.role('request'):
+            result=tape.protocol_command(args,**kwargs)
+        assert result is native.result
+        result['nested']['items'][0]['x']='changed';args['a'].append(9);kwargs['extra']['b'].append(9)
+        assert tape.role_name=='controller';tape.close()
+        row=json.loads(gzip.decompress(path.read_bytes()))
+        assert row['result']['nested']['items'][0]['x']=='中文'
+        assert row['args']==[{'a':[1]}] and row['kwargs']=={'extra':{'b':[2]}}
+        assert row['role']=='request' and row['ordinal']==0 and row['before']==row['after']==1.
+        assert row['start_ns']&lt;=row['end_ns'] and tape.capture_report['evidence_complete']
+        assert d.unchanged_invocation_proof()['inherited_getattr_identical_function_and_bytecode']
+&gt;       with pytest.raises(AssertionError):tape.unlisted()
+                                           ^^^^^^^^^^^^^
+
+tests\test_g31_circulation_deferred_service_tape.py:74: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\probe_original_route_update.py:112: in __getattr__
+    require(name in ENDPOINTS, "unclassified_native_endpoint:" + name)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+ok = False, why = 'unclassified_native_endpoint:unlisted'
+
+    def require(ok, why):
+&gt;       if not ok: raise ValueError("original_route_update:" + why)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: original_route_update:unclassified_native_endpoint:unlisted
+
+scripts\experiments\g31_ics_circulation\probe_original_route_update.py:41: ValueError</failure></testcase><testcase classname="tests.test_g31_circulation_deferred_service_tape" name="test_native_exception_still_captured_then_original_error_rethrown[ram]" time="0.009" /><testcase classname="tests.test_g31_circulation_deferred_service_tape" name="test_native_exception_still_captured_then_original_error_rethrown[spool]" time="0.011" /><testcase classname="tests.test_g31_circulation_deferred_service_tape" name="test_json_failure_caught_by_api_denominator_and_prefix_preserved[ram]" time="0.008" /><testcase classname="tests.test_g31_circulation_deferred_service_tape" name="test_json_failure_caught_by_api_denominator_and_prefix_preserved[spool]" time="0.013" /><testcase classname="tests.test_g31_circulation_deferred_service_tape" name="test_swallowed_capture_failure_cannot_become_success[ram]" time="0.008" /><testcase classname="tests.test_g31_circulation_deferred_service_tape" name="test_swallowed_capture_failure_cannot_become_success[spool]" time="0.010" /><testcase classname="tests.test_g31_circulation_deferred_service_tape" name="test_short_spool_write_preserves_incomplete_tail_unknown" time="0.011" /><testcase classname="tests.test_g31_circulation_deferred_service_tape" name="test_flush_exception_is_sticky_and_spool_is_retained" time="0.009" /><testcase classname="tests.test_g31_circulation_deferred_service_tape" name="test_export_failure_does_not_delete_prefix_or_claim_complete[ram]" time="0.007" /><testcase classname="tests.test_g31_circulation_deferred_service_tape" name="test_export_failure_does_not_delete_prefix_or_claim_complete[spool]" time="0.010" /><testcase classname="tests.test_g31_circulation_deferred_service_tape" name="test_invalid_limits_rejected[max_bytes-True]" time="0.006" /><testcase classname="tests.test_g31_circulation_deferred_service_tape" name="test_invalid_limits_rejected[max_rows-0]" time="0.006" /><testcase classname="tests.test_g31_circulation_deferred_service_tape" name="test_invalid_limits_rejected[max_bytes-1.2]" time="0.006" /><testcase classname="tests.test_g31_circulation_deferred_service_tape" name="test_invalid_limits_rejected[mode-other]" time="0.007" /><testcase classname="tests.test_g31_circulation_deferred_service_tape" name="test_spool_visible_prefix_before_close_is_not_compressed" time="0.011" /><testcase classname="tests.test_g31_circulation_deferred_service_tape" name="test_no_overwrite_and_must_flush_between_api_rows" time="0.009" /></testsuite></testsuites>

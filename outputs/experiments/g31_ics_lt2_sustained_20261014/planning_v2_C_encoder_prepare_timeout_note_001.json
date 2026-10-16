@@ -1,0 +1,44 @@
+{
+  "schema": "g31.planning_v2.C_encoder.metadata_timeout_note.v1",
+  "failed_directory": "planning_v2_C_encoder_gate_prepare_001",
+  "observed_terminal": {
+    "parent_exit_code": 1,
+    "owned_job_status": "hard_timeout",
+    "owned_job_child_exit_code": 0,
+    "owned_job_wall_seconds": 119.78099999998813,
+    "parent_pre_final_export_seconds": 120.01499999999942,
+    "bound_seconds": 120,
+    "acceptance": false,
+    "child_exit_zero_does_not_override_timeout": true
+  },
+  "small_terminal_read": {
+    "source_files_present": 10,
+    "CPython_headers_present": 189,
+    "plan_json_present": false,
+    "receipt_json_present": false,
+    "stdout_bytes": 0,
+    "stderr_bytes": 0,
+    "runner_live_matches_partial_archive_sha256": "ce0cddd9fc24ec4ca6aa402f852a1f88afff9ec63b3512597e965601546567b5"
+  },
+  "causal_scope": {
+    "proved": "The worker passed the initial environment capture and reached source/header archival. A final plan and worker receipt were not produced within the fixed bound.",
+    "not_proved": "There was no stage journal, so the last exact function and division of the 120 seconds cannot be inferred from file timestamps.",
+    "source_identified_redundancy": "The initial runtime enumeration traversed all Lib/site-packages and __pycache__ subtrees using rglob before excluding their paths. A versioned os.walk implementation can prune those same excluded subtrees without changing the selected-file predicate.",
+    "no_new_cost_claim": true
+  },
+  "versioned_repair": {
+    "runner": "scripts/experiments/g31_ics_circulation/run_planning_v2_c_encoder_gate_v2.py",
+    "gate": "planning_v2_C_encoder_enumeration_pure_001",
+    "pure_tests": 22,
+    "pure_parent_pre_export_seconds": 3.389999999999418,
+    "scope": "Synthetic file-set equivalence, exact inverse AST and unchanged build/functional code, explicit bare test closure, stage journal bound. No C or historical fixture.",
+    "before_after_hash_checks": "Unchanged. No member or actual execution guard removed.",
+    "new_metadata_bound_seconds": 120,
+    "old_failed_directory_and_runner_unchanged": true
+  },
+  "builds": 0,
+  "C_extension_loads": 0,
+  "native_simulation_calls": 0,
+  "actual_fixture_reads": 0,
+  "performance_runs": 0
+}

@@ -1,0 +1,51 @@
+{
+  "schema": "g31.initial_firsthop_entry_source_plan.v1",
+  "status": "source_only_not_implemented_not_prepared_for_native",
+  "independent_of_notification_gate": true,
+  "old_contract": "scripts/experiments/g31_ics_circulation/initial_owner_route_contract.py:120",
+  "source_authority": {
+    "archive": "outputs/experiments/g31_ics_lt2_sustained_20261014/native027_build_001/source",
+    "binding": "cpp/ics_core/bindings/circulation_session_binding.hpp:192-224",
+    "reservation_and_entry": "cpp/ics_core/runtime/circulation_runtime_impl.hpp:270-315",
+    "existing_hashed_audit": "outputs/experiments/g31_ics_lt2_sustained_20261014/initial_root_observation_source_diagnosis_001/report.json",
+    "audit_sha256": "794e7076e2fccb9434a471429488519c4c9498b8f62087c870bc8e6810f2a81a"
+  },
+  "finding": "The original observed_first_hop requires len(committed_prefix)>=2 before testing its entered branch. Native committed_prefix appends LEG_START and EDGE_EXIT only, so a real first-edge entry still has [0] and cannot reach that branch.",
+  "minimal_separate_candidate": [
+    "Keep the old post-exit branch and its full returned schema. Do not alter closure, ACK requirements, source/receiver checks, retry timing or mandatory complete drain.",
+    "Add a separate current-first-edge branch for the same admitted source tray/job/generation, current loaded tray at node=edge_from=0, exact committed_prefix [0], edge_to in {1,2}, and a finite non-Boolean edge_exit_at strictly greater than the actual fresh view.now. Require valid builtin identity types and the initial source prefix [0].",
+    "Return from=0, to=actual edge_to, observed_at=actual view.now, evidence=observed_entry_future_exit and the independent complete tray copy. Do not change raw view fields.",
+    "Use only the actual owner-A observe_protocol return from the accepted same session. A saved/supplied dictionary is a pure fixture and cannot authenticate this online proof."
+  ],
+  "entry_vs_reservation_proof": [
+    "circulation_publish_event reserves the edge and assigns current edge fields before actual EdgeEnter. Those fields alone prove no entry.",
+    "circulation_edge_enter checks active leg, current internal traversal, from/to and not-yet-observed entry, then emits EDGE_ENTER.",
+    "The accepted binding emits edge_exit_at only after finding that tray's actual EDGE_ENTER receipt with the current INTERNAL traversal. It derives the exit from an already observed start plus public travel/minimum duration, without reading a future event.",
+    "Current public traversal_id is public_traversal_version and must not be equated to the private receipt traversal. No inverse floating subtraction is needed to manufacture entry_at."
+  ],
+  "existing_real_positive": {
+    "raw": "outputs/experiments/g31_ics_lt2_sustained_20261014/initial_owner_route_campaign_v3_prepare_001/raw/normal/block0_load0/fixed_default.json.gz",
+    "raw_sha256": "84633d9fa8c503c6b92a2e88f814e914b083bac72850c4ef91a86ccb5da247dd",
+    "actual_view_at": 4.171,
+    "actual_prefix": [0],
+    "actual_from": 0,
+    "actual_to": 1,
+    "actual_edge_exit_at": 5.171,
+    "old_closed_at": 5.171,
+    "logical_interval_seconds": 1.0,
+    "isolated_compute_saving_established": false,
+    "real_reservation_only_negative_in_that_file_established": false
+  },
+  "required_pure_gate": [
+    "Hash-bound saved actual first-edge positive and preservation of all old accepted post-exit outputs.",
+    "Clearly hypothetical reservation negative with the same current edge fields but no edge_exit_at; no fabricated saved-native reservation example.",
+    "Wrong owner/tray/job/generation, duplicate tray rows, changed prefix/source, unknown or Boolean/nonfinite exit time, and incomplete timestamp remain unclosed.",
+    "prefer_2 still needs the actual correctly queried updated ACK plus the actual hop; rejection/expiry/failure handling and final complete drain remain unchanged. Native-default never promises edge1.",
+    "Keep first-hop changes out of notification-gate tests and performance claims."
+  ],
+  "comparison_caveat": "Earlier root closure also removes later root client.activate calls. Background demand IDs use len(client.roots), so the whole subsequent ID/tape stream can differ even if physical actions remain the same. This candidate cannot borrow the notification gate's identical-admission/ID claim. A separate version and declared comparison are required; no opaque-ID normalization or synthetic shadow admissions are proposed here.",
+  "cost_scope": "All fresh reads, original validation/ACK/retry, actual drain, evidence construction, codec and caller return remain charged. An earlier logical closure is not itself a compute-time measurement or a 100ms certificate.",
+  "native_calls": 0,
+  "new_predictions": 0,
+  "new_tests_or_benchmark_executed_for_this_plan": false
+}

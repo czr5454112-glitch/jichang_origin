@@ -1,0 +1,172 @@
+{
+  "schema": "g31.readonly_literature_review.contract_negotiation.001",
+  "status": "completed_readonly_primary_pdf_review",
+  "created_date_local": "2026-10-16",
+  "author_role": "/root/legal_context",
+  "scope": {
+    "engineering_sources_modified": false,
+    "checkpoint_modified": false,
+    "tests_or_gates_executed": false,
+    "native_or_model_executed": false,
+    "method": "Read all 16 extracted PDF pages; visually inspected complete PDF pages 4, 7, 11, 12 and 13, including formulas, Figure 5/11 and Table I. Literature-to-G31 mappings below are proposals/inferences, not new experiments or transferred guarantees.",
+    "g31_basis": "Previously established task constraints and saved-history conclusions supplied in the ongoing research; this review did not re-audit the large G31 tapes. Existing version/ACK/forecast-tombstone/immutable-commit protocol mechanisms are not claimed as contributions of this paper or new project inventions."
+  },
+  "paper": {
+    "title": "Synthesis of Distributed and Decentralized Supervisory Control via Contract Negotiation",
+    "authors": ["Ana Maria Mainhardt", "Anne-Kathrin Schmuck"],
+    "journal": "IEEE Transactions on Automatic Control, volume 71, number 9, September 2026",
+    "doi": "10.1109/TAC.2026.3682203",
+    "pdf_path": "C:/Users/38908/Downloads/Synthesis_of_Distributed_and_Decentralized_Supervisory_Control_via_Contract_Negotiation.pdf",
+    "pdf_sha256": "fb9929b5ea1b61bf5f03afe415e539b818d944033c0d37a92d9764d1aad439d3",
+    "pdf_pages": 16,
+    "printed_pages": [5892, 5907],
+    "page_mapping": "printed_page = PDF_page + 5891; all references below use one-based PDF pages and give printed pages too.",
+    "primary_evidence_base": "C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/tmp/pdfs/contract_negotiation_001",
+    "key_text_paths": [
+      "C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/tmp/pdfs/contract_negotiation_001/plain_11.txt",
+      "C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/tmp/pdfs/contract_negotiation_001/plain_12.txt"
+    ],
+    "key_render_paths": [
+      "C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/tmp/pdfs/contract_negotiation_001/render_11.png",
+      "C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/tmp/pdfs/contract_negotiation_001/render_12.png"
+    ]
+  },
+  "verdict": {
+    "usefulness": "High for designing and checking a small, two-owner shared-event contract interface; low as a directly reusable online optimizer or 100ms guarantee.",
+    "main_new_value_for_g31": "Go beyond authentic delivered facts and version-safe messages: specify what future shared behaviors each owner actually undertakes to permit or prohibit, and check compatibility plus nonconflict across indistinguishable private histories. A snapshot is a fact at capture time, not this behavioral commitment.",
+    "not_a_solution_to": [
+      "The physically unreachable FIFO head or zero capacity caused by the original segment/tray geometry.",
+      "The full 28506-job throughput objective, 39-prefix achievability, or optimality of a tray policy.",
+      "A 100ms complete-request bound, bounded task completion time, or asynchronous-message fault tolerance without an additional model and proof.",
+      "Treating already issued physical commands as retractable, or treating publication ACK as proof of empty-tray arrival."
+    ]
+  },
+  "evidence": [
+    {
+      "id": "E1",
+      "pages": [1, 2],
+      "printed_pages": [5892, 5893],
+      "location": "Abstract; I.A motivating example; Figure 1",
+      "finding": "The motivating plant is two vendors' manufacturing lines connected by FIFO buffers. Shared events put or take particular workpiece types. A shared event may be controllable by only one line. Contracts may constrain buffer capacity and the order of workpiece types, without sharing each line's private dynamics.",
+      "relevance": "Directly relevant interface vocabulary for empty-tray transfer, capacity admission and strict FIFO. It does not establish G31's particular transport geometry or finite-tray reachability."
+    },
+    {
+      "id": "E2",
+      "pages": [3, 4],
+      "printed_pages": [5894, 5895],
+      "location": "II.A/II.B; III.A Problems 1 and 2; Premise 1",
+      "finding": "The mathematical models are deterministic finite automata over finite words. The plant is a synchronous composition of exactly two subsystems; only shared events synchronize. Each supervisor observes its own events, not the other's private events. Globally uncontrollable events cannot be disabled; a shared event controlled by either subsystem is globally controllable, provided the controlling owner can cooperate on behalf of the other.",
+      "terminology": {
+        "distributed": "Describes the plant decomposed into interacting subsystems, and local synthesis that manipulates local-alphabet models rather than a centralized full model.",
+        "decentralized": "Describes local supervisors with local observations/control and no coordinating supervisor solving their conflicts. This is this paper's setting, not a universal equivalence between the terms distributed and decentralized.",
+        "not_communication_free": "Contract exchange occurs during synthesis; runtime signaling may be required when local controllability differs. Absence of a coordinator does not mean absence of communication or arbitrary independent actions."
+      },
+      "nonblocking_semantics": "Every reachable state has some continuation to a marked state (coreachability). This is an existential finite-word property, not a timed deadline guarantee or proof that every possible scheduler/fairness environment eventually completes every job."
+    },
+    {
+      "id": "E3",
+      "pages": [4, 5, 6],
+      "printed_pages": [5895, 5896, 5897],
+      "location": "III.B; Definition 2; IV and Procedure 1",
+      "finding": "An assumption models the complementary supervised behavior as perceived locally; a guarantee restricts the local shared-event sequences. Contracts are obtained as shared-alphabet observer automata of the peer supervisor. An owner must not assume stronger restrictions than its peer guarantees. Negotiation iterates local cooperative synthesis and composition with received contract drafts until equivalent contracts and a fixed point are obtained.",
+      "exact_scope": "The contract constrains allowed behavior and disabling of shared events; it is not simply an ETA estimate or a willingness flag, and an enabled transition is not by itself a guaranteed firing time."
+    },
+    {
+      "id": "E4",
+      "pages": [6, 7, 8, 9],
+      "printed_pages": [5897, 5898, 5899, 5900],
+      "location": "V residuals; VI.A Figure 5; Definition 5/6, Proposition 1; Procedure 3",
+      "finding": "Compatible contracts and individually trim local supervisors can still compose into a blocking system. Figure 5 gives locally distinct private histories with the same shared observation but incompatible future shared-event availability. Figure 6 shows that even compatible event continuations do not suffice if local marked states cannot synchronize. Unambiguity and its stronger union-closed relative form are sufficient local conditions used to ensure nonconflict.",
+      "g31_counterexample_template": "Two worlds expose the same last delivered snapshot/ACK history; in one the owner retains the only spare tray/berth, in the other a private admission consumes it. If the peer's next action is permitted using only that old history, the same public state can require incompatible decisions. Version correctness alone does not remove the ambiguity. A genuine reservation/commitment or conservative robust-to-both-states restriction is needed."
+    },
+    {
+      "id": "E5",
+      "pages": [10, 11],
+      "printed_pages": [5901, 5902],
+      "location": "VII.A/B; Procedure 4; Theorem 2/3; Remark 10",
+      "finding": "Auxiliary residual treatment and relative-unambiguity enforcement can reduce permissiveness; ordering choices can yield incomparable results. Optional lower-bound behavior languages exclude trivial or unacceptable solutions. Maximal permissiveness is guaranteed only in the special case where negotiation already returns trim, unambiguous supervisors. It is not generally guaranteed that NEGOTIATION or CBSS always halts; each round's observer construction is worst-case exponential and automata can grow between rounds.",
+      "short_verbatim": "It is unclear whether NEGOTIATION from Procedure 1 and consequently CBSS from Procedure 4 always halt.",
+      "acceptance_caution": "The algorithm has a validity result v and failed lower-bound branches. For an implementation, require a successful nonempty result and all stated structural conditions; never treat an arbitrary returned tuple, budget expiry, or failed branch as a supervisor certificate. The paper explicitly leaves termination unresolved."
+    },
+    {
+      "id": "E6",
+      "pages": [12],
+      "printed_pages": [5903],
+      "location": "VIII; Figure 11; Definition 7; Theorem 4; Remarks 11/12",
+      "finding": "When the peer controls an event that must be disabled locally, a private local change can make the necessary disablement invisible in the contract. The runtime solution assigns a signaling bit for each such shared event: the affected supervisor writes a disable request, and the controlling supervisor reads it. The paper explicitly assumes these bits update instantaneously with each local event. These signals disclose control decisions, not every private event or private model. They are used for implementation, not supervisor synthesis.",
+      "short_verbatim": "instantaneously updated",
+      "critical_nontransfer": "G31 message send, actual delivery, delayed/duplicate ACK and native physical execution are separate events. A last delivered bit or snapshot is not the paper's instantaneous bit. Theorem 4 cannot be applied to this asynchronous implementation without modeling and proving the channels and actuation boundary."
+    },
+    {
+      "id": "E7",
+      "pages": [12, 13],
+      "printed_pages": [5903, 5904],
+      "location": "IX and Table I; X Conclusion",
+      "finding": "Implementation uses Supremica and random examples generated by MDESops. There are eight cases with 100 random two-subsystem plants each. Table I row 1 gives average synthesis runtime across all examples, in milliseconds: the smallest listed value is 84ms and the largest 86955ms; nonempty-result fractions range from 12% to 91%. At 1000 states per subsystem, the global plant could have a million states. All experimental procedures terminated, but this does not prove general termination. The paper reports soundness, not completeness; more than two processes is future work.",
+      "table_read_scope": "Checked the complete rendered Table I and surrounding definitions. These are offline synthesis averages, not per-request execution, worst-case timing, G31 results, or success rates on industrial FIFO/finite-tray workloads."
+    }
+  ],
+  "g31_mapping": [
+    {
+      "topic": "Empty-tray demand promise",
+      "existing_foundation": "Actual owner-local captures, immutable physical requests, delivered ACKs, exact tray ownership and current empty/HOLD evidence, consumed completion/action watermarks.",
+      "additional_contract_question": "What future transfer behavior is the provider truly obligated and physically able to maintain after acknowledging a demand, and what receiving capacity must the requester preserve? Distinguish forecast, offer and accepted enforceable commitment.",
+      "proposed_local_obligation": "A provider may promise at most the specific controllable admission it can maintain with its own exact available tray and lawful route; a receiver may promise a reserved receiving opportunity only if it can prevent competing use. The transaction remains conditional on the actually implemented physical and channel model. Neither side may assume a future tray completion or bypass a FIFO head from an ETA alone.",
+      "proof_needed": "Local realizability under every retained private state; no double promise for the same finite tray; preservation of receiving capacity; compatible offer/accept/commit traces; nonconflict after accepted obligations."
+    },
+    {
+      "topic": "Shared capacity",
+      "existing_foundation": "Native capacity and physical guards remain authoritative; all 22 tray identities and the 21 parked-tray occupations remain present.",
+      "additional_contract_question": "Does each hidden local action preserve an accepted shared resource promise, and does the composition retain a path to completion/release?",
+      "proposed_interface": "Represent a small boundary resource with available, reserved, transfer-in-flight, occupied and released states, with explicit capacity conservation and authority for each transition. These are behavioral interface states, not a fictitious extra storage slot.",
+      "nontransfer": "Contract restriction can prevent a controllable bad admission; it cannot create physical space, change original direction/length/capacity, remove the mandatory Storage visit or turn a zero-capacity edge into a passable one."
+    },
+    {
+      "topic": "Version, cancellation and ACK",
+      "existing_foundation": "G31 already has message generations/versions, forecast tombstones and non-retractable issued commitments. These are not new mechanisms derived from this review.",
+      "additional_contract_question": "Are all owners operating on compatible behavioral contracts and the same acknowledged obligation lifecycle, including older in-flight versions?",
+      "proposed_constraint": "Before physical submission, cancellation or replacement must be an explicit legal transition with actual receiver acknowledgment if the peer can still act on the old offer. After submission/commit, a new version cannot erase the old obligation; retain its capacity/tray accounting until an actual physical terminal/release fact closes it. Timeout or missing ACK is uncertainty, not release. Keep publication ACK, command acceptance, physical arrival and obligation release as distinct evidence.",
+      "scope": "This is a proposed asynchronous refinement obligation, not a protocol specified or proved by the paper. No new native cancellation endpoint is assumed, and opaque IDs never authorize inferred payload."
+    },
+    {
+      "topic": "Issued prefix and FIFO",
+      "existing_foundation": "Every issued immutable request and physical event prefix stays fixed; strict source FIFO, full 28506 jobs, 22 trays and original physical assumptions stay unchanged.",
+      "additional_contract_question": "Can a newly selected interface contract be entered from the actual reached state without invalidating an old commitment, and does it preserve a nontrivial legal completion language?",
+      "proposed_constraint": "Any re-synthesis must start from the actual committed state/channel state and constrain only future controllable admissions. Previously issued commands and uncontrollable arrival/ACK events remain enabled in the model. Offline pruning of states/transitions must never be implemented as deletion of already emitted tape or suppression of a due immutable retry.",
+      "nontransfer": "A nonblocking supervisor for a reduced interface is not evidence that an unreachable FIFO head became reachable, nor that all 39 safe-prefix jobs or the full stream are achievable."
+    }
+  ],
+  "smallest_useful_next_research": {
+    "status": "design_only_not_implemented_or_authorized_for_execution",
+    "recommendation": "Use offline finite-state contract checking as a new layer above the existing protocol evidence, not wholesale CBSS in the 100ms request path.",
+    "scope": "Two current owners; one explicitly identified circulating tray; one fixed lawful boundary transfer/berth; a bounded generation and message-channel abstraction. Preserve all other trays' physical occupations. If the bounded abstraction is exceeded, return unknown instead of folding states without proof.",
+    "local_models": [
+      "Local plant states contain only facts legitimately available to that owner plus its own private resources; observer states represent all private states consistent with shared events.",
+      "Shared event alphabet distinguishes offer/actual receive, accept/actual receive, command submit, actual terminal ACK, physical arrival evidence, release and pre-submit cancel/ack. Send and receive are not merged into a synchronous event by assumption.",
+      "Controllable admission/offer/revoke-before-commit events must have a real local actuator. In-flight motion, already submitted commands, channel delivery and externally forced faults cannot be disabled merely to make synthesis succeed.",
+      "Desired safety includes tray/capacity conservation, no double use, no FIFO skipping, mandatory Storage and append-only committed prefixes. Marked behavior must close the accepted physical and acknowledgment obligations; local idleness or a single ACK is insufficient."
+    ],
+    "checks": [
+      "First check compatible assumptions/guarantees over the declared shared interface, then explicitly test for the Figure 5/6 hidden-state and marking conflicts; simple contract hash equality is not this test.",
+      "Check a nontrivial lower-bound behavior containing the intended legal transfer and safe return/release; report incompatible/empty/unknown outcomes rather than accepting a supervisor that only refuses new work.",
+      "Stress delayed/lost/duplicate messages, stale version arriving after newer offer, cancellation racing commitment, private capacity consumption after an offer, same tray promised twice, occupied receiving berth, unreachable current FIFO head, and one owner declaring completion before the other closes its obligation.",
+      "Only after a sound model-to-native refinement and preserved authority/physical guards could a small synthesized monitor be considered for online use. Its cold synthesis, source checks, communication, final native revalidation and complete requester wall cost must be reported separately and together as appropriate."
+    ],
+    "success_boundary": "A successful finite interface check would certify only that explicit abstraction under its stated channel/actuator assumptions. It would not certify G31 all-day throughput, physical reachability outside the abstraction, actual delivery under unbounded failures, or 100ms execution.",
+    "distinct_from_existing": "The proposed new evidence is compatibility/nonconflict of behavioral commitments and indistinguishable local states. Merely adding versions, ACKs, forecasts or tombstones again would duplicate existing protocol correctness rather than implement the paper's contribution."
+  },
+  "required_before_any_formal_transfer": [
+    "A justified finite abstraction and simulation/refinement relation from actual native state and channels to local automata, retaining tray geometry, FIFO, mandatory Storage and finite capacity.",
+    "An explicit model of delayed/duplicate/lost communication, observable actual delivery, ownership and real controllability; the instantaneous signaling assumption is currently not met.",
+    "A sound definition of shared events and marked completion, plus proof that each owner's observable event history and contract state are available without remote/private observation rights.",
+    "Nonempty successful synthesis and all required nonconflict/unambiguity/controllability conditions, not only local guard passes or compatible contract versions.",
+    "If timed commitments are required, added timing/channel/fairness assumptions and a timed proof; the paper's untimed finite-word result supplies none of these deadlines.",
+    "Separate actual verification and complete cost measurement. No projection, static model, average synthesis runtime or previous one-token success replaces full G31 acceptance."
+  ],
+  "research_artifact_notes": {
+    "full_text_extraction": "tmp/pdfs/contract_negotiation_001/extraction.json plus plain_01.txt through plain_16.txt",
+    "successful_visual_renders": ["render_4.png", "render_7.png", "render_11.png", "render_12.png", "render_13.png"],
+    "optional_crop_attempt": "An additional high-resolution Table I crop returned process exit -1 with no diagnostic. The complete successful render_13.png was already inspected and is the visual source used; this failed optional crop was not used as evidence.",
+    "final_source_verification": "PDF hash was computed from the unchanged supplied local file during extraction. No PDF was authored or modified."
+  }
+}

@@ -1,0 +1,146 @@
+Independent CPython builtin-tree normalization: source-only feasibility
+
+Status: design only. No C/C++ implementation, build, new prediction, native
+simulation, full-fixture traversal or performance measurement was performed.
+The actual entry+codec18 saved audit is a separate fixed180 task. This design
+does not change its169 frozen sources, the codec135, or any native binary.
+
+Source authority inspected
+
+scripts/experiments/g31_ics_circulation/initial_owner_route_json_v3.py:normalize
+scripts/experiments/g31_ics_circulation/initial_owner_route_image.py:limits,
+  artifact_encode, artifact_decode and _tree
+scripts/experiments/g31_ics_circulation/complete_root_evidence_codec.py
+CMakeLists.txt:202 onward, existing CZR005_BUILD_PYBIND branch
+Local CPython3.11 headers and python311.lib under C:/PROGRAMING/python3.11.9
+
+The existing fast _json encoder/decoder is not a substitute for normalize:
+the input permits exact tuples and context-limited integer resource keys,
+requires new containers, counts emitted keys, and has specific failure order.
+JSON roundtrip alone cannot reproduce that contract. The current codec already
+uses the C JSON implementation for serialization, while its normalizer and
+the retained decoder tree check remain Python walks. This proposal addresses
+only the first normalization/copy walk. It does not claim the decoder, proof,
+outbox, endpoint or root work disappears.
+
+Proposed smallest helper
+
+New standalone CPython extension with one data-only entry point. Use the
+existing Python development headers/library and raw C API; no third-party
+package, pybind conversion, ics_core link, native session/handle, planner,
+checkpoint, policy, filesystem I/O or mutable global cache. The existing root
+CMake is unsuitable as the build target because its extensions link ics_core.
+Use a new isolated source/build directory and module name, with its own small
+CMake project finding Python3 Interpreter+Development.Module. Verify the
+installed CMake Python3_add_library/SOABI support before freezing a command.
+Pin actual PythonABI/compiler/source/binary independently. Do not rebuild or
+overwrite czr005_circulation, czr005_cpp or any prior build directory.
+
+The Python wrapper calls try_normalize(value). A successful result is a fresh
+owned builtin tree. An internal unsupported token means the helper has not
+called any user-defined hook on supplied data, has discarded its partial tree,
+and the wrapper calls the original frozen normalize(value) once. Exceptions
+from the faithful supported path propagate; do not catch an arbitrary
+exception and repeat the original function after a hook might already run.
+There is no public external 'already validated' flag or JSON authority token.
+
+Exact traversal requirements
+
+* Check exact Py_TYPE, not subclass-inclusive conversion. Reuse immutable
+  str/int/bool/None/finite-float objects with a new reference. Never narrow a
+  Python integer or rebuild floats from text/double; original float object
+  reuse retains signed zero and every finite bit pattern.
+* Exact tuple/list becomes a fresh list. Exact dict becomes a fresh dict in
+  original insertion order. Shared containers are allowed and copied again
+  for each occurrence. Only active ancestors are checked for cycles; no
+  whole-call memo or alias preservation. An active pointer stack bounded by
+  depth64 is enough; retain strong references safely across recursive work.
+* Increment node count BEFORE all type/cycle checks, including root at depth0
+  and every emitted key at child depth. Error when depth>64 or visits>2000000.
+  Reproduce ValueError labels and check order; e.g. a too-deep NaN/cycle is a
+  tree_limit before nonfinite/cycle. Key visits occur after resource identity
+  and collision checks, as in the original. No omitted-field fast path.
+* Resource mode applies only to the resources child immediately inside a dict
+  whose status equals conditional_model_input and whose contract/resources
+  values are exact dicts. Generic dictionaries named resources are not enough.
+* In resource mode, mixed EXACT key types fail before per-key validation.
+  Exact nonnegative int keys become str(key). String keys require ASCII,
+  decimal, and exact str(int(key)) equality; no leading zero, sign, whitespace,
+  empty string, non-ASCII digit or bool-as-int. Empty maps are allowed.
+  Each member must be exactdict with exactint node equal to int(emitted).
+  Retain collision checks, although the valid homogeneous domain normally
+  makes them redundant. Preserve arbitrary integer sizes and the interpreter's
+  configured integer-string conversion limit and associated exceptions.
+* Do not reject surrogate strings here. Original normalize accepts them and
+  the later strict UTF8 encoding rejects them. Paired/unpaired surrogates,
+  astral strings, Unicode keys and control characters remain distinct cases.
+* Retain original encoder, strict decoder/full _tree, reencoding comparison,
+  byte cap, marker/outbox proof and all complete-root clocks outside the helper.
+
+Important invalid-input compatibility edge
+
+The original docstring says no user hooks, but its model_bundle expression
+evaluates item.get('status') == 'conditional_model_input' BEFORE recursively
+validating that status. A custom status can execute __eq__. Custom dict keys
+can also participate in .get('status'/'contract'/'resources'/'node') lookup.
+Do not silently change this to non_builtin or invoke the hook in C and then
+fallback, which could run it twice. Before those lookups, a no-hook inspection
+of exact dict keys/marker values must determine a safe builtin domain. Otherwise
+return unsupported for a full original fallback. Exact tuple/list/dict status
+values have the same false string comparison only if their exact builtin
+semantics are established; a subclass is not safe. Resource member node lookup
+needs the same protection. Supplied-data hook count/order is part of fallback
+tests, including hooks which raise rather than return.
+
+A local no-hook key scan may add work, even though it is in C. Bound that
+eligibility scan independently: if its work cap is reached, fallback rather
+than issue a new domain error or scan an arbitrarily large dict before the
+original node budget would stop. Do not optimize away this cost in reporting.
+
+Allocation/lifetime boundary
+
+Keep the GIL and never release it during traversal. Use exact builtin iterators
+or otherwise faithfully track dict/list mutation; do not keep borrowed member
+pointers live across allocations without ownership. Every error/unsupported
+path releases partially allocated containers and preserves the active Python
+exception. MemoryError remains an allocation failure, not successful fallback
+or partial evidence. No free-list/cache owns request data after return.
+
+The intended call site owns a stable evidence input for the duration of the
+call. Holding the GIL alone is not proof against a reentrant GC callback that
+mutates that input. GC must remain enabled and charged. The first candidate
+must either demonstrate the existing private-input ownership condition or
+retain original fallback for cases it cannot support; it cannot claim generic
+adversarial concurrent-mutation equivalence. Allocator failure timing and GC
+callback scheduling are not asserted identical between different algorithms.
+
+Minimal prototype stages, only after root authorization
+
+1. New helper + wrapper, no current campaign integration. Preserve original
+   Python normalizer callable/source binding for all fallback cases. Check
+   source drift at initialization and charge startup separately in full.
+2. Pure differential errors and ownership: all exact scalar types, -0.0,
+   arbitrary ints, Unicode/surrogates; tuples, deep/large boundary counts,
+   shared aliases versus cycles; resource markers/keys/member identity,
+   mixed types and error precedence; custom subclasses/status/key hooks and
+   conversion-limit errors; mutation isolation of each returned container.
+   Allocation cleanup/error behavior gets separate tests, not a claim that
+   MemoryError occurs at the same allocation number.
+3. Fixed complete18 evidence fixtures from the accepted saved audit, with
+   exact ordered key/type/float-bit comparison, original codec bytes and
+   strict roundtrip. No field, outbox, failure or unknown root may be omitted.
+   Use original saved inputs only; do not read outcomes into decision logic.
+4. Only then preregister whole complete-root A/B cost. Include all eligibility,
+   fallback, allocation, cleanup/GC, normalization and strict codec work, plus
+   fixture load/export and startup in outer cost. No new native campaign until
+   that exact-domain and frozen-source review closes.
+
+Feasibility conclusion
+
+A small raw CPython C API walker is plausible and keeps simulation authority
+unchanged. It can remove Python recursion/frame/call overhead; it cannot remove
+the mandatory full copy, key scans, output size, decoder validation or complete
+root evidence. No isolated cost for this walk has been established in this
+design, so no speedup, future hard-real-time bound or complete100ms claim follows.
+The previous full18 remains16closed/2unknown only as producer-reported data
+until its separate independent saved checks finish.

@@ -1,0 +1,45 @@
+{
+  "schema": "g31.live_communication.lazy_source_cost_plan.v1",
+  "status": "source_and_focused_pure_candidate_full96_pending",
+  "candidate_source_sha256": "980f245dc3b3563968015a626ed5e127fd94efb70044eb24b67d9d948835f86f",
+  "focused_tests_sha256": "3e30d378cc81b953d819536d5da1ada4326ecefbb3080f2f88a4ec5fe89b69a6",
+  "focused_XML_sha256": "acd57aa0521fc69657ca693b633f29d97a72ab095d8849fc428a46bc15bb2d20",
+  "focused_tests": 8,
+  "source_argument": {
+    "old_eager_read": "public_live_obligation_communication_projection.py:280 constructs a full view on every non-held owner activation, although only lines286/299 consume its L trigger row.",
+    "readonly": "CaptureWorld.view at live_obligation_projected_captures.py:84 reads/copies public contracts, current local trays/jobs/node occupancy and endpoint rows. Its helpers only read state, compute occupancy and deep-copy; no event, sequence, ACK, counter, history or authority mutation.",
+    "new_lazy_reads": "Construct the view only while evaluating the two exact next(... L ...) trigger expressions. No full view is cached across activation or across submitted actions.",
+    "intervening_E_recovery": "B may enqueue an E recovery request between the old read point and the L trigger. public_live_obligation_projection.py:183 guards E state and appends an operation record; public_reuse_model.py:287 appends the request and schedules future wire, changing no L field. Only L trigger data is consumed, so it is identical. Native/model events cannot interleave inside the Python activation.",
+    "proof": "An AST inverse replaces both deferred calls with the original local name and reinserts the exact assignment, yielding the original AST. No numeric expression or branch was added. predict code, run, collect, protocol_event and all guard functions are the original objects.",
+    "scope_limit": "The no-side-effect argument is bound to exact original source hashes and the declared private model. It does not authorize skipping actual native owner reads or guards in an online adapter."
+  },
+  "unchanged": ["all3 cases and32 actions each", "all ticks/heap pops/event priorities/count budget/horizon", "exact START+i*PERIOD arithmetic", "source capture and publication event times", "immutable retries and maxone fresh pair", "all source/current/ACK/digest/occupancy/expiry guards", "whole five-job exact endpoints", "actual targets excluded from predictor inputs"],
+  "other_cost_source_not_changed": "predict revalidates the initial immutable context, then initial_projection_bundle revalidates it again. Later guards rebuild and normalize complete source data. These costs remain in this candidate; no guarded path or repeated validation has been removed.",
+  "observed_partial_evidence": {
+    "report_sha256": "671f67f1831b9c1e43a0d3c1f879f0cdda06ead50253102f1b66cb1fcd430656",
+    "saved_exact_count": 73,
+    "not_closed_count": 23,
+    "model_seconds": 133.78447120000783,
+    "whole_python_seconds": 179.2177879,
+    "unpartitioned_seconds": 45.43331669999216,
+    "unpartitioned_limit": "Includes any in-flight74th work; cannot be called only codec or guard time.",
+    "old_timeout_missing_exitpins_and_receipt_preserved": true
+  },
+  "proposed_new_budget": {
+    "shared_seconds": 360,
+    "linear_full96_estimate_seconds": 235.68366627945204,
+    "observed_max_model_plus_scaled_residual_seconds": 274.65551053166695,
+    "basis": "360 allows about31percent above the conservative descriptive extrapolation, including another source/raw exit scan and73 full-output equivalence checks. It is a finite offline verification budget, not a guarantee or timing success. Root approval and a new frozen plan are required before dispatch.",
+    "same_scope": "All96 recomputed from public initial inputs in one fresh run. For the already committed73, compare complete prediction JSON including every message/collection/event record against the old saved prediction. No old row is reused as a new prediction.",
+    "failure": "Any timeout, incomplete row, exact difference or missing guard remains unknown. The old73+23 result never becomes a completed old96."
+  },
+  "product_goal": {
+    "complete_request_limit_ms": 100,
+    "certified": false,
+    "observed_old_min_candidate_seconds": 1.5935993000020972,
+    "32_times_observed_min_seconds": 50.99517760006711,
+    "qualification": "Descriptive candidate cost only; no shared-request optimization or complete-request measurement is inferred."
+  },
+  "native_calls": 0,
+  "new_full_candidate_predictions": 0
+}

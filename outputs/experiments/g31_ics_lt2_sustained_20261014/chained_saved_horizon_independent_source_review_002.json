@@ -1,0 +1,39 @@
+{
+  "schema": "g31.chained_saved_horizon_independent_source_review.v1",
+  "status": "no_concrete_remaining_source_blocker_in_reviewed_scope",
+  "reviewer": "control_timers",
+  "source_and_evidence": {
+    "scripts\\experiments\\g31_ics_circulation\\audit_chained_saved_horizon.py": "2a5926fd279a339ca21726740be3a6c4bae36cba1a646d971c07a1d16abcd1ff",
+    "tests\\test_g31_circulation_chained_saved_horizon.py": "7447d2d0a08c6807e6661c14ce8560a2ff5700a1fbb3b7612a3116d708859b61",
+    "outputs\\experiments\\g31_ics_lt2_sustained_20261014\\chained_saved_horizon_prepare_002\\receipt.json": "a28b5bb145a4bc5a953630e67db55294186345aaae775574eb4e755fdb1100d3",
+    "outputs\\experiments\\g31_ics_lt2_sustained_20261014\\chained_saved_horizon_pure_004.xml": "9eecbf7839f1528f438cc655b2496d6c3937815635738744501ccea5a9d76342",
+    "outputs\\experiments\\g31_ics_lt2_sustained_20261014\\chained_saved_horizon_metadata_preflight_005.json": "1a97fff335ffa2f0a0f0a05b674b14fed1a70a282e6b4ebf1e7888fb87d65dea"
+  },
+  "pure_receipt": {
+    "name": "pytest",
+    "errors": "0",
+    "failures": "0",
+    "skipped": "0",
+    "tests": "100",
+    "time": "31.075",
+    "timestamp": "2026-10-15T14:33:57.674685+08:00",
+    "hostname": "LAPTOP-M3GASC4G"
+  },
+  "reviewed": [
+    "Explicit nonempty or malformed source_changed always rejects. Missing is permitted only INITIAL schema with historical status running, then exact saved source receipt, input, archive/live policy and stopped parent/worker proof are still required.",
+    "Missing finalization is propagated as source_drift_finalization_unknown and any_ancestor_source_drift_finalization_unknown; never synthesized as an empty drift list.",
+    "Resumed ancestors require terminated failed/hard_timeout status and source_changed exactly empty.",
+    "Predecessor-only imports are restricted to the two declared entry points; each is archive/live hash bound.",
+    "Ancestor reconstruction costs recursively bind inherited and own costs without averaging; exact raw cut boundary counts/seal remain delegated to BoundaryReader during actual audit."
+  ],
+  "actual_actions": [
+    "Read final source and test changes; checked final source/test/preparation hashes.",
+    "Read saved XML showing 100 passed and metadata-only preflight with explicit finalization unknown."
+  ],
+  "limitations": [
+    "No new test execution by this reviewer.",
+    "No full raw-shard scan or independent native replay.",
+    "Historical initial producer did not finalize a drift report; live/archive equality does not prove absence of transient source changes.",
+    "No change to original producer receipts or completed/timeout status."
+  ]
+}

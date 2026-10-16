@@ -1,0 +1,39 @@
+{
+  "schema": "g31.live_obligation.owned_initial_bundle.source_design.v1",
+  "status": "source_and_synthetic_test_draft_pending_review_before_execution",
+  "candidate": "scripts/experiments/g31_ics_circulation/public_live_obligation_owned_bundle.py",
+  "tests": "tests/test_g31_circulation_live_obligation_owned_bundle.py",
+  "baseline": "public_live_obligation_initial_scoped_inputs.predict",
+  "change": "Only initial_projection_bundle's local bundle assignment stops deep-copying the already fresh revalidate result. Protocol deepcopy, resources conversion, tray load_end, all fields and error/status branches stay unchanged.",
+  "ownership_proof": [
+    "The original exact SuppliedContext type and payload digest check remain.",
+    "Original json.loads makes a fresh private builtin payload tree.",
+    "Original initial_context or later_context executes every supplied-data guard again and rebuilds the envelope.",
+    "Original byte-for-byte rebuilt payload equality remains.",
+    "Original revalidate still returns deepcopy(payload['validated']).",
+    "That result is referenced only by the local projection function; the new helper does not cache, publish, retain or call out with it before returning its bundle.",
+    "The resource map rewrite and load_end mutation therefore affect only the private result that becomes this call's output. Protocol still receives its own deepcopy."
+  ],
+  "guard_topology": {
+    "successful_whole_initial_plus_predict_initial_context_calls": 6,
+    "reason": "Two A/B constructors, two A/B projection revalidations, predictor's separate revalidation, and predictor's projection revalidation. This is a source count, not a time attribution.",
+    "all_six_retained": true,
+    "successful_whole_initial_plus_predict_projection_calls": 3,
+    "potential_removed_bundle_copies": 3,
+    "all_remaining_output_and_guard_copies_retained": true
+  },
+  "binding": "Fresh scoped-v2 instance; retain its original guard namespace. A separate context facade replaces only initial_projection_bundle; private original predictor replaces only the context global. Original explicit A/B caller function/code/globals are unchanged.",
+  "proof_scope": "Stable private builtin supplied-data inputs and frozen serial implementation; neither a general ownership flag nor native/session authority.",
+  "limitations": [
+    "Fewer allocations deliberately do not preserve allocation-failure timing; remaining MemoryError/other errors are not retried.",
+    "No caching of observations, successful validation, contexts or outcomes.",
+    "No guard skipped, no changed action or physical event, and no initial/future target data moved across authority boundaries.",
+    "No measured speed claim. Repeated-call count alone does not establish a hotspot.",
+    "Private scope cycles remain under default GC; no per-sample reclamation guarantee.",
+    "Future comparison must charge all scope construction, checks, output construction and whole lifecycle. This is not a complete business-request 100ms certificate."
+  ],
+  "tests_run": 0,
+  "model_runs": 0,
+  "native_runs": 0,
+  "benchmark_runs": 0
+}

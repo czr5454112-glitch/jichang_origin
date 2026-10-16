@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="18" skipped="0" tests="95" time="19.243" timestamp="2026-10-15T12:15:50.375971+08:00" hostname="LAPTOP-M3GASC4G"><testcase classname="tests.test_g31_circulation_preexisting_coverage_order" name="test_native_input_job_order_is_supported_without_sorting" time="0.006"><failure message="AssertionError: assert 'unknown' == 'conditional_validated_data'&#10;  &#10;  - conditional_validated_data&#10;  + unknown">def test_native_input_job_order_is_supported_without_sorting():
+        view, ack, peer = initial_pair("B")
+        body = peer[0]["capture"]
+        assert [j["business_bag_id"] for j in body["jobs"]] == ["loaded", "receiver", "blocker"]
+        assert body["coverage"]["business_bag_ids"] == ["loaded", "receiver", "blocker"]
+        result = adapter.validate_pair(view, ack, peer)
+&gt;       assert result["status"] == "conditional_validated_data"
+E       AssertionError: assert 'unknown' == 'conditional_validated_data'
+E         
+E         - conditional_validated_data
+E         + unknown
+
+tests\test_g31_circulation_preexisting_coverage_order.py:18: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_preexisting_coverage_order" name="test_adapter_requires_exact_unique_native_row_membership[coverage_reordered-business_bag_ids-jobs-business_bag_id]" time="0.004" /><testcase classname="tests.test_g31_circulation_preexisting_coverage_order" name="test_adapter_requires_exact_unique_native_row_membership[coverage_reordered-tray_ids-trays-tray_id]" time="0.003" /><testcase classname="tests.test_g31_circulation_preexisting_coverage_order" name="test_adapter_requires_exact_unique_native_row_membership[coverage_duplicate-business_bag_ids-jobs-business_bag_id]" time="0.004" /><testcase classname="tests.test_g31_circulation_preexisting_coverage_order" name="test_adapter_requires_exact_unique_native_row_membership[coverage_duplicate-tray_ids-trays-tray_id]" time="0.003" /><testcase classname="tests.test_g31_circulation_preexisting_coverage_order" name="test_adapter_requires_exact_unique_native_row_membership[coverage_missing-business_bag_ids-jobs-business_bag_id]" time="0.004" /><testcase classname="tests.test_g31_circulation_preexisting_coverage_order" name="test_adapter_requires_exact_unique_native_row_membership[coverage_missing-tray_ids-trays-tray_id]" time="0.004" /><testcase classname="tests.test_g31_circulation_preexisting_coverage_order" name="test_adapter_requires_exact_unique_native_row_membership[coverage_extra-business_bag_ids-jobs-business_bag_id]" time="0.004" /><testcase classname="tests.test_g31_circulation_preexisting_coverage_order" name="test_adapter_requires_exact_unique_native_row_membership[coverage_extra-tray_ids-trays-tray_id]" time="0.004" /><testcase classname="tests.test_g31_circulation_preexisting_coverage_order" name="test_adapter_requires_exact_unique_native_row_membership[rows_duplicate-business_bag_ids-jobs-business_bag_id]" time="0.003" /><testcase classname="tests.test_g31_circulation_preexisting_coverage_order" name="test_adapter_requires_exact_unique_native_row_membership[rows_duplicate-tray_ids-trays-tray_id]" time="0.003" /><testcase classname="tests.test_g31_circulation_preexisting_coverage_order" name="test_adapter_requires_exact_unique_native_row_membership[rows_missing-business_bag_ids-jobs-business_bag_id]" time="0.003" /><testcase classname="tests.test_g31_circulation_preexisting_coverage_order" name="test_adapter_requires_exact_unique_native_row_membership[rows_missing-tray_ids-trays-tray_id]" time="0.003" /><testcase classname="tests.test_g31_circulation_preexisting_coverage_order" name="test_adapter_requires_exact_unique_native_row_membership[identity_bool-business_bag_ids-jobs-business_bag_id]" time="0.002" /><testcase classname="tests.test_g31_circulation_preexisting_coverage_order" name="test_adapter_requires_exact_unique_native_row_membership[identity_bool-tray_ids-trays-tray_id]" time="0.004" /><testcase classname="tests.test_g31_circulation_preexisting_coverage_order" name="test_independent_verifier_also_checks_native_order_and_uniqueness[coverage_sorted]" time="0.042"><failure message="AssertionError: assert ('unknown_or_failed' == 'unknown_or_failed'&#10;  &#10;    unknown_or_failed and 'wrong_fault_...tion_reason:A' == 'wrong_capture_scope'&#10;  &#10;  - wrong_capture_scope&#10;  + wrong_fault_rejection_reason:A)">defect = 'coverage_sorted'
+
+    @pytest.mark.parametrize("defect", ["coverage_sorted", "coverage_duplicate", "rows_duplicate"])
+    def test_independent_verifier_also_checks_native_order_and_uniqueness(defect):
+        specification = runner.protocol()["rows"]["block1_load1/delivery"]
+        raw = raw_fixture(specification)
+        message = raw["initial_owners"]["B"]["raw_endpoints"]["received"][0]
+        body = message["capture"]
+        if defect == "coverage_sorted": body["coverage"]["business_bag_ids"].sort()
+        elif defect == "coverage_duplicate": body["coverage"]["business_bag_ids"].append("loaded")
+        else:
+            body["jobs"].append(copy.deepcopy(body["jobs"][0]))
+            body["coverage"]["business_bag_ids"].append("loaded")
+        message["payload_sha256"] = adapter.capture_digest(body)
+        result = verifier.verify_branch(raw, specification, raw["input"])
+&gt;       assert result["status"] == "unknown_or_failed" and result["reason"] == "wrong_capture_scope"
+E       AssertionError: assert ('unknown_or_failed' == 'unknown_or_failed'
+E         
+E           unknown_or_failed and 'wrong_fault_...tion_reason:A' == 'wrong_capture_scope'
+E         
+E         - wrong_capture_scope
+E         + wrong_fault_rejection_reason:A)
+
+tests\test_g31_circulation_preexisting_coverage_order.py:60: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_preexisting_coverage_order" name="test_independent_verifier_also_checks_native_order_and_uniqueness[coverage_duplicate]" time="0.043"><failure message="AssertionError: assert ('unknown_or_failed' == 'unknown_or_failed'&#10;  &#10;    unknown_or_failed and 'wrong_fault_...tion_reason:A' == 'wrong_capture_scope'&#10;  &#10;  - wrong_capture_scope&#10;  + wrong_fault_rejection_reason:A)">defect = 'coverage_duplicate'
+
+    @pytest.mark.parametrize("defect", ["coverage_sorted", "coverage_duplicate", "rows_duplicate"])
+    def test_independent_verifier_also_checks_native_order_and_uniqueness(defect):
+        specification = runner.protocol()["rows"]["block1_load1/delivery"]
+        raw = raw_fixture(specification)
+        message = raw["initial_owners"]["B"]["raw_endpoints"]["received"][0]
+        body = message["capture"]
+        if defect == "coverage_sorted": body["coverage"]["business_bag_ids"].sort()
+        elif defect == "coverage_duplicate": body["coverage"]["business_bag_ids"].append("loaded")
+        else:
+            body["jobs"].append(copy.deepcopy(body["jobs"][0]))
+            body["coverage"]["business_bag_ids"].append("loaded")
+        message["payload_sha256"] = adapter.capture_digest(body)
+        result = verifier.verify_branch(raw, specification, raw["input"])
+&gt;       assert result["status"] == "unknown_or_failed" and result["reason"] == "wrong_capture_scope"
+E       AssertionError: assert ('unknown_or_failed' == 'unknown_or_failed'
+E         
+E           unknown_or_failed and 'wrong_fault_...tion_reason:A' == 'wrong_capture_scope'
+E         
+E         - wrong_capture_scope
+E         + wrong_fault_rejection_reason:A)
+
+tests\test_g31_circulation_preexisting_coverage_order.py:60: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_preexisting_coverage_order" name="test_independent_verifier_also_checks_native_order_and_uniqueness[rows_duplicate]" time="0.037"><failure message="AssertionError: assert ('unknown_or_failed' == 'unknown_or_failed'&#10;  &#10;    unknown_or_failed and 'wrong_fault_...tion_reason:A' == 'wrong_capture_scope'&#10;  &#10;  - wrong_capture_scope&#10;  + wrong_fault_rejection_reason:A)">defect = 'rows_duplicate'
+
+    @pytest.mark.parametrize("defect", ["coverage_sorted", "coverage_duplicate", "rows_duplicate"])
+    def test_independent_verifier_also_checks_native_order_and_uniqueness(defect):
+        specification = runner.protocol()["rows"]["block1_load1/delivery"]
+        raw = raw_fixture(specification)
+        message = raw["initial_owners"]["B"]["raw_endpoints"]["received"][0]
+        body = message["capture"]
+        if defect == "coverage_sorted": body["coverage"]["business_bag_ids"].sort()
+        elif defect == "coverage_duplicate": body["coverage"]["business_bag_ids"].append("loaded")
+        else:
+            body["jobs"].append(copy.deepcopy(body["jobs"][0]))
+            body["coverage"]["business_bag_ids"].append("loaded")
+        message["payload_sha256"] = adapter.capture_digest(body)
+        result = verifier.verify_branch(raw, specification, raw["input"])
+&gt;       assert result["status"] == "unknown_or_failed" and result["reason"] == "wrong_capture_scope"
+E       AssertionError: assert ('unknown_or_failed' == 'unknown_or_failed'
+E         
+E           unknown_or_failed and 'wrong_fault_...tion_reason:A' == 'wrong_capture_scope'
+E         
+E         - wrong_capture_scope
+E         + wrong_fault_rejection_reason:A)
+
+tests\test_g31_circulation_preexisting_coverage_order.py:60: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_preexisting_online_model" name="test_complete_initial_native_shaped_pair_and_case_derived_from_facts[0]" time="0.012"><failure message="AssertionError: ({'status': 'unknown', 'reasons': ['unsupported_projected_model_input'], 'native_delivery_verified': False, 'native_pr...: ['unsupported_projected_model_input'], 'native_delivery_verified': False, 'native_protection_certified': False, ...})&#10;assert 'unknown' == 'conditional_validated_data'&#10;  &#10;  - conditional_validated_data&#10;  + unknown">case_index = 0
+
+    @pytest.mark.parametrize("case_index", range(6))
+    def test_complete_initial_native_shaped_pair_and_case_derived_from_facts(case_index):
+        a = initial_adapter.validate_pair(*initial_pair("A", case_index)); b = initial_adapter.validate_pair(*initial_pair("B", case_index))
+&gt;       assert a["status"] == b["status"] == "conditional_validated_data", (a, b)
+E       AssertionError: ({'status': 'unknown', 'reasons': ['unsupported_projected_model_input'], 'native_delivery_verified': False, 'native_pr...: ['unsupported_projected_model_input'], 'native_delivery_verified': False, 'native_protection_certified': False, ...})
+E       assert 'unknown' == 'conditional_validated_data'
+E         
+E         - conditional_validated_data
+E         + unknown
+
+tests\test_g31_circulation_preexisting_online_model.py:53: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_preexisting_online_model" name="test_complete_initial_native_shaped_pair_and_case_derived_from_facts[1]" time="0.011"><failure message="AssertionError: ({'status': 'unknown', 'reasons': ['unsupported_projected_model_input'], 'native_delivery_verified': False, 'native_pr...: ['unsupported_projected_model_input'], 'native_delivery_verified': False, 'native_protection_certified': False, ...})&#10;assert 'unknown' == 'conditional_validated_data'&#10;  &#10;  - conditional_validated_data&#10;  + unknown">case_index = 1
+
+    @pytest.mark.parametrize("case_index", range(6))
+    def test_complete_initial_native_shaped_pair_and_case_derived_from_facts(case_index):
+        a = initial_adapter.validate_pair(*initial_pair("A", case_index)); b = initial_adapter.validate_pair(*initial_pair("B", case_index))
+&gt;       assert a["status"] == b["status"] == "conditional_validated_data", (a, b)
+E       AssertionError: ({'status': 'unknown', 'reasons': ['unsupported_projected_model_input'], 'native_delivery_verified': False, 'native_pr...: ['unsupported_projected_model_input'], 'native_delivery_verified': False, 'native_protection_certified': False, ...})
+E       assert 'unknown' == 'conditional_validated_data'
+E         
+E         - conditional_validated_data
+E         + unknown
+
+tests\test_g31_circulation_preexisting_online_model.py:53: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_preexisting_online_model" name="test_complete_initial_native_shaped_pair_and_case_derived_from_facts[2]" time="0.011"><failure message="AssertionError: ({'status': 'unknown', 'reasons': ['unsupported_projected_model_input'], 'native_delivery_verified': False, 'native_pr...: ['unsupported_projected_model_input'], 'native_delivery_verified': False, 'native_protection_certified': False, ...})&#10;assert 'unknown' == 'conditional_validated_data'&#10;  &#10;  - conditional_validated_data&#10;  + unknown">case_index = 2
+
+    @pytest.mark.parametrize("case_index", range(6))
+    def test_complete_initial_native_shaped_pair_and_case_derived_from_facts(case_index):
+        a = initial_adapter.validate_pair(*initial_pair("A", case_index)); b = initial_adapter.validate_pair(*initial_pair("B", case_index))
+&gt;       assert a["status"] == b["status"] == "conditional_validated_data", (a, b)
+E       AssertionError: ({'status': 'unknown', 'reasons': ['unsupported_projected_model_input'], 'native_delivery_verified': False, 'native_pr...: ['unsupported_projected_model_input'], 'native_delivery_verified': False, 'native_protection_certified': False, ...})
+E       assert 'unknown' == 'conditional_validated_data'
+E         
+E         - conditional_validated_data
+E         + unknown
+
+tests\test_g31_circulation_preexisting_online_model.py:53: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_preexisting_online_model" name="test_complete_initial_native_shaped_pair_and_case_derived_from_facts[3]" time="0.009"><failure message="AssertionError: ({'status': 'unknown', 'reasons': ['unsupported_projected_model_input'], 'native_delivery_verified': False, 'native_pr...: ['unsupported_projected_model_input'], 'native_delivery_verified': False, 'native_protection_certified': False, ...})&#10;assert 'unknown' == 'conditional_validated_data'&#10;  &#10;  - conditional_validated_data&#10;  + unknown">case_index = 3
+
+    @pytest.mark.parametrize("case_index", range(6))
+    def test_complete_initial_native_shaped_pair_and_case_derived_from_facts(case_index):
+        a = initial_adapter.validate_pair(*initial_pair("A", case_index)); b = initial_adapter.validate_pair(*initial_pair("B", case_index))
+&gt;       assert a["status"] == b["status"] == "conditional_validated_data", (a, b)
+E       AssertionError: ({'status': 'unknown', 'reasons': ['unsupported_projected_model_input'], 'native_delivery_verified': False, 'native_pr...: ['unsupported_projected_model_input'], 'native_delivery_verified': False, 'native_protection_certified': False, ...})
+E       assert 'unknown' == 'conditional_validated_data'
+E         
+E         - conditional_validated_data
+E         + unknown
+
+tests\test_g31_circulation_preexisting_online_model.py:53: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_preexisting_online_model" name="test_complete_initial_native_shaped_pair_and_case_derived_from_facts[4]" time="0.009"><failure message="AssertionError: ({'status': 'unknown', 'reasons': ['unsupported_projected_model_input'], 'native_delivery_verified': False, 'native_pr...: ['unsupported_projected_model_input'], 'native_delivery_verified': False, 'native_protection_certified': False, ...})&#10;assert 'unknown' == 'conditional_validated_data'&#10;  &#10;  - conditional_validated_data&#10;  + unknown">case_index = 4
+
+    @pytest.mark.parametrize("case_index", range(6))
+    def test_complete_initial_native_shaped_pair_and_case_derived_from_facts(case_index):
+        a = initial_adapter.validate_pair(*initial_pair("A", case_index)); b = initial_adapter.validate_pair(*initial_pair("B", case_index))
+&gt;       assert a["status"] == b["status"] == "conditional_validated_data", (a, b)
+E       AssertionError: ({'status': 'unknown', 'reasons': ['unsupported_projected_model_input'], 'native_delivery_verified': False, 'native_pr...: ['unsupported_projected_model_input'], 'native_delivery_verified': False, 'native_protection_certified': False, ...})
+E       assert 'unknown' == 'conditional_validated_data'
+E         
+E         - conditional_validated_data
+E         + unknown
+
+tests\test_g31_circulation_preexisting_online_model.py:53: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_preexisting_online_model" name="test_complete_initial_native_shaped_pair_and_case_derived_from_facts[5]" time="0.011"><failure message="AssertionError: ({'status': 'unknown', 'reasons': ['unsupported_projected_model_input'], 'native_delivery_verified': False, 'native_pr...: ['unsupported_projected_model_input'], 'native_delivery_verified': False, 'native_protection_certified': False, ...})&#10;assert 'unknown' == 'conditional_validated_data'&#10;  &#10;  - conditional_validated_data&#10;  + unknown">case_index = 5
+
+    @pytest.mark.parametrize("case_index", range(6))
+    def test_complete_initial_native_shaped_pair_and_case_derived_from_facts(case_index):
+        a = initial_adapter.validate_pair(*initial_pair("A", case_index)); b = initial_adapter.validate_pair(*initial_pair("B", case_index))
+&gt;       assert a["status"] == b["status"] == "conditional_validated_data", (a, b)
+E       AssertionError: ({'status': 'unknown', 'reasons': ['unsupported_projected_model_input'], 'native_delivery_verified': False, 'native_pr...: ['unsupported_projected_model_input'], 'native_delivery_verified': False, 'native_protection_certified': False, ...})
+E       assert 'unknown' == 'conditional_validated_data'
+E         
+E         - conditional_validated_data
+E         + unknown
+
+tests\test_g31_circulation_preexisting_online_model.py:53: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_preexisting_online_model" name="test_initial_contract_and_delivery_guards[missing_P]" time="0.003" /><testcase classname="tests.test_g31_circulation_preexisting_online_model" name="test_initial_contract_and_delivery_guards[forged_P_owner]" time="0.003" /><testcase classname="tests.test_g31_circulation_preexisting_online_model" name="test_initial_contract_and_delivery_guards[future_P_ready]" time="0.004" /><testcase classname="tests.test_g31_circulation_preexisting_online_model" name="test_initial_contract_and_delivery_guards[P_unrepresented]" time="0.004" /><testcase classname="tests.test_g31_circulation_preexisting_online_model" name="test_initial_contract_and_delivery_guards[new_capacity]" time="0.006" /><testcase classname="tests.test_g31_circulation_preexisting_online_model" name="test_initial_contract_and_delivery_guards[new_delay]" time="0.003" /><testcase classname="tests.test_g31_circulation_preexisting_online_model" name="test_initial_contract_and_delivery_guards[missing_peer]" time="0.003" /><testcase classname="tests.test_g31_circulation_preexisting_online_model" name="test_initial_contract_and_delivery_guards[expired]" time="0.004" /><testcase classname="tests.test_g31_circulation_preexisting_online_model" name="test_initial_contract_and_delivery_guards[lost_self]" time="0.003" /><testcase classname="tests.test_g31_circulation_preexisting_online_model" name="test_initial_search_budget_and_fixed_family_all_four_times" time="0.005"><failure message="KeyError: 'bundle'">def test_initial_search_budget_and_fixed_family_all_four_times():
+&gt;       receipt = initial_adapter.validate_pair(*initial_pair()); bundle = receipt["bundle"]
+                                                                           ^^^^^^^^^^^^^^^^^
+E       KeyError: 'bundle'
+
+tests\test_g31_circulation_preexisting_online_model.py:78: KeyError</failure></testcase><testcase classname="tests.test_g31_circulation_preexisting_online_model" name="test_later_model_keeps_blocker_receipt_and_physical_tray" time="0.014" /><testcase classname="tests.test_g31_circulation_preexisting_online_model" name="test_later_unsupported_state_never_relaxes_old_guards[missing_P_receipt]" time="0.011" /><testcase classname="tests.test_g31_circulation_preexisting_online_model" name="test_later_unsupported_state_never_relaxes_old_guards[P_not_parked]" time="0.010" /><testcase classname="tests.test_g31_circulation_preexisting_online_model" name="test_later_unsupported_state_never_relaxes_old_guards[E_inflight]" time="0.010" /><testcase classname="tests.test_g31_circulation_preexisting_online_model" name="test_later_unsupported_state_never_relaxes_old_guards[pending_action]" time="0.010" /><testcase classname="tests.test_g31_circulation_preexisting_online_model" name="test_later_unsupported_state_never_relaxes_old_guards[changed_protocol]" time="0.004" /><testcase classname="tests.test_g31_circulation_preexisting_online_model" name="test_later_unsupported_state_never_relaxes_old_guards[changed_load]" time="0.011" /><testcase classname="tests.test_g31_circulation_preexisting_online_model" name="test_later_unsupported_state_never_relaxes_old_guards[age]" time="0.011" /><testcase classname="tests.test_g31_circulation_preexisting_online_model" name="test_fake_module_never_authenticates_or_creates_session_bound_ledger" time="0.001" /><testcase classname="tests.test_g31_circulation_preexisting_online_model" name="test_three_tray_v2_adapter_retains_both_completed_jobs_without_absence_inference" time="0.042" /><testcase classname="tests.test_g31_circulation_preexisting_online_model" name="test_three_tray_v2_receipt_and_action_coverage_fail_closed[missing_P_receipt]" time="0.014" /><testcase classname="tests.test_g31_circulation_preexisting_online_model" name="test_three_tray_v2_receipt_and_action_coverage_fail_closed[foreign_P_receipt]" time="0.007" /><testcase classname="tests.test_g31_circulation_preexisting_online_model" name="test_three_tray_v2_receipt_and_action_coverage_fail_closed[future_P_completion]" time="0.006" /><testcase classname="tests.test_g31_circulation_preexisting_online_model" name="test_three_tray_v2_receipt_and_action_coverage_fail_closed[pending_P_command]" time="0.006" /><testcase classname="tests.test_g31_circulation_preexisting_online_model" name="test_three_tray_v2_receipt_and_action_coverage_fail_closed[missing_P]" time="0.009" /><testcase classname="tests.test_g31_circulation_preexisting_online_model" name="test_three_tray_v2_receipt_and_action_coverage_fail_closed[bool_receipt_sequence]" time="0.006" /><testcase classname="tests.test_g31_circulation_preexisting_online_model" name="test_boolean_publication_sequence_is_not_native_integer_identity" time="0.003" /><testcase classname="tests.test_g31_circulation_preexisting_delivery_evidence" name="test_all_nine_exact_predeclared_positive_and_negative_evidence_shapes[block0_load0/delivery]" time="0.045"><failure message="AssertionError: {'status': 'unknown_or_failed', 'reason': 'wrong_fault_rejection_reason:A', 'business_admitted': False}&#10;assert 'unknown_or_failed' == 'passed'&#10;  &#10;  - passed&#10;  + unknown_or_failed">key = 'block0_load0/delivery'
+
+    @pytest.mark.parametrize("key", tuple(runner.protocol()["rows"]))
+    def test_all_nine_exact_predeclared_positive_and_negative_evidence_shapes(key):
+        spec = runner.protocol()["rows"][key]; raw = raw_fixture(spec)
+        result = verify.verify_branch(raw, spec, raw["input"])
+&gt;       assert result["status"] == "passed", result
+E       AssertionError: {'status': 'unknown_or_failed', 'reason': 'wrong_fault_rejection_reason:A', 'business_admitted': False}
+E       assert 'unknown_or_failed' == 'passed'
+E         
+E         - passed
+E         + unknown_or_failed
+
+tests\test_g31_circulation_preexisting_delivery_evidence.py:54: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_preexisting_delivery_evidence" name="test_all_nine_exact_predeclared_positive_and_negative_evidence_shapes[block0_load1/delivery]" time="0.045"><failure message="AssertionError: {'status': 'unknown_or_failed', 'reason': 'wrong_fault_rejection_reason:A', 'business_admitted': False}&#10;assert 'unknown_or_failed' == 'passed'&#10;  &#10;  - passed&#10;  + unknown_or_failed">key = 'block0_load1/delivery'
+
+    @pytest.mark.parametrize("key", tuple(runner.protocol()["rows"]))
+    def test_all_nine_exact_predeclared_positive_and_negative_evidence_shapes(key):
+        spec = runner.protocol()["rows"][key]; raw = raw_fixture(spec)
+        result = verify.verify_branch(raw, spec, raw["input"])
+&gt;       assert result["status"] == "passed", result
+E       AssertionError: {'status': 'unknown_or_failed', 'reason': 'wrong_fault_rejection_reason:A', 'business_admitted': False}
+E       assert 'unknown_or_failed' == 'passed'
+E         
+E         - passed
+E         + unknown_or_failed
+
+tests\test_g31_circulation_preexisting_delivery_evidence.py:54: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_preexisting_delivery_evidence" name="test_all_nine_exact_predeclared_positive_and_negative_evidence_shapes[block0_load2/delivery]" time="0.044"><failure message="AssertionError: {'status': 'unknown_or_failed', 'reason': 'wrong_fault_rejection_reason:A', 'business_admitted': False}&#10;assert 'unknown_or_failed' == 'passed'&#10;  &#10;  - passed&#10;  + unknown_or_failed">key = 'block0_load2/delivery'
+
+    @pytest.mark.parametrize("key", tuple(runner.protocol()["rows"]))
+    def test_all_nine_exact_predeclared_positive_and_negative_evidence_shapes(key):
+        spec = runner.protocol()["rows"][key]; raw = raw_fixture(spec)
+        result = verify.verify_branch(raw, spec, raw["input"])
+&gt;       assert result["status"] == "passed", result
+E       AssertionError: {'status': 'unknown_or_failed', 'reason': 'wrong_fault_rejection_reason:A', 'business_admitted': False}
+E       assert 'unknown_or_failed' == 'passed'
+E         
+E         - passed
+E         + unknown_or_failed
+
+tests\test_g31_circulation_preexisting_delivery_evidence.py:54: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_preexisting_delivery_evidence" name="test_all_nine_exact_predeclared_positive_and_negative_evidence_shapes[block1_load0/delivery]" time="0.041"><failure message="AssertionError: {'status': 'unknown_or_failed', 'reason': 'wrong_fault_rejection_reason:A', 'business_admitted': False}&#10;assert 'unknown_or_failed' == 'passed'&#10;  &#10;  - passed&#10;  + unknown_or_failed">key = 'block1_load0/delivery'
+
+    @pytest.mark.parametrize("key", tuple(runner.protocol()["rows"]))
+    def test_all_nine_exact_predeclared_positive_and_negative_evidence_shapes(key):
+        spec = runner.protocol()["rows"][key]; raw = raw_fixture(spec)
+        result = verify.verify_branch(raw, spec, raw["input"])
+&gt;       assert result["status"] == "passed", result
+E       AssertionError: {'status': 'unknown_or_failed', 'reason': 'wrong_fault_rejection_reason:A', 'business_admitted': False}
+E       assert 'unknown_or_failed' == 'passed'
+E         
+E         - passed
+E         + unknown_or_failed
+
+tests\test_g31_circulation_preexisting_delivery_evidence.py:54: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_preexisting_delivery_evidence" name="test_all_nine_exact_predeclared_positive_and_negative_evidence_shapes[block1_load1/delivery]" time="0.040"><failure message="AssertionError: {'status': 'unknown_or_failed', 'reason': 'wrong_fault_rejection_reason:A', 'business_admitted': False}&#10;assert 'unknown_or_failed' == 'passed'&#10;  &#10;  - passed&#10;  + unknown_or_failed">key = 'block1_load1/delivery'
+
+    @pytest.mark.parametrize("key", tuple(runner.protocol()["rows"]))
+    def test_all_nine_exact_predeclared_positive_and_negative_evidence_shapes(key):
+        spec = runner.protocol()["rows"][key]; raw = raw_fixture(spec)
+        result = verify.verify_branch(raw, spec, raw["input"])
+&gt;       assert result["status"] == "passed", result
+E       AssertionError: {'status': 'unknown_or_failed', 'reason': 'wrong_fault_rejection_reason:A', 'business_admitted': False}
+E       assert 'unknown_or_failed' == 'passed'
+E         
+E         - passed
+E         + unknown_or_failed
+
+tests\test_g31_circulation_preexisting_delivery_evidence.py:54: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_preexisting_delivery_evidence" name="test_all_nine_exact_predeclared_positive_and_negative_evidence_shapes[block1_load2/delivery]" time="0.034"><failure message="AssertionError: {'status': 'unknown_or_failed', 'reason': 'wrong_fault_rejection_reason:A', 'business_admitted': False}&#10;assert 'unknown_or_failed' == 'passed'&#10;  &#10;  - passed&#10;  + unknown_or_failed">key = 'block1_load2/delivery'
+
+    @pytest.mark.parametrize("key", tuple(runner.protocol()["rows"]))
+    def test_all_nine_exact_predeclared_positive_and_negative_evidence_shapes(key):
+        spec = runner.protocol()["rows"][key]; raw = raw_fixture(spec)
+        result = verify.verify_branch(raw, spec, raw["input"])
+&gt;       assert result["status"] == "passed", result
+E       AssertionError: {'status': 'unknown_or_failed', 'reason': 'wrong_fault_rejection_reason:A', 'business_admitted': False}
+E       assert 'unknown_or_failed' == 'passed'
+E         
+E         - passed
+E         + unknown_or_failed
+
+tests\test_g31_circulation_preexisting_delivery_evidence.py:54: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_preexisting_delivery_evidence" name="test_all_nine_exact_predeclared_positive_and_negative_evidence_shapes[readiness/missing_peer]" time="0.034" /><testcase classname="tests.test_g31_circulation_preexisting_delivery_evidence" name="test_all_nine_exact_predeclared_positive_and_negative_evidence_shapes[readiness/expired_capture]" time="0.040" /><testcase classname="tests.test_g31_circulation_preexisting_delivery_evidence" name="test_all_nine_exact_predeclared_positive_and_negative_evidence_shapes[readiness/lost_self_ack]" time="0.036" /><testcase classname="tests.test_g31_circulation_preexisting_delivery_evidence" name="test_raw_verifier_rejects_different_or_unrelated_failure[digest]" time="0.037" /><testcase classname="tests.test_g31_circulation_preexisting_delivery_evidence" name="test_raw_verifier_rejects_different_or_unrelated_failure[wrong_fault]" time="0.027" /><testcase classname="tests.test_g31_circulation_preexisting_delivery_evidence" name="test_raw_verifier_rejects_different_or_unrelated_failure[future_ack]" time="0.037" /><testcase classname="tests.test_g31_circulation_preexisting_delivery_evidence" name="test_raw_verifier_rejects_different_or_unrelated_failure[wrong_scope]" time="0.037" /><testcase classname="tests.test_g31_circulation_preexisting_delivery_evidence" name="test_raw_verifier_rejects_different_or_unrelated_failure[hidden_action]" time="0.025" /><testcase classname="tests.test_g31_circulation_preexisting_delivery_evidence" name="test_raw_verifier_rejects_different_or_unrelated_failure[wrong_local_job]" time="0.034" /><testcase classname="tests.test_g31_circulation_preexisting_delivery_evidence" name="test_raw_verifier_rejects_different_or_unrelated_failure[lying_summary]" time="0.035" /><testcase classname="tests.test_g31_circulation_preexisting_delivery_evidence" name="test_raw_verifier_rejects_different_or_unrelated_failure[missing_raw]" time="0.030" /><testcase classname="tests.test_g31_circulation_preexisting_delivery_evidence" name="test_raw_verifier_rejects_different_or_unrelated_failure[forged_information]" time="0.034" /><testcase classname="tests.test_g31_circulation_preexisting_delivery_evidence" name="test_gate_recomputes_nine_raws_instead_of_trusting_summary" time="1.293"><failure message="ValueError: preexisting:raw_delivery_validation:wrong_fault_rejection_reason:A">tmp_path = WindowsPath('C:/Users/38908/AppData/Local/Packages/sandbox.{b6d7f36a-0533-4b20-b490-21c4ce5d2eca}/AC/Temp/pytest-of-38908/pytest-0/test_gate_recomputes_nine_raws0')
+
+    def test_gate_recomputes_nine_raws_instead_of_trusting_summary(tmp_path):
+        output, plan, _, _ = saved_gate(tmp_path)
+&gt;       result = runner.require_delivery_gate(output, "a"*64, plan)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_preexisting_delivery_evidence.py:92: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\research_native_preexisting_occupancy.py:636: in require_delivery_gate
+    require(result["status"] == "passed", "preexisting:raw_delivery_validation:" + str(result.get("reason")))
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+condition = False
+reason = 'preexisting:raw_delivery_validation:wrong_fault_rejection_reason:A'
+
+    def require(condition, reason):
+&gt;       if not condition: raise ValueError(reason)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: preexisting:raw_delivery_validation:wrong_fault_rejection_reason:A
+
+scripts\experiments\g31_ics_circulation\verify_preexisting_delivery.py:28: ValueError</failure></testcase><testcase classname="tests.test_g31_circulation_preexisting_delivery_evidence" name="test_evidence_gate_rejects_tampering_even_if_booleans_claim_success[raw_missing]" time="1.310" /><testcase classname="tests.test_g31_circulation_preexisting_delivery_evidence" name="test_evidence_gate_rejects_tampering_even_if_booleans_claim_success[raw_changed]" time="1.040" /><testcase classname="tests.test_g31_circulation_preexisting_delivery_evidence" name="test_evidence_gate_rejects_tampering_even_if_booleans_claim_success[input_changed]" time="1.131" /><testcase classname="tests.test_g31_circulation_preexisting_delivery_evidence" name="test_evidence_gate_rejects_tampering_even_if_booleans_claim_success[ledger_forged_true]" time="1.140" /><testcase classname="tests.test_g31_circulation_preexisting_delivery_evidence" name="test_evidence_gate_rejects_tampering_even_if_booleans_claim_success[fault_replaced]" time="1.127" /><testcase classname="tests.test_g31_circulation_preexisting_delivery_evidence" name="test_evidence_gate_rejects_tampering_even_if_booleans_claim_success[source_archive_drift]" time="0.994" /><testcase classname="tests.test_g31_circulation_preexisting_delivery_evidence" name="test_evidence_gate_rejects_tampering_even_if_booleans_claim_success[raw_wrong_fault_rehashed]" time="1.097" /><testcase classname="tests.test_g31_circulation_preexisting_delivery_evidence" name="test_evidence_gate_rejects_tampering_even_if_booleans_claim_success[source_missing]" time="1.049" /><testcase classname="tests.test_g31_circulation_preexisting_delivery_evidence" name="test_evidence_gate_rejects_tampering_even_if_booleans_claim_success[receipt_lies]" time="1.260" /><testcase classname="tests.test_g31_circulation_preexisting_delivery_evidence" name="test_summary_flags_without_raw_validation_cannot_pass_assessor" time="0.050" /><testcase classname="tests.test_g31_circulation_native_preexisting_occupancy" name="test_new_native_configs_rebuild_potential_without_mutating_saved_pure_domain" time="0.017" /><testcase classname="tests.test_g31_circulation_native_preexisting_occupancy" name="test_preregistered_two_stage_denominators_and_all_four_fixed_windows" time="0.116" /><testcase classname="tests.test_g31_circulation_native_preexisting_occupancy" name="test_import_closure_includes_absolute_potential_dependency_and_archive_paths" time="0.801" /><testcase classname="tests.test_g31_circulation_native_preexisting_occupancy" name="test_incomplete_fixed_reference_remains_unknown_with_full_denominator[missing]" time="0.181" /><testcase classname="tests.test_g31_circulation_native_preexisting_occupancy" name="test_incomplete_fixed_reference_remains_unknown_with_full_denominator[nonfinite]" time="0.202" /><testcase classname="tests.test_g31_circulation_native_preexisting_occupancy" name="test_incomplete_fixed_reference_remains_unknown_with_full_denominator[unfinished]" time="0.210" /><testcase classname="tests.test_g31_circulation_native_preexisting_occupancy" name="test_incomplete_fixed_reference_remains_unknown_with_full_denominator[censored]" time="0.207" /><testcase classname="tests.test_g31_circulation_native_preexisting_occupancy" name="test_incomplete_fixed_reference_remains_unknown_with_full_denominator[audit_failed]" time="0.205" /><testcase classname="tests.test_g31_circulation_native_preexisting_occupancy" name="test_incomplete_fixed_reference_remains_unknown_with_full_denominator[wrong_sum]" time="0.206" /><testcase classname="tests.test_g31_circulation_native_preexisting_occupancy" name="test_all_five_jobs_strict_zero_protection" time="0.213" /><testcase classname="tests.test_g31_circulation_native_preexisting_occupancy" name="test_action_label_cannot_hide_or_rebind_rows[missing_row]" time="0.188" /><testcase classname="tests.test_g31_circulation_native_preexisting_occupancy" name="test_action_label_cannot_hide_or_rebind_rows[wrong_case]" time="0.214" /><testcase classname="tests.test_g31_circulation_native_preexisting_occupancy" name="test_action_label_cannot_hide_or_rebind_rows[wrong_method]" time="0.198" /><testcase classname="tests.test_g31_circulation_native_preexisting_occupancy" name="test_business_cannot_skip_delivery_gate" time="0.001" /><testcase classname="tests.test_g31_circulation_native_preexisting_occupancy" name="test_no_method_can_use_pure_or_forged_native_flag" time="0.001" /></testsuite></testsuites>

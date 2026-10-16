@@ -1,0 +1,98 @@
+{
+  "schema": "g31.bridge.linear_failure.small_terminal_review.v1",
+  "reviewed_at_utc": "2026-10-15T16:36:11.489080+00:00",
+  "scope": "Small terminal files and source only. No native, predictor, raw_final decode, API gzip row read or full source archive scan.",
+  "source": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\bridge_saved_linear_prepare_001",
+  "evidence": {
+    "plan.json": "5048eb9e3365b5a29e69c82f685e821a36cc2417d4d9c9f8ea1876e56ad40032",
+    "external_application_wall.json": "8472f61d1d7c3ef19935d58dbbf8a0cb3c905b4620204e1d1df5e1c044685deb",
+    "bounded_execution.json": "ed0fbcab4047a0dd35f1aefb9eae671914337197978ea5f30b1cf8b81a20584c",
+    "failure.json": "1cf432958d42c7a866242acc12fc7eb8d4098016e9567f2a8e801c3dda75cb70",
+    "progress.jsonl": "5fe1916e0a06e098df4801dbf622d7d12c4a5f0c527d301687238e13ff3487e6",
+    "stderr.log": "1dd9f264def2bcc55a4c16da6348e62efc924b002005df38f0798147507455b3"
+  },
+  "whole_python_application_seconds": 92.0623104,
+  "process": {
+    "status": "exited",
+    "pid": 40756,
+    "exitcode": 1,
+    "wall_seconds": 91.43799999999464,
+    "hard_timeout_seconds": 599.6089999999967,
+    "windows_job_kill_on_close": true,
+    "child_released_only_after_job_assignment": true
+  },
+  "accepted": false,
+  "report_exists": false,
+  "all_job_states_exists": false,
+  "progress_rows": 1024,
+  "event_counts": {
+    "stage_start": 439,
+    "stage_end": 436,
+    "shared_decoded_read": 2,
+    "new_row_hash_progress": 145,
+    "new_row_hash_complete": 1,
+    "api_replay_progress": 1
+  },
+  "last_record": {
+    "record": 1023,
+    "at_ns": 53148292048700,
+    "event": "stage_start",
+    "stage": "decode:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_low_wip_prepare_005\\api\\000428.json.gz"
+  },
+  "non_decode_completed_stages": [
+    {
+      "record": 1,
+      "at_ns": 53059770065000,
+      "event": "stage_end",
+      "stage": "entry_plan_source_artifact_and_runtime_checks",
+      "elapsed_ns": 444754100
+    },
+    {
+      "record": 3,
+      "at_ns": 53059926589700,
+      "event": "stage_end",
+      "stage": "old_complete_prefix_manifest",
+      "elapsed_ns": 100573300
+    },
+    {
+      "record": 6,
+      "at_ns": 53079247870600,
+      "event": "stage_end",
+      "stage": "original_source_and_reference_pins",
+      "elapsed_ns": 19032927100
+    },
+    {
+      "record": 14,
+      "at_ns": 53124727127000,
+      "event": "stage_end",
+      "stage": "original_source_and_reference_pins",
+      "elapsed_ns": 23190537600
+    },
+    {
+      "record": 163,
+      "at_ns": 53143277842600,
+      "event": "stage_end",
+      "stage": "new_manifest_and_all_compressed_hashes",
+      "elapsed_ns": 18257403000
+    }
+  ],
+  "terminal_exception": "ValueError: original_low_wip:serialize_bridge_prefix_order",
+  "observed_facts": [
+    "Progress reached its fixed1024-record cap. Its final row is decode_start for original005 bootstrap API000428. No matching decode_end was saved.",
+    "The final traceback records serialize_bridge_prefix_order, not the initial progress capacity error. No successful complete replay or independent physical certificate was produced."
+  ],
+  "source_causal_diagnosis": [
+    "SharedReads.read was wired not only to the two whole raw/input reads but also the original verifier bootstrap gzread for every old005 API row; v1 emitted stage_start and stage_end for every such read.",
+    "At record1023 a successful loader return would attempt record1024 decode_end and necessarily raise linear_progress_budget_or_failure. That guard is before the v1 try, so failed is not made sticky at capacity exhaustion.",
+    "The original cooperative policy catches ValueError/KeyError/TypeError from owner activation, retains failure and continues. The observer invokes bootstrap comparison after the underlying replay consumed a row. A swallowed progress error can therefore cause the later prefix_order failure. This is a source-supported causal inference, not an independently recorded first-exception traceback."
+  ],
+  "lesson": "Progress must be budgeted across every actual loader consumer, including secondary bootstrap rows. Saved small functional cases did not reach the1024 cap. New tests must include complete declared bootstrap denominator and preserve first-fatal instrumentation evidence.",
+  "new_version_plan": [
+    "Keep original87 sources and failed directory immutable. Only allowed raw/input paths receive individual decode stages; all other reads emit at most every256 completions.",
+    "Keep1024 records and600 seconds unchanged; retain all original row hashes, ordered comparisons and policy/physical guards.",
+    "Sticky first instrumentation failure, first error metadata and original error precedence prevent downstream replay errors from obscuring the first fatal.",
+    "Use synthetic complete-size progress events and >600 bootstrap reads before preparing another bounded actual audit."
+  ],
+  "large_saved_raw_reads": 0,
+  "native_calls": 0
+}

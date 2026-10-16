@@ -1,0 +1,134 @@
+{
+  "schema": "g31.bridge.linear_v3_terminal_small_review.v1",
+  "status": "unknown_full_saved_audit_timeout_preserved",
+  "recorded_utc": "2026-10-15T17:25:05.365979+00:00",
+  "references": {
+    "plan.json": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\bridge_saved_linear_v3_prepare_001\\plan.json",
+      "sha256": "4bbf6f364ac097db7fbf2bd1ff35f9ea74500566f367933e552bf6da6f0bd87e"
+    },
+    "external_application_wall.json": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\bridge_saved_linear_v3_prepare_001\\external_application_wall.json",
+      "sha256": "277e2c8371e1016600629c0f68536c9f650e5332a48e32f1d0493cae70545a7a"
+    },
+    "bounded_execution.json": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\bridge_saved_linear_v3_prepare_001\\bounded_execution.json",
+      "sha256": "7815d56f6a9739ec9d1dc5ab111a1e542455536ed35c519ce0432f6a0fd45172"
+    },
+    "progress.jsonl": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\bridge_saved_linear_v3_prepare_001\\progress.jsonl",
+      "sha256": "7d512d51ab194dc122f9d4d0284cbb28086c18cffcd4bdbe660bb08a54f135eb"
+    },
+    "stdout.log": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\bridge_saved_linear_v3_prepare_001\\stdout.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "stderr.log": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\bridge_saved_linear_v3_prepare_001\\stderr.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "live_archive_sources_unchanged": 92,
+  "whole_python_application_seconds": 600.2173738,
+  "owned_process_status": "hard_timeout",
+  "whole_fixed_seconds": 600,
+  "log_records": 271,
+  "log_limit": 1024,
+  "journal_limit_not_exhausted": true,
+  "completed_stages": [
+    {
+      "name": "entry_plan_source_artifact_and_runtime_checks",
+      "milliseconds": 573.4043,
+      "record": 1
+    },
+    {
+      "name": "old_complete_prefix_manifest",
+      "milliseconds": 112.3963,
+      "record": 3
+    },
+    {
+      "name": "original_source_and_reference_pins",
+      "milliseconds": 18242.3746,
+      "record": 6
+    },
+    {
+      "name": "decode:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_bridge_serialize_once_prepare_001\\bridge\\raw_final.json.gz",
+      "milliseconds": 21364.0869,
+      "record": 8
+    },
+    {
+      "name": "decode:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_bridge_serialize_once_prepare_001\\bridge\\input.json.gz",
+      "milliseconds": 135.2489,
+      "record": 10
+    },
+    {
+      "name": "original_source_and_reference_pins",
+      "milliseconds": 23776.3767,
+      "record": 12
+    },
+    {
+      "name": "new_manifest_and_all_compressed_hashes",
+      "milliseconds": 18962.3547,
+      "record": 161
+    }
+  ],
+  "last_progress": {
+    "record": 270,
+    "at_ns": 55430965515000,
+    "event": "api_replay_progress",
+    "completed": 18688,
+    "old_prefix_completed": 18688,
+    "ordinal": 18687,
+    "endpoint": "advance_to"
+  },
+  "log_span_seconds": 591.7192212,
+  "last_complete_logged_replay_prefix": 18688,
+  "required_new_rows": 37270,
+  "required_old_prefix_rows": 27218,
+  "slowest_logged_256_call_blocks": [
+    {
+      "completed_before": 18432,
+      "completed_after": 18688,
+      "seconds": 30.6595199
+    },
+    {
+      "completed_before": 18176,
+      "completed_after": 18432,
+      "seconds": 27.1551266
+    },
+    {
+      "completed_before": 17920,
+      "completed_after": 18176,
+      "seconds": 25.5289553
+    },
+    {
+      "completed_before": 17664,
+      "completed_after": 17920,
+      "seconds": 24.7787396
+    },
+    {
+      "completed_before": 17408,
+      "completed_after": 17664,
+      "seconds": 24.470513
+    }
+  ],
+  "missing_terminal_files": [
+    "report.json",
+    "failure.json",
+    "instrumentation_failure.json",
+    "all_job_states.json.gz"
+  ],
+  "interpretation": "Logging bug is bypassed, but complete_policy_replay was still running at the shared600 censor. Last logged18688 is a completed-prefix lower bound, not the exact final in-flight call. No complete physical/FIFO/storage/alloffered certificate is available.",
+  "cost_hypothesis": "Late replay blocks combine decompression, old-prefix comparison, actor deepcopy and policy work. Current recursive ordered comparator is Python code; original double JSON encoding may exploit C. Block intervals do not isolate a function. Measure bounded representative row operations before changing another full audit.",
+  "next_diagnostic_only": "Consider fixed saved old/new row pairs for exact recursive-vs-original-C comparison and actor-copy cost; keep original comparators and all scalar/order semantics. No general speed claim or budget extension.",
+  "big_raw_or_API_reads": 0,
+  "native_calls": 0,
+  "predictor_calls": 0,
+  "original_2400_and_prior_600_and_linear001_failures_unchanged": true,
+  "producer39_fullH_claim_upgraded": false,
+  "overall_goals_completed": false,
+  "producer_script": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\user_resume_20261015_001\\review_bridge_linear_v3_terminal_001.py",
+    "sha256": "d5ccdc19877b9f0d176dfa9e5a09e12162c8a20fe84a2ac375d99fcebe028310"
+  }
+}

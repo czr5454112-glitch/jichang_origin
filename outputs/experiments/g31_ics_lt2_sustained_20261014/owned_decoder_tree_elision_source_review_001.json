@@ -1,0 +1,48 @@
+{
+  "schema": "g31.complete_evidence.owned_decode_tree_elision.source_review.v1",
+  "status": "conditional_source_design_review_only",
+  "reviewer": "control_timers",
+  "source_pins": {
+    "complete_root_evidence_codec.py": "7e05b5c16ac305ba13024c9787306f5f7ced7b349c938a8c544ab022696fd3cb",
+    "complete_root_evidence_candidate.py": "94cfb9f16a36d6dfb02c95eb62517285fc2a0d48c18a5c83732bddc537283c20",
+    "initial_owner_route_image.py": "5d2416f11af10a56a6651e48de3dc91e856c66c8e77eb1fb62cfd3fd3689d697",
+    "initial_owner_route_json_v3.py": "e2b5ac243b0722905b60ef36d7bd9d2a7afca95a24c97a98b020a0eef1724353"
+  },
+  "source_directory": "scripts/experiments/g31_ics_circulation",
+  "proposal": "Only on the privately owned normalized-evidence path, remove artifact_decode's repeated _tree traversal; retain all other decoder statements and the canonical re-encoding comparison. Do not alter public artifact_decode.",
+  "conditional_argument": [
+    "normalize returns a fresh exact-builtin JSON tree and validates depth and node count, counting object keys and values with the same convention as _tree. Tuple-to-list and resource-key normalization have already happened before this argument starts.",
+    "The existing private encoder retains json.dumps ensure_ascii=False, compact separators and allow_nan=False, strict UTF-8 encoding, newline and MAX_ARTIFACT_BYTES. It must consume this exact owned tree before that tree escapes or can be mutated.",
+    "Default json.loads with original object_pairs_hook and parse_constant produces only the expected builtin types. Keep those exact hook/function identities; do not accept arbitrary parse_int/parse_float/object hooks.",
+    "On finite exact builtin trees with string keys and encodable Unicode, the original canonical bytes distinguish int, float and bool, preserve negative floating zero, list order and object insertion order. Strings are not Unicode-normalized. Equal re-encoded bytes therefore preserve the normalized tree's structure and its depth/node bounds.",
+    "The source of those bytes is part of the proof. Canonical re-encoding equality alone does not establish that a normalization or bound check previously occurred."
+  ],
+  "required_boundaries": [
+    "Bind every callsite in the versioned worker to the fresh normalize -> owned encode -> private check chain. An underscore function name is not an ownership proof. No external or RPC-provided bytes, cached normalized trees, custom return values, or concurrent mutation enter this private path.",
+    "Keep exact raw bytes type/size check, UTF-8 decode, duplicate-key rejection, parse_constant rejection, standard JSON parser and canonical re-encode equality. Public artifact_decode retains _tree for every external input.",
+    "Keep the check before the evidence result escapes and inside the complete root/caller clock. Preserve the original body timestamp position and all publication/ledger/output work.",
+    "Keep original normalization and encode failures. A private decoder or re-encode failure remains a failed/unknown request; do not retry through a weaker decoder or certify the old reported root."
+  ],
+  "counterexamples_to_an_unrestricted_bytes_API": [
+    "Canonical UTF-8 JSON nested deeper than MAX_DEPTH can be below the byte limit and re-encode identically. Without proof it came from the normalizer, deleting _tree accepts a tree the public decoder rejects.",
+    "A canonical list or object with more than MAX_ARTIFACT_NODES nodes can likewise fit below64MiB and re-encode identically. Byte size is not a substitute for the node bound.",
+    "ensure_ascii=True would reopen the historical surrogate-pair representation issue. Keep ensure_ascii=False and strict UTF-8; explicit surrogate strings/keys fail encoding, while real astral Unicode succeeds.",
+    "parse_constant does not itself reject exponent-overflow tokens such as1e400: standard parsing can yield infinity. Such a token cannot come from the successful finite owned encoder, and unchanged allow_nan=False re-encoding rejects it. Do not claim parse_constant alone is a finite-tree guard."
+  ],
+  "resource_and_failure_limits": {
+    "all_exception_equivalence": false,
+    "reason": "Removing the recursive _tree walk changes allocation/work/recursion failure points. MemoryError, a near-limit RecursionError or asynchronous interruption may differ even though successful values are equivalent. These remain unknown, not successful equivalence claims.",
+    "security_scope": "Versioned fixed-code private process assumption, not an OS sandbox against arbitrary monkeypatches, extensions, mutation callbacks or hostile in-process code.",
+    "performance_gain_known": false,
+    "full_request_100ms_certified": false
+  },
+  "focused_future_tests": [
+    "exact int/float/bool/null, negative zero, boundary finite floats, key order, empty/nonempty containers, alias input normalized into fresh separate containers",
+    "depth and node-limit exact boundary; private API cannot be used as proof for external canonical over-limit bytes; public decoder still rejects them",
+    "astral text/key success and paired/unpaired explicit surrogate failure; duplicate keys, nonfinite constants,1e400, invalid UTF-8, BOM and malformed JSON preserve declared acceptance/failure domain",
+    "source inverse AST removes only the decoder _tree expression; exact private callsite/global/closure binding and no escape before check",
+    "resource/codec/check exceptions retain unknown, full clocks and independent reported/certified state; no fallback to success"
+  ],
+  "work_performed": {"source_read": true, "implementation": false, "tests": 0, "benchmark": 0, "native": 0, "raw_decode": 0},
+  "conclusion": "Plausible under the explicit owned fixed-code path; not approval of an unrestricted decoder or a performance claim. Implement and review a separate version with the ownership and negative tests before measurement."
+}

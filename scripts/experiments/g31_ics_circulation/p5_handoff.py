@@ -12,6 +12,7 @@ import time
 from .analytic_control import PublicTravel, _min_cost_matching, conditional_service_windows, transfer_candidates
 from .boundary_reference import ObligationWindow, capacity_violations
 from .joint_window_repair import _footprint, digest
+from .local_context import LocalContextToken, PROTOCOL_OBSERVATION, protocol_projection
 from .native_host import prepare_input
 
 HORIZON = 160.
@@ -72,6 +73,70 @@ def _cost(action, service=True):
 
 
 def build_domain(observation: dict, *, max_actions=64, message_delay=.1) -> dict:
+    """Dispatch versioned protocol views; retain the historical v1 entry.
+
+    New online code should call ``build_protocol_domain`` explicitly. Existing
+    v1 experiments keep their original request/read-set encoding through
+    ``build_legacy_domain`` and are not silently relabelled protocol evidence.
+    """
+    if observation.get("schema") == PROTOCOL_OBSERVATION:
+        return build_protocol_domain(observation, max_actions=max_actions, message_delay=message_delay)
+    return build_legacy_domain(observation, max_actions=max_actions, message_delay=message_delay)
+
+
+def build_legacy_domain(observation: dict, *, max_actions=64, message_delay=.1) -> dict:
+    """Historical finite-domain v1 compatibility; not an online protocol view."""
+    if observation.get("schema") == PROTOCOL_OBSERVATION or "version" not in observation:
+        raise ValueError("handoff:legacy_versioned_observation_required")
+    return _build_domain(observation, max_actions=max_actions, message_delay=message_delay)
+
+
+def build_protocol_domain(observation: dict, *, max_actions=64, message_delay=.1) -> dict:
+    """Use only local sensors, client payloads and actually delivered messages."""
+    view = protocol_projection(observation)
+    context = LocalContextToken.from_observation(view)
+    # The compact analytic view omits waiting service contracts. Do not turn
+    # that optimization into access to private jobs or invented durations.
+    if "control_projection" in view:
+        return {"status": "unknown_full_service_projection_required", "actions": [],
+                "schema": "g31.handoff_protocol_domain.v2", "local_context": context.to_dict(),
+                "message_requirements": [{"kind": "local_full_observation", "owner_id": view["owner_id"]}]}
+    result = _build_domain(view, max_actions=max_actions, message_delay=message_delay, context=context)
+    result.update(schema="g31.handoff_protocol_domain.v2", local_context=context.to_dict(),
+                  decision_identity=context.identity,
+                  executable_status="unknown_until_native_owner_delivery_revalidation")
+    return result
+
+
+def submit_protocol_action(client, action: dict, observation: dict) -> dict:
+    """Enqueue a proposal with distinct client IDs and saved decision evidence.
+
+    This checks fresh *local* provenance once before the bundle. It provides
+    no atomic commit: source and receiver validate each delivered request, and
+    only a delivered ACK may resolve it. Retries use the saved client outbox.
+    """
+    context = LocalContextToken.from_observation(observation)
+    if action.get("public_read_sha256") != context.identity:
+        raise ValueError("handoff:action_context_mismatch")
+    current = LocalContextToken.from_observation(client.view(context.owner_id, compact=False))
+    if current != context:
+        return {"status": "unknown_changed_local_context", "submissions": [], "atomic": False}
+    # Validate the entire bundle before its first side effect.
+    for candidate in action["candidates"]:
+        request = candidate["request"]
+        if "expected_version" in request or "request_id" in request:
+            raise ValueError("handoff:protocol_requires_client_request_identity")
+        if request.get("owner_id") != context.owner_id or request.get("decision_context") != context.to_dict():
+            raise ValueError("handoff:candidate_context_mismatch")
+    rows = []
+    for candidate in action["candidates"]:
+        identity, reply = client.submit(context.owner_id, "transfer", candidate["request"])
+        rows.append({"candidate_id": candidate["candidate_id"], "request_id": identity, "reply": reply})
+    return {"status": "submitted" if rows else "wait", "submissions": rows, "atomic": False,
+            "decision_identity": context.identity, "physical_resolution": "unknown_until_delivered_ack"}
+
+
+def _build_domain(observation: dict, *, max_actions=64, message_delay=.1, context=None) -> dict:
     """All injective partial assignments, earliest/first receiver-window exit.
 
     Every strategy receives the same lawful owner projection and this same
@@ -82,11 +147,28 @@ def build_domain(observation: dict, *, max_actions=64, message_delay=.1) -> dict
     started = time.perf_counter()
     base = transfer_candidates(observation, predictive=True, message_delay=message_delay,
         terminal_clearing=False, respect_service_forecasts=True, request_prefix="handoff-base")
+    if context is not None:
+        # Analytic v1 defaults its old version metadata to zero. It is neither
+        # a protocol version nor an execution precondition; omit it entirely.
+        base.pop("version", None)
+        for row in base["supplies"] + base["forecasts"]:
+            row.pop("version", None)
+        for request in base["intents"]:
+            request.pop("expected_version", None)
+            request.pop("request_id", None)
+            request["decision_context"] = context.to_dict()
     if len(base["supplies"]) > 3 or len(base["demands"]) > 2:
         return {"status": "unknown_domain_budget", "actions": [], "base": base}
     local = {j["business_bag_id"]: j for j in observation["jobs"]}
-    if any(j["business_bag_id"] not in local for j in base["demands"]):
-        return {"status": "unknown_private_service_contract", "actions": [], "base": base}
+    missing = [j for j in base["demands"] if j["business_bag_id"] not in local]
+    if missing:
+        contracts = {n["node"]: n for n in observation["node_contracts"]}
+        return {"status": "unknown_private_service_contract", "actions": [], "base": base,
+                "message_requirements": [{"kind": "conditional_service_contract",
+                    "source_owner": contracts[j["origin"]].get("resource_owner", contracts[j["origin"]]["zone"]),
+                    "target_owner": observation["owner_id"], "business_bag_id": j["business_bag_id"],
+                    "required": ["service_completion_conditions", "route_applicability", "valid_until", "revocation_identity"],
+                    "status": "required_message_not_available_in_current_native_protocol"} for j in missing]}
     travel = PublicTravel(observation)
     capacities = {f"node:{n['node']}": n["capacity"] for n in observation["node_contracts"]}
     capacities.update({f"edge:{e['from']}:{e['to']}": e["capacity"] for e in observation["edge_contracts"]})
@@ -116,10 +198,15 @@ def build_domain(observation: dict, *, max_actions=64, message_delay=.1) -> dict
         for departure in sorted({ready, shifted}):
             arrival = departure + travel.complete(supply["node"], destination)
             identity = digest([pair["supply"], pair["demand"], departure])
-            request = {"request_id": "live:handoff:"+digest(observation)[:20]+":"+identity, "tray_id": supply["tray_id"],
+            request = {"tray_id": supply["tray_id"],
                 "source": supply["node"], "destination": destination, "issued_at": observation["now"],
                 "message_delay": message_delay, "earliest_departure": departure,
-                "expiry": arrival + 30., "owner_id": observation["owner_id"], "expected_version": observation["version"]}
+                "expiry": arrival + 30., "owner_id": observation["owner_id"]}
+            if context is None:
+                request.update(request_id="live:handoff:"+digest(observation)[:20]+":"+identity,
+                               expected_version=observation["version"])
+            else:
+                request["decision_context"] = context.to_dict()
             footprint = _footprint(observation, pair["path"], departure, identity, travel)
             terminal = {"task": identity, "resource": f"node:{destination}", "start": departure,
                         "end": arrival+job["load_seconds"]+travel.service[destination], "amount": 1}
@@ -129,9 +216,11 @@ def build_domain(observation: dict, *, max_actions=64, message_delay=.1) -> dict
                 "request": request, "path": pair["path"], "footprint": footprint,
                 "predicted_arrival": arrival, "predicted_completion": predicted_completion(job, arrival, travel),
                 "individual_conflicts": conflict,
-                "read_set": {"owner": observation["owner_id"], "version": observation["version"],
+                "read_set": {"owner": observation["owner_id"],
+                    **({"version": observation["version"]} if context is None else {"local_context": context.to_dict()}),
                     "supply": supply, "local_job_contract": job, "delivered_windows": messages,
-                    "static_contract_sha256": digest([observation["node_contracts"], observation["edge_contracts"]])}})
+                    "static_contract_sha256": (digest([observation["node_contracts"], observation["edge_contracts"]])
+                                               if context is None else context.static_contract_sha256)}})
     actions = []
     for choice in itertools.product(*[[None]+v for v in by_supply.values()]):
         chosen = [c for c in choice if c is not None]
@@ -141,7 +230,7 @@ def build_domain(observation: dict, *, max_actions=64, message_delay=.1) -> dict
             return {"status": "unknown_domain_budget", "actions": actions, "base": base}
         footprint = frozen + [w for c in chosen for w in c["footprint"]]
         actions.append({"action_id": digest([c["candidate_id"] for c in chosen]) if chosen else "WAIT",
-            "candidates": chosen, "public_read_sha256": digest(observation),
+            "candidates": chosen, "public_read_sha256": digest(observation) if context is None else context.identity,
             "arrival_sum": sum(c["predicted_arrival"] for c in chosen),
             "completion_sum": sum(c["predicted_completion"] for c in chosen),
             "conditional_conflicts": capacity_violations([ObligationWindow(**w) for w in footprint], capacities)})

@@ -28,9 +28,11 @@
 
 #include "ics_core/graph/graph.hpp"
 #include "ics_core/io/canonical_map2_reader.hpp"
+#include "ics_core/io/incremental_sha256.hpp"
 #include "ics_core/models/edge_score.hpp"
 #include "ics_core/runtime/bounded_local_pibt.hpp"
 #include "ics_core/runtime/circulation.hpp"
+#include "ics_core/runtime/circulation_observation_index.hpp"
 #include "ics_core/runtime/circulation_checkpoint.hpp"
 #include "ics_core/runtime/circulation_static_domain.hpp"
 #include "ics_core/runtime/destination_merge_grant.hpp"
@@ -41,6 +43,7 @@
 #include "ics_core/runtime/g4irsf16_supervisor.hpp"
 #include "ics_core/runtime/g4irsf17_source_policy.hpp"
 #include "ics_core/runtime/g4irsf18_merge_policy.hpp"
+#include "ics_core/runtime/request_timing_recorder.hpp"
 
 namespace czr005::ics {
 
@@ -3153,6 +3156,45 @@ class EventDrivenJunctionRuntime {
   [[nodiscard]] const CirculationState& circulation_state() const noexcept {
     return circulation_;
   }
+  [[nodiscard]] const CirculationPublicationJournal& circulation_publication_journal() const noexcept {
+    return circulation_publication_journal_;
+  }
+
+  // Offline diagnostic state only. It is deliberately absent from config,
+  // circulation state, checkpoints and all deterministic fingerprints.
+  using TimingPhase = diagnostic::RequestTimingPhase;
+  using TimingMethod = diagnostic::RequestTimingMethod;
+  using TimingIdentity = diagnostic::RequestTimingIdentity;
+  using TimingAssociation = diagnostic::RequestTimingAssociation;
+  diagnostic::RequestTimingRecorder& request_timing() const noexcept { return request_timing_; }
+  void start_request_timing(std::size_t capacity, std::uint64_t session_identity) {
+    require_checkpoint_safe_boundary();
+    request_timing_.start(capacity, session_identity);
+  }
+  diagnostic::RequestTimingBatch take_request_timing() {
+    require_checkpoint_safe_boundary();
+    return request_timing_.take();
+  }
+  void stop_request_timing() {
+    require_checkpoint_safe_boundary();
+    request_timing_.stop();
+  }
+  TimingAssociation request_timing_leg(int runtime_id) const noexcept {
+    if (!request_timing_.enabled() || runtime_id < 0 ||
+        static_cast<std::size_t>(runtime_id) >= circulation_.legs.size()) return {};
+    const auto& leg = circulation_.legs[runtime_id];
+    TimingAssociation result{TimingIdentity::leg, runtime_id};
+    if (leg.tray >= 0 && static_cast<std::size_t>(leg.tray) < circulation_.trays.size() &&
+        leg.kind == "empty_return" && circulation_.trays[leg.tray].active_leg == runtime_id &&
+        circulation_.trays[leg.tray].transfer >= 0) {
+      result.related_kind = TimingIdentity::transfer;
+      result.related_index = circulation_.trays[leg.tray].transfer;
+    } else if (leg.job >= 0) {
+      result.related_kind = TimingIdentity::job;
+      result.related_index = leg.job;
+    }
+    return result;
+  }
 
   // Environment/session APIs. The next event and complete result must never be
   // exposed as online policy features: they include the private future tape.
@@ -3187,6 +3229,8 @@ class EventDrivenJunctionRuntime {
                                        const std::string& target, double delay,bool protocol_internal=false);
   std::string publish_circulation_service_forecast(const std::string& source,
       const std::string& target, const std::string& tray_id, int next_node, double delay,bool protocol_internal=false);
+  std::string publish_circulation_planning_snapshot(const std::string& source,
+      const std::string& target,double delay,double valid_until,bool version2=false,bool version3=false);
   std::string withdraw_circulation_service_forecast(const std::string& source,
       const std::string& original_message_id, double delay,bool protocol_internal=false);
   double circulation_minimum_service_seconds() const noexcept { return config_.minimum_service_seconds; }
@@ -4227,14 +4271,17 @@ class EventDrivenJunctionRuntime {
     }
 
     void boolean(bool value) {
-      payload_.push_back(value ? '\x01' : '\x00');
+      const char byte = value ? '\x01' : '\x00';
+      digest_.update(std::string_view(&byte, 1));
     }
 
     void u64(std::uint64_t value) {
+      std::array<char, 8> encoded{};
       for (int shift = 56; shift >= 0; shift -= 8) {
-        payload_.push_back(
-            static_cast<char>((value >> shift) & 0xffU));
+        encoded[static_cast<std::size_t>((56-shift)/8)] =
+            static_cast<char>((value >> shift) & 0xffU);
       }
+      digest_.update(std::string_view(encoded.data(), encoded.size()));
     }
 
     void i64(std::int64_t value) {
@@ -4250,15 +4297,15 @@ class EventDrivenJunctionRuntime {
 
     void string(std::string_view value) {
       u64(static_cast<std::uint64_t>(value.size()));
-      payload_.append(value);
+      digest_.update(value);
     }
 
     [[nodiscard]] std::string sha256() const {
-      return canonical_map2_detail::sha256_hex(payload_);
+      return digest_.hex_digest();
     }
 
    private:
-    std::string payload_;
+    IncrementalSha256 digest_;
   };
 
   void require_checkpoint_safe_boundary() const {
@@ -5363,6 +5410,7 @@ class EventDrivenJunctionRuntime {
 
   void reset() {
     circulation_ = {};
+    circulation_publication_journal_.clear();
     runtime_phase_ = EventDrivenJunctionRuntimePhase::kIdle;
     time_limit_ = 0.0;
     result_ = {};
@@ -5587,6 +5635,12 @@ class EventDrivenJunctionRuntime {
   }
 
   void process_event(const RuntimeEvent& event) {
+    const bool timing_leg_event = event.type == JunctionEventType::kBagRelease ||
+        event.type == JunctionEventType::kArriveJunction || event.type == JunctionEventType::kJunctionServiceComplete ||
+        event.type == JunctionEventType::kEdgeEnter || event.type == JunctionEventType::kEdgeExit;
+    auto timing_event = request_timing_.scoped(TimingPhase::event_dispatch,
+        timing_leg_event ? request_timing_leg(event.task_id) : TimingAssociation{},
+        TimingMethod::none, event.seq, event.time);
     if (g4irsf14_state_ != nullptr) {
       g4irsf14_state_->current_event_seq = event.seq;
       if (canonical_event_semantics() !=
@@ -8199,6 +8253,8 @@ class EventDrivenJunctionRuntime {
 
   void process_destination_merge_arbitration(
       const RuntimeEvent& event) {
+    auto timing_merge = request_timing_.scoped(TimingPhase::permission_validate,
+        {}, TimingMethod::none, event.seq, event.time);
     if (!uses_destination_merge_grants() ||
         g4irsf14_state_ == nullptr) {
       ++result_.summary
@@ -14817,6 +14873,8 @@ class EventDrivenJunctionRuntime {
                             bool first_edge_credit_required,
                             bool first_edge_credit_ready,
                             int first_edge_credit_to) {
+    auto timing_permission = request_timing_.scoped(TimingPhase::permission_validate,
+        request_timing_leg(bag.request.runtime_bag_id), TimingMethod::none, 0, time);
     if (circulation_.enabled) {
       const auto reason = circulation_.can_enter(
           bag.request.runtime_bag_id, current, candidate, time);
@@ -14907,6 +14965,8 @@ class EventDrivenJunctionRuntime {
       PIBTActionDelta* transaction_delta = nullptr,
       const MergeGrantCapability*
           destination_merge_grant_authority = nullptr) {
+    auto timing_dispatch = request_timing_.scoped(TimingPhase::physical_dispatch,
+        request_timing_leg(bag.request.runtime_bag_id), TimingMethod::none, 0, time);
     if (circulation_.enabled && circulation_.can_enter(
             bag.request.runtime_bag_id, current, selected, time) != "allowed") {
       throw std::logic_error("circulation:physical_commit_state_changed");
@@ -18020,7 +18080,9 @@ class EventDrivenJunctionRuntime {
   }
 
   const Graph& graph_;
+  mutable diagnostic::RequestTimingRecorder request_timing_;
   CirculationState circulation_;
+  CirculationPublicationJournal circulation_publication_journal_;
   void circulation_publish_event(RuntimeEvent& event) noexcept;
   bool circulation_edge_enter(const RuntimeEvent& event);
   bool circulation_edge_exit(const RuntimeEvent& event);
@@ -18368,6 +18430,7 @@ EventDrivenJunctionRuntime::capture_state_checkpoint() const {
 
 inline void EventDrivenJunctionRuntime::
 restore_state_checkpoint(const StateCheckpoint& checkpoint) {
+  request_timing_.reset_after_restore();
   // A restore attempt is itself a phase boundary.  Fail closed before even
   // inspecting the supplied checkpoint so a bad seal/graph/phase cannot
   // leave an already-Ready target able to process its previous event queue.
@@ -18426,6 +18489,7 @@ restore_state_checkpoint(const StateCheckpoint& checkpoint) {
   }
   result_ = storage.result;
   circulation_ = storage.circulation;
+  circulation_publication_journal_.rebuild(circulation_);
   bags_ = storage.bags;
   segment_runtime_ids_ = storage.segment_runtime_ids;
   junctions_ = storage.junctions;
@@ -20784,6 +20848,7 @@ EventDrivenJunctionRuntime::circulation_state_sha256() const {
 
 #include "ics_core/runtime/circulation_runtime_impl.hpp"
 #include "ics_core/runtime/circulation_online_impl.hpp"
+#include "ics_core/runtime/circulation_planning_snapshot_impl.hpp"
 #include "ics_core/runtime/circulation_notifications_impl.hpp"
 #include "ics_core/runtime/circulation_protocol_impl.hpp"
 #include "ics_core/runtime/circulation_protocol_commands_impl.hpp"

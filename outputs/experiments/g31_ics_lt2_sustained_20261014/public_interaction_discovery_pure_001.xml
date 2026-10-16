@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="11" skipped="0" tests="15" time="1.784" timestamp="2026-10-15T16:28:10.615343+08:00" hostname="LAPTOP-M3GASC4G"><testcase classname="tests.test_g31_circulation_public_interaction_discovery" name="test_complete_separate_discovery_validation_denominators" time="0.003"><failure message="TypeError: 'tuple' object does not support item assignment">def test_complete_separate_discovery_validation_denominators():
+&gt;       p = m.protocol()
+            ^^^^^^^^^^^^
+
+tests\test_g31_circulation_public_interaction_discovery.py:8: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\research_public_interaction_discovery.py:240: in protocol
+    'cases': [{**case, 'bundle_sha256': hashlib.sha256(canonical(bundle(case)).encode()).hexdigest(),
+scripts\experiments\g31_ics_circulation\research_public_interaction_discovery.py:240: in &lt;listcomp&gt;
+    'cases': [{**case, 'bundle_sha256': hashlib.sha256(canonical(bundle(case)).encode()).hexdigest(),
+                                                                 ^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+case = {'case_id': 'discovery_b0_l0_x0', 'stage': 'discovery', 'blocker_load': 0.2, 'receiver_load': 2.0, ...}
+
+    def bundle(case):
+        checked_case(case)
+        old = next(c for c in engine.contract.domain.cases()
+                   if c['blocker_load'] == case['blocker_load'] and c['receiver_load'] == 3.)
+        data = engine.contract.domain.make_bundle(old)
+        # Only public static fields are retained. In particular the historical
+        # 9x9 preprocessing matrix cannot leak into this ten-node hypothetical.
+        static = engine.contract.supported_contract()
+        static.pop('native_semantics')
+        static['scope'] = 'HYPOTHETICAL_PUBLIC_INTERACTION_3TRAY_5JOB_V1'
+        edge = next(e for e in static['edge_records'] if tuple(e[:2]) == (7, 8))
+&gt;       edge[2] = edge[2] + case['later_extra_travel'] * edge[3]
+        ^^^^^^^
+E       TypeError: 'tuple' object does not support item assignment
+
+scripts\experiments\g31_ics_circulation\research_public_interaction_discovery.py:85: TypeError</failure></testcase><testcase classname="tests.test_g31_circulation_public_interaction_discovery" name="test_only_new_public_edge_length_and_receiver_load_change" time="0.003"><failure message="TypeError: 'tuple' object does not support item assignment">def test_only_new_public_edge_length_and_receiver_load_change():
+        a, b = m.parameters('discovery')[0:2]
+&gt;       ba, bb = m.bundle(a), m.bundle(b)
+                 ^^^^^^^^^^^
+
+tests\test_g31_circulation_public_interaction_discovery.py:20: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+case = {'case_id': 'discovery_b0_l0_x0', 'stage': 'discovery', 'blocker_load': 0.2, 'receiver_load': 2.0, ...}
+
+    def bundle(case):
+        checked_case(case)
+        old = next(c for c in engine.contract.domain.cases()
+                   if c['blocker_load'] == case['blocker_load'] and c['receiver_load'] == 3.)
+        data = engine.contract.domain.make_bundle(old)
+        # Only public static fields are retained. In particular the historical
+        # 9x9 preprocessing matrix cannot leak into this ten-node hypothetical.
+        static = engine.contract.supported_contract()
+        static.pop('native_semantics')
+        static['scope'] = 'HYPOTHETICAL_PUBLIC_INTERACTION_3TRAY_5JOB_V1'
+        edge = next(e for e in static['edge_records'] if tuple(e[:2]) == (7, 8))
+&gt;       edge[2] = edge[2] + case['later_extra_travel'] * edge[3]
+        ^^^^^^^
+E       TypeError: 'tuple' object does not support item assignment
+
+scripts\experiments\g31_ics_circulation\research_public_interaction_discovery.py:85: TypeError</failure></testcase><testcase classname="tests.test_g31_circulation_public_interaction_discovery" name="test_exact_hypothetical_template_rejects_changed_field[edge]" time="0.003"><failure message="TypeError: 'tuple' object does not support item assignment">change = 'edge'
+
+    @pytest.mark.parametrize('change', ['edge', 'capacity', 'job', 'status', 'source', 'arrival', 'available', 'case'])
+    def test_exact_hypothetical_template_rejects_changed_field(change):
+&gt;       c = m.parameters('discovery')[0]; b = m.bundle(c); action = m.actions(c)[0, 0, 0, 0]
+                                              ^^^^^^^^^^^
+
+tests\test_g31_circulation_public_interaction_discovery.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+case = {'case_id': 'discovery_b0_l0_x0', 'stage': 'discovery', 'blocker_load': 0.2, 'receiver_load': 2.0, ...}
+
+    def bundle(case):
+        checked_case(case)
+        old = next(c for c in engine.contract.domain.cases()
+                   if c['blocker_load'] == case['blocker_load'] and c['receiver_load'] == 3.)
+        data = engine.contract.domain.make_bundle(old)
+        # Only public static fields are retained. In particular the historical
+        # 9x9 preprocessing matrix cannot leak into this ten-node hypothetical.
+        static = engine.contract.supported_contract()
+        static.pop('native_semantics')
+        static['scope'] = 'HYPOTHETICAL_PUBLIC_INTERACTION_3TRAY_5JOB_V1'
+        edge = next(e for e in static['edge_records'] if tuple(e[:2]) == (7, 8))
+&gt;       edge[2] = edge[2] + case['later_extra_travel'] * edge[3]
+        ^^^^^^^
+E       TypeError: 'tuple' object does not support item assignment
+
+scripts\experiments\g31_ics_circulation\research_public_interaction_discovery.py:85: TypeError</failure></testcase><testcase classname="tests.test_g31_circulation_public_interaction_discovery" name="test_exact_hypothetical_template_rejects_changed_field[capacity]" time="0.004"><failure message="TypeError: 'tuple' object does not support item assignment">change = 'capacity'
+
+    @pytest.mark.parametrize('change', ['edge', 'capacity', 'job', 'status', 'source', 'arrival', 'available', 'case'])
+    def test_exact_hypothetical_template_rejects_changed_field(change):
+&gt;       c = m.parameters('discovery')[0]; b = m.bundle(c); action = m.actions(c)[0, 0, 0, 0]
+                                              ^^^^^^^^^^^
+
+tests\test_g31_circulation_public_interaction_discovery.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+case = {'case_id': 'discovery_b0_l0_x0', 'stage': 'discovery', 'blocker_load': 0.2, 'receiver_load': 2.0, ...}
+
+    def bundle(case):
+        checked_case(case)
+        old = next(c for c in engine.contract.domain.cases()
+                   if c['blocker_load'] == case['blocker_load'] and c['receiver_load'] == 3.)
+        data = engine.contract.domain.make_bundle(old)
+        # Only public static fields are retained. In particular the historical
+        # 9x9 preprocessing matrix cannot leak into this ten-node hypothetical.
+        static = engine.contract.supported_contract()
+        static.pop('native_semantics')
+        static['scope'] = 'HYPOTHETICAL_PUBLIC_INTERACTION_3TRAY_5JOB_V1'
+        edge = next(e for e in static['edge_records'] if tuple(e[:2]) == (7, 8))
+&gt;       edge[2] = edge[2] + case['later_extra_travel'] * edge[3]
+        ^^^^^^^
+E       TypeError: 'tuple' object does not support item assignment
+
+scripts\experiments\g31_ics_circulation\research_public_interaction_discovery.py:85: TypeError</failure></testcase><testcase classname="tests.test_g31_circulation_public_interaction_discovery" name="test_exact_hypothetical_template_rejects_changed_field[job]" time="0.003"><failure message="TypeError: 'tuple' object does not support item assignment">change = 'job'
+
+    @pytest.mark.parametrize('change', ['edge', 'capacity', 'job', 'status', 'source', 'arrival', 'available', 'case'])
+    def test_exact_hypothetical_template_rejects_changed_field(change):
+&gt;       c = m.parameters('discovery')[0]; b = m.bundle(c); action = m.actions(c)[0, 0, 0, 0]
+                                              ^^^^^^^^^^^
+
+tests\test_g31_circulation_public_interaction_discovery.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+case = {'case_id': 'discovery_b0_l0_x0', 'stage': 'discovery', 'blocker_load': 0.2, 'receiver_load': 2.0, ...}
+
+    def bundle(case):
+        checked_case(case)
+        old = next(c for c in engine.contract.domain.cases()
+                   if c['blocker_load'] == case['blocker_load'] and c['receiver_load'] == 3.)
+        data = engine.contract.domain.make_bundle(old)
+        # Only public static fields are retained. In particular the historical
+        # 9x9 preprocessing matrix cannot leak into this ten-node hypothetical.
+        static = engine.contract.supported_contract()
+        static.pop('native_semantics')
+        static['scope'] = 'HYPOTHETICAL_PUBLIC_INTERACTION_3TRAY_5JOB_V1'
+        edge = next(e for e in static['edge_records'] if tuple(e[:2]) == (7, 8))
+&gt;       edge[2] = edge[2] + case['later_extra_travel'] * edge[3]
+        ^^^^^^^
+E       TypeError: 'tuple' object does not support item assignment
+
+scripts\experiments\g31_ics_circulation\research_public_interaction_discovery.py:85: TypeError</failure></testcase><testcase classname="tests.test_g31_circulation_public_interaction_discovery" name="test_exact_hypothetical_template_rejects_changed_field[status]" time="0.003"><failure message="TypeError: 'tuple' object does not support item assignment">change = 'status'
+
+    @pytest.mark.parametrize('change', ['edge', 'capacity', 'job', 'status', 'source', 'arrival', 'available', 'case'])
+    def test_exact_hypothetical_template_rejects_changed_field(change):
+&gt;       c = m.parameters('discovery')[0]; b = m.bundle(c); action = m.actions(c)[0, 0, 0, 0]
+                                              ^^^^^^^^^^^
+
+tests\test_g31_circulation_public_interaction_discovery.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+case = {'case_id': 'discovery_b0_l0_x0', 'stage': 'discovery', 'blocker_load': 0.2, 'receiver_load': 2.0, ...}
+
+    def bundle(case):
+        checked_case(case)
+        old = next(c for c in engine.contract.domain.cases()
+                   if c['blocker_load'] == case['blocker_load'] and c['receiver_load'] == 3.)
+        data = engine.contract.domain.make_bundle(old)
+        # Only public static fields are retained. In particular the historical
+        # 9x9 preprocessing matrix cannot leak into this ten-node hypothetical.
+        static = engine.contract.supported_contract()
+        static.pop('native_semantics')
+        static['scope'] = 'HYPOTHETICAL_PUBLIC_INTERACTION_3TRAY_5JOB_V1'
+        edge = next(e for e in static['edge_records'] if tuple(e[:2]) == (7, 8))
+&gt;       edge[2] = edge[2] + case['later_extra_travel'] * edge[3]
+        ^^^^^^^
+E       TypeError: 'tuple' object does not support item assignment
+
+scripts\experiments\g31_ics_circulation\research_public_interaction_discovery.py:85: TypeError</failure></testcase><testcase classname="tests.test_g31_circulation_public_interaction_discovery" name="test_exact_hypothetical_template_rejects_changed_field[source]" time="0.003"><failure message="TypeError: 'tuple' object does not support item assignment">change = 'source'
+
+    @pytest.mark.parametrize('change', ['edge', 'capacity', 'job', 'status', 'source', 'arrival', 'available', 'case'])
+    def test_exact_hypothetical_template_rejects_changed_field(change):
+&gt;       c = m.parameters('discovery')[0]; b = m.bundle(c); action = m.actions(c)[0, 0, 0, 0]
+                                              ^^^^^^^^^^^
+
+tests\test_g31_circulation_public_interaction_discovery.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+case = {'case_id': 'discovery_b0_l0_x0', 'stage': 'discovery', 'blocker_load': 0.2, 'receiver_load': 2.0, ...}
+
+    def bundle(case):
+        checked_case(case)
+        old = next(c for c in engine.contract.domain.cases()
+                   if c['blocker_load'] == case['blocker_load'] and c['receiver_load'] == 3.)
+        data = engine.contract.domain.make_bundle(old)
+        # Only public static fields are retained. In particular the historical
+        # 9x9 preprocessing matrix cannot leak into this ten-node hypothetical.
+        static = engine.contract.supported_contract()
+        static.pop('native_semantics')
+        static['scope'] = 'HYPOTHETICAL_PUBLIC_INTERACTION_3TRAY_5JOB_V1'
+        edge = next(e for e in static['edge_records'] if tuple(e[:2]) == (7, 8))
+&gt;       edge[2] = edge[2] + case['later_extra_travel'] * edge[3]
+        ^^^^^^^
+E       TypeError: 'tuple' object does not support item assignment
+
+scripts\experiments\g31_ics_circulation\research_public_interaction_discovery.py:85: TypeError</failure></testcase><testcase classname="tests.test_g31_circulation_public_interaction_discovery" name="test_exact_hypothetical_template_rejects_changed_field[arrival]" time="0.003"><failure message="TypeError: 'tuple' object does not support item assignment">change = 'arrival'
+
+    @pytest.mark.parametrize('change', ['edge', 'capacity', 'job', 'status', 'source', 'arrival', 'available', 'case'])
+    def test_exact_hypothetical_template_rejects_changed_field(change):
+&gt;       c = m.parameters('discovery')[0]; b = m.bundle(c); action = m.actions(c)[0, 0, 0, 0]
+                                              ^^^^^^^^^^^
+
+tests\test_g31_circulation_public_interaction_discovery.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+case = {'case_id': 'discovery_b0_l0_x0', 'stage': 'discovery', 'blocker_load': 0.2, 'receiver_load': 2.0, ...}
+
+    def bundle(case):
+        checked_case(case)
+        old = next(c for c in engine.contract.domain.cases()
+                   if c['blocker_load'] == case['blocker_load'] and c['receiver_load'] == 3.)
+        data = engine.contract.domain.make_bundle(old)
+        # Only public static fields are retained. In particular the historical
+        # 9x9 preprocessing matrix cannot leak into this ten-node hypothetical.
+        static = engine.contract.supported_contract()
+        static.pop('native_semantics')
+        static['scope'] = 'HYPOTHETICAL_PUBLIC_INTERACTION_3TRAY_5JOB_V1'
+        edge = next(e for e in static['edge_records'] if tuple(e[:2]) == (7, 8))
+&gt;       edge[2] = edge[2] + case['later_extra_travel'] * edge[3]
+        ^^^^^^^
+E       TypeError: 'tuple' object does not support item assignment
+
+scripts\experiments\g31_ics_circulation\research_public_interaction_discovery.py:85: TypeError</failure></testcase><testcase classname="tests.test_g31_circulation_public_interaction_discovery" name="test_exact_hypothetical_template_rejects_changed_field[available]" time="0.003"><failure message="TypeError: 'tuple' object does not support item assignment">change = 'available'
+
+    @pytest.mark.parametrize('change', ['edge', 'capacity', 'job', 'status', 'source', 'arrival', 'available', 'case'])
+    def test_exact_hypothetical_template_rejects_changed_field(change):
+&gt;       c = m.parameters('discovery')[0]; b = m.bundle(c); action = m.actions(c)[0, 0, 0, 0]
+                                              ^^^^^^^^^^^
+
+tests\test_g31_circulation_public_interaction_discovery.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+case = {'case_id': 'discovery_b0_l0_x0', 'stage': 'discovery', 'blocker_load': 0.2, 'receiver_load': 2.0, ...}
+
+    def bundle(case):
+        checked_case(case)
+        old = next(c for c in engine.contract.domain.cases()
+                   if c['blocker_load'] == case['blocker_load'] and c['receiver_load'] == 3.)
+        data = engine.contract.domain.make_bundle(old)
+        # Only public static fields are retained. In particular the historical
+        # 9x9 preprocessing matrix cannot leak into this ten-node hypothetical.
+        static = engine.contract.supported_contract()
+        static.pop('native_semantics')
+        static['scope'] = 'HYPOTHETICAL_PUBLIC_INTERACTION_3TRAY_5JOB_V1'
+        edge = next(e for e in static['edge_records'] if tuple(e[:2]) == (7, 8))
+&gt;       edge[2] = edge[2] + case['later_extra_travel'] * edge[3]
+        ^^^^^^^
+E       TypeError: 'tuple' object does not support item assignment
+
+scripts\experiments\g31_ics_circulation\research_public_interaction_discovery.py:85: TypeError</failure></testcase><testcase classname="tests.test_g31_circulation_public_interaction_discovery" name="test_exact_hypothetical_template_rejects_changed_field[case]" time="0.003"><failure message="TypeError: 'tuple' object does not support item assignment">change = 'case'
+
+    @pytest.mark.parametrize('change', ['edge', 'capacity', 'job', 'status', 'source', 'arrival', 'available', 'case'])
+    def test_exact_hypothetical_template_rejects_changed_field(change):
+&gt;       c = m.parameters('discovery')[0]; b = m.bundle(c); action = m.actions(c)[0, 0, 0, 0]
+                                              ^^^^^^^^^^^
+
+tests\test_g31_circulation_public_interaction_discovery.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+case = {'case_id': 'discovery_b0_l0_x0', 'stage': 'discovery', 'blocker_load': 0.2, 'receiver_load': 2.0, ...}
+
+    def bundle(case):
+        checked_case(case)
+        old = next(c for c in engine.contract.domain.cases()
+                   if c['blocker_load'] == case['blocker_load'] and c['receiver_load'] == 3.)
+        data = engine.contract.domain.make_bundle(old)
+        # Only public static fields are retained. In particular the historical
+        # 9x9 preprocessing matrix cannot leak into this ten-node hypothetical.
+        static = engine.contract.supported_contract()
+        static.pop('native_semantics')
+        static['scope'] = 'HYPOTHETICAL_PUBLIC_INTERACTION_3TRAY_5JOB_V1'
+        edge = next(e for e in static['edge_records'] if tuple(e[:2]) == (7, 8))
+&gt;       edge[2] = edge[2] + case['later_extra_travel'] * edge[3]
+        ^^^^^^^
+E       TypeError: 'tuple' object does not support item assignment
+
+scripts\experiments\g31_ics_circulation\research_public_interaction_discovery.py:85: TypeError</failure></testcase><testcase classname="tests.test_g31_circulation_public_interaction_discovery" name="test_boolean_action_cannot_be_declared_zero" time="0.003"><failure message="TypeError: 'tuple' object does not support item assignment">def test_boolean_action_cannot_be_declared_zero():
+        c = m.parameters('discovery')[0]; a = m.actions(c)[0, 0, 0, 0]
+        a['return_delay'] = False
+&gt;       assert m.predict(c, m.bundle(c), a)['status'] == 'unknown_undeclared_action'
+                            ^^^^^^^^^^^
+
+tests\test_g31_circulation_public_interaction_discovery.py:47: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+case = {'case_id': 'discovery_b0_l0_x0', 'stage': 'discovery', 'blocker_load': 0.2, 'receiver_load': 2.0, ...}
+
+    def bundle(case):
+        checked_case(case)
+        old = next(c for c in engine.contract.domain.cases()
+                   if c['blocker_load'] == case['blocker_load'] and c['receiver_load'] == 3.)
+        data = engine.contract.domain.make_bundle(old)
+        # Only public static fields are retained. In particular the historical
+        # 9x9 preprocessing matrix cannot leak into this ten-node hypothetical.
+        static = engine.contract.supported_contract()
+        static.pop('native_semantics')
+        static['scope'] = 'HYPOTHETICAL_PUBLIC_INTERACTION_3TRAY_5JOB_V1'
+        edge = next(e for e in static['edge_records'] if tuple(e[:2]) == (7, 8))
+&gt;       edge[2] = edge[2] + case['later_extra_travel'] * edge[3]
+        ^^^^^^^
+E       TypeError: 'tuple' object does not support item assignment
+
+scripts\experiments\g31_ics_circulation\research_public_interaction_discovery.py:85: TypeError</failure></testcase><testcase classname="tests.test_g31_circulation_public_interaction_discovery" name="test_two_single_regressions_pair_protected_is_only_conditional_barrier" time="0.001" /><testcase classname="tests.test_g31_circulation_public_interaction_discovery" name="test_unknown_cube_and_positive_ulp_regression_fail_closed" time="0.001" /><testcase classname="tests.test_g31_circulation_public_interaction_discovery" name="test_rejected_preference_never_becomes_successful_default" time="0.001" /><testcase classname="tests.test_g31_circulation_public_interaction_discovery" name="test_incomplete_or_misbound_factorial_is_unknown" time="0.001" /></testsuite></testsuites>

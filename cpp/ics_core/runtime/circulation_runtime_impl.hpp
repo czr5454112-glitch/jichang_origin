@@ -230,6 +230,18 @@ inline void EventDrivenJunctionRuntime::circulation_create_leg(
   if (tray.active_leg >= 0 || tray.edge_to >= 0 || tray.node == destination)
     throw std::logic_error("circulation:invalid_leg_activation");
   const int id = static_cast<int>(circulation_.legs.size());
+  TimingAssociation timing_identity{TimingIdentity::leg, id};
+  if (kind == "empty_return" && tray.transfer >= 0) {
+    timing_identity.related_kind = TimingIdentity::transfer;
+    timing_identity.related_index = tray.transfer;
+  } else if (job_index >= 0) {
+    timing_identity.related_kind = TimingIdentity::job;
+    timing_identity.related_index = job_index;
+  }
+  // Immutable creation-time relation survives a reused tray and stale old-leg
+  // events. No later reconstruction from the tray or transport ID text.
+  auto timing_leg = request_timing_.scoped(TimingPhase::leg_creation, timing_identity,
+      TimingMethod::none, 0, time);
   CirculationLeg leg;
   leg.runtime_id = id; leg.tray = tray_index; leg.job = job_index; leg.kind = kind;
   const std::string owner = job_index >= 0
@@ -262,6 +274,10 @@ inline void EventDrivenJunctionRuntime::circulation_publish_event(RuntimeEvent& 
       event.task_id >= static_cast<int>(circulation_.legs.size())) return;
   auto& tray = circulation_.trays[circulation_.legs[event.task_id].tray];
   if (event.type == JunctionEventType::kEdgeEnter) {
+    // event.seq is assigned only AFTER this callback. The enclosing dispatch
+    // scope supplies the causative event; do not report this unpublished seq.
+    auto timing_commit = request_timing_.scoped(TimingPhase::reservation_commit,
+        request_timing_leg(event.task_id), TimingMethod::none, 0, now_);
     circulation_.reserve_enter(event.task_id, event.from_node, event.to_node, event.time);
     // Reservation changes visible capacity at commit, not future EdgeEnter.
     circulation_.notify_node(event.from_node,now_,2);
@@ -316,6 +332,9 @@ inline bool EventDrivenJunctionRuntime::circulation_edge_exit(const RuntimeEvent
 }
 
 inline void EventDrivenJunctionRuntime::circulation_leg_completed(int runtime_id, double time) {
+  // Capture transfer association before the successful empty return clears it.
+  auto timing_complete = request_timing_.scoped(TimingPhase::outcome_update,
+      request_timing_leg(runtime_id), TimingMethod::none, 0, time);
   if (!circulation_.enabled) return;
   circulation_forget_resource_wait(runtime_id);
   const auto leg = circulation_.legs.at(runtime_id);
@@ -352,6 +371,8 @@ inline void EventDrivenJunctionRuntime::circulation_leg_completed(int runtime_id
 
 inline void EventDrivenJunctionRuntime::circulation_leg_failed(
     int runtime_id, const std::string& reason, double time) {
+  auto timing_failed = request_timing_.scoped(TimingPhase::outcome_update,
+      request_timing_leg(runtime_id), TimingMethod::none, 0, time);
   if (!circulation_.enabled || runtime_id < 0 || runtime_id >= static_cast<int>(circulation_.legs.size())) return;
   circulation_forget_resource_wait(runtime_id);
   const auto& leg = circulation_.legs[runtime_id];
@@ -377,6 +398,7 @@ inline void EventDrivenJunctionRuntime::circulation_leg_failed(
 }
 
 inline void EventDrivenJunctionRuntime::circulation_progress(double time) {
+  auto timing_scan = request_timing_.scoped(TimingPhase::shared_scan, {}, TimingMethod::none, 0, time);
   // Owner-local load permission is consumed before discretionary empty export.
   std::vector<std::size_t> waiting;
   for (std::size_t ji = 0; ji < circulation_.jobs.size(); ++ji)
@@ -406,6 +428,11 @@ inline void EventDrivenJunctionRuntime::circulation_progress(double time) {
   for (std::size_t xi = 0; xi < circulation_.transfers.size(); ++xi) {
     auto& state = circulation_.transfers[xi];
     if (state.status != "pending") continue;
+    const TimingAssociation timing_identity{TimingIdentity::transfer, static_cast<std::int64_t>(xi)};
+    auto timing_transfer = request_timing_.scoped(TimingPhase::transfer_progress, timing_identity,
+        TimingMethod::none, 0, time);
+    auto timing_source = request_timing_.scoped(TimingPhase::source_validate, timing_identity,
+        TimingMethod::none, 0, time);
     if(!circulation_protocol_transfer_available(static_cast<int>(xi))) continue;
     const auto& request = circulation_.input.transfers[xi];
     auto& tray = circulation_.trays.at(state.tray);
@@ -425,13 +452,25 @@ inline void EventDrivenJunctionRuntime::circulation_progress(double time) {
       reject("same_zone_transfer_not_authorized"); continue;
     }
     if (!source.allow_export) { reject("source_module_refused"); continue; }
+    timing_source.finish();
+    auto timing_receive_permission = request_timing_.scoped(TimingPhase::receiver_validate, timing_identity,
+        TimingMethod::none, 0, time);
     if (!destination.allow_receive) { reject("destination_module_refused"); continue; }
+    timing_receive_permission.finish();
+    auto timing_stock = request_timing_.scoped(TimingPhase::source_validate, timing_identity,
+        TimingMethod::none, 0, time);
     if (circulation_.empty_stock(request.source, time) <= source.export_min_stock) {
       reject("source_module_min_stock"); continue;
     }
+    timing_stock.finish();
+    auto timing_receiving_capacity = request_timing_.scoped(TimingPhase::receiver_validate, timing_identity,
+        TimingMethod::none, 0, time);
     if (circulation_.occupancy(request.destination, state.tray) >= destination.capacity) {
       reject("receiving_full"); continue;
     }
+    timing_receiving_capacity.finish();
+    auto timing_grant = request_timing_.scoped(TimingPhase::reservation_commit, timing_identity,
+        TimingMethod::none, 0, time);
     tray.reception_node = request.destination; tray.transfer = static_cast<int>(xi);
     tray.mode = "empty_transit"; state.status = "dispatching";
     circulation_receipt(time, "EXPORT_GRANTED", state.tray, -1,
@@ -450,6 +489,8 @@ inline void EventDrivenJunctionRuntime::process_circulation_event(const RuntimeE
     return;
   }
   if (event.reason == "control_route") {
+    auto timing_route = request_timing_.scoped(TimingPhase::permission_validate,
+        {TimingIdentity::route, event.task_id}, TimingMethod::none, event.seq, time);
     auto& request = circulation_.route_intents.at(event.task_id);
     if (request.status != "pending") return;
     if(!circulation_protocol_publication_available("route",event.task_id)) return;
@@ -503,25 +544,72 @@ inline void EventDrivenJunctionRuntime::process_circulation_event(const RuntimeE
     return;
   }
   if (event.reason == "control_demand") {
+    auto timing_delivery = request_timing_.scoped(TimingPhase::publication_delivery,
+        {TimingIdentity::demand, event.task_id}, TimingMethod::none, event.seq, time);
     if(!circulation_protocol_publication_available("demand",event.task_id)) return;
     auto& message=circulation_.demand_messages.at(event.task_id);
+    const bool first_delivery=!message.delivered;
     message.delivered = true;
+    if(first_delivery) circulation_publication_journal_.record_demand(event.task_id);
     if(circulation_.input.owner_protocol.enabled) message.delivered_at=time;
     circulation_protocol_command_complete("demand",event.task_id,"delivered","",message.message_id,time);
     circulation_.notify_owner(message.target_owner,now_,4);
     return;
   }
   if (event.reason == "control_service_forecast") {
+    auto timing_delivery = request_timing_.scoped(TimingPhase::publication_delivery,
+        {TimingIdentity::service_forecast, event.task_id}, TimingMethod::none, event.seq, time);
     // Delivery never recomputes the sender's old snapshot from remote state.
     if(!circulation_protocol_publication_available("service_forecast",event.task_id)) return;
     auto& message=circulation_.service_forecasts.at(event.task_id);
+    const bool first_delivery=!message.delivered;
     message.delivered = true;
+    if(first_delivery) circulation_publication_journal_.record_forecast(event.task_id);
     if(circulation_.input.owner_protocol.enabled) message.delivered_at=time;
     circulation_protocol_command_complete("service_forecast",event.task_id,"delivered","",message.message_id,time);
     circulation_.notify_owner(message.target_owner,now_,8);
     return;
   }
+  if (event.reason == "control_planning_snapshot") {
+    auto timing_delivery = request_timing_.scoped(TimingPhase::publication_delivery,
+        {TimingIdentity::planning_snapshot, event.task_id}, TimingMethod::none, event.seq, time);
+    if(!circulation_protocol_publication_available("planning_snapshot",event.task_id)) return;
+    auto& message=circulation_.planning_snapshots.at(event.task_id);
+    if(message.delivered) return;
+    message.delivered=true;message.delivered_at=time;
+    const bool expired=time>=message.valid_until;
+    circulation_protocol_command_complete("planning_snapshot",event.task_id,expired ? "expired" : "delivered",
+        expired ? "planning_snapshot_expired" : "",message.message_id,time);
+    circulation_.notify_owner(message.target_owner,now_,128);
+    return;
+  }
   if (event.reason == "control_clock") return;
+  if (event.reason == "control_planning_snapshot_v2") {
+    auto timing_delivery = request_timing_.scoped(TimingPhase::publication_delivery,
+        {TimingIdentity::planning_snapshot_v2, event.task_id}, TimingMethod::none, event.seq, time);
+    if(!circulation_protocol_publication_available("planning_snapshot_v2",event.task_id)) return;
+    auto& message=circulation_.planning_snapshots_v2.at(event.task_id);
+    if(message.delivered) return;
+    message.delivered=true;message.delivered_at=time;
+    const bool expired=time>=message.valid_until;
+    circulation_protocol_command_complete("planning_snapshot_v2",event.task_id,expired ? "expired" : "delivered",
+        expired ? "planning_snapshot_expired" : "",message.message_id,time);
+    circulation_.notify_owner(message.target_owner,now_,128);
+    return;
+  }
+  if (event.reason == "control_planning_snapshot_v3") {
+    auto timing_delivery = request_timing_.scoped(TimingPhase::publication_delivery,
+        {TimingIdentity::planning_snapshot_v3, event.task_id}, TimingMethod::none, event.seq, time);
+    if(!circulation_protocol_publication_available("planning_snapshot_v3",event.task_id)) return;
+    auto& message=circulation_.planning_snapshots_v3.at(event.task_id);
+    if(message.delivered) return;
+    message.delivered=true;message.delivered_at=time;
+    const bool expired=time>=message.valid_until;
+    circulation_protocol_command_complete("planning_snapshot_v3",event.task_id,expired ? "expired" : "delivered",
+        expired ? "planning_snapshot_expired" : "",message.message_id,time);
+    circulation_.notify_owner(message.target_owner,now_,128);
+    return;
+  }
   if (event.reason == "control_recover_empty") {
     auto& request=circulation_.recovery_intents.at(event.task_id);
     if(request.status!="pending") return;
@@ -565,6 +653,8 @@ inline void EventDrivenJunctionRuntime::process_circulation_event(const RuntimeE
     return;
   }
   if (event.reason == "module_message") {
+    auto timing_delivery = request_timing_.scoped(TimingPhase::source_execution,
+        {TimingIdentity::transfer, event.task_id, event.wakeup_generation}, TimingMethod::none, event.seq, time);
     auto& state = circulation_.transfers.at(event.task_id);
     int protocol_index=-1;
     if(circulation_.input.owner_protocol.enabled) {
@@ -600,6 +690,8 @@ inline void EventDrivenJunctionRuntime::process_circulation_event(const RuntimeE
     return;
   }
   if (event.reason == "transfer_wakeup" || event.reason == "transfer_expiry") {
+    auto timing_deferred = request_timing_.scoped(TimingPhase::transfer_progress,
+        {TimingIdentity::transfer, event.task_id}, TimingMethod::none, event.seq, time);
     auto& state = circulation_.transfers.at(event.task_id);
     if (event.reason == "transfer_expiry" && state.status == "dispatching") {
       const int tray_index = state.tray;

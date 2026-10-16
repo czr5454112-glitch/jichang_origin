@@ -1,0 +1,29 @@
+{
+  "status": "source_review_closed_no_concrete_blocker_in_declared_cooperative_scope",
+  "evidence_sha256": {
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\current_empty_possession_permit.py": "a97048354707269311bbde53a0a45501fe122b199de5d38f5ca2d218a4acca96",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\tests\\test_g31_circulation_current_possession_permit.py": "70062f72bd9d1349b42df011705b6c8cc1060fdcf972eef6493ad515cccd3c66",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_original_low_wip.py": "729cbbdd03ecff3a85bd5324653db424bd601632a5fbecdc72c02bb83c3c7bc9",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_original_low_wip_reuse.py": "e91ada16a9f6089ffb49ac79e06fff492be467e54ee8074bd46c3c47e1742a02",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\possession_gate_tests_002.xml": "48902242249562474d009a0c7f69cbca46fd573c4922903696b67978b88034d2"
+  },
+  "saved_pure_tests_inspected": 24,
+  "tests_rerun": 0,
+  "native_calls": 0,
+  "controller_integration_reviewed": false,
+  "reviewed": [
+    "Exact current local token empty state, node ownership, no job/edge/reception and availability guard; own delivered native selfcopy matches node/generation/traversal/availability and newest valid peer follows own capture.",
+    "Own actual outbox payloads bind each post-parking transfer to token and parking payloads to declared rows; own selfcopy action identity set equals current complete own transfer set.",
+    "Both owners source-authored action rows have actual received ACK status; pending/rejected/expired/undeclared action states cannot grant.",
+    "Exact strictly increasing frozen action-ID set consumed before permit return; duplicate ACK changes or same-cardinality replacement do not reauthorize. Returned copies/checkpoint do not mutate consumed set.",
+    "No opaque peer ID is parsed as payload; no EMPTY_RECEIVED or completed-job receipt is fabricated."
+  ],
+  "integration_requirements": [
+    "Caller must supply fresh actual same-session current view and immutable actual outbox; this pure gate alone cannot authenticate arbitrary caller dictionaries.",
+    "Both cooperating owners must restrict all post-parking physical actions to the designated token and admit at most one outstanding transfer; peer rows do not prove remote payload or absence of future unsubmitted plans.",
+    "Persist consumed watermarks with actual client state, disallow reset/reuse after crash without an explicit recovery contract, then perform native source/receiver revalidation before operation installation.",
+    "No public active_leg field is invented. Current empty/no-edge/no-reception is a guarded public prerequisite; final native actual validation remains required."
+  ],
+  "remote_payload_or_arrival_causality_certified": false,
+  "original_business_100ms_certified": false
+}

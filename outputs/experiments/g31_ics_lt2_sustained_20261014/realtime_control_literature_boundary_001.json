@@ -1,0 +1,42 @@
+{
+  "schema": "g31.literature_application_boundary.v1",
+  "reviewed_date": "2026-10-15",
+  "purpose": "Guide next structural request-cost work after exact32 two-shard warm caller latency remains above100ms. This note is not a performance or safety proof.",
+  "sources": [
+    {
+      "title": "Real-Time Iterations for Nonlinear Optimal Feedback Control",
+      "authors": "Moritz Diehl, Hans Georg Bock, Johannes P. Schloeder",
+      "year": 2005,
+      "url": "https://cdn.syscop.de/publications/Diehl2005c.pdf",
+      "read_scope": "Author-hosted six-page conference paper, algorithm II.A and theorem3.1 assumptions; full text available.",
+      "paraphrase": "One Newton-type step per control interval separates preparation from feedback using a particular smooth problem structure. Local contractivity assumes suitable derivatives, bounded inverse approximations and nominal model evolution after an initial disturbance. The presented proof omits inequality path constraints, although implementations include them.",
+      "applicability_limit": "Our discrete FIFO, finite trays, route permissions, storage, dropped ACKs and owner-local state do not satisfy the paper's assumed smooth optimization formulation by default. Its theorem gives no strict all-job completion guarantee here. Code-only preparation may be separated when independent of current data; dynamic input validation, baseline, actual native admission and ACK handling remain charged."
+    },
+    {
+      "title": "On real-time robust model predictive control",
+      "authors": "Melanie N. Zeilinger, Davide M. Raimondo, Alexander Domahidi, Manfred Morari, Colin N. Jones",
+      "year": 2014,
+      "doi": "10.1016/j.automatica.2013.11.019",
+      "url": "https://www.sciencedirect.com/science/article/pii/S0005109813005360",
+      "read_scope": "Publisher indexed abstract and introduction; direct full-text open returned403. No inaccessible proof assumed.",
+      "paraphrase": "For linear systems with additive disturbances, the method combines robust MPC, a warm-start procedure and a stability-enforcing constraint to retain feasibility and stability under early termination. Finite computation can trade solution quality while preserving those specifically established conditions.",
+      "applicability_limit": "An incomplete search is not automatically a safe incumbent. Our current actual state, strict per-job baseline comparison and real native validation must establish admissibility independently. Old candidate outcomes cannot be treated as a new state certificate, and different owners cannot independently select incompatible time-limited results."
+    },
+    {
+      "title": "Computation delay compensation for real time implementation of robust model predictive control",
+      "authors": "Yang Su, Kok Kiong Tan, Tong Heng Lee",
+      "year": 2013,
+      "doi": "10.1016/j.jprocont.2013.09.006",
+      "url": "https://www.sciencedirect.com/science/article/pii/S0959152413001741",
+      "read_scope": "Publisher indexed abstract and introduction; direct full-text open returned403. No inaccessible proof assumed.",
+      "paraphrase": "The paper explicitly models feedback computation delay and proposes a fast pre-compensator with a slower MPC update, analysing feasibility and stability for its control design.",
+      "applicability_limit": "A fast local callback and slow optimizer are not a complete100ms request certificate. Any asynchronous design here must retain observation age, actual source and receiver checks, retries, fallback, delivered ACK closure and all remaining shared computation."
+    }
+  ],
+  "project_inference": "Investigate immutable full-wire evidence ownership to remove repeated copies without dropping outputs, or an explicitly bounded safe-incumbent request with genuine native finalization. These are separate changes and must not be mixed into one performance comparison. No literature source certifies the current design.",
+  "native_calls": 0,
+  "model_predictions": 0,
+  "new_performance_runs": 0,
+  "complete_100ms_certified": false,
+  "algorithm_novelty_claim": false
+}

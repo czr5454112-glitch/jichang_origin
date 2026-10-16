@@ -1,0 +1,39 @@
+{
+  "schema": "g31.online_initial_methods.independent_narrow_source_review.v1",
+  "reviewer": "legal_context",
+  "status": "no_concrete_remaining_blocker_in_read_scope",
+  "sources": {
+    "scripts/experiments/g31_ics_circulation/research_live_obligation_initial_methods.py": "36f76d65454d794e9ae51b71a8cc06ec4a22c99593ce125eda83439eee795d38",
+    "tests/test_g31_circulation_online_initial_methods.py": "d5b8d96ccecba0efa5e3a84ccc447084b332feb8f971bff9e49f17dbe2683d07",
+    "outputs/experiments/g31_ics_lt2_sustained_20261014/native027_build_001/source/cpp/ics_core/bindings/circulation_session_binding.hpp": "66cbba8a046c5ee863241a6b449731be430caae37c046ec9e392ac232d380f66"
+  },
+  "corrected_finding": {
+    "original_candidate_sha256": "729b4962e2f4dc79c445c9a62fff45cd3817588b447c67f4524e26996a2b19c6",
+    "original_test_sha256": "355bc41863f25da965cf6845621f1e0b8f0d61d2147eb629dac4baba90cf7110",
+    "finding": "Missing owner policies made the copied cursor dictionary smaller than the fixed requested A/B notification domain. The actual native027 binding rejects unequal key sets; the synthetic Session originally omitted this requirement.",
+    "resolution": "The new private extraction sets exactly A/B cursors. The original due and activate expressions still iterate only present policies. Inverse AST now restores both the cursor assignment and final aggregate. The four owner-domain synthetic cases now enforce native cursor-key equality.",
+    "original_failure_draft_retained_by_parent": true,
+    "tests_executed_by_reviewer": false
+  },
+  "read_scope": [
+    "Complete new branch and synthetic test source, with the corrected extraction reread.",
+    "Original native-domain branch notification span, assess_cell and capture_partial.",
+    "Owner-local dispatch and retained historical policy source; original local executed expression.",
+    "Native027 archived notification binding owner/cursor key checks."
+  ],
+  "conclusions": [
+    "The incumbent index is derived uniquely from the declared historical incumbent action, not assumed to be index zero.",
+    "Each start_owner uses its own actual dispatch result and ledger; differing peer proposals do not block policy creation. Missing owners remain explicit and have no fabricated policy.",
+    "The two reversible continuation edits affect the cursor domain and final aggregate only; original notification, tick, retry, admission and due-policy order remain.",
+    "The retrospective composite uses A initial/return and B supply/later components only in post-run assessment. It is not sent to a policy or predictor.",
+    "The original physical assessor still requires actual transfer ACKs, executed edges, same-tray lifecycle, all five jobs and mandatory Storage. A prediction or local guard is not presented as actual protection.",
+    "Partial capture keeps actual client/session evidence and uses const diagnostics without result_at after failure.",
+    "The branch keeps strict_protected unknown and complete-request100ms false; new whole prospective evidence is still required."
+  ],
+  "limits": [
+    "Source-only review: no imports, tests, model predictions, native runs or runtime source-closure verification.",
+    "The 21 synthetic cases were read, not independently collected or executed.",
+    "A future saved verifier must bind the new initial record schema and actual branch envelope; the old fixed-vector initial verifier cannot be reused unchanged.",
+    "Exceptions may terminate the experimental branch with partial unknown evidence; this review does not claim distributed failure recovery."
+  ]
+}

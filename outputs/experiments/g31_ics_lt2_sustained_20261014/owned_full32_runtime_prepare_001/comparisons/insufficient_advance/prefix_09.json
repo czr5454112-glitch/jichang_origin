@@ -1,0 +1,403 @@
+{
+  "status": "exact_two_future_suffixes",
+  "candidate_keys": [
+    "insufficient_advance/vector_18",
+    "insufficient_advance/vector_19"
+  ],
+  "group": {
+    "prefix_index": 9,
+    "prefix_key": {
+      "initial_action": "prefer_2",
+      "empty_departure": 0.11,
+      "return_delay": 0.5
+    },
+    "representative_action": {
+      "initial_action": "prefer_2",
+      "empty_departure": 0.11,
+      "return_delay": 0.5,
+      "later_action": "native_default"
+    },
+    "candidate_indices": [
+      18,
+      19
+    ],
+    "actions": [
+      {
+        "initial_action": "prefer_2",
+        "empty_departure": 0.11,
+        "return_delay": 0.5,
+        "later_action": "native_default"
+      },
+      {
+        "initial_action": "prefer_2",
+        "empty_departure": 0.11,
+        "return_delay": 0.5,
+        "later_action": "prefer_8"
+      }
+    ],
+    "strict_cut": "first known B first_reuse_route post-collect/pre-action",
+    "outcomes": [
+      {
+        "candidate_index": 18,
+        "status": "unknown_unexecuted"
+      },
+      {
+        "candidate_index": 19,
+        "status": "unknown_unexecuted"
+      }
+    ]
+  },
+  "context_and_execution_seconds": 4.670805999994627,
+  "result": {
+    "prefix_index": 9,
+    "candidate_indices": [
+      18,
+      19
+    ],
+    "context_constructions": 1,
+    "detail": {
+      "status": "exact_paired_future_suffixes",
+      "prefix": {
+        "status": "supported_known_B_cut",
+        "point": {
+          "schema": "g31.live_obligation.conditional_continuation.v1",
+          "program_counter": "after_collect_before_record_and_action",
+          "consumed": false,
+          "model_time": 10.219999999999997,
+          "event_count": 485,
+          "native_authority": false,
+          "model_history_coverage_certified": false,
+          "same_action_only": true,
+          "owner": "B",
+          "at": 10.219999999999997,
+          "phase": "first_reuse_route",
+          "recollection_index": 1,
+          "information_status": "conditional_validated_later_v3_data",
+          "retry_status": "not_admitted",
+          "graph_sha256": "3ae282f439881b314ee7a05c79e650ac6f80f25d52abaa8f674feb727eaca20f",
+          "graph_encoded_bytes": 844481,
+          "heap_events": 600,
+          "event_sequence": 1085,
+          "current_event": {
+            "at": 10.219999999999997,
+            "priority": 100,
+            "sequence": 1084,
+            "kind": "owner_activation"
+          },
+          "current_event_already_popped": true,
+          "current_event_count_already_included": true,
+          "before_event_already_called": true,
+          "after_event_not_yet_called": true,
+          "tick_owner_order": [
+            "B"
+          ],
+          "tick_owner_index": 0,
+          "owner_pending_alias": true,
+          "world_engine_alias": true,
+          "external_recorder_present": false,
+          "arbitrary_tamper_resistance_claimed": false
+        },
+        "parent_graph_sha256": "3ae282f439881b314ee7a05c79e650ac6f80f25d52abaa8f674feb727eaca20f",
+        "complete_graph_only_future_action_changed": true,
+        "three_mutable_graphs_disjoint": true,
+        "parent_unconsumed": true
+      },
+      "points": [
+        {
+          "schema": "g31.live_obligation.conditional_continuation.v1",
+          "program_counter": "after_collect_before_record_and_action",
+          "consumed": false,
+          "model_time": 6.839999999999997,
+          "event_count": 274,
+          "native_authority": false,
+          "model_history_coverage_certified": false,
+          "same_action_only": true,
+          "owner": "A",
+          "at": 6.839999999999997,
+          "phase": "first_return",
+          "recollection_index": 0,
+          "information_status": "unknown",
+          "retry_status": "conditional_retry_admissible",
+          "graph_sha256": "6ba2bb128273359dd4df6ab0514f8ea449a4267e812126a44835bc44adb50041",
+          "graph_encoded_bytes": 366697,
+          "heap_events": 667,
+          "event_sequence": 941,
+          "current_event": {
+            "at": 6.839999999999997,
+            "priority": 99,
+            "sequence": 940,
+            "kind": "owner_activation"
+          },
+          "current_event_already_popped": true,
+          "current_event_count_already_included": true,
+          "before_event_already_called": true,
+          "after_event_not_yet_called": true,
+          "tick_owner_order": [
+            "A"
+          ],
+          "tick_owner_index": 0,
+          "owner_pending_alias": true,
+          "world_engine_alias": true,
+          "external_recorder_present": false,
+          "arbitrary_tamper_resistance_claimed": false
+        },
+        {
+          "schema": "g31.live_obligation.conditional_continuation.v1",
+          "program_counter": "after_collect_before_record_and_action",
+          "consumed": false,
+          "model_time": 6.879999999999996,
+          "event_count": 283,
+          "native_authority": false,
+          "model_history_coverage_certified": false,
+          "same_action_only": true,
+          "owner": "A",
+          "at": 6.879999999999996,
+          "phase": "first_return",
+          "recollection_index": 1,
+          "information_status": "conditional_validated_later_v3_data",
+          "retry_status": "not_admitted",
+          "graph_sha256": "d5c024a5c26a46b72150e75a2b0c4d0aed12109555bc811bb16e9a5372c90386",
+          "graph_encoded_bytes": 510008,
+          "heap_events": 667,
+          "event_sequence": 950,
+          "current_event": {
+            "at": 6.879999999999996,
+            "priority": 99,
+            "sequence": 949,
+            "kind": "owner_activation"
+          },
+          "current_event_already_popped": true,
+          "current_event_count_already_included": true,
+          "before_event_already_called": true,
+          "after_event_not_yet_called": true,
+          "tick_owner_order": [
+            "A"
+          ],
+          "tick_owner_index": 0,
+          "owner_pending_alias": true,
+          "world_engine_alias": true,
+          "external_recorder_present": false,
+          "arbitrary_tamper_resistance_claimed": false
+        },
+        {
+          "schema": "g31.live_obligation.conditional_continuation.v1",
+          "program_counter": "after_collect_before_record_and_action",
+          "consumed": false,
+          "model_time": 10.179999999999998,
+          "event_count": 476,
+          "native_authority": false,
+          "model_history_coverage_certified": false,
+          "same_action_only": true,
+          "owner": "B",
+          "at": 10.179999999999998,
+          "phase": "first_reuse_route",
+          "recollection_index": 0,
+          "information_status": "unknown",
+          "retry_status": "conditional_retry_admissible",
+          "graph_sha256": "95b481894fa50fd21ca4c6b5136c79761bd3a2abecd3d0c22a75c608540a0a12",
+          "graph_encoded_bytes": 687900,
+          "heap_events": 600,
+          "event_sequence": 1076,
+          "current_event": {
+            "at": 10.179999999999998,
+            "priority": 100,
+            "sequence": 1075,
+            "kind": "owner_activation"
+          },
+          "current_event_already_popped": true,
+          "current_event_count_already_included": true,
+          "before_event_already_called": true,
+          "after_event_not_yet_called": true,
+          "tick_owner_order": [
+            "B"
+          ],
+          "tick_owner_index": 0,
+          "owner_pending_alias": true,
+          "world_engine_alias": true,
+          "external_recorder_present": false,
+          "arbitrary_tamper_resistance_claimed": false
+        },
+        {
+          "schema": "g31.live_obligation.conditional_continuation.v1",
+          "program_counter": "after_collect_before_record_and_action",
+          "consumed": false,
+          "model_time": 10.219999999999997,
+          "event_count": 485,
+          "native_authority": false,
+          "model_history_coverage_certified": false,
+          "same_action_only": true,
+          "owner": "B",
+          "at": 10.219999999999997,
+          "phase": "first_reuse_route",
+          "recollection_index": 1,
+          "information_status": "conditional_validated_later_v3_data",
+          "retry_status": "not_admitted",
+          "graph_sha256": "3ae282f439881b314ee7a05c79e650ac6f80f25d52abaa8f674feb727eaca20f",
+          "graph_encoded_bytes": 844481,
+          "heap_events": 600,
+          "event_sequence": 1085,
+          "current_event": {
+            "at": 10.219999999999997,
+            "priority": 100,
+            "sequence": 1084,
+            "kind": "owner_activation"
+          },
+          "current_event_already_popped": true,
+          "current_event_count_already_included": true,
+          "before_event_already_called": true,
+          "after_event_not_yet_called": true,
+          "tick_owner_order": [
+            "B"
+          ],
+          "tick_owner_index": 0,
+          "owner_pending_alias": true,
+          "world_engine_alias": true,
+          "external_recorder_present": false,
+          "arbitrary_tamper_resistance_claimed": false
+        }
+      ],
+      "suffixes": {
+        "native_default": {
+          "status": "returned",
+          "prediction": {
+            "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\full32_future_suffix_prepare_001\\predictions\\insufficient_advance\\prefix_09\\native_default.json.gz",
+            "sha256": "cd20d493fa11ec67840696711b25c72ff435cc480e71e359930345bde7f5dfe4"
+          },
+          "terminal_state": {
+            "graph_sha256": "3b213a90317091e801c1d2073fa9756f1941e25f10f9f38a31e0318e8624f24c",
+            "graph_encoded_bytes": 671060,
+            "model_time": 39.96,
+            "event_count": 1225,
+            "handler_pc": "next_event",
+            "remaining_heap_events": 0,
+            "event_sequence": 1225,
+            "consumed": true
+          },
+          "initial_cut_action": {
+            "initial_action": "prefer_2",
+            "empty_departure": 0.11,
+            "return_delay": 0.5,
+            "later_action": "native_default"
+          },
+          "parent_and_unconsumed_sibling_isolated": true,
+          "whole_prediction_bytes_exact": true,
+          "JSON_types_floathex_order_exact": true,
+          "full_chronology_included": true
+        },
+        "prefer_8": {
+          "status": "returned",
+          "prediction": {
+            "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\full32_future_suffix_prepare_001\\predictions\\insufficient_advance\\prefix_09\\prefer_8.json.gz",
+            "sha256": "e81232b6beeae3efb45923bd03de778204f267797c9be738841dcd6da74f1093"
+          },
+          "terminal_state": {
+            "graph_sha256": "fdf0a1cccc6441fa7f8fda93dace05dcc4b38adab840862b1310c6577a3235c3",
+            "graph_encoded_bytes": 673332,
+            "model_time": 39.96,
+            "event_count": 1227,
+            "handler_pc": "next_event",
+            "remaining_heap_events": 0,
+            "event_sequence": 1227,
+            "consumed": true
+          },
+          "initial_cut_action": {
+            "initial_action": "prefer_2",
+            "empty_departure": 0.11,
+            "return_delay": 0.5,
+            "later_action": "prefer_8"
+          },
+          "parent_and_unconsumed_sibling_isolated": true,
+          "whole_prediction_bytes_exact": true,
+          "JSON_types_floathex_order_exact": true,
+          "full_chronology_included": true
+        }
+      },
+      "counts": {
+        "initial_engines": 1,
+        "initial_advances": 1,
+        "prefix_same_resumes": 3,
+        "future_forks": 2,
+        "future_resumes": 2
+      }
+    },
+    "rows": {
+      "vector_18": {
+        "candidate_index": 18,
+        "action": {
+          "initial_action": "prefer_2",
+          "empty_departure": 0.11,
+          "return_delay": 0.5,
+          "later_action": "native_default"
+        },
+        "status": "exact_conformance",
+        "prefix_status": "supported_known_B_cut",
+        "suffix": {
+          "status": "returned",
+          "prediction": {
+            "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\full32_future_suffix_prepare_001\\predictions\\insufficient_advance\\prefix_09\\native_default.json.gz",
+            "sha256": "cd20d493fa11ec67840696711b25c72ff435cc480e71e359930345bde7f5dfe4"
+          },
+          "terminal_state": {
+            "graph_sha256": "3b213a90317091e801c1d2073fa9756f1941e25f10f9f38a31e0318e8624f24c",
+            "graph_encoded_bytes": 671060,
+            "model_time": 39.96,
+            "event_count": 1225,
+            "handler_pc": "next_event",
+            "remaining_heap_events": 0,
+            "event_sequence": 1225,
+            "consumed": true
+          },
+          "initial_cut_action": {
+            "initial_action": "prefer_2",
+            "empty_departure": 0.11,
+            "return_delay": 0.5,
+            "later_action": "native_default"
+          },
+          "parent_and_unconsumed_sibling_isolated": true,
+          "whole_prediction_bytes_exact": true,
+          "JSON_types_floathex_order_exact": true,
+          "full_chronology_included": true
+        }
+      },
+      "vector_19": {
+        "candidate_index": 19,
+        "action": {
+          "initial_action": "prefer_2",
+          "empty_departure": 0.11,
+          "return_delay": 0.5,
+          "later_action": "prefer_8"
+        },
+        "status": "exact_conformance",
+        "prefix_status": "supported_known_B_cut",
+        "suffix": {
+          "status": "returned",
+          "prediction": {
+            "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\full32_future_suffix_prepare_001\\predictions\\insufficient_advance\\prefix_09\\prefer_8.json.gz",
+            "sha256": "e81232b6beeae3efb45923bd03de778204f267797c9be738841dcd6da74f1093"
+          },
+          "terminal_state": {
+            "graph_sha256": "fdf0a1cccc6441fa7f8fda93dace05dcc4b38adab840862b1310c6577a3235c3",
+            "graph_encoded_bytes": 673332,
+            "model_time": 39.96,
+            "event_count": 1227,
+            "handler_pc": "next_event",
+            "remaining_heap_events": 0,
+            "event_sequence": 1227,
+            "consumed": true
+          },
+          "initial_cut_action": {
+            "initial_action": "prefer_2",
+            "empty_departure": 0.11,
+            "return_delay": 0.5,
+            "later_action": "prefer_8"
+          },
+          "parent_and_unconsumed_sibling_isolated": true,
+          "whole_prediction_bytes_exact": true,
+          "JSON_types_floathex_order_exact": true,
+          "full_chronology_included": true
+        }
+      }
+    },
+    "status": "exact_two_future_suffixes"
+  }
+}

@@ -1,0 +1,1025 @@
+{
+  "schema": "g31.saved_route_native027_phase_audit.v1",
+  "status": "passed_saved_six_cell_audit_after_original_timeout",
+  "cases": {
+    "plain/baseline": {
+      "status": "closed_finite_request",
+      "job": "projected:1x:4",
+      "disposition": {
+        "sequence": 5,
+        "at": 9605.7,
+        "wall_ns": 22233948384800,
+        "disposition": "completed"
+      },
+      "intent_status": "updated_ack_and_actual_edge",
+      "warm_elapsed_upper_ms": 89.0496,
+      "worker_setup_prefix_ms": 6946.8348,
+      "child_cold_elapsed_upper_ms": 18215.5617,
+      "shared_measured_parent_setup_charged_fully_ms": 18804.0783,
+      "child_plus_measured_parent_setup_ms": 37019.64,
+      "full_cold_upper_ms": null,
+      "parent_startup_import_cost": "unmeasured; require externally pinned launch-to-exit bound for full campaign charge",
+      "native_call_envelopes_within_root_ms": 15.3947,
+      "native_call_count_within_root": 33,
+      "request_api_rows": 8,
+      "all_warm_native_api_rows": 1273,
+      "controller_trace_rows": 2796,
+      "owner_activations": 1006,
+      "exact_pre_admission_original_prefix": {
+        "parts": 2,
+        "status": "ordered_exact_except_listed_clock_fields",
+        "excluded": [
+          "wall_seconds",
+          "control_records[].compute_wall_ms",
+          "control_records[].compute_cpu_ms",
+          "native_batches[].wall_ms",
+          "native_batches[].cpu_ms",
+          "client_calls[].submit_compute_ms",
+          "result.advance.wall_seconds"
+        ]
+      },
+      "split_deadline_actual_reference": {
+        "status": "exact_request_api_and_common9900_producer_seal",
+        "request_rows": 8,
+        "physical_horizon": 9900.0,
+        "native_state_sha256": "c41257b955faaf6d5bc4dbb704f174fd7820d7723a6ad8455283897f5d54c7ad",
+        "excluded_request_fields": [
+          "outer ordinal",
+          "outer role (both filtered request)",
+          "outer start_ns/end_ns",
+          "advance_to.result.wall_seconds"
+        ],
+        "reference_raw_sha256": "16ce70086dd0e2ac32dc88454c7a726d3c2dad5e36b1677b6b3a1db797184fc4",
+        "reference_api_sha256": "d9b67e88e4d1ddca6c756324fa858224874b8a43fa7620c90169aa4e234e84d5",
+        "independent_native_seal_replay": false
+      },
+      "eligibility_schedule": {
+        "first_observed_at": 9600.0,
+        "source_service_seconds": 1.5,
+        "wire_seconds": 2.0,
+        "deadline": 9603.5,
+        "fired_at": 9603.5,
+        "source": "initial_admitted_root_fresh_view",
+        "initial_candidate_count": 1
+      },
+      "root_request_ids": [
+        "live:21:owner:system_domestic:route:0"
+      ],
+      "attempts": 1,
+      "raw_sha256": "9c8da55962891b879e8e1c23fa07a339ffa614c1bd1caadc0f250cfd2c9befef",
+      "producer_native_seal": "c41257b955faaf6d5bc4dbb704f174fd7820d7723a6ad8455283897f5d54c7ad",
+      "whole_child_wall_seconds": 24.9643931,
+      "post_capture_seal_export_and_process_tail_upper_ms": 187.4294,
+      "scope": "Exact saved REQUEST-SIDE API replay. Background controller/native transcript is retained, hash/order/clock/denominator checked, but controller policy is not recomputed. No new native seal reconstruction, exclusive phase subtraction or long-term maintenance proof.",
+      "complete_100ms_certified": false,
+      "native026_reference": {
+        "status": "all_ordered_api_controller_parts_and_common9900_producer_seal_exact",
+        "api_rows": 1273,
+        "controller_parts": 3,
+        "producer_seal": "c41257b955faaf6d5bc4dbb704f174fd7820d7723a6ad8455283897f5d54c7ad",
+        "independent_native_replay": false,
+        "comparison_algorithm": "rowwise exact original api_semantics; all controller parts unchanged",
+        "clock_exclusions": [
+          "API outer start_ns/end_ns",
+          "advance_to/advance_until_owner_notification.result.wall_seconds when present",
+          "result_at.result.advance.wall_seconds",
+          "controller prefix_semantics exact fixed clock list"
+        ]
+      },
+      "phase_diagnostics": {
+        "status": "disabled"
+      },
+      "phase_capture_sha256": "368a6b236f7c086c9bd75129b5f14c89c3f7c07bb7a5fe6a95101aca433e931b"
+    },
+    "plain/drop_first_ack": {
+      "status": "closed_finite_request",
+      "job": "projected:1x:4",
+      "disposition": {
+        "sequence": 6,
+        "at": 9667.4,
+        "wall_ns": 22264098244900,
+        "disposition": "completed"
+      },
+      "intent_status": "updated_ack_and_actual_edge",
+      "warm_elapsed_upper_ms": 1599.3227,
+      "worker_setup_prefix_ms": 8225.5936,
+      "child_cold_elapsed_upper_ms": 23384.3407,
+      "shared_measured_parent_setup_charged_fully_ms": 18804.0783,
+      "child_plus_measured_parent_setup_ms": 42188.419,
+      "full_cold_upper_ms": null,
+      "parent_startup_import_cost": "unmeasured; require externally pinned launch-to-exit bound for full campaign charge",
+      "native_call_envelopes_within_root_ms": 307.9454,
+      "native_call_count_within_root": 2019,
+      "request_api_rows": 79,
+      "all_warm_native_api_rows": 6233,
+      "controller_trace_rows": 3794,
+      "owner_activations": 1340,
+      "exact_pre_admission_original_prefix": {
+        "parts": 2,
+        "status": "ordered_exact_except_listed_clock_fields",
+        "excluded": [
+          "wall_seconds",
+          "control_records[].compute_wall_ms",
+          "control_records[].compute_cpu_ms",
+          "native_batches[].wall_ms",
+          "native_batches[].cpu_ms",
+          "client_calls[].submit_compute_ms",
+          "result.advance.wall_seconds"
+        ]
+      },
+      "split_deadline_actual_reference": {
+        "status": "exact_request_api_and_common9900_producer_seal",
+        "request_rows": 79,
+        "physical_horizon": 9900.0,
+        "native_state_sha256": "425364a12ef280fc386907b79b15c9cb7b705d5cdc1b960ad4e3ed1c5390c6a7",
+        "excluded_request_fields": [
+          "outer ordinal",
+          "outer role (both filtered request)",
+          "outer start_ns/end_ns",
+          "advance_to.result.wall_seconds"
+        ],
+        "reference_raw_sha256": "7791f87d9a2335dd36906d00ae1ed625673f976f74396cb891f8049a43f88290",
+        "reference_api_sha256": "990e459e662333752d6858848c1e999478cb5264d8eae521164cdd88490b1473",
+        "independent_native_seal_replay": false
+      },
+      "eligibility_schedule": {
+        "first_observed_at": 9600.0,
+        "source_service_seconds": 1.5,
+        "wire_seconds": 2.0,
+        "deadline": 9603.5,
+        "fired_at": 9603.5,
+        "source": "initial_admitted_root_fresh_view",
+        "initial_candidate_count": 1
+      },
+      "root_request_ids": [
+        "live:21:owner:system_domestic:route:0"
+      ],
+      "attempts": 2,
+      "raw_sha256": "bb1f8d35a267329ca3a670fd3cb81c796055ed2f54e33765e71c6c0daff675ac",
+      "producer_native_seal": "425364a12ef280fc386907b79b15c9cb7b705d5cdc1b960ad4e3ed1c5390c6a7",
+      "whole_child_wall_seconds": 30.5189785,
+      "post_capture_seal_export_and_process_tail_upper_ms": 189.4736,
+      "scope": "Exact saved REQUEST-SIDE API replay. Background controller/native transcript is retained, hash/order/clock/denominator checked, but controller policy is not recomputed. No new native seal reconstruction, exclusive phase subtraction or long-term maintenance proof.",
+      "complete_100ms_certified": false,
+      "native026_reference": {
+        "status": "all_ordered_api_controller_parts_and_common9900_producer_seal_exact",
+        "api_rows": 6233,
+        "controller_parts": 3,
+        "producer_seal": "425364a12ef280fc386907b79b15c9cb7b705d5cdc1b960ad4e3ed1c5390c6a7",
+        "independent_native_replay": false,
+        "comparison_algorithm": "rowwise exact original api_semantics; all controller parts unchanged",
+        "clock_exclusions": [
+          "API outer start_ns/end_ns",
+          "advance_to/advance_until_owner_notification.result.wall_seconds when present",
+          "result_at.result.advance.wall_seconds",
+          "controller prefix_semantics exact fixed clock list"
+        ]
+      },
+      "phase_diagnostics": {
+        "status": "disabled"
+      },
+      "phase_capture_sha256": "e94b5897b9f7fae0b72cc15c841096c3211d65348ea165957ff712d2c2790281"
+    },
+    "plain/ack_withheld_in_window": {
+      "status": "open_censored_request",
+      "job": "projected:1x:4",
+      "disposition": null,
+      "intent_status": "awaiting_delivered_ack_and_edge",
+      "warm_elapsed_prefix_ms": 32676.3501,
+      "worker_setup_prefix_ms": 18480.4895,
+      "child_cold_elapsed_prefix_ms": 63465.0466,
+      "shared_measured_parent_setup_charged_fully_ms": 18804.0783,
+      "child_plus_measured_parent_setup_ms": 82269.1249,
+      "full_cold_upper_ms": null,
+      "parent_startup_import_cost": "unmeasured; require externally pinned launch-to-exit bound for full campaign charge",
+      "native_call_envelopes_within_root_ms": 4291.5745,
+      "native_call_count_within_root": 147653,
+      "request_api_rows": 977,
+      "all_warm_native_api_rows": 147653,
+      "controller_trace_rows": 13241,
+      "owner_activations": 4512,
+      "exact_pre_admission_original_prefix": {
+        "parts": 6,
+        "status": "ordered_exact_except_listed_clock_fields",
+        "excluded": [
+          "wall_seconds",
+          "control_records[].compute_wall_ms",
+          "control_records[].compute_cpu_ms",
+          "native_batches[].wall_ms",
+          "native_batches[].cpu_ms",
+          "client_calls[].submit_compute_ms",
+          "result.advance.wall_seconds"
+        ]
+      },
+      "split_deadline_actual_reference": {
+        "status": "exact_request_api_and_common9900_producer_seal",
+        "request_rows": 977,
+        "physical_horizon": 9900.0,
+        "native_state_sha256": "f32a0efc994617f476088c4bf724a67b819c7c79bd480bc4ebdc4a1f8ee8586d",
+        "excluded_request_fields": [
+          "outer ordinal",
+          "outer role (both filtered request)",
+          "outer start_ns/end_ns",
+          "advance_to.result.wall_seconds"
+        ],
+        "reference_raw_sha256": "e44469a335808f6e35f9ff578812bde9e782204e2a3256e9f6a89a6fcc5352ff",
+        "reference_api_sha256": "2f622c795e67c5c9e99e4ddd8af1f3f703f185b3ee3e82c8a44e3bf66af7581c",
+        "independent_native_seal_replay": false
+      },
+      "eligibility_schedule": {
+        "first_observed_at": 9600.0,
+        "source_service_seconds": 1.5,
+        "wire_seconds": 2.0,
+        "deadline": 9603.5,
+        "fired_at": 9603.5,
+        "source": "initial_admitted_root_fresh_view",
+        "initial_candidate_count": 1
+      },
+      "root_request_ids": [
+        "live:21:owner:system_domestic:route:0"
+      ],
+      "attempts": 5,
+      "raw_sha256": "b65582e91a2a9de32091b05726d0b177c73c042eeaea90b97f4a38ff0e0a8f27",
+      "producer_native_seal": "f32a0efc994617f476088c4bf724a67b819c7c79bd480bc4ebdc4a1f8ee8586d",
+      "whole_child_wall_seconds": 66.5096158,
+      "post_capture_seal_export_and_process_tail_upper_ms": 199.8431,
+      "scope": "Exact saved REQUEST-SIDE API replay. Background controller/native transcript is retained, hash/order/clock/denominator checked, but controller policy is not recomputed. No new native seal reconstruction, exclusive phase subtraction or long-term maintenance proof.",
+      "complete_100ms_certified": false,
+      "native026_reference": {
+        "status": "all_ordered_api_controller_parts_and_common9900_producer_seal_exact",
+        "api_rows": 147653,
+        "controller_parts": 10,
+        "producer_seal": "f32a0efc994617f476088c4bf724a67b819c7c79bd480bc4ebdc4a1f8ee8586d",
+        "independent_native_replay": false,
+        "comparison_algorithm": "rowwise exact original api_semantics; all controller parts unchanged",
+        "clock_exclusions": [
+          "API outer start_ns/end_ns",
+          "advance_to/advance_until_owner_notification.result.wall_seconds when present",
+          "result_at.result.advance.wall_seconds",
+          "controller prefix_semantics exact fixed clock list"
+        ]
+      },
+      "phase_diagnostics": {
+        "status": "disabled"
+      },
+      "phase_capture_sha256": "eabce851cb533903e9fb7191bcaea410de0999c7892a3de5eabd4ca7eca18942"
+    },
+    "timed/baseline": {
+      "status": "closed_finite_request",
+      "job": "projected:1x:4",
+      "disposition": {
+        "sequence": 5,
+        "at": 9605.7,
+        "wall_ns": 22359890807800,
+        "disposition": "completed"
+      },
+      "intent_status": "updated_ack_and_actual_edge",
+      "warm_elapsed_upper_ms": 103.1931,
+      "worker_setup_prefix_ms": 10836.1206,
+      "child_cold_elapsed_upper_ms": 22070.1449,
+      "shared_measured_parent_setup_charged_fully_ms": 140891.8325,
+      "child_plus_measured_parent_setup_ms": 162961.9774,
+      "full_cold_upper_ms": null,
+      "parent_startup_import_cost": "unmeasured; require externally pinned launch-to-exit bound for full campaign charge",
+      "native_call_envelopes_within_root_ms": 20.2,
+      "native_call_count_within_root": 33,
+      "request_api_rows": 8,
+      "all_warm_native_api_rows": 1273,
+      "controller_trace_rows": 2796,
+      "owner_activations": 1006,
+      "exact_pre_admission_original_prefix": {
+        "parts": 2,
+        "status": "ordered_exact_except_listed_clock_fields",
+        "excluded": [
+          "wall_seconds",
+          "control_records[].compute_wall_ms",
+          "control_records[].compute_cpu_ms",
+          "native_batches[].wall_ms",
+          "native_batches[].cpu_ms",
+          "client_calls[].submit_compute_ms",
+          "result.advance.wall_seconds"
+        ]
+      },
+      "split_deadline_actual_reference": {
+        "status": "exact_request_api_and_common9900_producer_seal",
+        "request_rows": 8,
+        "physical_horizon": 9900.0,
+        "native_state_sha256": "c41257b955faaf6d5bc4dbb704f174fd7820d7723a6ad8455283897f5d54c7ad",
+        "excluded_request_fields": [
+          "outer ordinal",
+          "outer role (both filtered request)",
+          "outer start_ns/end_ns",
+          "advance_to.result.wall_seconds"
+        ],
+        "reference_raw_sha256": "16ce70086dd0e2ac32dc88454c7a726d3c2dad5e36b1677b6b3a1db797184fc4",
+        "reference_api_sha256": "d9b67e88e4d1ddca6c756324fa858224874b8a43fa7620c90169aa4e234e84d5",
+        "independent_native_seal_replay": false
+      },
+      "eligibility_schedule": {
+        "first_observed_at": 9600.0,
+        "source_service_seconds": 1.5,
+        "wire_seconds": 2.0,
+        "deadline": 9603.5,
+        "fired_at": 9603.5,
+        "source": "initial_admitted_root_fresh_view",
+        "initial_candidate_count": 1
+      },
+      "root_request_ids": [
+        "live:21:owner:system_domestic:route:0"
+      ],
+      "attempts": 1,
+      "raw_sha256": "48c45e49f9796366f6021329777974894c5ab4493eaa8fedf3a31ae0f1b1f7be",
+      "producer_native_seal": "c41257b955faaf6d5bc4dbb704f174fd7820d7723a6ad8455283897f5d54c7ad",
+      "whole_child_wall_seconds": 29.326006,
+      "post_capture_seal_export_and_process_tail_upper_ms": 1146.0561,
+      "scope": "Exact saved REQUEST-SIDE API replay. Background controller/native transcript is retained, hash/order/clock/denominator checked, but controller policy is not recomputed. No new native seal reconstruction, exclusive phase subtraction or long-term maintenance proof.",
+      "complete_100ms_certified": false,
+      "native026_reference": {
+        "status": "all_ordered_api_controller_parts_and_common9900_producer_seal_exact",
+        "api_rows": 1273,
+        "controller_parts": 3,
+        "producer_seal": "c41257b955faaf6d5bc4dbb704f174fd7820d7723a6ad8455283897f5d54c7ad",
+        "independent_native_replay": false,
+        "comparison_algorithm": "rowwise exact original api_semantics; all controller parts unchanged",
+        "clock_exclusions": [
+          "API outer start_ns/end_ns",
+          "advance_to/advance_until_owner_notification.result.wall_seconds when present",
+          "result_at.result.advance.wall_seconds",
+          "controller prefix_semantics exact fixed clock list"
+        ]
+      },
+      "phase_diagnostics": {
+        "status": "validated_partial_root_phase_diagnostics",
+        "native_partition_all_warm_calls": {
+          "schema": "g31.native_request_timing_audit.v1",
+          "status": "structurally_valid_native027_candidate_partition",
+          "errors": [],
+          "complete_request_100ms_certified": false,
+          "physics_subtracted_ns": 0,
+          "refined_per_request_totals_available": false,
+          "session_identity": 1,
+          "trace_epoch": 1,
+          "native_call_count": 1273,
+          "span_count": 2335,
+          "resolved_association_count": 826,
+          "exclusive_ns_by_phase": {
+            "native_call": 521745300,
+            "event_dispatch": 4227000,
+            "timeout": 29200,
+            "admission": 2727300,
+            "source_execution": 494400,
+            "permission_validate": 616300,
+            "reservation_commit": 34100,
+            "shared_scan": 164500,
+            "outcome_update": 12800,
+            "ack_create": 271800,
+            "physical_dispatch": 158200,
+            "ack_delivery": 326700,
+            "publication_delivery": 37400,
+            "withdrawal": 104000
+          },
+          "identified_control_bundle_ns": 476310000,
+          "unclassified_native_remainder_ns": 54639000,
+          "python_binding_remainder_ns": 9378900,
+          "unchanged_whole_native_envelope_ns": 540327900,
+          "scope": "Only a conserved phase decomposition. All native work and Python remainder remain charged; no physical work is subtracted and no per-business-request total is asserted.",
+          "runtime_accepted": false,
+          "abi_name": "native027"
+        },
+        "root_total_ns": 103193100,
+        "root_native_envelope_ns": 19500000,
+        "root_native_phase_bundles": {
+          "exclusive_ns_by_phase": {
+            "native_call": 18715700,
+            "event_dispatch": 216000,
+            "timeout": 1300,
+            "admission": 183100,
+            "source_execution": 22700,
+            "permission_validate": 66600,
+            "reservation_commit": 2100,
+            "shared_scan": 3500,
+            "outcome_update": 800,
+            "ack_create": 2700,
+            "physical_dispatch": 11700,
+            "ack_delivery": 2300
+          },
+          "native_inner_total_ns": 19228500,
+          "binding_and_wrapper_remainder_ns": 271500,
+          "whole_native_envelope_ns": 19500000,
+          "call_count": 33,
+          "span_count": 76,
+          "physics_subtracted_ns": 0,
+          "scope": "All native calls inside the actual root, including shared/background work, charged fully. Labels are broad bundles; physical_dispatch is not an exemption. No complete-computation attribution is inferred."
+        },
+        "root_python_request_service_remainder_ns": 49573300,
+        "root_other_unclassified_ns": 34119800,
+        "partition_exact": true,
+        "python_exclusive_bundles_including_nested_native_ns": {
+          "request_service_invocation": 1826300,
+          "request_public_observation_and_filter": 52974400,
+          "candidate_and_intent_update": 1478200
+        },
+        "max_request_service_invocation_ns": 18247400,
+        "diagnostic_step_tail_outside_root_ns": 91900,
+        "scope": "Service maximum is the measured request invocation, not the maximum of all background executor services. Python bundle table includes nested native envelopes and must not be added to native totals. All native/Python/shared remainder remains charged.",
+        "complete_computation_available": false,
+        "complete_100ms_certified": false,
+        "physics_subtracted_ns": 0
+      },
+      "phase_capture_sha256": "bf6a6c0291333c575399d517c1c1028a73dfff12a0198b96ed097b0bdb4b3f7c"
+    },
+    "timed/drop_first_ack": {
+      "status": "closed_finite_request",
+      "job": "projected:1x:4",
+      "disposition": {
+        "sequence": 6,
+        "at": 9667.4,
+        "wall_ns": 22393333968700,
+        "disposition": "completed"
+      },
+      "intent_status": "updated_ack_and_actual_edge",
+      "warm_elapsed_upper_ms": 1586.0818,
+      "worker_setup_prefix_ms": 12177.0702,
+      "child_cold_elapsed_upper_ms": 26172.6395,
+      "shared_measured_parent_setup_charged_fully_ms": 140891.8325,
+      "child_plus_measured_parent_setup_ms": 167064.472,
+      "full_cold_upper_ms": null,
+      "parent_startup_import_cost": "unmeasured; require externally pinned launch-to-exit bound for full campaign charge",
+      "native_call_envelopes_within_root_ms": 328.4933,
+      "native_call_count_within_root": 2019,
+      "request_api_rows": 79,
+      "all_warm_native_api_rows": 6233,
+      "controller_trace_rows": 3794,
+      "owner_activations": 1340,
+      "exact_pre_admission_original_prefix": {
+        "parts": 2,
+        "status": "ordered_exact_except_listed_clock_fields",
+        "excluded": [
+          "wall_seconds",
+          "control_records[].compute_wall_ms",
+          "control_records[].compute_cpu_ms",
+          "native_batches[].wall_ms",
+          "native_batches[].cpu_ms",
+          "client_calls[].submit_compute_ms",
+          "result.advance.wall_seconds"
+        ]
+      },
+      "split_deadline_actual_reference": {
+        "status": "exact_request_api_and_common9900_producer_seal",
+        "request_rows": 79,
+        "physical_horizon": 9900.0,
+        "native_state_sha256": "425364a12ef280fc386907b79b15c9cb7b705d5cdc1b960ad4e3ed1c5390c6a7",
+        "excluded_request_fields": [
+          "outer ordinal",
+          "outer role (both filtered request)",
+          "outer start_ns/end_ns",
+          "advance_to.result.wall_seconds"
+        ],
+        "reference_raw_sha256": "7791f87d9a2335dd36906d00ae1ed625673f976f74396cb891f8049a43f88290",
+        "reference_api_sha256": "990e459e662333752d6858848c1e999478cb5264d8eae521164cdd88490b1473",
+        "independent_native_seal_replay": false
+      },
+      "eligibility_schedule": {
+        "first_observed_at": 9600.0,
+        "source_service_seconds": 1.5,
+        "wire_seconds": 2.0,
+        "deadline": 9603.5,
+        "fired_at": 9603.5,
+        "source": "initial_admitted_root_fresh_view",
+        "initial_candidate_count": 1
+      },
+      "root_request_ids": [
+        "live:21:owner:system_domestic:route:0"
+      ],
+      "attempts": 2,
+      "raw_sha256": "7042f43aa1ffe55656d99544effcfd708c99be18a15266fc728576c32e7759cc",
+      "producer_native_seal": "425364a12ef280fc386907b79b15c9cb7b705d5cdc1b960ad4e3ed1c5390c6a7",
+      "whole_child_wall_seconds": 34.4662885,
+      "post_capture_seal_export_and_process_tail_upper_ms": 1669.0098,
+      "scope": "Exact saved REQUEST-SIDE API replay. Background controller/native transcript is retained, hash/order/clock/denominator checked, but controller policy is not recomputed. No new native seal reconstruction, exclusive phase subtraction or long-term maintenance proof.",
+      "complete_100ms_certified": false,
+      "native026_reference": {
+        "status": "all_ordered_api_controller_parts_and_common9900_producer_seal_exact",
+        "api_rows": 6233,
+        "controller_parts": 3,
+        "producer_seal": "425364a12ef280fc386907b79b15c9cb7b705d5cdc1b960ad4e3ed1c5390c6a7",
+        "independent_native_replay": false,
+        "comparison_algorithm": "rowwise exact original api_semantics; all controller parts unchanged",
+        "clock_exclusions": [
+          "API outer start_ns/end_ns",
+          "advance_to/advance_until_owner_notification.result.wall_seconds when present",
+          "result_at.result.advance.wall_seconds",
+          "controller prefix_semantics exact fixed clock list"
+        ]
+      },
+      "phase_diagnostics": {
+        "status": "validated_partial_root_phase_diagnostics",
+        "native_partition_all_warm_calls": {
+          "schema": "g31.native_request_timing_audit.v1",
+          "status": "structurally_valid_native027_candidate_partition",
+          "errors": [],
+          "complete_request_100ms_certified": false,
+          "physics_subtracted_ns": 0,
+          "refined_per_request_totals_available": false,
+          "session_identity": 1,
+          "trace_epoch": 1,
+          "native_call_count": 6233,
+          "span_count": 7851,
+          "resolved_association_count": 1175,
+          "exclusive_ns_by_phase": {
+            "native_call": 831740000,
+            "event_dispatch": 4708600,
+            "source_execution": 520800,
+            "ack_create": 538800,
+            "ack_delivery": 306500,
+            "timeout": 88100,
+            "admission": 5525500,
+            "permission_validate": 586200,
+            "reservation_commit": 37100,
+            "shared_scan": 151300,
+            "outcome_update": 11500,
+            "physical_dispatch": 172000,
+            "publication_delivery": 35900,
+            "withdrawal": 93000
+          },
+          "identified_control_bundle_ns": 780677500,
+          "unclassified_native_remainder_ns": 63837800,
+          "python_binding_remainder_ns": 24758000,
+          "unchanged_whole_native_envelope_ns": 869273300,
+          "scope": "Only a conserved phase decomposition. All native work and Python remainder remain charged; no physical work is subtracted and no per-business-request total is asserted.",
+          "runtime_accepted": false,
+          "abi_name": "native027"
+        },
+        "root_total_ns": 1586081800,
+        "root_native_envelope_ns": 301678400,
+        "root_native_phase_bundles": {
+          "exclusive_ns_by_phase": {
+            "native_call": 288541800,
+            "event_dispatch": 2119400,
+            "source_execution": 193800,
+            "ack_create": 164100,
+            "ack_delivery": 84400,
+            "timeout": 30500,
+            "admission": 1704000,
+            "permission_validate": 302900,
+            "reservation_commit": 14900,
+            "shared_scan": 82000,
+            "outcome_update": 6800,
+            "physical_dispatch": 57300,
+            "publication_delivery": 21200,
+            "withdrawal": 66800
+          },
+          "native_inner_total_ns": 293389900,
+          "binding_and_wrapper_remainder_ns": 8288500,
+          "whole_native_envelope_ns": 301678400,
+          "call_count": 2019,
+          "span_count": 2593,
+          "physics_subtracted_ns": 0,
+          "scope": "All native calls inside the actual root, including shared/background work, charged fully. Labels are broad bundles; physical_dispatch is not an exemption. No complete-computation attribution is inferred."
+        },
+        "root_python_request_service_remainder_ns": 432310300,
+        "root_other_unclassified_ns": 852093100,
+        "partition_exact": true,
+        "python_exclusive_bundles_including_nested_native_ns": {
+          "request_service_invocation": 16341700,
+          "request_public_observation_and_filter": 475352600,
+          "candidate_and_intent_update": 2991100
+        },
+        "max_request_service_invocation_ns": 16668000,
+        "diagnostic_step_tail_outside_root_ns": 107500,
+        "scope": "Service maximum is the measured request invocation, not the maximum of all background executor services. Python bundle table includes nested native envelopes and must not be added to native totals. All native/Python/shared remainder remains charged.",
+        "complete_computation_available": false,
+        "complete_100ms_certified": false,
+        "physics_subtracted_ns": 0
+      },
+      "phase_capture_sha256": "6df63947682495d76cf7f01f3ac4cdbd632bc6be067ac5208962a2b7089661a2"
+    },
+    "timed/ack_withheld_in_window": {
+      "status": "open_censored_request",
+      "job": "projected:1x:4",
+      "disposition": null,
+      "intent_status": "awaiting_delivered_ack_and_edge",
+      "warm_elapsed_prefix_ms": 38375.0117,
+      "worker_setup_prefix_ms": 22098.326,
+      "child_cold_elapsed_prefix_ms": 72013.2687,
+      "shared_measured_parent_setup_charged_fully_ms": 140891.8325,
+      "child_plus_measured_parent_setup_ms": 212905.1012,
+      "full_cold_upper_ms": null,
+      "parent_startup_import_cost": "unmeasured; require externally pinned launch-to-exit bound for full campaign charge",
+      "native_call_envelopes_within_root_ms": 6837.1372,
+      "native_call_count_within_root": 147653,
+      "request_api_rows": 977,
+      "all_warm_native_api_rows": 147653,
+      "controller_trace_rows": 13241,
+      "owner_activations": 4512,
+      "exact_pre_admission_original_prefix": {
+        "parts": 6,
+        "status": "ordered_exact_except_listed_clock_fields",
+        "excluded": [
+          "wall_seconds",
+          "control_records[].compute_wall_ms",
+          "control_records[].compute_cpu_ms",
+          "native_batches[].wall_ms",
+          "native_batches[].cpu_ms",
+          "client_calls[].submit_compute_ms",
+          "result.advance.wall_seconds"
+        ]
+      },
+      "split_deadline_actual_reference": {
+        "status": "exact_request_api_and_common9900_producer_seal",
+        "request_rows": 977,
+        "physical_horizon": 9900.0,
+        "native_state_sha256": "f32a0efc994617f476088c4bf724a67b819c7c79bd480bc4ebdc4a1f8ee8586d",
+        "excluded_request_fields": [
+          "outer ordinal",
+          "outer role (both filtered request)",
+          "outer start_ns/end_ns",
+          "advance_to.result.wall_seconds"
+        ],
+        "reference_raw_sha256": "e44469a335808f6e35f9ff578812bde9e782204e2a3256e9f6a89a6fcc5352ff",
+        "reference_api_sha256": "2f622c795e67c5c9e99e4ddd8af1f3f703f185b3ee3e82c8a44e3bf66af7581c",
+        "independent_native_seal_replay": false
+      },
+      "eligibility_schedule": {
+        "first_observed_at": 9600.0,
+        "source_service_seconds": 1.5,
+        "wire_seconds": 2.0,
+        "deadline": 9603.5,
+        "fired_at": 9603.5,
+        "source": "initial_admitted_root_fresh_view",
+        "initial_candidate_count": 1
+      },
+      "root_request_ids": [
+        "live:21:owner:system_domestic:route:0"
+      ],
+      "attempts": 5,
+      "raw_sha256": "245d522b4c5eb8cf5610fa097c4f3ec3ef851dfcf234e08102a68f5948c0074f",
+      "producer_native_seal": "f32a0efc994617f476088c4bf724a67b819c7c79bd480bc4ebdc4a1f8ee8586d",
+      "whole_child_wall_seconds": 93.7698,
+      "post_capture_seal_export_and_process_tail_upper_ms": 18246.4534,
+      "scope": "Exact saved REQUEST-SIDE API replay. Background controller/native transcript is retained, hash/order/clock/denominator checked, but controller policy is not recomputed. No new native seal reconstruction, exclusive phase subtraction or long-term maintenance proof.",
+      "complete_100ms_certified": false,
+      "native026_reference": {
+        "status": "all_ordered_api_controller_parts_and_common9900_producer_seal_exact",
+        "api_rows": 147653,
+        "controller_parts": 10,
+        "producer_seal": "f32a0efc994617f476088c4bf724a67b819c7c79bd480bc4ebdc4a1f8ee8586d",
+        "independent_native_replay": false,
+        "comparison_algorithm": "rowwise exact original api_semantics; all controller parts unchanged",
+        "clock_exclusions": [
+          "API outer start_ns/end_ns",
+          "advance_to/advance_until_owner_notification.result.wall_seconds when present",
+          "result_at.result.advance.wall_seconds",
+          "controller prefix_semantics exact fixed clock list"
+        ]
+      },
+      "phase_diagnostics": {
+        "status": "validated_partial_root_phase_diagnostics",
+        "native_partition_all_warm_calls": {
+          "schema": "g31.native_request_timing_audit.v1",
+          "status": "structurally_valid_native027_candidate_partition",
+          "errors": [],
+          "complete_request_100ms_certified": false,
+          "physics_subtracted_ns": 0,
+          "refined_per_request_totals_available": false,
+          "session_identity": 1,
+          "trace_epoch": 1,
+          "native_call_count": 147653,
+          "span_count": 154976,
+          "resolved_association_count": 4745,
+          "exclusive_ns_by_phase": {
+            "native_call": 4849639800,
+            "admission": 31082900,
+            "event_dispatch": 11004200,
+            "timeout": 970700,
+            "source_execution": 1151800,
+            "ack_create": 3364000,
+            "ack_delivery": 1628500,
+            "permission_validate": 567800,
+            "reservation_commit": 36500,
+            "shared_scan": 99000,
+            "outcome_update": 8700,
+            "physical_dispatch": 166800,
+            "publication_delivery": 26000,
+            "withdrawal": 76000
+          },
+          "identified_control_bundle_ns": 4769427600,
+          "unclassified_native_remainder_ns": 130395100,
+          "python_binding_remainder_ns": 396907800,
+          "unchanged_whole_native_envelope_ns": 5296730500,
+          "scope": "Only a conserved phase decomposition. All native work and Python remainder remain charged; no physical work is subtracted and no per-business-request total is asserted.",
+          "runtime_accepted": false,
+          "abi_name": "native027"
+        },
+        "root_total_ns": 38375011700,
+        "root_native_envelope_ns": 5296730500,
+        "root_native_phase_bundles": {
+          "exclusive_ns_by_phase": {
+            "native_call": 4849639800,
+            "admission": 31082900,
+            "event_dispatch": 11004200,
+            "timeout": 970700,
+            "source_execution": 1151800,
+            "ack_create": 3364000,
+            "ack_delivery": 1628500,
+            "permission_validate": 567800,
+            "reservation_commit": 36500,
+            "shared_scan": 99000,
+            "outcome_update": 8700,
+            "physical_dispatch": 166800,
+            "publication_delivery": 26000,
+            "withdrawal": 76000
+          },
+          "native_inner_total_ns": 4899822700,
+          "binding_and_wrapper_remainder_ns": 396907800,
+          "whole_native_envelope_ns": 5296730500,
+          "call_count": 147653,
+          "span_count": 154976,
+          "physics_subtracted_ns": 0,
+          "scope": "All native calls inside the actual root, including shared/background work, charged fully. Labels are broad bundles; physical_dispatch is not an exemption. No complete-computation attribution is inferred."
+        },
+        "root_python_request_service_remainder_ns": 4736108900,
+        "root_other_unclassified_ns": 28342172300,
+        "partition_exact": true,
+        "python_exclusive_bundles_including_nested_native_ns": {
+          "request_service_invocation": 186352900,
+          "request_public_observation_and_filter": 5277189800,
+          "candidate_and_intent_update": 24003800
+        },
+        "max_request_service_invocation_ns": 32578900,
+        "diagnostic_step_tail_outside_root_ns": 0,
+        "scope": "Service maximum is the measured request invocation, not the maximum of all background executor services. Python bundle table includes nested native envelopes and must not be added to native totals. All native/Python/shared remainder remains charged.",
+        "complete_computation_available": false,
+        "complete_100ms_certified": false,
+        "physics_subtracted_ns": 0
+      },
+      "phase_capture_sha256": "d50bd2b53cbfda1d79ef6e5d1ffa9bc29721cfd57689f4730b41304bb7fdb602"
+    }
+  },
+  "parity": {
+    "baseline": {
+      "status": "ordered_all_warm_api_and_native_seal_exact",
+      "api_rows": 1273,
+      "producer_native_seal": "c41257b955faaf6d5bc4dbb704f174fd7820d7723a6ad8455283897f5d54c7ad"
+    },
+    "drop_first_ack": {
+      "status": "ordered_all_warm_api_and_native_seal_exact",
+      "api_rows": 6233,
+      "producer_native_seal": "425364a12ef280fc386907b79b15c9cb7b705d5cdc1b960ad4e3ed1c5390c6a7"
+    },
+    "ack_withheld_in_window": {
+      "status": "ordered_all_warm_api_and_native_seal_exact",
+      "api_rows": 147653,
+      "producer_native_seal": "f32a0efc994617f476088c4bf724a67b819c7c79bd480bc4ebdc4a1f8ee8586d"
+    }
+  },
+  "declared_roots": 6,
+  "original_campaign_status": "unknown_campaign_process",
+  "original_timeout_preserved": true,
+  "original_external_receipt_sha256": "e62ba050bb399409fb6c2abd8e063051253375e3a3942e3a8f6b19f418fe773b",
+  "verification_AST_proof": {
+    "status": "original_case_AST_unchanged_except_final_return_callback",
+    "original_source_sha256": "3a4f69b25f66d25fc758b3a93e0ccfdc6a3165549f792d9da6fc3efcabc9f65f",
+    "unchanged": "raw/process/clock/API/request replay/shard/outbox/ACK/drain/owner/budget/lineage/prefix and split-reference checks"
+  },
+  "native_timing_contract": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\native027_accepted_contract_001.json",
+    "sha256": "db7c4bd36a5cdc505afec24473c2f5ce6dc2dd85912c5d9fe8ba9bedee269dc6"
+  },
+  "native_executions": 0,
+  "complete_computation_available": false,
+  "complete_100ms_certified": false,
+  "physics_subtracted_ns": 0,
+  "closed_roots": 4,
+  "source_before": {
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\data\\build_g4d_cie_retry_large_window_dataset.py": "460903c1e595bed1590ffccf2a1034927f9a8c69d0a61986beb2d9d9a4ed7689",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\g4i_runtime.py": "28ed250a699fbb6b696a6565319370d3764f4431fcccb1c8cedb56dcb05be681",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\g4irsf11_experiment_protocol.py": "c8b6022598df7042e7a063da3da5a306849da016ae7b41474c7bfb1ad1d7176f",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\g4irsf11_fixed_map.py": "26b7f33b997c8d691e3e4d3c8fe093e37ec81cf8749e63d542bdb5e0826ea7b1",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\g4irsf11_workloads.py": "d46c8acf1dd0c12c2c6d95c68f7a8c8ced021f3ed5cf74e67fc5262d411ddf6e",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\g4irsf12_reproducible_harness.py": "56c19a159b0cbd3f87140e9f0bf6746c5dd663df0e457ca00e74a5be1df2c362",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\g4irsf12_size_ladder.py": "e07097f1d3817f9a0b7cd4ddb0f2a83cff3acd188b171d0af4ae6eef7faaaeaa",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\g4irsf13_runtime_profile.py": "cd663e04ae42e4ffed15f7f8a3d9fa9c397ea64c5b6929c9e83f2079c4cea7a3",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\g4irsf14_opportunity_census.py": "60bea44339851d367397c359544acf1de3ca0e3d1eae91f5dc8e12fd14b3de4f",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g3k_cie_node_window_retry_audit.py": "2ac143765333abc68d13e751109d3f7e917d72df6c53416b5c0d41258dda11a8",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4g_no_astar_fallback_validation.py": "d0969b9d642488c4b42c34ef07763bf48e4d8e7dc440a8f129132585db5ffa38",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf10_v2_safe_scale_hardcase_training.py": "f72283fec4aa72ae5613f9ee6142d95f7e6ec6a9bfdd867b06ee58ca600b8390",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf18_jit_campaign.py": "954c29994c22c1d7b8a7e777e4accee9b9066ff57d2d6a77caeb67da4377ed75",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf19_bounded_capacity.py": "efee97d3f8f9b2460e5dedee5b2892aecebe34d5f7ab6d1ad070c1ce3e2837c4",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf20_event_hotpath.py": "d5abbae3052d0dabab7d43eecb25b0f8a51b1e5c6c8682be7aa0fafa940d7de6",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf24_native_race.py": "e09ac7d266e7d925cccd2055f6fa06c0a6898fa630ed519bd94b884786a3a0ba",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf26_paper_experiments.py": "7ac52959104ffc6cd507939a43acfd51a81b4508ba0b6de864fa5be39483792b",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf27_fault_values.py": "ecd8558a7971c3ca991956a1cdfb36eb3cf093db156e785c34e8b6f4f496e87a",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf28_service_potential.py": "992ebc5b33f09acc5935e4c1724d8874da10dd46ca69390f72c74bd5bdd2b52f",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf5_original_protocol_comparative_validation.py": "55fd1956b92678011876e28cb50c4bdeaa7609fc43d68790c124686de4317c0d",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf6_paper_protocol_gap_closure.py": "0b3f750e0b56d830e0eb2fb34a286c40eb61cb8084f857f7af365a9a9f146904",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf7_engineering_tht_gap_closure.py": "b5099f212c07ad7319ddff1343a6b297d36af9b783699f18c166ab979d4e25f2",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf8_source_release_denominator_validation.py": "f4ccb6ef64451c4fa7f038f6b1260175674e4df8a866476c8abc7e7bd48a68f9",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf9_v2_candidate_tiering_open_end_proof.py": "4698b581237540295d2dd469549fb77339b40324b782808de7d24b8e54c04614",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\__init__.py": "495b29212f548915ec02a3c29999151b9ba4a24e455fc8df58fca68473e23f38",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\analytic_control.py": "a895b79a0adb93dcb61e08da97f68510b0c8e454fb7f69e419952ca7a0854115",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\bounded_windows_job.py": "798ae87c19d5fa61569b1c9301cebe7ef6a5885302f32f42380cf53fd6363cde",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\business_update_outbox.py": "72a7b4daaa8535bb96c8f56e4976f5888f07ede9e319ff214b3815f3b3acb275",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\capture_native025_request_timing.py": "8e63b811852f3b02a152411aa4f5e5c770090464a8114d4356a83d20e595e885",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\capture_native027_request_timing.py": "486d7f9690a056732f47742643fc73dcd0cd0b9696787d89dafc29881f64f471",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\capture_native_request_timing.py": "31573bea57b059d2c1c5b628c3b61198a82c65e659dea36a95236f0503196287",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\event_protocol_control.py": "3f8b73b663d44f0d07ba8f5298500b619944fd325a4a103ac30aef531b4276b0",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\event_protocol_control_deadline.py": "a0c85051cc8a79fcdf7ae94d70fffdb2323f2e43c311de316421d07751d2dee9",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\launch_original_route_update_native027_phase.py": "eba1e2b9e935dc76b2978fc01d055f1ffc4e82a94c8a9af5cc866f730a14cac1",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\native025_request_timing.py": "9395cd47dc521685039d00bb41d1be9fcbb4dd898b3ff5fe9b49417d2899d28c",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\native025_timing_gate.py": "c259b3e74b7cc4eade5d88a673e474a48a0b01de821647cce1dcdb4f8921d449",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\native027_request_timing.py": "38adc52d4c16bbb8e1d836993c78b11d7ee841e8c786ebf811abd6c3d34c71c0",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\native027_timing_gate.py": "9271a539ad1ae2f481749f6cd15b214f7bef65b621c4ff4a4cfc5db5ae809b70",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\native_host.py": "03c33fbbaff5049b9068471edf7d7208f4921e977cc008e04461c515635bc48b",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\native_request_timing.py": "47a642588ade637228164a282f4ce38e47ecbe13735f6d2a3884cb9f8423cc31",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\planning_capture_v2_digest.py": "01fc49cbded5ba70851f1294fce9f5aaa06b66e82bfb5b9862740c310faf9fd5",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\planning_capture_v3_contract.py": "b6fc962ad5c3459981f423e4162874325a2c04778aa189e33e4baa450fb67962",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\probe_original_route_update.py": "43ddfc061084d8228b56f23ee19b90ba6197a17b52edc41a8f2d9d7c987c5a8e",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\probe_original_route_update_eligibility.py": "b42a87e6a2bcfe0dfe07a3340c8881b13a53443b38b655f82031544331436602",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\probe_original_route_update_internal_deadline.py": "fff46387cde09fabae99e3f3b7b7d5b5e015f0882e91c81558e27fdedf381d5e",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\probe_original_route_update_native027_phase.py": "52528fe87a47514b1235e33383694145c4dc7b5bd697150c4c9de6debe76652f",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\profile_native_request_timing.py": "3d383402465a072beb3b8567570bca5ee883dd52baa0a638250cbb3c333b0550",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\profile_request_bundles.py": "9e7e8a67931db308c1b02accedef6b46072f8d906027630317c0ef73225bb6dd",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\protocol_control.py": "3ff5770e11de5c20b203455546829986d8c3e22e6d4a4189bf0214f14fe1da2f",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_control.py": "78bc3e2723dfb4b66863b6c599ae7752b5fb7a697b3b8eb2f8d4332c207e6997",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\request_bundle_measurement.py": "4d5acf933e1c8eba02b8cf81a65d40aa0c9e971a73d1d736bcc3a72db16382b8",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_original_waiting112.py": "5ff5e6b449e163daa3d5e0d0cabb01d2453484acd9e531152e4d2657e730ad94",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\rolling_request_lineage.py": "993c9517c692c8b5f0f503a3874e788f038f3448dd2672c3c02c56a4afbaf192",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\route_update_phase_measurement.py": "11a793150202197ae8a9b4a82f9ace14ba80d3001850340bf0e633ad96f2fe1b",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\verify_original_route_update.py": "bc731eb582dda5f424ba619e23f12fbf36e7ae81f9c2f2fac6a46b56f43154aa",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\verify_original_route_update_eligibility.py": "056759a40364901a10347b1d013d09bcf2eecd860b431e54a145000c920ef475",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\verify_original_route_update_internal_deadline.py": "4f51d0020d021f49379f1056bef384f1386bb839f9344e0f2af45f7306dd0fd4",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\verify_original_route_update_native027_phase.py": "3a4f69b25f66d25fc758b3a93e0ccfdc6a3165549f792d9da6fc3efcabc9f65f",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\__init__.py": "432d04eebbba673d42defd9a2a97a226a6c43a2b4e5f817882c9f6f8425b28b0",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\baselines\\__init__.py": "682580f17626d10a54f0a46104509f5625cb96217fc60a446cfb8a4402cbd152",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\baselines\\legacy_route_sipp.py": "790b5b98d7350564e7664e6df71af50c1a78299af02695bdfa15f09d03ec2aa8",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\baselines\\periodic_replanning.py": "c4d41c5c6769b5cad8e3059d0352b0b9d283b3675f0096c469c749515ebdda3b",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\baselines\\pibt.py": "7565a71a39b97ad64643c6045df1397e380ba6d4e75fcb57aea9be7d1504f4d5",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\baselines\\pibt_replay.py": "1b4c0607244e530be0edde4511423101feb7e8f84be8d2a3913f45e57d968b51",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\baselines\\queue_aware.py": "6c4a9b3554b89a93b69a2a31b9efaeee4bb33c578624881b9d6c10d0f8bd4d26",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\baselines\\rolling_horizon.py": "2e9ce04f6be6286ae19241dda5b71e16231172623c6367085c48a124730ead92",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\baselines\\sipp.py": "b5825cdc25e3b50a67bdebbf9f85e95e29e994e41fdee9ea2b22fc11bceeb778",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\cpp_backend.py": "a33318264474ee47caa42f33b41e5caf06dbaaf2c6a1bfd57e02be8ad69133b7",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\envs\\__init__.py": "2130f188f292deeacf053c8c273e258e49b258074285858d0fc5111edf14297c",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\envs\\action_mask.py": "984774e0c535569a5e2907f41cc7d4502078fc60d7d86d31047c8c6e5893c506",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\envs\\ics_junction_env.py": "f2e4d06161b1f35d17153692508e934525d2f80be45b0df32ed2e24809bfab92",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\envs\\observation_builder.py": "6cd05d759abfdd7ee2ce79163270b52d7f7eb8077c585c93dc9e0e2a0d35db01",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\envs\\reward.py": "4e1f4c5b78c48e908ed81c6431c74a3cc619efc149975644031e14e9c1371c16",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\envs\\vectorized_ics_env.py": "2d0ad5752157cdbdea8fe8c8400c136246c8476c630e9ee33416815124556393",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\g4irsf16\\__init__.py": "b5e2a23b386a34b6aae15bd47efa37001bd02e9e2ed44f801fc98fbbeb296cb3",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\g4irsf16\\model.py": "df5fe35ad4538c05a7f69d5f3860b992732f806cb7ffc81befd97993cb796e4a",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\io\\__init__.py": "e2e96b67e5b8e787106b40042959f0edb80ed1583174da92e1aa8b10e278410b",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\io\\legacy_map.py": "2fdd7b7446a01b67dafe0f17358a0e30da4ff71c1624466fa2035585f71c9bdd",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\io\\legacy_tasks.py": "3e1a01fdf7b0bd3aa8a1293d7f63b37823a0d1bdf360ccb5e4697fe70133d93f",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\models\\__init__.py": "1ba0b30d17f606d3244858ad221e2f1271e1d0a18ed24618b4096babab73d5fe",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\models\\edge_score.py": "dae75954f9675486144674fca538f53ebdd2e8e37f04fe25a7aa0d228849623e",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\models\\g4b_cie_retry.py": "af2a207a3af8e0f58e621182e5500f2442bcdc8153fda44e0845b46922b1353f",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\models\\g4d_cie_retry.py": "29acff3f8fc00262ffacaf9f8a634c069c8196e24d93ed1a3e91e866cd1871bf",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\policies\\__init__.py": "40001e3dd847f6835025ed7253d5a886a4cc7ad07fcb1252aedf9fe8bee7e989",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\policies\\g4irsf16_supervisor.py": "e10fd5b2c7a571e138c8428e7565425e70a129a4427e85d5d63768807db500c1",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\policies\\local_progress_fallback.py": "bd7da831e3141921e1690c36a9f600375aff4cc3fa39277d6d8f89f4485699de",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\sim_py\\__init__.py": "1aca64d309dc8d99deb7b039d77b34cc1a7bc7737909a72d59f2d1c0c0b4cc83",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\sim_py\\astar.py": "a33b1af725c82b297751da0d771c1b35eb2daeb8645ff09c95eeebb66084e811",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\sim_py\\event_sim.py": "3ad27e3cd837d9b9a037a6e132ad7eb3d3a5057a38baef8743dc8cc10d9b25cc",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\sim_py\\graph.py": "7fb1e2abbe6baf19a2804240e7d64d11f3b9b0d60f8a78e2e91048506f7c9c04",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\sim_py\\metrics.py": "53dbe162ee85dc093e36a884f9e2905d9a1836216f1e044049e245ca38522f08",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\sim_py\\reservation.py": "a4477b095bdcd0bc1b0d6dcb29764bacc3f74f9a671340e3a71a4abd1f059881",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\sim_py\\task_stream.py": "017fc931ee601de673dc113d721f056e7d36d9eab9f8956ea9b87b39c428d267",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\tests\\test_g31_circulation_original_route_native027_phase.py": "e3c2bdc4bdfb3de0beead2867e29cd8759a5bc2ad4633db20b827c4ac251ed7a",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\tests\\test_g31_circulation_original_route_update.py": "31e25d278cafa047c959e488aa993713385a51c51b65b2b6f8c14fb833f2417a",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\tests\\test_g31_circulation_original_route_update_eligibility.py": "7d82e03371bc0424d77f2dba261e4b196526ad69e36b469f3b3110b55eed3a17",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\tests\\test_g31_circulation_original_route_update_internal_deadline.py": "011c66bfa88604eb47d32fc237388290472181168ee3633da1be5f75f6b7b0cb"
+  },
+  "audit_source_pins": {
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\verify_original_route_update_native027_phase.py": "3a4f69b25f66d25fc758b3a93e0ccfdc6a3165549f792d9da6fc3efcabc9f65f",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\route_update_phase_measurement.py": "11a793150202197ae8a9b4a82f9ace14ba80d3001850340bf0e633ad96f2fe1b",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\probe_original_route_update_native027_phase.py": "52528fe87a47514b1235e33383694145c4dc7b5bd697150c4c9de6debe76652f",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\audit_saved_route_native027_phase.py": "cbaa61eb9583f0498c3f50962240eb19a4752d52fe634389da2022566b699618"
+  },
+  "evidence_sha256": {
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\external_launch_receipt.json": "e62ba050bb399409fb6c2abd8e063051253375e3a3942e3a8f6b19f418fe773b",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\campaign.json": "ce9424cca08af52c15d9f1cf25f25c5177abd3fa7c6fc25ba3c3d311ceeca3f4",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\branch_ledger.json": "153dff85fecbc167a747e0f9efd6ae830a9eef4f54c434d46f4c23e6856c0b7b",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\campaign.stdout.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\campaign.stderr.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\plain\\receipt.json": "c46aaa0becaecb1afe6be352d51b20d20902b7ffacf437d31dc6c942d595744e",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\plain\\preregistered_protocol.json": "362b612e1d02c2c62a1f89619c22ce74645536c895bb12521e6ab0c4fb6c33ba",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\plain\\baseline\\raw.json.gz": "9c8da55962891b879e8e1c23fa07a339ffa614c1bd1caadc0f250cfd2c9befef",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\plain\\baseline\\service_tape.jsonl.gz": "f17c2674cd82996366dad7aaecede7aa2d6f1a0cf3115e1180675b238f90a3c8",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\plain\\baseline\\shards.json": "6fe8c8b68a3689d5578756cff2e7c1919afe20f1b4ed472a88ce31f7b8a0761d",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\plain\\baseline\\phase_capture.json.gz": "368a6b236f7c086c9bd75129b5f14c89c3f7c07bb7a5fe6a95101aca433e931b",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\plain\\baseline\\input.json.gz": "2ce6b70478735d3dd71fdab930b5a7547826e4c825769a3c23e9763f08cc8a1b",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\plain\\baseline\\segments\\0000.json.gz": "6a24afdc3de579c5abc18845ae819322b863fa04c3741dc431a313f5d3e1232f",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\plain\\baseline\\segments\\0001.json.gz": "d8e174455bc127792a8fcb644ab248ca5e2ecb2b2a921c53f3065df3c17214f8",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\plain\\baseline\\segments\\0002.json.gz": "2adb09a0d7f578102c8a7a1ba28360bb2aac48dcfad89760c17a63b51950fdc5",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\plain\\drop_first_ack\\raw.json.gz": "bb1f8d35a267329ca3a670fd3cb81c796055ed2f54e33765e71c6c0daff675ac",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\plain\\drop_first_ack\\service_tape.jsonl.gz": "38e5503f6814392c68496cc9fda497d2f81ffa3436ddd58de3ef965c9fa29652",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\plain\\drop_first_ack\\shards.json": "9e9f45c0904143cfae758c185a980faa029e6877cc027661dbba89cd3a65a169",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\plain\\drop_first_ack\\phase_capture.json.gz": "e94b5897b9f7fae0b72cc15c841096c3211d65348ea165957ff712d2c2790281",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\plain\\drop_first_ack\\input.json.gz": "69719908f52059a50b64be4af78412c38902c8420a6de286cd77b7c75258d50b",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\plain\\drop_first_ack\\segments\\0000.json.gz": "89c1e2732a04918825b4c024c4165dfb65c2e4f8411c076c74a821c2af67ed52",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\plain\\drop_first_ack\\segments\\0001.json.gz": "086562cc9b07f9fc50fc63c0f716ef75e6e64644d9f4e85c4f3fddf9784b1f0b",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\plain\\drop_first_ack\\segments\\0002.json.gz": "53ee8c87d905ffa03317bf88b369471bfdebf7e8838da549d1d45316e279864f",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\plain\\ack_withheld_in_window\\raw.json.gz": "b65582e91a2a9de32091b05726d0b177c73c042eeaea90b97f4a38ff0e0a8f27",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\plain\\ack_withheld_in_window\\service_tape.jsonl.gz": "0173c4caceb29e16921e6195fb7f18eccd2845dfc9e2d30d77ce6f65ba994f5b",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\plain\\ack_withheld_in_window\\shards.json": "02c01742c93aca668f407157243cc2b35967808f0370a5d2f56ba9db4fd3b35d",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\plain\\ack_withheld_in_window\\phase_capture.json.gz": "eabce851cb533903e9fb7191bcaea410de0999c7892a3de5eabd4ca7eca18942",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\plain\\ack_withheld_in_window\\input.json.gz": "5632acfacb923e9fd36ded771370d17fd60af7aada31f6600e03f5a833baf587",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\plain\\ack_withheld_in_window\\segments\\0000.json.gz": "626932eac1787d9e58d60ea9f689eff62ce76043ed20aaec0330dd263bb6db9c",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\plain\\ack_withheld_in_window\\segments\\0001.json.gz": "6c85a59257ca80eefa054c8eca7716ce9c88b2d316da06e50be6d9dcf46a7238",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\plain\\ack_withheld_in_window\\segments\\0002.json.gz": "2cbbbe8f5af7ce95254b3bf5699360b75351bd8b76ba12a3824e3c270ecfc5ac",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\plain\\ack_withheld_in_window\\segments\\0003.json.gz": "6d758291e071b11ed84a7c952e1717e44e0f57590337301780a46440d592c1e4",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\plain\\ack_withheld_in_window\\segments\\0004.json.gz": "cb50b5d7b34f8aae62bb06e9a168784d29dcb2ef24a64beb9f2bc2a6b9b9b4ac",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\plain\\ack_withheld_in_window\\segments\\0005.json.gz": "12496abb6b9897b65f922802235af20b66acee0406d32ccfc70c83ac9d6b430d",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\plain\\ack_withheld_in_window\\segments\\0006.json.gz": "c745320f952978507b3d15144ba2671e0b157ed9f906a5d45bb6e9229deb60a8",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\plain\\ack_withheld_in_window\\segments\\0007.json.gz": "473f2d82c0ca210df8f574b71bfec23e710adbc533e9d314901794d895f68433",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\plain\\ack_withheld_in_window\\segments\\0008.json.gz": "f3fa1d8e7b89189b58e97bae534bc1e552e66b2e536478be17475221d532ebf7",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\plain\\ack_withheld_in_window\\segments\\0009.json.gz": "d3fc1e752d879a20a1894d8d83d4d1cd235c4ddf9e392e592b4a90ce7557480b",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\timed\\receipt.json": "cab8055799b6530b34486749ef1bda287ada8f81ef52378c9ebf72d54bb5ec8f",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\timed\\preregistered_protocol.json": "04937581a29a5fe494406ef7ad99192ac834d81e06b85ff5c52cfa16bb04e5eb",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\timed\\baseline\\raw.json.gz": "48c45e49f9796366f6021329777974894c5ab4493eaa8fedf3a31ae0f1b1f7be",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\timed\\baseline\\service_tape.jsonl.gz": "6d30567a930a511db5300ca04a127de5739482d32cfcd13d724fed440ef67694",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\timed\\baseline\\shards.json": "5f92f201ef69d7223d96a2d7912091011487e8e12168a82e2fd0114fec43bbeb",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\timed\\baseline\\phase_capture.json.gz": "bf6a6c0291333c575399d517c1c1028a73dfff12a0198b96ed097b0bdb4b3f7c",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\timed\\baseline\\input.json.gz": "14c4dde4df39694b4a43ee30e0aa77eee49509dbe5a75bd8fe7672819fa9b228",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\timed\\baseline\\segments\\0000.json.gz": "23c3f0a9ef07ab578ef23a56894c3c98d5ba1f74c6437fd3be281df0b185649f",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\timed\\baseline\\segments\\0001.json.gz": "34302c43e8a96fc931cdd58e4209b48eaf4739cae201b71aea68f4c6ac1f51c2",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\timed\\baseline\\segments\\0002.json.gz": "36b4d20e02df7aa1a187b0f0d742e7344e3d918cdc24589ced0214ede1b1ed28",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\timed\\drop_first_ack\\raw.json.gz": "7042f43aa1ffe55656d99544effcfd708c99be18a15266fc728576c32e7759cc",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\timed\\drop_first_ack\\service_tape.jsonl.gz": "0cab4856b1a81ff38f4443669c759c11c5bdf29e94aaf55136ed1bda14c3b63b",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\timed\\drop_first_ack\\shards.json": "2b706e67e9975f87d14d854e27874ae64af4b196eecbbaf89bc930f2e1a85432",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\timed\\drop_first_ack\\phase_capture.json.gz": "6df63947682495d76cf7f01f3ac4cdbd632bc6be067ac5208962a2b7089661a2",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\timed\\drop_first_ack\\input.json.gz": "0b026e99ad8bcffb12e7013608d65accdc50a6fb34fcf6013c786fffef1552c4",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\timed\\drop_first_ack\\segments\\0000.json.gz": "236c1694fd753c8c32fd005b804bbc393358e231b9b56e46100356b15e6b9aee",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\timed\\drop_first_ack\\segments\\0001.json.gz": "606a648c1e4845cc49374a05c5deee6398736efeed63021260cccf4d5959fbc0",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\timed\\drop_first_ack\\segments\\0002.json.gz": "99d7095e8472bc6b1af50052130f0df4501a68718723a8cfa9e766828f68e701",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\timed\\ack_withheld_in_window\\raw.json.gz": "245d522b4c5eb8cf5610fa097c4f3ec3ef851dfcf234e08102a68f5948c0074f",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\timed\\ack_withheld_in_window\\service_tape.jsonl.gz": "ffb8a0250e79783455c1ef13e1cbd0572ca3c23a652a91016ed74aea7f2cb129",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\timed\\ack_withheld_in_window\\shards.json": "d04b8b010aaacfbeb0def96f772b12595dcb3fd11931fec6366ba1b657a21e07",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\timed\\ack_withheld_in_window\\phase_capture.json.gz": "d50bd2b53cbfda1d79ef6e5d1ffa9bc29721cfd57689f4730b41304bb7fdb602",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\timed\\ack_withheld_in_window\\input.json.gz": "474683191f0a1e83c34df461cebdb82bbcf3206ae192f335df3940bef068d704",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\timed\\ack_withheld_in_window\\segments\\0000.json.gz": "edf48d6bd6117d565d0b5441e8dda7ee7ba9bf45a7e57f4f7c61ebfefd4256e7",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\timed\\ack_withheld_in_window\\segments\\0001.json.gz": "70e53230b9af40f0638786f420e85ca7d245cd61f7bbf6a25c063c1386bc03e5",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\timed\\ack_withheld_in_window\\segments\\0002.json.gz": "0dc13f4926fe3dd22bbb15149bab4381133857ffe7b6950ca343d8993ed8b15f",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\timed\\ack_withheld_in_window\\segments\\0003.json.gz": "276a4bd1c7be1cfe98797d41ffef62fb54dd53e521e69525f6d50d401a60591f",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\timed\\ack_withheld_in_window\\segments\\0004.json.gz": "09f2752967e1743350fac7bed3858e0d99dd2f631bf2efc160ce2622afe09b15",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\timed\\ack_withheld_in_window\\segments\\0005.json.gz": "b4f574c55f4efa25735dcf89bf8cbe8756eab84d1f0de08283bfc3bbcbc0a679",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\timed\\ack_withheld_in_window\\segments\\0006.json.gz": "51341715cb007911641103d1bcfedcc8bc15595f08affd476fbcd47e285e8158",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\timed\\ack_withheld_in_window\\segments\\0007.json.gz": "0f5b1f08b1ec441b59ab7bd1585ce6403b20fcc08cb33e90e7ae99f9c8289b93",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\timed\\ack_withheld_in_window\\segments\\0008.json.gz": "647dbe323a3254aeb81d32164d8e4f3b33d6022fbb0ff3ad977e79a3ea5eba4e",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\original_route_native027_phase_prepare_002\\timed\\ack_withheld_in_window\\segments\\0009.json.gz": "2f38d4de0c62df4268986c78e8fa93abb3432374e9f6073a5d73b9f69e58f816"
+  },
+  "stages": [
+    {
+      "stage": "actual_six_cells_and_original_timeout_pinned",
+      "elapsed_seconds": 0.2572790999984136
+    },
+    {
+      "stage": "full_source_and_closed027_authority_verified",
+      "elapsed_seconds": 23.585288899997977
+    },
+    {
+      "stage": "verified:plain/baseline",
+      "elapsed_seconds": 39.510596899999655
+    },
+    {
+      "stage": "verified:plain/drop_first_ack",
+      "elapsed_seconds": 57.36323999999877
+    },
+    {
+      "stage": "verified:plain/ack_withheld_in_window",
+      "elapsed_seconds": 158.17846019999706
+    },
+    {
+      "stage": "verified:timed/baseline",
+      "elapsed_seconds": 176.3449944999993
+    },
+    {
+      "stage": "verified:timed/drop_first_ack",
+      "elapsed_seconds": 195.2904826999984
+    },
+    {
+      "stage": "verified:timed/ack_withheld_in_window",
+      "elapsed_seconds": 311.6551412999979
+    },
+    {
+      "stage": "plain_timed_parity:baseline",
+      "elapsed_seconds": 321.3927984999973
+    },
+    {
+      "stage": "plain_timed_parity:drop_first_ack",
+      "elapsed_seconds": 331.43351419999817
+    },
+    {
+      "stage": "plain_timed_parity:ack_withheld_in_window",
+      "elapsed_seconds": 387.05115149999983
+    },
+    {
+      "stage": "exit_all_evidence_sources_and_closed027_authority_verified",
+      "elapsed_seconds": 399.1038989999979
+    }
+  ],
+  "audit_wall_seconds": 399.1086813999973,
+  "scope": "All original six-cell guards, exact request-policy replay, API/controller/native-seal comparisons and unchanged phase validator. Rowwise comparisons avoid full normalized API copies. Separate saved audit does not repair the original600s timeout, prove isolated compute or create a new native seal.",
+  "open_roots": 2
+}

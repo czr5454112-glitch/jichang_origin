@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 from collections import Counter, deque
+import copy
 from dataclasses import asdict, dataclass
 import gzip
 import hashlib
@@ -41,6 +42,34 @@ def digest(path: Path) -> str:
 def json_digest(value: Any) -> str:
     return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(",", ":"),
                                     allow_nan=False).encode()).hexdigest()
+
+
+def research_r1_authorized(data: dict) -> tuple[dict, dict]:
+    """Create the separate LT2 permission factor without changing old inputs.
+
+    This is an explicit research permission, not a claim about field authority.
+    Every method in a comparison receives the exact same returned input. Native
+    delivery revalidation still protects executed prefixes and mandatory stages.
+    """
+    if "r1_authorization_contract" in data:
+        raise ValueError("research_r1:already_authorized_contract")
+    result = copy.deepcopy(data)
+    for job in result["jobs"]:
+        job["allow_suffix_reroute"] = True
+    contract = {
+        "schema": "g31.research_r1_authorized.v1",
+        "contract_id": "research_r1_authorized",
+        "authority": "LT2 original R1 research scope; field authority unconfirmed",
+        "permission": "owner may propose an uncommitted loaded stage suffix",
+        "immutable": ["destination", "executed_prefix", "mandatory_storage", "physical_location",
+                      "graph", "direction", "length", "capacity", "fifo", "port_permissions"],
+        "same_for_all_methods": True,
+        "native_validation_required_at_delivery": True,
+        "source_input_sha256": json_digest(data),
+        "authorized_business_ids": [j["business_bag_id"] for j in result["jobs"]],
+    }
+    result["r1_authorization_contract"] = contract
+    return result, copy.deepcopy(contract)
 
 
 @dataclass(frozen=True)

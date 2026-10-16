@@ -1,0 +1,247 @@
+{
+  "schema": "g31.owned_full96.root_review.v1",
+  "status": "one_original_full96_conformance_authorized",
+  "review_script_sha256": "0d00bad7e444ad51de800038b1b85cfa5b474f184f49de2d12fa5c6dd42a38b0",
+  "plan_sha256": "6f4434bcf87d8e35d709eabfed5561b6461adde71389b92c8042072a9e6c4bc5",
+  "source_count_verified": 191,
+  "evidence_count_verified": 447,
+  "command": [
+    "C:\\PROGRAMING\\python3.11.9\\python.exe",
+    "-m",
+    "scripts.experiments.g31_ics_circulation.validate_owned_full32_runtime",
+    "--execute",
+    "--output",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\owned_full32_runtime_prepare_001",
+    "--expected-plan",
+    "6f4434bcf87d8e35d709eabfed5561b6461adde71389b92c8042072a9e6c4bc5"
+  ],
+  "hard_application_seconds": 360,
+  "root_read": [
+    "full driver",
+    "20 tests",
+    "pure runner",
+    "original worker/execute/check_plan",
+    "owned runtime saver"
+  ],
+  "source_proof": {
+    "schema": "g31.owned_full32_runtime_conformance.v1",
+    "save_inverse_AST": {
+      "function": "execute_group",
+      "original_AST_sha256": "80a412ff1716916014d4cc2f8f740035abb6862efd04625e1d3e8b2fabf50980",
+      "candidate_AST_sha256": "783639dbb0fa8d58849228ae05e7bd6a7eab6f76e687ebfa9d7d94888ff660c6",
+      "inverse_AST_exact": true,
+      "exact_statement_count": 1,
+      "removed_metadata_keys": []
+    },
+    "worker_inverse_AST": {
+      "function": "worker",
+      "original_AST_sha256": "b1e155fb2112615d715183840d76966cd175bde7ea0fb0acf14c66ec5f6ea349",
+      "candidate_AST_sha256": "51ea56a0db853dee2660bf75fc164f9d45a07bf702cfb04f5ac1926537f3e661",
+      "inverse_AST_exact": true,
+      "exact_statement_count": 1,
+      "removed_metadata_keys": []
+    },
+    "runtime": {
+      "schema": "g31.owned_model_future_suffix_execution.v1",
+      "point": {
+        "function": "point_description",
+        "original_AST_sha256": "4f215d2c9bf9dc8ca1e14a168e1cfacd780f16e8758067b9fcb2ce2e6fc5c92d",
+        "candidate_AST_sha256": "9979ac9ef9cb8d762313331668516fff6c9c70aaf74abd328dcb0eb1623afc55",
+        "inverse_AST_exact": true,
+        "exact_statement_count": 1,
+        "removed_metadata_keys": [
+          "graph_sha256",
+          "graph_encoded_bytes"
+        ]
+      },
+      "terminal": {
+        "function": "terminal_description",
+        "original_AST_sha256": "21af2c50878f6ec89c13a1240e4281371467c210dc3d7b5f1f8393c8460b2d94",
+        "candidate_AST_sha256": "749cf7c94c3679b0e5b418604150d44bcc832c605d3ec3e0f715ccbeaad35ca8",
+        "inverse_AST_exact": true,
+        "exact_statement_count": 1,
+        "removed_metadata_keys": [
+          "graph_sha256",
+          "graph_encoded_bytes"
+        ]
+      },
+      "run": {
+        "function": "run_case",
+        "original_AST_sha256": "e0a1449f8ade77f61dcabe9d12732ab4dab2347b4956c43e5e0b18a76513117a",
+        "candidate_AST_sha256": "0f831cde6249628a59f6a86f5e9a37f232f029c7146d70ca3a617033f9b33375",
+        "inverse_AST_exact": true,
+        "exact_statement_count": 16,
+        "removed_metadata_keys": []
+      },
+      "group": {
+        "function": "execute_group",
+        "original_AST_sha256": "88ddb63e648287b5264d63624092fa3ee323f963012101a2d2e2d71367b09083",
+        "candidate_AST_sha256": "1cce0f821cbd7e89907fa89fff679050e50980c8fefd99c196e197f773fe456f",
+        "inverse_AST_exact": true,
+        "exact_statement_count": 1,
+        "removed_metadata_keys": []
+      },
+      "unchanged_future_source_proof": {
+        "schema": "g31.conditional_future_later_fork.v1",
+        "core_source_sha256": "31ad32a9a74d90dc64400b801a16fceb73abc73db1d9cf9850aa8fa3f4fb6b63",
+        "core_control_flow_proof": {
+          "original_source_sha256": "0c77f130e31f2727d0f6b7f6e6425ae073e3bf5b97515843cf1d03cced5c56ea",
+          "lazy_source_sha256": "980f245dc3b3563968015a626ed5e127fd94efb70044eb24b67d9d948835f86f",
+          "decide_inverse_AST": true,
+          "activate_inverse_AST": true,
+          "run_inverse_AST": true,
+          "accepted_lazy_code_shape": true,
+          "accepted_generated_run_code_shape": true,
+          "complete_defining_globals": true,
+          "physical_handler_statements_changed": false,
+          "same_action_only": true,
+          "arbitrary_program_counters_supported": false
+        },
+        "effective_action_uses": {
+          "decide": [
+            {
+              "field": "return_delay",
+              "access": "Load"
+            },
+            {
+              "field": "return_delay",
+              "access": "Store"
+            },
+            {
+              "field": "return_delay",
+              "access": "Store"
+            },
+            {
+              "field": "later_action",
+              "access": "Load"
+            }
+          ],
+          "run": [
+            {
+              "field": "empty_departure",
+              "access": "Load"
+            },
+            {
+              "field": "initial_action",
+              "access": "Load"
+            },
+            {
+              "field": "return_delay",
+              "access": "Load"
+            },
+            {
+              "field": "later_action",
+              "access": "Load"
+            }
+          ]
+        },
+        "declared_super_action_uses": {
+          "scripts.experiments.g31_ics_circulation.public_live_obligation_communication_projection.Projection.decide": [
+            {
+              "field": "return_delay",
+              "access": "Load"
+            },
+            {
+              "field": "return_delay",
+              "access": "Store"
+            },
+            {
+              "field": "return_delay",
+              "access": "Store"
+            },
+            {
+              "field": "later_action",
+              "access": "Load"
+            }
+          ],
+          "scripts.experiments.g31_ics_circulation.public_native_preference_projection.run": [
+            {
+              "field": "empty_departure",
+              "access": "Load"
+            },
+            {
+              "field": "initial_action",
+              "access": "Load"
+            },
+            {
+              "field": "return_delay",
+              "access": "Load"
+            },
+            {
+              "field": "later_action",
+              "access": "Load"
+            }
+          ],
+          "scripts.experiments.g31_ics_circulation.public_live_obligation_projection.Projection.request": [
+            {
+              "field": "return_delay",
+              "access": "Load"
+            }
+          ],
+          "scripts.experiments.g31_ics_circulation.public_native_preference_projection.Projection.__init__": [
+            {
+              "field": "*constructor_copy*",
+              "access": "Store"
+            }
+          ],
+          "scripts.experiments.g31_ics_circulation.public_native_preference_projection.Projection.run": [
+            {
+              "field": "empty_departure",
+              "access": "Load"
+            },
+            {
+              "field": "initial_action",
+              "access": "Load"
+            },
+            {
+              "field": "return_delay",
+              "access": "Load"
+            },
+            {
+              "field": "later_action",
+              "access": "Load"
+            }
+          ]
+        },
+        "both_later_choices_in_independent_cartesian_domain": true,
+        "constructor_legacy_action_later_independent": true,
+        "obsolete_scheduler_effective_noop": true,
+        "obsolete_event_producers": [],
+        "obsolete_run_later_read_only_in_unreachable_event_kind": true,
+        "collect_before_live_read": true,
+        "fresh_pair_returns_before_live_read": true,
+        "live_read_only_nonreturn_known_tail": true,
+        "capture_does_not_read_action": true,
+        "native_authority": false,
+        "coverage_of_unknown_remote_states_certified": false
+      },
+      "original_initial_and_cut_guards_retained": true,
+      "same_whole_dynamic_graph_clone": true,
+      "both_children_before_either_resume": true,
+      "source_inventory_memoization": false,
+      "initial_context_cache": false,
+      "offline_diagnostic_path_unchanged": true,
+      "isolation_basis": "private_factory_complete_graph_clone_v1",
+      "closed_domain": "Exact source-owned factories and serial private state; no arbitrary reflection, callbacks receiving state or concurrent mutation.",
+      "arbitrary_tamper_resistance": false,
+      "native_authority": false,
+      "100ms_certified": false
+    },
+    "unchanged_default_GC": true,
+    "original360_budget_code": true,
+    "source_files_only_audit": true,
+    "comparison_only_after_complete_output_saved": true,
+    "graph_metrics_not_recreated": true,
+    "native_calls": 0,
+    "100ms_certified": false
+  },
+  "requirements": [
+    "Original48 groups/96suffixes, entire predictions durably saved before targets; every retained point/terminal/action/count compared; unknowns remain in denominator.",
+    "Original shared360 including imports/pins/context/clone/suffix/export/audit; external launch-through-exit clock and closed process required. Default GC; no per-request cleanup or native/C."
+  ],
+  "limits": [
+    "Historical graph diagnostics are reference only and not remeasured; no fabricated graph flags.",
+    "Offline conformance, not paired speed, native hidden-state coverage, online utility or complete100ms certification.",
+    "No static source-proof cache or scoped initial context optimization is included."
+  ]
+}

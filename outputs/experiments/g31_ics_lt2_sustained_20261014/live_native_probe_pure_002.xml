@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="12" skipped="0" tests="48" time="3.877" timestamp="2026-10-15T19:50:40.405317+08:00" hostname="LAPTOP-M3GASC4G"><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_explicit_supported_storage_or_observed_entry[first_return-False]" time="0.038" /><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_explicit_supported_storage_or_observed_entry[first_reuse_route-False]" time="0.036" /><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_explicit_supported_storage_or_observed_entry[first_reuse_route-True]" time="0.046" /><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_fails_closed[pending]" time="0.037" /><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_fails_closed[ack_equal]" time="0.038" /><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_fails_closed[ack_after]" time="0.037" /><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_fails_closed[missing_ack_time]" time="0.036" /><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_fails_closed[wrong_owner]" time="0.037" /><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_fails_closed[missing_action]" time="0.036" /><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_fails_closed[future_completion]" time="0.039" /><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_fails_closed[missing_prefix]" time="0.037" /><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_fails_closed[missing_entry]" time="0.037" /><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_fails_closed[unobserved_entry]" time="0.037" /><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_fails_closed[entry_after_floor]" time="0.037" /><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_fails_closed[exit_equal_now]" time="0.036" /><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_fails_closed[changed_traversal]" time="0.037" /><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_fails_closed[changed_occupancy]" time="0.037" /><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_fails_closed[bool_occupancy]" time="0.038" /><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_fails_closed[unrepresented]" time="0.036" /><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_fails_closed[P_release_equal_now]" time="0.037" /><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_fails_closed[P_wrong_node]" time="0.038" /><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_fails_closed[E_wrong_job]" time="0.040" /><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_fails_closed[L_service_equal_now]" time="0.039" /><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_fails_closed[future_population]" time="0.038" /><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_fails_closed[changed_static]" time="0.027" /><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_fails_closed[changed_job]" time="0.054" /><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_fails_closed[missing_resource]" time="0.051" /><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_fails_closed[future_python_certainty]" time="0.047" /><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_fixed_domain_three_not_a_full_reference" time="0.003" /><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_unfinished_not_protected_and_raw_default_no_claim" time="0.001" /><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_initial_static_domain_and_facts" time="0.067" /><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_runtime_overlay_is_exact_and_public_contract_unchanged" time="0.018"><failure message="AttributeError: module 'scripts.experiments.g31_ics_circulation.public_preexisting_v3_model' has no attribute 'public_contract'">def test_runtime_overlay_is_exact_and_public_contract_unchanged():
+&gt;       runtime=runner.native_scene('mechanism')
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_live_obligation_native_probe.py:120: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\research_live_obligation_native_probe.py:41: in native_scene
+    validate_runtime_input(data)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+data = {'schema': 'g31.circulation.input.v1', 'model_scope': 'NEW fixed live-obligation mechanism; five jobs/three trays; sou...[[0, 1, 1.0, 1.0], [0, 2, 2.0, 1.0], [1, 3, 1.0, 1.0], [2, 3, 1.0, 1.0], [3, 4, 1.0, 1.0], [5, 1, 0.2, 1.0], ...], ...}
+
+    def validate_runtime_input(data):
+        """Only the declared observer overlay may differ from frozen physical input."""
+        require(type(data) is dict, 'runtime_input_shape')
+        notification = data.get('owner_notifications')
+        require(type(notification) is dict and set(notification) == {'enabled'}
+                and notification['enabled'] is True, 'runtime_notification_overlay')
+        physical = copy.deepcopy(data); del physical['owner_notifications']
+        require(initial_adapter.canonical(physical) == initial_adapter.canonical(initial_adapter.public_input()),
+                'runtime_physical_input_changed')
+&gt;       require(initial_adapter.canonical(model.public_contract(data)) == initial_adapter.canonical(initial_adapter.supported_contract()),
+                                          ^^^^^^^^^^^^^^^^^^^^^
+                'runtime_public_contract_changed')
+E       AttributeError: module 'scripts.experiments.g31_ics_circulation.public_preexisting_v3_model' has no attribute 'public_contract'
+
+scripts\experiments\g31_ics_circulation\research_live_obligation_native_probe.py:53: AttributeError</failure></testcase><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_runtime_overlay_does_not_widen_input_domain[missing]" time="0.014"><failure message="AttributeError: module 'scripts.experiments.g31_ics_circulation.public_preexisting_v3_model' has no attribute 'public_contract'">change = 'missing'
+
+    @pytest.mark.parametrize('change',['missing','false','int','extra_overlay','extra_top','capacity','service','fault','trace_limit'])
+    def test_runtime_overlay_does_not_widen_input_domain(change):
+&gt;       runtime=runner.native_scene('mechanism')
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_live_obligation_native_probe.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\research_live_obligation_native_probe.py:41: in native_scene
+    validate_runtime_input(data)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+data = {'schema': 'g31.circulation.input.v1', 'model_scope': 'NEW fixed live-obligation mechanism; five jobs/three trays; sou...[[0, 1, 1.0, 1.0], [0, 2, 2.0, 1.0], [1, 3, 1.0, 1.0], [2, 3, 1.0, 1.0], [3, 4, 1.0, 1.0], [5, 1, 0.2, 1.0], ...], ...}
+
+    def validate_runtime_input(data):
+        """Only the declared observer overlay may differ from frozen physical input."""
+        require(type(data) is dict, 'runtime_input_shape')
+        notification = data.get('owner_notifications')
+        require(type(notification) is dict and set(notification) == {'enabled'}
+                and notification['enabled'] is True, 'runtime_notification_overlay')
+        physical = copy.deepcopy(data); del physical['owner_notifications']
+        require(initial_adapter.canonical(physical) == initial_adapter.canonical(initial_adapter.public_input()),
+                'runtime_physical_input_changed')
+&gt;       require(initial_adapter.canonical(model.public_contract(data)) == initial_adapter.canonical(initial_adapter.supported_contract()),
+                                          ^^^^^^^^^^^^^^^^^^^^^
+                'runtime_public_contract_changed')
+E       AttributeError: module 'scripts.experiments.g31_ics_circulation.public_preexisting_v3_model' has no attribute 'public_contract'
+
+scripts\experiments\g31_ics_circulation\research_live_obligation_native_probe.py:53: AttributeError</failure></testcase><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_runtime_overlay_does_not_widen_input_domain[false]" time="0.014"><failure message="AttributeError: module 'scripts.experiments.g31_ics_circulation.public_preexisting_v3_model' has no attribute 'public_contract'">change = 'false'
+
+    @pytest.mark.parametrize('change',['missing','false','int','extra_overlay','extra_top','capacity','service','fault','trace_limit'])
+    def test_runtime_overlay_does_not_widen_input_domain(change):
+&gt;       runtime=runner.native_scene('mechanism')
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_live_obligation_native_probe.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\research_live_obligation_native_probe.py:41: in native_scene
+    validate_runtime_input(data)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+data = {'schema': 'g31.circulation.input.v1', 'model_scope': 'NEW fixed live-obligation mechanism; five jobs/three trays; sou...[[0, 1, 1.0, 1.0], [0, 2, 2.0, 1.0], [1, 3, 1.0, 1.0], [2, 3, 1.0, 1.0], [3, 4, 1.0, 1.0], [5, 1, 0.2, 1.0], ...], ...}
+
+    def validate_runtime_input(data):
+        """Only the declared observer overlay may differ from frozen physical input."""
+        require(type(data) is dict, 'runtime_input_shape')
+        notification = data.get('owner_notifications')
+        require(type(notification) is dict and set(notification) == {'enabled'}
+                and notification['enabled'] is True, 'runtime_notification_overlay')
+        physical = copy.deepcopy(data); del physical['owner_notifications']
+        require(initial_adapter.canonical(physical) == initial_adapter.canonical(initial_adapter.public_input()),
+                'runtime_physical_input_changed')
+&gt;       require(initial_adapter.canonical(model.public_contract(data)) == initial_adapter.canonical(initial_adapter.supported_contract()),
+                                          ^^^^^^^^^^^^^^^^^^^^^
+                'runtime_public_contract_changed')
+E       AttributeError: module 'scripts.experiments.g31_ics_circulation.public_preexisting_v3_model' has no attribute 'public_contract'
+
+scripts\experiments\g31_ics_circulation\research_live_obligation_native_probe.py:53: AttributeError</failure></testcase><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_runtime_overlay_does_not_widen_input_domain[int]" time="0.019"><failure message="AttributeError: module 'scripts.experiments.g31_ics_circulation.public_preexisting_v3_model' has no attribute 'public_contract'">change = 'int'
+
+    @pytest.mark.parametrize('change',['missing','false','int','extra_overlay','extra_top','capacity','service','fault','trace_limit'])
+    def test_runtime_overlay_does_not_widen_input_domain(change):
+&gt;       runtime=runner.native_scene('mechanism')
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_live_obligation_native_probe.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\research_live_obligation_native_probe.py:41: in native_scene
+    validate_runtime_input(data)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+data = {'schema': 'g31.circulation.input.v1', 'model_scope': 'NEW fixed live-obligation mechanism; five jobs/three trays; sou...[[0, 1, 1.0, 1.0], [0, 2, 2.0, 1.0], [1, 3, 1.0, 1.0], [2, 3, 1.0, 1.0], [3, 4, 1.0, 1.0], [5, 1, 0.2, 1.0], ...], ...}
+
+    def validate_runtime_input(data):
+        """Only the declared observer overlay may differ from frozen physical input."""
+        require(type(data) is dict, 'runtime_input_shape')
+        notification = data.get('owner_notifications')
+        require(type(notification) is dict and set(notification) == {'enabled'}
+                and notification['enabled'] is True, 'runtime_notification_overlay')
+        physical = copy.deepcopy(data); del physical['owner_notifications']
+        require(initial_adapter.canonical(physical) == initial_adapter.canonical(initial_adapter.public_input()),
+                'runtime_physical_input_changed')
+&gt;       require(initial_adapter.canonical(model.public_contract(data)) == initial_adapter.canonical(initial_adapter.supported_contract()),
+                                          ^^^^^^^^^^^^^^^^^^^^^
+                'runtime_public_contract_changed')
+E       AttributeError: module 'scripts.experiments.g31_ics_circulation.public_preexisting_v3_model' has no attribute 'public_contract'
+
+scripts\experiments\g31_ics_circulation\research_live_obligation_native_probe.py:53: AttributeError</failure></testcase><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_runtime_overlay_does_not_widen_input_domain[extra_overlay]" time="0.016"><failure message="AttributeError: module 'scripts.experiments.g31_ics_circulation.public_preexisting_v3_model' has no attribute 'public_contract'">change = 'extra_overlay'
+
+    @pytest.mark.parametrize('change',['missing','false','int','extra_overlay','extra_top','capacity','service','fault','trace_limit'])
+    def test_runtime_overlay_does_not_widen_input_domain(change):
+&gt;       runtime=runner.native_scene('mechanism')
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_live_obligation_native_probe.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\research_live_obligation_native_probe.py:41: in native_scene
+    validate_runtime_input(data)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+data = {'schema': 'g31.circulation.input.v1', 'model_scope': 'NEW fixed live-obligation mechanism; five jobs/three trays; sou...[[0, 1, 1.0, 1.0], [0, 2, 2.0, 1.0], [1, 3, 1.0, 1.0], [2, 3, 1.0, 1.0], [3, 4, 1.0, 1.0], [5, 1, 0.2, 1.0], ...], ...}
+
+    def validate_runtime_input(data):
+        """Only the declared observer overlay may differ from frozen physical input."""
+        require(type(data) is dict, 'runtime_input_shape')
+        notification = data.get('owner_notifications')
+        require(type(notification) is dict and set(notification) == {'enabled'}
+                and notification['enabled'] is True, 'runtime_notification_overlay')
+        physical = copy.deepcopy(data); del physical['owner_notifications']
+        require(initial_adapter.canonical(physical) == initial_adapter.canonical(initial_adapter.public_input()),
+                'runtime_physical_input_changed')
+&gt;       require(initial_adapter.canonical(model.public_contract(data)) == initial_adapter.canonical(initial_adapter.supported_contract()),
+                                          ^^^^^^^^^^^^^^^^^^^^^
+                'runtime_public_contract_changed')
+E       AttributeError: module 'scripts.experiments.g31_ics_circulation.public_preexisting_v3_model' has no attribute 'public_contract'
+
+scripts\experiments\g31_ics_circulation\research_live_obligation_native_probe.py:53: AttributeError</failure></testcase><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_runtime_overlay_does_not_widen_input_domain[extra_top]" time="0.015"><failure message="AttributeError: module 'scripts.experiments.g31_ics_circulation.public_preexisting_v3_model' has no attribute 'public_contract'">change = 'extra_top'
+
+    @pytest.mark.parametrize('change',['missing','false','int','extra_overlay','extra_top','capacity','service','fault','trace_limit'])
+    def test_runtime_overlay_does_not_widen_input_domain(change):
+&gt;       runtime=runner.native_scene('mechanism')
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_live_obligation_native_probe.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\research_live_obligation_native_probe.py:41: in native_scene
+    validate_runtime_input(data)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+data = {'schema': 'g31.circulation.input.v1', 'model_scope': 'NEW fixed live-obligation mechanism; five jobs/three trays; sou...[[0, 1, 1.0, 1.0], [0, 2, 2.0, 1.0], [1, 3, 1.0, 1.0], [2, 3, 1.0, 1.0], [3, 4, 1.0, 1.0], [5, 1, 0.2, 1.0], ...], ...}
+
+    def validate_runtime_input(data):
+        """Only the declared observer overlay may differ from frozen physical input."""
+        require(type(data) is dict, 'runtime_input_shape')
+        notification = data.get('owner_notifications')
+        require(type(notification) is dict and set(notification) == {'enabled'}
+                and notification['enabled'] is True, 'runtime_notification_overlay')
+        physical = copy.deepcopy(data); del physical['owner_notifications']
+        require(initial_adapter.canonical(physical) == initial_adapter.canonical(initial_adapter.public_input()),
+                'runtime_physical_input_changed')
+&gt;       require(initial_adapter.canonical(model.public_contract(data)) == initial_adapter.canonical(initial_adapter.supported_contract()),
+                                          ^^^^^^^^^^^^^^^^^^^^^
+                'runtime_public_contract_changed')
+E       AttributeError: module 'scripts.experiments.g31_ics_circulation.public_preexisting_v3_model' has no attribute 'public_contract'
+
+scripts\experiments\g31_ics_circulation\research_live_obligation_native_probe.py:53: AttributeError</failure></testcase><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_runtime_overlay_does_not_widen_input_domain[capacity]" time="0.015"><failure message="AttributeError: module 'scripts.experiments.g31_ics_circulation.public_preexisting_v3_model' has no attribute 'public_contract'">change = 'capacity'
+
+    @pytest.mark.parametrize('change',['missing','false','int','extra_overlay','extra_top','capacity','service','fault','trace_limit'])
+    def test_runtime_overlay_does_not_widen_input_domain(change):
+&gt;       runtime=runner.native_scene('mechanism')
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_live_obligation_native_probe.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\research_live_obligation_native_probe.py:41: in native_scene
+    validate_runtime_input(data)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+data = {'schema': 'g31.circulation.input.v1', 'model_scope': 'NEW fixed live-obligation mechanism; five jobs/three trays; sou...[[0, 1, 1.0, 1.0], [0, 2, 2.0, 1.0], [1, 3, 1.0, 1.0], [2, 3, 1.0, 1.0], [3, 4, 1.0, 1.0], [5, 1, 0.2, 1.0], ...], ...}
+
+    def validate_runtime_input(data):
+        """Only the declared observer overlay may differ from frozen physical input."""
+        require(type(data) is dict, 'runtime_input_shape')
+        notification = data.get('owner_notifications')
+        require(type(notification) is dict and set(notification) == {'enabled'}
+                and notification['enabled'] is True, 'runtime_notification_overlay')
+        physical = copy.deepcopy(data); del physical['owner_notifications']
+        require(initial_adapter.canonical(physical) == initial_adapter.canonical(initial_adapter.public_input()),
+                'runtime_physical_input_changed')
+&gt;       require(initial_adapter.canonical(model.public_contract(data)) == initial_adapter.canonical(initial_adapter.supported_contract()),
+                                          ^^^^^^^^^^^^^^^^^^^^^
+                'runtime_public_contract_changed')
+E       AttributeError: module 'scripts.experiments.g31_ics_circulation.public_preexisting_v3_model' has no attribute 'public_contract'
+
+scripts\experiments\g31_ics_circulation\research_live_obligation_native_probe.py:53: AttributeError</failure></testcase><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_runtime_overlay_does_not_widen_input_domain[service]" time="0.015"><failure message="AttributeError: module 'scripts.experiments.g31_ics_circulation.public_preexisting_v3_model' has no attribute 'public_contract'">change = 'service'
+
+    @pytest.mark.parametrize('change',['missing','false','int','extra_overlay','extra_top','capacity','service','fault','trace_limit'])
+    def test_runtime_overlay_does_not_widen_input_domain(change):
+&gt;       runtime=runner.native_scene('mechanism')
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_live_obligation_native_probe.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\research_live_obligation_native_probe.py:41: in native_scene
+    validate_runtime_input(data)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+data = {'schema': 'g31.circulation.input.v1', 'model_scope': 'NEW fixed live-obligation mechanism; five jobs/three trays; sou...[[0, 1, 1.0, 1.0], [0, 2, 2.0, 1.0], [1, 3, 1.0, 1.0], [2, 3, 1.0, 1.0], [3, 4, 1.0, 1.0], [5, 1, 0.2, 1.0], ...], ...}
+
+    def validate_runtime_input(data):
+        """Only the declared observer overlay may differ from frozen physical input."""
+        require(type(data) is dict, 'runtime_input_shape')
+        notification = data.get('owner_notifications')
+        require(type(notification) is dict and set(notification) == {'enabled'}
+                and notification['enabled'] is True, 'runtime_notification_overlay')
+        physical = copy.deepcopy(data); del physical['owner_notifications']
+        require(initial_adapter.canonical(physical) == initial_adapter.canonical(initial_adapter.public_input()),
+                'runtime_physical_input_changed')
+&gt;       require(initial_adapter.canonical(model.public_contract(data)) == initial_adapter.canonical(initial_adapter.supported_contract()),
+                                          ^^^^^^^^^^^^^^^^^^^^^
+                'runtime_public_contract_changed')
+E       AttributeError: module 'scripts.experiments.g31_ics_circulation.public_preexisting_v3_model' has no attribute 'public_contract'
+
+scripts\experiments\g31_ics_circulation\research_live_obligation_native_probe.py:53: AttributeError</failure></testcase><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_runtime_overlay_does_not_widen_input_domain[fault]" time="0.013"><failure message="AttributeError: module 'scripts.experiments.g31_ics_circulation.public_preexisting_v3_model' has no attribute 'public_contract'">change = 'fault'
+
+    @pytest.mark.parametrize('change',['missing','false','int','extra_overlay','extra_top','capacity','service','fault','trace_limit'])
+    def test_runtime_overlay_does_not_widen_input_domain(change):
+&gt;       runtime=runner.native_scene('mechanism')
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_live_obligation_native_probe.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\research_live_obligation_native_probe.py:41: in native_scene
+    validate_runtime_input(data)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+data = {'schema': 'g31.circulation.input.v1', 'model_scope': 'NEW fixed live-obligation mechanism; five jobs/three trays; sou...[[0, 1, 1.0, 1.0], [0, 2, 2.0, 1.0], [1, 3, 1.0, 1.0], [2, 3, 1.0, 1.0], [3, 4, 1.0, 1.0], [5, 1, 0.2, 1.0], ...], ...}
+
+    def validate_runtime_input(data):
+        """Only the declared observer overlay may differ from frozen physical input."""
+        require(type(data) is dict, 'runtime_input_shape')
+        notification = data.get('owner_notifications')
+        require(type(notification) is dict and set(notification) == {'enabled'}
+                and notification['enabled'] is True, 'runtime_notification_overlay')
+        physical = copy.deepcopy(data); del physical['owner_notifications']
+        require(initial_adapter.canonical(physical) == initial_adapter.canonical(initial_adapter.public_input()),
+                'runtime_physical_input_changed')
+&gt;       require(initial_adapter.canonical(model.public_contract(data)) == initial_adapter.canonical(initial_adapter.supported_contract()),
+                                          ^^^^^^^^^^^^^^^^^^^^^
+                'runtime_public_contract_changed')
+E       AttributeError: module 'scripts.experiments.g31_ics_circulation.public_preexisting_v3_model' has no attribute 'public_contract'
+
+scripts\experiments\g31_ics_circulation\research_live_obligation_native_probe.py:53: AttributeError</failure></testcase><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_runtime_overlay_does_not_widen_input_domain[trace_limit]" time="0.016"><failure message="AttributeError: module 'scripts.experiments.g31_ics_circulation.public_preexisting_v3_model' has no attribute 'public_contract'">change = 'trace_limit'
+
+    @pytest.mark.parametrize('change',['missing','false','int','extra_overlay','extra_top','capacity','service','fault','trace_limit'])
+    def test_runtime_overlay_does_not_widen_input_domain(change):
+&gt;       runtime=runner.native_scene('mechanism')
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_circulation_live_obligation_native_probe.py:130: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\research_live_obligation_native_probe.py:41: in native_scene
+    validate_runtime_input(data)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+data = {'schema': 'g31.circulation.input.v1', 'model_scope': 'NEW fixed live-obligation mechanism; five jobs/three trays; sou...[[0, 1, 1.0, 1.0], [0, 2, 2.0, 1.0], [1, 3, 1.0, 1.0], [2, 3, 1.0, 1.0], [3, 4, 1.0, 1.0], [5, 1, 0.2, 1.0], ...], ...}
+
+    def validate_runtime_input(data):
+        """Only the declared observer overlay may differ from frozen physical input."""
+        require(type(data) is dict, 'runtime_input_shape')
+        notification = data.get('owner_notifications')
+        require(type(notification) is dict and set(notification) == {'enabled'}
+                and notification['enabled'] is True, 'runtime_notification_overlay')
+        physical = copy.deepcopy(data); del physical['owner_notifications']
+        require(initial_adapter.canonical(physical) == initial_adapter.canonical(initial_adapter.public_input()),
+                'runtime_physical_input_changed')
+&gt;       require(initial_adapter.canonical(model.public_contract(data)) == initial_adapter.canonical(initial_adapter.supported_contract()),
+                                          ^^^^^^^^^^^^^^^^^^^^^
+                'runtime_public_contract_changed')
+E       AttributeError: module 'scripts.experiments.g31_ics_circulation.public_preexisting_v3_model' has no attribute 'public_contract'
+
+scripts\experiments\g31_ics_circulation\research_live_obligation_native_probe.py:53: AttributeError</failure></testcase><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_failed_session_prefix_is_captured_without_advance_or_result" time="0.015"><failure message="AttributeError: module 'scripts.experiments.g31_ics_circulation.public_preexisting_v3_model' has no attribute 'public_contract'">def test_failed_session_prefix_is_captured_without_advance_or_result():
+        class Session:
+            physical_time=.11
+            def offline_diagnostics(self):return {'now':self.physical_time,'actual':True}
+            def result_at(self,*a):raise AssertionError('must not advance result')
+            def advance_to(self,*a):raise AssertionError('must not advance')
+        class Client:
+            calls=[{'at':.11,'request':{'request_id':'actually-submitted'}}]
+            rows={'actually-submitted':{'ack':None}}
+            creations={};roots=[];ack_handling=[]
+&gt;       progress={'specification':runner.probe_rows()[runner.ORDER[0]],'input':runner.native_scene('mechanism'),
+                                                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                  'session':Session(),'client':Client(),'initial_owners':{},'native_batches':[],'stage':'owner_notification_continuation'}
+
+tests\test_g31_circulation_live_obligation_native_probe.py:153: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\research_live_obligation_native_probe.py:41: in native_scene
+    validate_runtime_input(data)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+data = {'schema': 'g31.circulation.input.v1', 'model_scope': 'NEW fixed live-obligation mechanism; five jobs/three trays; sou...[[0, 1, 1.0, 1.0], [0, 2, 2.0, 1.0], [1, 3, 1.0, 1.0], [2, 3, 1.0, 1.0], [3, 4, 1.0, 1.0], [5, 1, 0.2, 1.0], ...], ...}
+
+    def validate_runtime_input(data):
+        """Only the declared observer overlay may differ from frozen physical input."""
+        require(type(data) is dict, 'runtime_input_shape')
+        notification = data.get('owner_notifications')
+        require(type(notification) is dict and set(notification) == {'enabled'}
+                and notification['enabled'] is True, 'runtime_notification_overlay')
+        physical = copy.deepcopy(data); del physical['owner_notifications']
+        require(initial_adapter.canonical(physical) == initial_adapter.canonical(initial_adapter.public_input()),
+                'runtime_physical_input_changed')
+&gt;       require(initial_adapter.canonical(model.public_contract(data)) == initial_adapter.canonical(initial_adapter.supported_contract()),
+                                          ^^^^^^^^^^^^^^^^^^^^^
+                'runtime_public_contract_changed')
+E       AttributeError: module 'scripts.experiments.g31_ics_circulation.public_preexisting_v3_model' has no attribute 'public_contract'
+
+scripts\experiments\g31_ics_circulation\research_live_obligation_native_probe.py:53: AttributeError</failure></testcase><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_partial_getter_errors_preserve_other_actual_fields" time="0.002" /><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_run_branch_exception_preserves_live_prefix" time="0.015"><failure message="AssertionError: assert (True is True and 'before_session_creation' == 'test_actual_failure'&#10;  &#10;  - test_actual_failure&#10;  + before_session_creation)">monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001C5103E4E50&gt;
+
+    def test_run_branch_exception_preserves_live_prefix(monkeypatch):
+        def injected(*args,progress,**kwargs):
+            progress.update(input=runner.native_scene('mechanism'),stage='test_actual_failure',initial_owners={})
+            raise ValueError('injected before native; pure test')
+        monkeypatch.setattr(runner,'_run_branch',injected)
+        raw=runner.run_branch(None,runner.probe_rows()[runner.ORDER[0]],None,None,accepted_run=None,branch_key=runner.ORDER[0])
+&gt;       assert raw['partial'] is True and raw['failure_stage']=='test_actual_failure'
+E       AssertionError: assert (True is True and 'before_session_creation' == 'test_actual_failure'
+E         
+E         - test_actual_failure
+E         + before_session_creation)
+
+tests\test_g31_circulation_live_obligation_native_probe.py:183: AssertionError</failure></testcase><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_partial_cannot_be_promoted_or_advanced[promotion]" time="0.001" /><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_partial_cannot_be_promoted_or_advanced[metric]" time="0.001" /><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_partial_cannot_be_promoted_or_advanced[advanced_clock]" time="0.001" /><testcase classname="tests.test_g31_circulation_live_obligation_native_probe" name="test_partial_cannot_be_promoted_or_advanced[nan_clock]" time="0.001" /></testsuite></testsuites>
