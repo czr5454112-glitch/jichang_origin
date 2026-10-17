@@ -104,8 +104,8 @@ def prepare():
             raise ValueError('unpublished tested dependency: ' + name)
     archived = selected | {Path(name) for name in tested}
     archived.add(ROOT / 'outputs/experiments/g31_ics_lt2_sustained_20261014/native027_accepted_contract_001.json')
-    for name in git('ls-files', '-z', '--', 'cpp/ics_core', 'CMakeLists.txt', 'pyproject.toml', 'requirements.txt').decode().split('\0'):
-        if name:
+    for name in git('ls-files', '-z', '--', 'cpp/ics_core', 'CMakeLists.txt').decode().split('\0'):
+        if name and (Path(name).suffix in {'.cpp', '.hpp', '.h', '.c', '.cmake'} or Path(name).name == 'CMakeLists.txt'):
             archived.add(ROOT / name)
     native_pins = {}
     for acceptance_path in ['native_001/acceptance.json', 'budgeted_learned_001/native/acceptance.json',
