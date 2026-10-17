@@ -1,0 +1,516 @@
+{
+  "schema": "g31.independent_native003_raw_physical_audit.v1",
+  "script_sha256": "4e8dd1b415ee4883f5e64773665d3d2a757dfd1e2a21070ee1b3dff68c853fb1",
+  "native_calls": 0,
+  "model_calls": 0,
+  "imports_production_auditor": false,
+  "production_edits": [],
+  "scope": "Independent reads and arithmetic over saved raw receipts only; not a simulation or universal safety proof.",
+  "mechanism003": {
+    "incumbent": {
+      "raw_path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\compatible_initial_native_20261017_003\\mechanism\\incumbent.raw.json.gz",
+      "raw_sha256": "ad398209d0f4e378b53a5409351ee4e229d2ca0918a09b2fe3750556cdf2a0e9",
+      "physical": {
+        "status": "passed_scoped_independent_receipt_replay",
+        "completion": {
+          "loaded": 7.1999999999999975,
+          "receiver": 10.12,
+          "blocker": 11.349999999999998,
+          "reuse1": 13.049999999999997,
+          "reuse2": 18.46
+        },
+        "source_fifo_load_order": {
+          "0": [
+            "loaded"
+          ],
+          "1": [
+            "blocker",
+            "receiver"
+          ],
+          "7": [
+            "reuse1",
+            "reuse2"
+          ]
+        },
+        "same_L_two_returns_received_at": [
+          9.549999999999995,
+          15.359999999999996
+        ],
+        "job_tray_bindings": {
+          "loaded": "L",
+          "blocker": "P",
+          "receiver": "E",
+          "reuse1": "L",
+          "reuse2": "L"
+        },
+        "tray_count": 3,
+        "edge_entries": 18,
+        "edge_exits": 18,
+        "maximum_parked_plus_incoming_by_node": {
+          "0": 1,
+          "5": 1,
+          "1": 1,
+          "9": 1,
+          "3": 1,
+          "4": 2,
+          "6": 1,
+          "7": 1,
+          "10": 1
+        },
+        "loaded_actual_next": 1,
+        "reuse_actual_next": {
+          "reuse1": 3,
+          "reuse2": 3
+        },
+        "E_first_actual_edge_enter": 4.42,
+        "scope_limit": "Checks receipt identities, lifecycle, source FIFO, unload endpoints, edge travel/headway/capacity and parked+incoming node capacity. Does not reconstruct pending reception reservations, planner queues, message authority, hidden state, or future safety."
+      },
+      "owners": {
+        "A": {
+          "original_selected_index": 4,
+          "compatible_selected_index": 4,
+          "original_proposal_rejected": false,
+          "selected_action": {
+            "initial_action": "native_default",
+            "empty_departure": 2.2100000000000004,
+            "return_delay": 0.0,
+            "later_action": "native_default"
+          },
+          "proof_uses": 65,
+          "source_binding_status": "closed_complete65",
+          "model_counts": {
+            "logical_candidates": 32,
+            "context_constructions": 16,
+            "initial_engines": 16,
+            "initial_advances": 16,
+            "prefix_same_resumes": 23,
+            "future_forks": 32,
+            "future_resumes": 32
+          },
+          "queried_indices": 1
+        },
+        "B": {
+          "original_selected_index": 4,
+          "compatible_selected_index": 4,
+          "original_proposal_rejected": false,
+          "selected_action": {
+            "initial_action": "native_default",
+            "empty_departure": 2.2100000000000004,
+            "return_delay": 0.0,
+            "later_action": "native_default"
+          },
+          "proof_uses": 65,
+          "source_binding_status": "closed_complete65",
+          "model_counts": {
+            "logical_candidates": 32,
+            "context_constructions": 16,
+            "initial_engines": 16,
+            "initial_advances": 16,
+            "prefix_same_resumes": 23,
+            "future_forks": 32,
+            "future_resumes": 32
+          },
+          "queried_indices": 1
+        }
+      },
+      "effective_policy_parameter_vector": {
+        "initial_action": "native_default",
+        "empty_departure": 2.2100000000000004,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "vector_time_warning": "empty_departure is the proposal parameter, not E's actual edge-enter time; the independent physical replay reports that separately",
+      "reported_assessment": "assessed",
+      "run_acceptance": "closed_run_acceptance_passed",
+      "strict_protected": null,
+      "native_model_protection_certified": false,
+      "complete_request_100ms_certified": false
+    },
+    "coordinate_strict": {
+      "raw_path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\compatible_initial_native_20261017_003\\mechanism\\coordinate_strict.raw.json.gz",
+      "raw_sha256": "5f43689a6c625ec018cbf3501fbd2cbcb04c6c0f4451fea25607a09ef751b0c1",
+      "physical": {
+        "status": "passed_scoped_independent_receipt_replay",
+        "completion": {
+          "loaded": 7.1999999999999975,
+          "receiver": 10.000999999999998,
+          "blocker": 11.349999999999998,
+          "reuse1": 13.049999999999997,
+          "reuse2": 18.46
+        },
+        "source_fifo_load_order": {
+          "0": [
+            "loaded"
+          ],
+          "1": [
+            "blocker",
+            "receiver"
+          ],
+          "7": [
+            "reuse1",
+            "reuse2"
+          ]
+        },
+        "same_L_two_returns_received_at": [
+          9.549999999999995,
+          15.359999999999996
+        ],
+        "job_tray_bindings": {
+          "loaded": "L",
+          "blocker": "P",
+          "receiver": "E",
+          "reuse1": "L",
+          "reuse2": "L"
+        },
+        "tray_count": 3,
+        "edge_entries": 18,
+        "edge_exits": 18,
+        "maximum_parked_plus_incoming_by_node": {
+          "0": 1,
+          "5": 1,
+          "1": 1,
+          "9": 1,
+          "3": 1,
+          "4": 2,
+          "6": 1,
+          "7": 1,
+          "10": 1
+        },
+        "loaded_actual_next": 1,
+        "reuse_actual_next": {
+          "reuse1": 3,
+          "reuse2": 3
+        },
+        "E_first_actual_edge_enter": 4.300999999999999,
+        "scope_limit": "Checks receipt identities, lifecycle, source FIFO, unload endpoints, edge travel/headway/capacity and parked+incoming node capacity. Does not reconstruct pending reception reservations, planner queues, message authority, hidden state, or future safety."
+      },
+      "owners": {
+        "A": {
+          "original_selected_index": 25,
+          "compatible_selected_index": 4,
+          "original_proposal_rejected": true,
+          "selected_action": {
+            "initial_action": "native_default",
+            "empty_departure": 2.2100000000000004,
+            "return_delay": 0.0,
+            "later_action": "native_default"
+          },
+          "proof_uses": 65,
+          "source_binding_status": "closed_complete65",
+          "model_counts": {
+            "logical_candidates": 32,
+            "context_constructions": 16,
+            "initial_engines": 16,
+            "initial_advances": 16,
+            "prefix_same_resumes": 23,
+            "future_forks": 32,
+            "future_resumes": 32
+          },
+          "queried_indices": 14
+        },
+        "B": {
+          "original_selected_index": 25,
+          "compatible_selected_index": 12,
+          "original_proposal_rejected": true,
+          "selected_action": {
+            "initial_action": "native_default",
+            "empty_departure": 4.201,
+            "return_delay": 0.0,
+            "later_action": "native_default"
+          },
+          "proof_uses": 65,
+          "source_binding_status": "closed_complete65",
+          "model_counts": {
+            "logical_candidates": 32,
+            "context_constructions": 16,
+            "initial_engines": 16,
+            "initial_advances": 16,
+            "prefix_same_resumes": 23,
+            "future_forks": 32,
+            "future_resumes": 32
+          },
+          "queried_indices": 14
+        }
+      },
+      "effective_policy_parameter_vector": {
+        "initial_action": "native_default",
+        "empty_departure": 4.201,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "vector_time_warning": "empty_departure is the proposal parameter, not E's actual edge-enter time; the independent physical replay reports that separately",
+      "reported_assessment": "assessed",
+      "run_acceptance": "closed_run_acceptance_passed",
+      "strict_protected": null,
+      "native_model_protection_certified": false,
+      "complete_request_100ms_certified": false,
+      "observed_completion_delta_from_incumbent": {
+        "loaded": 0.0,
+        "receiver": -0.11900000000000155,
+        "blocker": 0.0,
+        "reuse1": 0.0,
+        "reuse2": 0.0
+      },
+      "zero_degradation_in_this_realization": true,
+      "strict_certificate_warning": "Observed endpoint dominance is not a current-state or future native-model protection certificate."
+    },
+    "finite_MPC": {
+      "raw_path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\compatible_initial_native_20261017_003\\mechanism\\finite_MPC.raw.json.gz",
+      "raw_sha256": "d56aa0ce0b4b6f1e1948fc073f455686779130ca3334c29f90c00050af26aa9e",
+      "physical": {
+        "status": "passed_scoped_independent_receipt_replay",
+        "completion": {
+          "loaded": 7.1999999999999975,
+          "receiver": 10.000999999999998,
+          "blocker": 11.349999999999998,
+          "reuse1": 13.049999999999997,
+          "reuse2": 18.46
+        },
+        "source_fifo_load_order": {
+          "0": [
+            "loaded"
+          ],
+          "1": [
+            "blocker",
+            "receiver"
+          ],
+          "7": [
+            "reuse1",
+            "reuse2"
+          ]
+        },
+        "same_L_two_returns_received_at": [
+          9.549999999999995,
+          15.359999999999996
+        ],
+        "job_tray_bindings": {
+          "loaded": "L",
+          "blocker": "P",
+          "receiver": "E",
+          "reuse1": "L",
+          "reuse2": "L"
+        },
+        "tray_count": 3,
+        "edge_entries": 18,
+        "edge_exits": 18,
+        "maximum_parked_plus_incoming_by_node": {
+          "0": 1,
+          "5": 1,
+          "1": 1,
+          "9": 1,
+          "3": 1,
+          "4": 2,
+          "6": 1,
+          "7": 1,
+          "10": 1
+        },
+        "loaded_actual_next": 1,
+        "reuse_actual_next": {
+          "reuse1": 3,
+          "reuse2": 3
+        },
+        "E_first_actual_edge_enter": 4.300999999999999,
+        "scope_limit": "Checks receipt identities, lifecycle, source FIFO, unload endpoints, edge travel/headway/capacity and parked+incoming node capacity. Does not reconstruct pending reception reservations, planner queues, message authority, hidden state, or future safety."
+      },
+      "owners": {
+        "A": {
+          "original_selected_index": 25,
+          "compatible_selected_index": 4,
+          "original_proposal_rejected": true,
+          "selected_action": {
+            "initial_action": "native_default",
+            "empty_departure": 2.2100000000000004,
+            "return_delay": 0.0,
+            "later_action": "native_default"
+          },
+          "proof_uses": 65,
+          "source_binding_status": "closed_complete65",
+          "model_counts": {
+            "logical_candidates": 32,
+            "context_constructions": 16,
+            "initial_engines": 16,
+            "initial_advances": 16,
+            "prefix_same_resumes": 23,
+            "future_forks": 32,
+            "future_resumes": 32
+          },
+          "queried_indices": 32
+        },
+        "B": {
+          "original_selected_index": 25,
+          "compatible_selected_index": 12,
+          "original_proposal_rejected": true,
+          "selected_action": {
+            "initial_action": "native_default",
+            "empty_departure": 4.201,
+            "return_delay": 0.0,
+            "later_action": "native_default"
+          },
+          "proof_uses": 65,
+          "source_binding_status": "closed_complete65",
+          "model_counts": {
+            "logical_candidates": 32,
+            "context_constructions": 16,
+            "initial_engines": 16,
+            "initial_advances": 16,
+            "prefix_same_resumes": 23,
+            "future_forks": 32,
+            "future_resumes": 32
+          },
+          "queried_indices": 32
+        }
+      },
+      "effective_policy_parameter_vector": {
+        "initial_action": "native_default",
+        "empty_departure": 4.201,
+        "return_delay": 0.0,
+        "later_action": "native_default"
+      },
+      "vector_time_warning": "empty_departure is the proposal parameter, not E's actual edge-enter time; the independent physical replay reports that separately",
+      "reported_assessment": "assessed",
+      "run_acceptance": "closed_run_acceptance_passed",
+      "strict_protected": null,
+      "native_model_protection_certified": false,
+      "complete_request_100ms_certified": false,
+      "observed_completion_delta_from_incumbent": {
+        "loaded": 0.0,
+        "receiver": -0.11900000000000155,
+        "blocker": 0.0,
+        "reuse1": 0.0,
+        "reuse2": 0.0
+      },
+      "zero_degradation_in_this_realization": true,
+      "strict_certificate_warning": "Observed endpoint dominance is not a current-state or future native-model protection certificate."
+    }
+  },
+  "old04_vs003incumbent": {
+    "old_raw_path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\live_obligation_unloading_native_prepare_001\\mechanism\\vector_04.json.gz",
+    "old_raw_sha256": "98f3cd68833beefd46a7dfaea907ced7314643c2c0d73d26ec2be44861077cb3",
+    "predeclared_events": [
+      "BAG_ARRIVAL",
+      "EDGE_ENTER",
+      "EDGE_EXIT",
+      "EMPTY_RECEIVED",
+      "HOLD_COMPLETE",
+      "HOLD_START",
+      "LOAD_COMPLETE",
+      "LOAD_START",
+      "STORAGE_ENTER",
+      "STORAGE_RELEASE",
+      "UNLOAD_COMPLETE",
+      "UNLOAD_START"
+    ],
+    "predeclared_fields": [
+      "time",
+      "event",
+      "business_bag_id",
+      "tray_id",
+      "traversal_id",
+      "node",
+      "from",
+      "to"
+    ],
+    "selected_rows": 78,
+    "eight_field_projection_exact": true,
+    "selected_all_ten_fields_exact": true,
+    "sorting_rounding_id_renaming_or_other_normalization": false,
+    "projection_sha256": "11faeb88a31b8c5b688b1cef504413b68403298b60367b48be1a0e3888c3a4af",
+    "input_exact": true,
+    "terminal_jobs_exact": true,
+    "terminal_trays_exact": true,
+    "all_receipt_count": 153,
+    "all_receipts_exact": false,
+    "different_receipt_count": 7,
+    "first_protocol_difference": {
+      "index": 13,
+      "old": {
+        "time": 0.12,
+        "event": "MODULE_REQUEST_DELIVERED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "E",
+        "traversal_id": 0,
+        "node": 5,
+        "from": 5,
+        "to": 1,
+        "reason": "live:1:B:initial-supply"
+      },
+      "new": {
+        "time": 0.12,
+        "event": "MODULE_REQUEST_DELIVERED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "E",
+        "traversal_id": 0,
+        "node": 5,
+        "from": 5,
+        "to": 1,
+        "reason": "live:1:B:online-initial"
+      }
+    },
+    "scope_limit": "Only the predeclared 78 physical receipts have exact parity. The full protocol stream and top-level schemas do not."
+  },
+  "optional004_first_no_overlap": {
+    "status": "read_only_completed_cell",
+    "cell_status": "assessed",
+    "raw_sha256": "2a85eccee1f0804260e6c1bc59821fe6ed653c8410e90ec7f75add1a5d68f0ba",
+    "physical": {
+      "status": "passed_scoped_independent_receipt_replay",
+      "completion": {
+        "loaded": 7.1999999999999975,
+        "blocker": 9.85,
+        "receiver": 10.95,
+        "reuse1": 12.650999999999998,
+        "reuse2": 18.061
+      },
+      "source_fifo_load_order": {
+        "0": [
+          "loaded"
+        ],
+        "1": [
+          "blocker",
+          "receiver"
+        ],
+        "7": [
+          "reuse1",
+          "reuse2"
+        ]
+      },
+      "same_L_two_returns_received_at": [
+        9.549999999999995,
+        14.960999999999997
+      ],
+      "job_tray_bindings": {
+        "loaded": "L",
+        "blocker": "P",
+        "receiver": "E",
+        "reuse1": "L",
+        "reuse2": "L"
+      },
+      "tray_count": 3,
+      "edge_entries": 18,
+      "edge_exits": 18,
+      "maximum_parked_plus_incoming_by_node": {
+        "0": 1,
+        "5": 1,
+        "1": 1,
+        "9": 1,
+        "3": 1,
+        "4": 2,
+        "6": 1,
+        "7": 1,
+        "10": 1
+      },
+      "loaded_actual_next": 1,
+      "reuse_actual_next": {
+        "reuse1": 3,
+        "reuse2": 3
+      },
+      "E_first_actual_edge_enter": 4.42,
+      "scope_limit": "Checks receipt identities, lifecycle, source FIFO, unload endpoints, edge travel/headway/capacity and parked+incoming node capacity. Does not reconstruct pending reception reservations, planner queues, message authority, hidden state, or future safety."
+    },
+    "strict_protected": null,
+    "complete_request_100ms_certified": false
+  },
+  "status": "passed_scoped_saved_raw_audit"
+}

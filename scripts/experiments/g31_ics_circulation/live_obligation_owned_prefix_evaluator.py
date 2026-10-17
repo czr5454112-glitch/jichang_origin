@@ -1,9 +1,9 @@
 """Source candidate: owned model execution separated from graph diagnostics.
 
 No native authority, actual hidden-state coverage, speed or protection claim.
-This deliberately retains the accepted future API, repeated source inventories,
-all initial/dynamic guards and one whole graph clone per suffix. The old paired
-diagnostic remains unchanged and is the proposed independent comparison path.
+The original entry retains repeated source inventories. The explicit bound
+entry reuses one request's static inventory with all original dependency and
+dynamic guards. Both retain one whole graph clone per suffix.
 """
 from __future__ import annotations
 import ast
@@ -12,11 +12,13 @@ import hashlib
 import inspect
 import json
 import textwrap
+import traceback
 from types import FunctionType
 from . import validate_future_later_paired_suffix as previous
 from . import live_obligation_future_later_fork as future
 from . import live_obligation_full32_suffix_evaluator as evaluator
 from . import live_obligation_full32_suffix_partition as domain
+from . import live_obligation_bound_future_fork_v3 as binding
 
 VERSION='g31.owned_model_future_suffix_execution.v1'
 OWNERSHIP='private_factory_complete_graph_clone_v1'
@@ -121,7 +123,7 @@ _CODES={function:function.__code__ for function in (*_FUNCTIONS.values(),*_FUTUR
 _PRIVATE_CODES={_point:_POINT_CODE,_terminal:_TERMINAL_CODE,_run:_RUN_CODE,_group:_GROUP_CODE}
 
 
-def source_proof():
+def _source_proof(actual_future):
     require(all(function.__code__ is code for function,code in _PRIVATE_CODES.items()),'private_code_identity')
     require(all(getattr(future.core,k) is v for k,v in _FUNCTIONS.items())
         and all(getattr(future,k) is v for k,v in _FUTURE.items())
@@ -137,16 +139,30 @@ def source_proof():
     require(set(_GROUP_GLOBALS)==set(evaluator.execute_group.__globals__)|{'_owned_run'}
         and all(_GROUP_GLOBALS[k] is v for k,v in evaluator.execute_group.__globals__.items())
         and _GROUP_GLOBALS['_owned_run'] is _run,'group_defining_globals')
-    # The existing source proof and each original fork/resume still run; no
-    # source-inventory cache is introduced by this diagnostic-only revision.
-    old=future.source_proof()
+    old=actual_future.source_proof()
     return {'schema':VERSION,'point':copy.deepcopy(_POINT_PROOF),'terminal':copy.deepcopy(_TERMINAL_PROOF),
         'run':copy.deepcopy(_RUN_PROOF),'group':copy.deepcopy(_GROUP_PROOF),'unchanged_future_source_proof':old,
         'original_initial_and_cut_guards_retained':True,'same_whole_dynamic_graph_clone':True,
-        'both_children_before_either_resume':True,'source_inventory_memoization':False,
+        'both_children_before_either_resume':True,'source_inventory_memoization':actual_future is not future,
         'initial_context_cache':False,'offline_diagnostic_path_unchanged':True,
         'isolation_basis':OWNERSHIP,'closed_domain':'Exact source-owned factories and serial private state; no arbitrary reflection, callbacks receiving state or concurrent mutation.',
         'arbitrary_tamper_resistance':False,'native_authority':False,'100ms_certified':False}
+
+
+def source_proof():
+    return _source_proof(future)
+
+
+def _bound_future(request):
+    require(type(request) is binding.original.BoundFutureRequest
+        and type(request._proof) is binding.binding.RequestStaticProof
+        and request._original is future,'exact_v3_request_binding')
+    request.check_integration()
+    return request.facade
+
+
+def bound_source_proof(request):
+    return _source_proof(_bound_future(request))
 
 
 def execute_group(group,context):
@@ -173,3 +189,28 @@ are deliberately absent and must not be inferred by a caller.
     return {'schema':VERSION,'prefix_index':group['prefix_index'],'candidate_indices':copy.deepcopy(group['candidate_indices']),
         'detail':detail,'predictions':predictions,'isolation_basis':OWNERSHIP,
         'diagnostic_graphs_computed':False,'native_authority':False,'hidden_state_coverage':False}
+
+
+def execute_bound_group(request,group,context):
+    """Explicit request facade with the original group's data and cut guards."""
+    actual_future=_bound_future(request)
+    expected=domain.partition(actual_future.core.lazy.original.physics.previous.actions())['groups']
+    require(type(group) is dict and type(group.get('prefix_index')) is int and 0<=group['prefix_index']<16
+        and previous.bytes_of(group)==previous.bytes_of(expected[group['prefix_index']]),'fixed_prefix_group')
+    predictions={}
+    def save(label,value):
+        raw=previous.bytes_of(value)
+        predictions[label]=json.loads(raw)
+        return {'memory_label':label,'sha256':hashlib.sha256(raw).hexdigest(),'bytes':len(raw)}
+    detail=_group(group,lambda index,action:context,save,model=actual_future.core,future=actual_future)
+    require(tuple(detail['rows'])==tuple(f'vector_{i:02d}' for i in group['candidate_indices']),
+        'two_suffix_denominator')
+    binding_error=None
+    try:
+        request.check_integration()
+    except Exception:
+        binding_error=traceback.format_exc()
+    return {'schema':VERSION,'prefix_index':group['prefix_index'],'candidate_indices':copy.deepcopy(group['candidate_indices']),
+        'detail':detail,'predictions':predictions,'isolation_basis':OWNERSHIP,
+        'diagnostic_graphs_computed':False,'native_authority':False,'hidden_state_coverage':False,
+        'binding_error':binding_error}

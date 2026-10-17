@@ -80,6 +80,8 @@ def fixture(owner='A', *, collection_unknown=False, selection_unknown=False,
         'origin':SimpleNamespace(InitialDecision=Decision,collect_initial_decision=collect,
             revalidate_first_component=revalidate,require_current=current),
         'search':SimpleNamespace(propose_initial=propose)}
+    ns['compatibility'] = SimpleNamespace(select_component=lambda selection, actual_owner, incumbent:
+        {'selected_action': copy.deepcopy(selection['selected_action']), 'contract': 'synthetic_transport_only'})
     if clock is not None:ns['time']=SimpleNamespace(perf_counter_ns=clock)
     if broken_evidence:
         def fail_evidence(*args):raise OSError('synthetic evidence export')

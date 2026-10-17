@@ -1,0 +1,92 @@
+{
+  "status": "passed",
+  "root": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree",
+  "dataset_sha256": "70e1f7d5e643ad86e118a6358d60b6b616d877b1ca76ae2e4e68b45f37f33a57",
+  "candidate_rows_verified": 192,
+  "independent_scenario_groups": 3,
+  "owner_decision_groups": 6,
+  "source_raws": [
+    {
+      "path": "outputs\\experiments\\g31_ics_lt2_sustained_20261014\\compatible_initial_native_20261017_004\\mechanism\\incumbent.raw.json.gz",
+      "sha256": "afc3f1cd434832be891ea28f400bc74a121ba7dbff058885d9f544643db37ade",
+      "verified_rows": 64
+    },
+    {
+      "path": "outputs\\experiments\\g31_ics_lt2_sustained_20261014\\compatible_initial_native_20261017_004\\no_overlap\\incumbent.raw.json.gz",
+      "sha256": "2a85eccee1f0804260e6c1bc59821fe6ed653c8410e90ec7f75add1a5d68f0ba",
+      "verified_rows": 64
+    },
+    {
+      "path": "outputs\\experiments\\g31_ics_lt2_sustained_20261014\\compatible_initial_native_20261017_004\\insufficient_advance\\incumbent.raw.json.gz",
+      "sha256": "b5846c228f3c6ce3bff65775d8c3d98834ff329d1b78d531bd4271794fbabedf",
+      "verified_rows": 64
+    }
+  ],
+  "group_fold_models_verified": [
+    {
+      "path": "outputs\\experiments\\g31_ics_foundation_learning_20261017\\l0_002\\models\\linear_holdout_insufficient_advance.json",
+      "sha256": "3b6bc949b5d82f0fa91917719ecad92998e8d94508ad7cecead0a6c4d34b455b",
+      "held_out_group": "insufficient_advance",
+      "training_groups": [
+        "mechanism",
+        "no_overlap"
+      ],
+      "kind": "linear"
+    },
+    {
+      "path": "outputs\\experiments\\g31_ics_foundation_learning_20261017\\l0_002\\models\\mlp_holdout_insufficient_advance.json",
+      "sha256": "2010397e286c3a1b8e07f62d4b00d9696bb74fc6db5a204f2b8be5365fca38ff",
+      "held_out_group": "insufficient_advance",
+      "training_groups": [
+        "mechanism",
+        "no_overlap"
+      ],
+      "kind": "mlp"
+    },
+    {
+      "path": "outputs\\experiments\\g31_ics_foundation_learning_20261017\\l0_002\\models\\linear_holdout_mechanism.json",
+      "sha256": "caa345a054c8c05c5db528f9b11dfd5343b334c1d6dd977e93f60ad7e2669f78",
+      "held_out_group": "mechanism",
+      "training_groups": [
+        "insufficient_advance",
+        "no_overlap"
+      ],
+      "kind": "linear"
+    },
+    {
+      "path": "outputs\\experiments\\g31_ics_foundation_learning_20261017\\l0_002\\models\\mlp_holdout_mechanism.json",
+      "sha256": "8981228111c49626fd9e94158b3a1b23406a4e7d36852695a1c7bd45a62e22db",
+      "held_out_group": "mechanism",
+      "training_groups": [
+        "insufficient_advance",
+        "no_overlap"
+      ],
+      "kind": "mlp"
+    },
+    {
+      "path": "outputs\\experiments\\g31_ics_foundation_learning_20261017\\l0_002\\models\\linear_holdout_no_overlap.json",
+      "sha256": "74dd160f5ca1b206221745aad47f20446c66fd8c87a541b586fa77bccd2412b4",
+      "held_out_group": "no_overlap",
+      "training_groups": [
+        "insufficient_advance",
+        "mechanism"
+      ],
+      "kind": "linear"
+    },
+    {
+      "path": "outputs\\experiments\\g31_ics_foundation_learning_20261017\\l0_002\\models\\mlp_holdout_no_overlap.json",
+      "sha256": "ebb0be7181dfd22f8329a44a2594d757f3d489ee62c9f902b223060ee41c9df5",
+      "held_out_group": "no_overlap",
+      "training_groups": [
+        "insufficient_advance",
+        "mechanism"
+      ],
+      "kind": "mlp"
+    }
+  ],
+  "heldout_replay_summaries_exact": true,
+  "heldout_result_records_exact_except_score_timing": true,
+  "native_or_model_training_executions": 0,
+  "model_inference_executions": 0,
+  "scope": "Artifact hashes, saved observation legality, exact raw-derived targets, declared whole-scene splits and saved replay consistency only. No retraining, native replay, independent recomputation of model scores, generalization or 100ms certification."
+}

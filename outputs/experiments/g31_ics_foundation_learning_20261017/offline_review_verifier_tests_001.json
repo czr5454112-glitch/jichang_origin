@@ -1,0 +1,20 @@
+{
+  "status": "passed",
+  "checks": {
+    "outside_root": "reference_outside_original_root:D:/unrelated/file.json",
+    "traversal": "unsafe_relative_reference",
+    "future_message": "future_message",
+    "tampered_target": "cost_targets_exact",
+    "existing_output": "exit2_and_unchanged",
+    "different_root_full_check": "passed",
+    "tampered_dataset": "dataset_hash"
+  },
+  "original_report_sha256_before_and_after": "f569b4e24bc192cf0767c367612e9e13fabafd0362883bdd2e2b76531acdae5b",
+  "verifier_sha256": "d594a04285bd79fe17188008a5db472fcadc688a8fad496d33216ee251218805",
+  "native_or_training_runs": 0,
+  "harness_setup_notes": [
+    "Initial path-traversal test input failed to normalize Windows separators; corrected fixture only.",
+    "Initial deeply nested temporary destination hit Windows path-length copy limit; retried in shorter outputs/tmp_offline_* directory, then removed it after verifying its resolved parent."
+  ],
+  "recommended_extract_location": "Short local path such as C:/review/repo on Windows; original evidence is not rewritten."
+}

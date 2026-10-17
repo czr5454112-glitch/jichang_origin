@@ -219,13 +219,21 @@ def provider_fake(monkeypatch):
     seen=[];decision=SimpleNamespace(audit_copy=lambda:{'owner':'A','public_sha256':'fake','at':.11})
     monkeypatch.setattr(p.origin,'require_current',lambda d:seen.append('guard') or d)
     monkeypatch.setattr(p.origin,'supplied_snapshot',lambda d:seen.append('context') or 'initial_only')
-    monkeypatch.setattr(p,'source_proof',lambda:seen.append('proof'))
+    request=SimpleNamespace(uses=0)
+    request.description=lambda:{'proof_binding':{'proof_uses':request.uses}}
+    request.close=lambda:seen.append('close')
+    monkeypatch.setattr(p.binding,'bind_request',lambda:seen.append('bind') or request)
+    def proof(actual):
+        assert actual is request
+        request.uses+=1;seen.append('proof')
+    monkeypatch.setattr(p,'source_proof',proof)
     def setup(defect=None):
-        def execute(group,context):
-            assert context=='initial_only';seen.append(group['prefix_index'])
+        def execute(actual,group,context):
+            assert actual is request and context=='initial_only';seen.append(group['prefix_index'])
             if defect=='raise' and group['prefix_index']==0:raise ValueError('synthetic_group_error')
+            request.uses+=4
             return fake_item(group,defect if group['prefix_index']==0 else None)
-        monkeypatch.setattr(p.execution,'execute_group',execute)
+        monkeypatch.setattr(p.execution,'execute_bound_group',execute)
         return decision,seen
     return setup
 
@@ -238,6 +246,8 @@ def test_provider_all16_constructions_full32_order_and_cost(provider_fake):
     assert value['counts']['future_forks']==value['counts']['future_resumes']==32
     assert value['counts']['initial_engines']==value['counts']['context_constructions']==16
     assert value['complete_request_100ms_certified'] is False
+    assert seen.count('bind')==seen.count('close')==1
+    assert value['source_binding']['status']=='closed_complete65'
 
 
 @pytest.mark.parametrize('defect',['suffix_status','group_error','ownership','consumed','missing','info','raise'])

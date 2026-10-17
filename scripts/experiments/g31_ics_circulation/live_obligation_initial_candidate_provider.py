@@ -10,6 +10,7 @@ import hashlib
 import json
 import math
 import time
+from types import MappingProxyType
 from . import live_obligation_initial_decision_adapter as origin
 from . import live_obligation_full32_suffix_evaluator as evaluator
 from . import live_obligation_full32_suffix_partition as domain
@@ -27,6 +28,18 @@ def require(ok,reason):
 def encoding(value):return json.dumps(value,allow_nan=False,separators=(',',':'))
 
 
+def _freeze(value):
+    if type(value) is dict:return MappingProxyType({key:_freeze(item) for key,item in value.items()})
+    if type(value) is list:return tuple(_freeze(item) for item in value)
+    return value
+
+
+def _copy_frozen(value):
+    if type(value) is MappingProxyType:return {key:_copy_frozen(item) for key,item in value.items()}
+    if type(value) is tuple:return [_copy_frozen(item) for item in value]
+    return value
+
+
 def known_completion(prediction):
     if type(prediction) is not dict or prediction.get('status')!='conditional_prediction':return None
     values=prediction.get('completion')
@@ -38,19 +51,37 @@ def known_completion(prediction):
 
 class CandidateBatch:
     """One search may claim it. It cannot authorize native execution."""
-    __slots__=('_token','_bytes','_digest','_claimed','_decision','_provider_elapsed')
+    __slots__=('_token','_bytes','_digest','_claimed','_decision','_provider_elapsed','_data','_sealed')
     def __init__(self,token,data,decision):
         require(token is _TOKEN,'provider_factory_required')
         require(type(data['rows']) is list and len(data['rows'])==32
             and [r['candidate_index'] for r in data['rows']]==list(range(32)),'full32_order')
         domain.partition([r['action'] for r in data['rows']])
-        self._token=token;self._bytes=encoding(data);self._digest=hashlib.sha256(self._bytes.encode()).hexdigest()
+        raw=encoding(data);data=json.loads(raw)
+        self._token=token;self._bytes=raw;self._digest=hashlib.sha256(raw.encode()).hexdigest()
         self._claimed=False;self._decision=decision;self._provider_elapsed=None
+        self._data=_freeze(data)
+        self._sealed=(self._token,self._bytes,self._digest,self._data,self._decision)
+
+    def __setattr__(self,name,value):
+        if hasattr(self,'_sealed'):
+            require(name=='_provider_elapsed' and self._provider_elapsed is None
+                and type(value) is float and math.isfinite(value) and value>=0,'batch_fields_sealed')
+        object.__setattr__(self,name,value)
+
+    def __delattr__(self,name):
+        raise ValueError('initial_provider:batch_fields_sealed')
+
+    def _checked(self):
+        require(type(self) is CandidateBatch and self._token is _TOKEN
+            and type(self._sealed) is tuple and len(self._sealed)==5
+            and all(current is sealed for current,sealed in zip(
+                (self._token,self._bytes,self._digest,self._data,self._decision),self._sealed,strict=True)),
+            'batch_integrity')
+        return self._data
 
     def _read(self):
-        require(type(self) is CandidateBatch and self._token is _TOKEN
-            and hashlib.sha256(self._bytes.encode()).hexdigest()==self._digest,'batch_integrity')
-        return json.loads(self._bytes)
+        return _copy_frozen(self._checked())
 
     def audit_copy(self):
         value=self._read();value.update(batch_sha256=self._digest,search_already_claimed=self._claimed,
@@ -58,28 +89,37 @@ class CandidateBatch:
         return value
 
     def claim(self,method):
+        self._checked()
         require(type(method) is str and method and self._claimed is False,'one_search_per_charged_batch')
-        self._claimed=True
+        object.__setattr__(self,'_claimed',True)
         return CandidateQueries(_TOKEN,self,method)
 
 
 class CandidateQueries:
-    __slots__=('_token','_batch','method','indices')
+    __slots__=('_token','_batch','method','_indices')
     def __init__(self,token,batch,method):
-        require(token is _TOKEN,'provider_query_factory');self._token,self._batch,self.method=token,batch,method;self.indices=[]
+        require(token is _TOKEN,'provider_query_factory');self._token,self._batch,self.method=token,batch,method;self._indices=()
+    def __setattr__(self,name,value):
+        require(not hasattr(self,'_indices'),'query_fields_sealed')
+        object.__setattr__(self,name,value)
+    def __delattr__(self,name):
+        raise ValueError('initial_provider:query_fields_sealed')
+    @property
+    def indices(self):return list(self._indices)
     def query(self,index):
         require(self._token is _TOKEN and type(index) is int and 0<=index<32,'declared_candidate_index')
-        if index not in self.indices:self.indices.append(index)
-        require(len(self.indices)<=32,'logical_query_budget')
-        return self._batch._read()['rows'][index]
+        data=self._batch._checked()
+        if index not in self._indices:object.__setattr__(self,'_indices',(*self._indices,index))
+        require(len(self._indices)<=32,'logical_query_budget')
+        return _copy_frozen(data['rows'][index])
     def domain(self):
-        return [copy.deepcopy(row['action']) for row in self._batch._read()['rows']]
+        return [_copy_frozen(row['action']) for row in self._batch._checked()['rows']]
     def accounting(self):
-        data=self._batch._read()
-        return {'provider_charged_candidate_denominator':32,'provider_counts':data['counts'],
+        data=self._batch._checked()
+        return {'provider_charged_candidate_denominator':32,'provider_counts':_copy_frozen(data['counts']),
             'provider_preseal_seconds':data['provider_preseal_seconds'],
-            'provider_measured_through_seal_seconds':self._batch._provider_elapsed,'query_indices':list(self.indices),
-            'queried_indices':len(self.indices),'model_budget_saved_by_queries':False,
+            'provider_measured_through_seal_seconds':self._batch._provider_elapsed,'query_indices':list(self._indices),
+            'queried_indices':len(self._indices),'model_budget_saved_by_queries':False,
             'complete_request_100ms_certified':False,'batch_sha256':self._batch._digest,
             'initial_public_sha256':data.get('initial_public_sha256'),'owner':data.get('owner')}
 

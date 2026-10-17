@@ -1,0 +1,847 @@
+{
+  "schema": "g31.foundation.independent_physical_replay.v1",
+  "status": "passed_scoped_native_baseline",
+  "raw_reference": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_foundation_learning_20261017\\native_001\\raw.json.gz",
+    "sha256": "a8e3c61e447dc7654d83e8f216d2dec33c2c082c868215fdf5987ad0e5d04902"
+  },
+  "physical_replay": {
+    "status": "passed_scoped_independent_receipt_replay",
+    "completion": {
+      "loaded": 7.1999999999999975,
+      "receiver": 10.12,
+      "blocker": 11.349999999999998,
+      "reuse1": 13.049999999999997,
+      "reuse2": 18.46
+    },
+    "source_fifo_load_order": {
+      "0": [
+        "loaded"
+      ],
+      "1": [
+        "blocker",
+        "receiver"
+      ],
+      "7": [
+        "reuse1",
+        "reuse2"
+      ]
+    },
+    "same_L_two_returns_received_at": [
+      9.549999999999995,
+      15.359999999999996
+    ],
+    "job_tray_bindings": {
+      "loaded": "L",
+      "blocker": "P",
+      "receiver": "E",
+      "reuse1": "L",
+      "reuse2": "L"
+    },
+    "tray_count": 3,
+    "edge_entries": 18,
+    "edge_exits": 18,
+    "maximum_parked_plus_incoming_by_node": {
+      "0": 1,
+      "5": 1,
+      "1": 1,
+      "9": 1,
+      "3": 1,
+      "4": 2,
+      "6": 1,
+      "7": 1,
+      "10": 1
+    },
+    "loaded_actual_next": 1,
+    "reuse_actual_next": {
+      "reuse1": 3,
+      "reuse2": 3
+    },
+    "E_first_actual_edge_enter": 4.42,
+    "scope_limit": "Checks receipt identities, lifecycle, source FIFO, unload endpoints, edge travel/headway/capacity and parked+incoming node capacity. Does not reconstruct pending reception reservations, planner queues, message authority, hidden state, or future safety."
+  },
+  "per_tray_actual_receipt_counts": {
+    "L": {
+      "LOAD_START": 3,
+      "LOAD_COMPLETE": 3,
+      "LEG_START": 6,
+      "RESOURCE_WAIT": 3,
+      "RESOURCE_WAKE": 3,
+      "EDGE_ENTER": 12,
+      "EDGE_EXIT": 12,
+      "LEG_COMPLETE": 6,
+      "STORAGE_ENTER": 1,
+      "STORAGE_RELEASE": 1,
+      "UNLOAD_START": 3,
+      "UNLOAD_COMPLETE": 3,
+      "HOLD_START": 3,
+      "HOLD_COMPLETE": 3,
+      "MODULE_REQUEST_DELIVERED": 2,
+      "EXPORT_GRANTED": 2,
+      "EMPTY_RECEIVED": 2,
+      "ROUTE_INTENT_updated": 1
+    },
+    "E": {
+      "MODULE_REQUEST_DELIVERED": 4,
+      "TRANSFER_REJECTED": 3,
+      "EXPORT_GRANTED": 1,
+      "LEG_START": 2,
+      "EDGE_ENTER": 3,
+      "EDGE_EXIT": 3,
+      "LEG_COMPLETE": 2,
+      "EMPTY_RECEIVED": 1,
+      "LOAD_START": 1,
+      "LOAD_COMPLETE": 1,
+      "UNLOAD_START": 1,
+      "UNLOAD_COMPLETE": 1,
+      "HOLD_START": 1,
+      "HOLD_COMPLETE": 1
+    },
+    "P": {
+      "LOAD_START": 1,
+      "LOAD_COMPLETE": 1,
+      "LEG_START": 2,
+      "EDGE_ENTER": 3,
+      "EDGE_EXIT": 3,
+      "LEG_COMPLETE": 2,
+      "STORAGE_ENTER": 1,
+      "STORAGE_RELEASE": 1,
+      "UNLOAD_START": 1,
+      "UNLOAD_COMPLETE": 1,
+      "HOLD_START": 1,
+      "HOLD_COMPLETE": 1
+    }
+  },
+  "same_L_lifecycle_trajectory": [
+    {
+      "time": 0.0,
+      "event": "LOAD_START",
+      "business_bag_id": "loaded",
+      "transport_leg_id": "",
+      "tray_id": "L",
+      "traversal_id": 0,
+      "node": 0,
+      "from": -1,
+      "to": -1,
+      "reason": ""
+    },
+    {
+      "time": 0.1,
+      "event": "LOAD_COMPLETE",
+      "business_bag_id": "loaded",
+      "transport_leg_id": "",
+      "tray_id": "L",
+      "traversal_id": 0,
+      "node": 0,
+      "from": -1,
+      "to": -1,
+      "reason": ""
+    },
+    {
+      "time": 3.1,
+      "event": "EDGE_ENTER",
+      "business_bag_id": "loaded",
+      "transport_leg_id": "loaded:storage_in:0",
+      "tray_id": "L",
+      "traversal_id": 2,
+      "node": 0,
+      "from": 0,
+      "to": 1,
+      "reason": ""
+    },
+    {
+      "time": 4.1,
+      "event": "EDGE_EXIT",
+      "business_bag_id": "loaded",
+      "transport_leg_id": "loaded:storage_in:0",
+      "tray_id": "L",
+      "traversal_id": 2,
+      "node": 1,
+      "from": 0,
+      "to": 1,
+      "reason": ""
+    },
+    {
+      "time": 4.199999999999999,
+      "event": "EDGE_ENTER",
+      "business_bag_id": "loaded",
+      "transport_leg_id": "loaded:storage_in:0",
+      "tray_id": "L",
+      "traversal_id": 3,
+      "node": 1,
+      "from": 1,
+      "to": 3,
+      "reason": ""
+    },
+    {
+      "time": 5.199999999999999,
+      "event": "EDGE_EXIT",
+      "business_bag_id": "loaded",
+      "transport_leg_id": "loaded:storage_in:0",
+      "tray_id": "L",
+      "traversal_id": 3,
+      "node": 3,
+      "from": 1,
+      "to": 3,
+      "reason": ""
+    },
+    {
+      "time": 5.299999999999999,
+      "event": "EDGE_ENTER",
+      "business_bag_id": "loaded",
+      "transport_leg_id": "loaded:storage_in:0",
+      "tray_id": "L",
+      "traversal_id": 5,
+      "node": 3,
+      "from": 3,
+      "to": 4,
+      "reason": ""
+    },
+    {
+      "time": 6.299999999999999,
+      "event": "EDGE_EXIT",
+      "business_bag_id": "loaded",
+      "transport_leg_id": "loaded:storage_in:0",
+      "tray_id": "L",
+      "traversal_id": 5,
+      "node": 4,
+      "from": 3,
+      "to": 4,
+      "reason": ""
+    },
+    {
+      "time": 6.499999999999998,
+      "event": "EDGE_ENTER",
+      "business_bag_id": "loaded",
+      "transport_leg_id": "loaded:storage_out:3",
+      "tray_id": "L",
+      "traversal_id": 6,
+      "node": 4,
+      "from": 4,
+      "to": 6,
+      "reason": ""
+    },
+    {
+      "time": 6.999999999999998,
+      "event": "EDGE_EXIT",
+      "business_bag_id": "loaded",
+      "transport_leg_id": "loaded:storage_out:3",
+      "tray_id": "L",
+      "traversal_id": 6,
+      "node": 6,
+      "from": 4,
+      "to": 6,
+      "reason": ""
+    },
+    {
+      "time": 7.099999999999998,
+      "event": "UNLOAD_START",
+      "business_bag_id": "loaded",
+      "transport_leg_id": "loaded:storage_out:3",
+      "tray_id": "L",
+      "traversal_id": 6,
+      "node": 6,
+      "from": -1,
+      "to": -1,
+      "reason": ""
+    },
+    {
+      "time": 7.1999999999999975,
+      "event": "UNLOAD_COMPLETE",
+      "business_bag_id": "loaded",
+      "transport_leg_id": "",
+      "tray_id": "L",
+      "traversal_id": 6,
+      "node": 6,
+      "from": -1,
+      "to": -1,
+      "reason": ""
+    },
+    {
+      "time": 7.299999999999997,
+      "event": "HOLD_COMPLETE",
+      "business_bag_id": "loaded",
+      "transport_leg_id": "",
+      "tray_id": "L",
+      "traversal_id": 6,
+      "node": 6,
+      "from": -1,
+      "to": -1,
+      "reason": ""
+    },
+    {
+      "time": 7.449999999999996,
+      "event": "EDGE_ENTER",
+      "business_bag_id": "",
+      "transport_leg_id": "live:1:A:return-0:empty_return:4",
+      "tray_id": "L",
+      "traversal_id": 7,
+      "node": 6,
+      "from": 6,
+      "to": 7,
+      "reason": ""
+    },
+    {
+      "time": 9.449999999999996,
+      "event": "EDGE_EXIT",
+      "business_bag_id": "",
+      "transport_leg_id": "live:1:A:return-0:empty_return:4",
+      "tray_id": "L",
+      "traversal_id": 7,
+      "node": 7,
+      "from": 6,
+      "to": 7,
+      "reason": ""
+    },
+    {
+      "time": 9.549999999999995,
+      "event": "EMPTY_RECEIVED",
+      "business_bag_id": "",
+      "transport_leg_id": "live:1:A:return-0:empty_return:4",
+      "tray_id": "L",
+      "traversal_id": 7,
+      "node": 7,
+      "from": -1,
+      "to": 7,
+      "reason": "live:1:A:return-0"
+    },
+    {
+      "time": 9.549999999999995,
+      "event": "LOAD_START",
+      "business_bag_id": "reuse1",
+      "transport_leg_id": "",
+      "tray_id": "L",
+      "traversal_id": 7,
+      "node": 7,
+      "from": -1,
+      "to": -1,
+      "reason": ""
+    },
+    {
+      "time": 9.649999999999995,
+      "event": "LOAD_COMPLETE",
+      "business_bag_id": "reuse1",
+      "transport_leg_id": "",
+      "tray_id": "L",
+      "traversal_id": 7,
+      "node": 7,
+      "from": -1,
+      "to": -1,
+      "reason": ""
+    },
+    {
+      "time": 10.149999999999999,
+      "event": "EDGE_ENTER",
+      "business_bag_id": "reuse1",
+      "transport_leg_id": "reuse1:direct:7",
+      "tray_id": "L",
+      "traversal_id": 12,
+      "node": 7,
+      "from": 7,
+      "to": 3,
+      "reason": ""
+    },
+    {
+      "time": 11.149999999999999,
+      "event": "EDGE_EXIT",
+      "business_bag_id": "reuse1",
+      "transport_leg_id": "reuse1:direct:7",
+      "tray_id": "L",
+      "traversal_id": 12,
+      "node": 3,
+      "from": 7,
+      "to": 3,
+      "reason": ""
+    },
+    {
+      "time": 11.249999999999998,
+      "event": "EDGE_ENTER",
+      "business_bag_id": "reuse1",
+      "transport_leg_id": "reuse1:direct:7",
+      "tray_id": "L",
+      "traversal_id": 13,
+      "node": 3,
+      "from": 3,
+      "to": 4,
+      "reason": ""
+    },
+    {
+      "time": 12.249999999999998,
+      "event": "EDGE_EXIT",
+      "business_bag_id": "reuse1",
+      "transport_leg_id": "reuse1:direct:7",
+      "tray_id": "L",
+      "traversal_id": 13,
+      "node": 4,
+      "from": 3,
+      "to": 4,
+      "reason": ""
+    },
+    {
+      "time": 12.349999999999998,
+      "event": "EDGE_ENTER",
+      "business_bag_id": "reuse1",
+      "transport_leg_id": "reuse1:direct:7",
+      "tray_id": "L",
+      "traversal_id": 14,
+      "node": 4,
+      "from": 4,
+      "to": 6,
+      "reason": ""
+    },
+    {
+      "time": 12.849999999999998,
+      "event": "EDGE_EXIT",
+      "business_bag_id": "reuse1",
+      "transport_leg_id": "reuse1:direct:7",
+      "tray_id": "L",
+      "traversal_id": 14,
+      "node": 6,
+      "from": 4,
+      "to": 6,
+      "reason": ""
+    },
+    {
+      "time": 12.949999999999998,
+      "event": "UNLOAD_START",
+      "business_bag_id": "reuse1",
+      "transport_leg_id": "reuse1:direct:7",
+      "tray_id": "L",
+      "traversal_id": 14,
+      "node": 6,
+      "from": -1,
+      "to": -1,
+      "reason": ""
+    },
+    {
+      "time": 13.049999999999997,
+      "event": "UNLOAD_COMPLETE",
+      "business_bag_id": "reuse1",
+      "transport_leg_id": "",
+      "tray_id": "L",
+      "traversal_id": 14,
+      "node": 6,
+      "from": -1,
+      "to": -1,
+      "reason": ""
+    },
+    {
+      "time": 13.149999999999997,
+      "event": "HOLD_COMPLETE",
+      "business_bag_id": "reuse1",
+      "transport_leg_id": "",
+      "tray_id": "L",
+      "traversal_id": 14,
+      "node": 6,
+      "from": -1,
+      "to": -1,
+      "reason": ""
+    },
+    {
+      "time": 13.259999999999996,
+      "event": "EDGE_ENTER",
+      "business_bag_id": "",
+      "transport_leg_id": "live:1:A:return-1:empty_return:8",
+      "tray_id": "L",
+      "traversal_id": 15,
+      "node": 6,
+      "from": 6,
+      "to": 7,
+      "reason": ""
+    },
+    {
+      "time": 15.259999999999996,
+      "event": "EDGE_EXIT",
+      "business_bag_id": "",
+      "transport_leg_id": "live:1:A:return-1:empty_return:8",
+      "tray_id": "L",
+      "traversal_id": 15,
+      "node": 7,
+      "from": 6,
+      "to": 7,
+      "reason": ""
+    },
+    {
+      "time": 15.359999999999996,
+      "event": "EMPTY_RECEIVED",
+      "business_bag_id": "",
+      "transport_leg_id": "live:1:A:return-1:empty_return:8",
+      "tray_id": "L",
+      "traversal_id": 15,
+      "node": 7,
+      "from": -1,
+      "to": 7,
+      "reason": "live:1:A:return-1"
+    },
+    {
+      "time": 15.359999999999996,
+      "event": "LOAD_START",
+      "business_bag_id": "reuse2",
+      "transport_leg_id": "",
+      "tray_id": "L",
+      "traversal_id": 15,
+      "node": 7,
+      "from": -1,
+      "to": -1,
+      "reason": ""
+    },
+    {
+      "time": 15.459999999999996,
+      "event": "LOAD_COMPLETE",
+      "business_bag_id": "reuse2",
+      "transport_leg_id": "",
+      "tray_id": "L",
+      "traversal_id": 15,
+      "node": 7,
+      "from": -1,
+      "to": -1,
+      "reason": ""
+    },
+    {
+      "time": 15.559999999999995,
+      "event": "EDGE_ENTER",
+      "business_bag_id": "reuse2",
+      "transport_leg_id": "reuse2:direct:9",
+      "tray_id": "L",
+      "traversal_id": 16,
+      "node": 7,
+      "from": 7,
+      "to": 3,
+      "reason": ""
+    },
+    {
+      "time": 16.559999999999995,
+      "event": "EDGE_EXIT",
+      "business_bag_id": "reuse2",
+      "transport_leg_id": "reuse2:direct:9",
+      "tray_id": "L",
+      "traversal_id": 16,
+      "node": 3,
+      "from": 7,
+      "to": 3,
+      "reason": ""
+    },
+    {
+      "time": 16.659999999999997,
+      "event": "EDGE_ENTER",
+      "business_bag_id": "reuse2",
+      "transport_leg_id": "reuse2:direct:9",
+      "tray_id": "L",
+      "traversal_id": 17,
+      "node": 3,
+      "from": 3,
+      "to": 4,
+      "reason": ""
+    },
+    {
+      "time": 17.659999999999997,
+      "event": "EDGE_EXIT",
+      "business_bag_id": "reuse2",
+      "transport_leg_id": "reuse2:direct:9",
+      "tray_id": "L",
+      "traversal_id": 17,
+      "node": 4,
+      "from": 3,
+      "to": 4,
+      "reason": ""
+    },
+    {
+      "time": 17.759999999999998,
+      "event": "EDGE_ENTER",
+      "business_bag_id": "reuse2",
+      "transport_leg_id": "reuse2:direct:9",
+      "tray_id": "L",
+      "traversal_id": 18,
+      "node": 4,
+      "from": 4,
+      "to": 6,
+      "reason": ""
+    },
+    {
+      "time": 18.259999999999998,
+      "event": "EDGE_EXIT",
+      "business_bag_id": "reuse2",
+      "transport_leg_id": "reuse2:direct:9",
+      "tray_id": "L",
+      "traversal_id": 18,
+      "node": 6,
+      "from": 4,
+      "to": 6,
+      "reason": ""
+    },
+    {
+      "time": 18.36,
+      "event": "UNLOAD_START",
+      "business_bag_id": "reuse2",
+      "transport_leg_id": "reuse2:direct:9",
+      "tray_id": "L",
+      "traversal_id": 18,
+      "node": 6,
+      "from": -1,
+      "to": -1,
+      "reason": ""
+    },
+    {
+      "time": 18.46,
+      "event": "UNLOAD_COMPLETE",
+      "business_bag_id": "reuse2",
+      "transport_leg_id": "",
+      "tray_id": "L",
+      "traversal_id": 18,
+      "node": 6,
+      "from": -1,
+      "to": -1,
+      "reason": ""
+    },
+    {
+      "time": 18.560000000000002,
+      "event": "HOLD_COMPLETE",
+      "business_bag_id": "reuse2",
+      "transport_leg_id": "",
+      "tray_id": "L",
+      "traversal_id": 18,
+      "node": 6,
+      "from": -1,
+      "to": -1,
+      "reason": ""
+    }
+  ],
+  "actual_transfer_request_endpoints": [
+    {
+      "request_id": "live:1:B:online-initial",
+      "request": {
+        "request_id": "live:1:B:online-initial",
+        "owner_id": "B",
+        "tray_id": "E",
+        "source": 5,
+        "destination": 1,
+        "earliest_departure": 2.2100000000000004,
+        "expiry": 39.0,
+        "message_delay": 0.01
+      },
+      "ack": {
+        "sequence": 6,
+        "attempt": 6,
+        "observed_at": 2.67,
+        "delivered_at": 2.69,
+        "status": "rejected",
+        "reason": "receiving_full",
+        "received_at": -1.0
+      }
+    },
+    {
+      "request_id": "live:1:B:supply-recovery-1",
+      "request": {
+        "request_id": "live:1:B:supply-recovery-1",
+        "owner_id": "B",
+        "tray_id": "E",
+        "source": 5,
+        "destination": 1,
+        "earliest_departure": 3.21,
+        "expiry": 39.0,
+        "message_delay": 0.01
+      },
+      "ack": {
+        "sequence": 1,
+        "attempt": 1,
+        "observed_at": 3.2199999999999998,
+        "delivered_at": 3.2399999999999998,
+        "status": "rejected",
+        "reason": "receiving_full",
+        "received_at": -1.0
+      }
+    },
+    {
+      "request_id": "live:1:B:supply-recovery-2",
+      "request": {
+        "request_id": "live:1:B:supply-recovery-2",
+        "owner_id": "B",
+        "tray_id": "E",
+        "source": 5,
+        "destination": 1,
+        "earliest_departure": 3.7600000000000002,
+        "expiry": 39.0,
+        "message_delay": 0.01
+      },
+      "ack": {
+        "sequence": 1,
+        "attempt": 1,
+        "observed_at": 3.77,
+        "delivered_at": 3.79,
+        "status": "rejected",
+        "reason": "receiving_full",
+        "received_at": -1.0
+      }
+    },
+    {
+      "request_id": "live:1:B:supply-recovery-3",
+      "request": {
+        "request_id": "live:1:B:supply-recovery-3",
+        "owner_id": "B",
+        "tray_id": "E",
+        "source": 5,
+        "destination": 1,
+        "earliest_departure": 4.3100000000000005,
+        "expiry": 39.0,
+        "message_delay": 0.01
+      },
+      "ack": {
+        "sequence": 2,
+        "attempt": 2,
+        "observed_at": 4.82,
+        "delivered_at": 4.84,
+        "status": "received",
+        "reason": "",
+        "received_at": 4.72
+      }
+    },
+    {
+      "request_id": "live:1:A:return-0",
+      "request": {
+        "request_id": "live:1:A:return-0",
+        "owner_id": "A",
+        "tray_id": "L",
+        "source": 6,
+        "destination": 7,
+        "earliest_departure": 7.339999999999996,
+        "expiry": 39.0,
+        "message_delay": 0.01
+      },
+      "ack": {
+        "sequence": 6,
+        "attempt": 6,
+        "observed_at": 9.579999999999995,
+        "delivered_at": 9.599999999999994,
+        "status": "received",
+        "reason": "",
+        "received_at": 9.549999999999995
+      }
+    },
+    {
+      "request_id": "live:1:A:return-1",
+      "request": {
+        "request_id": "live:1:A:return-1",
+        "owner_id": "A",
+        "tray_id": "L",
+        "source": 6,
+        "destination": 7,
+        "earliest_departure": 13.149999999999997,
+        "expiry": 39.0,
+        "message_delay": 0.01
+      },
+      "ack": {
+        "sequence": 6,
+        "attempt": 6,
+        "observed_at": 15.67,
+        "delivered_at": 15.69,
+        "status": "received",
+        "reason": "",
+        "received_at": 15.359999999999996
+      }
+    }
+  ],
+  "later_retained_decisions": {
+    "A": [
+      {
+        "phase": "first_return",
+        "at": 7.339999999999996,
+        "request_id": "live:1:A:return-0",
+        "admitted": true
+      }
+    ],
+    "B": [
+      {
+        "phase": "first_reuse_route",
+        "at": 9.689999999999994,
+        "request_id": null,
+        "admitted": true
+      }
+    ]
+  },
+  "policy_activations_after_first_unload": 1395,
+  "owner_observation_checks": {
+    "count": 1719,
+    "pre_wire": [
+      {
+        "owner": "A",
+        "at": 0.05,
+        "local_tray_ids": [
+          "L",
+          "P"
+        ],
+        "delivered_planning_count": 0,
+        "foreign_dynamic_state_absent": true
+      },
+      {
+        "owner": "B",
+        "at": 0.05,
+        "local_tray_ids": [
+          "E"
+        ],
+        "delivered_planning_count": 0,
+        "foreign_dynamic_state_absent": true
+      }
+    ],
+    "first_delivered": [
+      {
+        "owner": "A",
+        "at": 0.11,
+        "local_tray_ids": [
+          "L",
+          "P"
+        ],
+        "delivered_planning_count": 1,
+        "foreign_dynamic_state_absent": true
+      },
+      {
+        "owner": "B",
+        "at": 0.11,
+        "local_tray_ids": [
+          "E"
+        ],
+        "delivered_planning_count": 1,
+        "foreign_dynamic_state_absent": true
+      }
+    ],
+    "all_passed": true,
+    "scope": "native local trays and dynamic node data; actual delivered planning endpoint target/time; not adversarial Python process isolation"
+  },
+  "shadow": {
+    "advice_only_count": 4,
+    "all_native_hashes_unchanged": true,
+    "full_saved_trajectory_comparison": {
+      "status": "exact_saved_baseline_trajectory",
+      "reference": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\compatible_initial_native_20261017_004\\mechanism\\incumbent.raw.json.gz",
+        "sha256": "afc3f1cd434832be891ea28f400bc74a121ba7dbff058885d9f544643db37ade"
+      },
+      "input_exact": true,
+      "compared_native_result_fields": [
+        "receipts",
+        "jobs",
+        "trays"
+      ],
+      "all_fields_exact": true,
+      "trajectory_equivalence": true,
+      "scope": "same input and method against prior closed native execution; no new paired execution or general shadow proof"
+    }
+  },
+  "L1": {
+    "rl_ready": false,
+    "continuous_native_baseline": true,
+    "same_tray_two_actual_reuses": true,
+    "new_later_R1_R2_choices": false,
+    "reason": "The two later collected actions consume the retained initial policy; repeated activations and guarded execution are not a new learnable action contract."
+  },
+  "unchanged_limits": [
+    "normal mechanism instance only",
+    "no new packet/fault campaign",
+    "no full joint R1/R2 or hard cross-owner protection",
+    "no 100ms or asynchronous physical-time claim"
+  ],
+  "tests": {
+    "command": "python -m pytest tests/test_g31_foundation_native_environment.py -q -p no:cacheprovider",
+    "passed": 16,
+    "scope": "pure API scheduling and isolation checks, mocked native endpoint is not physical evidence"
+  }
+}

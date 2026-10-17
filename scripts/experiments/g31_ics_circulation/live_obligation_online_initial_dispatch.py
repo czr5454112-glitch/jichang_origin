@@ -1,10 +1,10 @@
-"""Unexecuted owner-local initial online dispatch seam.
+"""Owner-local dispatch with a conservative component execution gate.
 
 All seven arms pay the same full32 provider. No case label, saved outcome or
 peer proposal is accepted here. A successful returned record means only that a
 local command was submitted, or the selected native default required none.
 Actual ACK/physical outcome, strict five-job protection, later re-estimation
-and the complete100ms boundary require the future enclosing campaign.
+and the complete100ms boundary require the enclosing campaign evidence.
 """
 from __future__ import annotations
 import copy
@@ -12,6 +12,7 @@ import time
 
 from . import live_obligation_owned_same_information_search as search
 from . import live_obligation_initial_decision_adapter_v2 as origin
+from . import live_obligation_component_compatibility as compatibility
 
 SCHEMA = 'g31.live_obligation.owner_local_initial_dispatch.v1'
 ARMS = {
@@ -125,6 +126,13 @@ as JSON. The selected suffix is initially nonbinding, not a rolling replan.
         if action is None:
             progress['status'] = 'unknown_no_admissible_estimate'
             return progress, decision._ledger
+        progress['stage'] = 'conditional_component_compatibility'
+        compatible = compatibility.select_component(selection, owner, incumbent_index)
+        progress['compatibility'] = compatible
+        action = compatible['selected_action']
+        if action is None:
+            progress['status'] = 'unknown_no_compatible_component'
+            return progress, decision._ledger
         # Retain the complete proposal before the final native recollection.
         # Earlier provider-local revalidation is not reused as dispatch proof.
         progress['selected_action'] = copy.deepcopy(action)
@@ -146,6 +154,7 @@ as JSON. The selected suffix is initially nonbinding, not a rolling replan.
             'decision_information_sha256': decision._digest,
             'online_initial_arm': arm, 'online_initial_restriction': restriction,
             'local_initial_estimate_vector': copy.deepcopy(action),
+            'component_compatibility_contract': compatible['contract'],
             'peer_proposal_read': False, 'later_model_reestimation_performed': False}
         payload = {k: v for k, v in component.items() if k != 'kind'}
         creating_root = client.context['root_id']

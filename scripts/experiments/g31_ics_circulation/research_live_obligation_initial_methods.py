@@ -1,10 +1,9 @@
-"""Prospective owner-local seven-arm branch, not yet a launched campaign.
+"""Owner-local seven-arm branch with conditional component compatibility.
 
-Each owner selects from its own delivered facts and keeps only its own initial
-estimate. The original guarded notification continuation is extracted intact.
-There is no peer-proposal agreement gate. A combined action exists only in the
-post-run assessment; it never enters a decision. Full32/100ms, rolling updates,
-and physical nonregression require separate complete prospective evidence.
+Each owner selects from its own delivered facts. The public conservative
+contract keeps A's incumbent components and permits B's already queried safe
+deviations. Conditional compatibility grants no native resource guarantee.
+The original guarded notification continuation is extracted intact.
 """
 from __future__ import annotations
 
@@ -173,8 +172,18 @@ def completed_summary(data, result, client, continuation, initial, decisions):
         current_state_certified=False, native_model_protection_certified=False,
         complete_request_100ms_certified=False, strict_protected=None,
         forecast_scope='Retained initial estimate with actual current guards; no hidden-state coverage certificate.')
+    summary['component_compatibility_contract'] = dispatch.compatibility.CONTRACT
+    summary['conditional_component_domain_verified'] = all(
+        initial[owner].get('compatibility', {}).get('contract') == dispatch.compatibility.CONTRACT
+        and initial[owner]['compatibility'].get('selected_action') == initial[owner]['selected_action']
+        for owner in ('A', 'B')) and vector == initial['B']['selected_action'] and all(
+            vector[field] == protocol.incumbent_action()[field]
+            for field in dispatch.compatibility.OWNER_FIELDS['A'])
+    summary['joint_R1_R2_domain_restored'] = False
     if not inputs or not executed:
         summary['status'] = 'unknown_missing_input_or_unexecuted_initial_estimate'
+    elif not summary['conditional_component_domain_verified']:
+        summary['status'] = 'unknown_unverified_component_contract'
     return summary
 
 

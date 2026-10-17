@@ -194,7 +194,7 @@ def test_posthoc_composite_uses_only_respective_owner_components(monkeypatch):
     result = subject.completed_summary({}, {}, None, {'missing_owner_policies': []}, initial, decisions)
     assert seen == [{'initial_action': 'prefer_2', 'empty_departure': 1.,
                      'return_delay': .5, 'later_action': 'prefer_8'}]
-    assert initial == before and result['status'] == 'assessed'
+    assert initial == before and result['status'] == 'unknown_unverified_component_contract'
     assert result['owner_proposals_agreed_posthoc'] is False
     assert result['strict_protected'] is None and result['complete_request_100ms_certified'] is False
 
@@ -205,6 +205,23 @@ def test_missing_owner_cannot_be_filled_by_peer_estimate(monkeypatch):
     result = subject.completed_summary({}, {}, None, {'missing_owner_policies': ['B']}, initial, {})
     assert result['status'] == 'unknown_missing_owner_initial_proposal'
     assert result['business_metrics'] is None and result['strict_protected'] is None
+
+
+@pytest.mark.parametrize('owner_b_index,expected', [(12, True), (25, False)])
+def test_posthoc_rechecks_effective_vector_against_B_witness(monkeypatch, owner_b_index, expected):
+    actions = subject.old.construction.actions()
+    initial = {owner: {**record(owner), 'selected_action': copy.deepcopy(actions[index]),
+        'continuation_policy_created': True, 'compatibility': {
+            'contract': subject.dispatch.compatibility.CONTRACT,
+            'selected_action': copy.deepcopy(actions[index])}}
+        for owner, index in (('A', 4), ('B', owner_b_index))}
+    monkeypatch.setattr(subject.old, 'assess_cell', lambda *args: {'status': 'assessed'})
+    decisions = {owner: [{'information': {'native_delivery_verified': True},
+        'selected_action_admitted': True, 'fallback_used': False}] for owner in ('A', 'B')}
+    result = subject.completed_summary({}, {}, None, {'missing_owner_policies': []}, initial, decisions)
+    assert result['conditional_component_domain_verified'] is expected
+    assert result['status'] == ('assessed' if expected else 'unknown_unverified_component_contract')
+    assert not result['native_model_protection_certified']
 
 
 def test_partial_branch_uses_const_diagnostics_and_keeps_dispatch(monkeypatch):
