@@ -1,0 +1,1887 @@
+{
+  "schema": "g31.foundation.service_update.independent_native_review.v1",
+  "status": "passed_exact_native_and_current_model_parity",
+  "independent_scene_count": 1,
+  "native_executions": 0,
+  "model_evaluations": 0,
+  "complete_request_100ms_certified": false,
+  "quality_improvement_claimed": false,
+  "excluded_transition_fields": [
+    "actor_choose_wall_ms",
+    "actor_inference_wall_ms",
+    "collection_through_offer_wall_ms",
+    "model_and_guard_wall_ms",
+    "submission_and_local_guard_wall_ms",
+    "collection_to_decision_record_wall_ms",
+    "request_timing_scope"
+  ],
+  "comparison_scope": "Strict sorted JSON identity; no float tolerance, ID rewriting, trace filtering or outcome-based rebasing.",
+  "timing_limit": "Instrumented offline_sync collection entry through decision record is not a complete deployment request or ACK latency.",
+  "episodes": {
+    "reference": {
+      "native_receipt": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\receipt.json",
+        "sha256": "174ce6bc3682a2d831c056f2e2772b5d5f606cad5f20c1a1761ab0bc2d069013"
+      },
+      "raw": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\raw.json.gz",
+        "sha256": "f49b8048d018f7a6db1f188ee961dfbfae5281bc171427e152d495f2f98a937d"
+      },
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\preregistered_protocol.json",
+        "sha256": "ca78b49f12c4feef44d6fe49c8fcdb8d738d7cf0ea1bb8b44eccaa35fc6989db"
+      },
+      "process": {
+        "status": "exited",
+        "pid": 3080,
+        "exitcode": 0,
+        "wall_seconds": 52.296000000002095,
+        "hard_timeout_seconds": 150,
+        "windows_job_kill_on_close": true,
+        "child_released_only_after_job_assignment": true
+      },
+      "source_archive_count": 119,
+      "live_source_files_not_used_to_rejudge_historical_runs": true
+    },
+    "current": {
+      "native_receipt": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\receipt.json",
+        "sha256": "3e2656b691600a9c4d951d38070fb499c9fa042474f5eb0627dc2d4ba8ecc522"
+      },
+      "raw": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\raw.json.gz",
+        "sha256": "c20033e9c6278022bd3f4ad551126c74e04bfa5e4287ed24ca209489d93a40bd"
+      },
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\preregistered_protocol.json",
+        "sha256": "cf646a125d0c57d78ef86a05a7bb801da1a44a9e8a8bab71d77f504dc2e745fb"
+      },
+      "process": {
+        "status": "exited",
+        "pid": 2132,
+        "exitcode": 0,
+        "wall_seconds": 56.39100000000326,
+        "hard_timeout_seconds": 150,
+        "windows_job_kill_on_close": true,
+        "child_released_only_after_job_assignment": true
+      },
+      "source_archive_count": 120,
+      "live_source_files_not_used_to_rejudge_historical_runs": true
+    }
+  },
+  "cutpoints": [
+    {
+      "owner": "A",
+      "phase": "first_return",
+      "at": 7.339999999999996,
+      "action_id": "return_now",
+      "candidate_id": "4e05630eab505ed37dc27e696b7c45a94c1583c682dc0140e0a043deaee78a0e",
+      "full_model_report_json_sha256": "8088ee81a6b921f023356f9d8fac41e03bd664906857bf6d5a720b54993a6503",
+      "evaluation": {
+        "schema": "g31.foundation.request_local_static_context.v1",
+        "counts": {
+          "static_catalog_builds": 1,
+          "static_catalog_reads": 31,
+          "dynamic_later_context_calls": 2
+        },
+        "static_catalog_sha256": "7e2d77ce30ee389faee5eb59e84a3f01de43a6d74cd9d2a5a866c93bc7b7ca9d",
+        "source_sha256": {
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf28_service_potential.py": "992ebc5b33f09acc5935e4c1724d8874da10dd46ca69390f72c74bd5bdd2b52f",
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\domain_guard_historical_service.py": "f929343e46b9f22c7de9584ee2373357659fb64d6ff0d7cb2f513e9896e4b90d",
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\domain_guard_v2.py": "d1803b7b001fa8b4c9ff0f7cdcadb0293227c7a1803d11d6eac905d894254c23",
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_request_context.py": "fe0e0bcbafc100c1bf375d1abf0d7fdb15146b018be2f9c2ef9417b0dc0f931d",
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_delivered_context.py": "af8ca670a59e7a93084c1cf7f1c90aae13e134261c81f964f60c070e4b38709e",
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_domain_guard.py": "61f914a59d2c38e4410001d2287bffd0d246c1ce47056d8abc2419b607492ab7",
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_historical_service.py": "95faa9ed59579ab338f9bd3de3ad35ba842e7ad5e0e6fcf1989f655ae88ff414",
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_lifecycle_state_v2.py": "de55e0e5b4ecfe2de98c8684055080b810156d72b6c08144c51d026cadcfe3da",
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\native_host.py": "03c33fbbaff5049b9068471edf7d7208f4921e977cc008e04461c515635bc48b",
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_live_obligation_event_projection_v2.py": "46a7e358dfb2ff181af2b99f31a68cfc1ecffa8eb2ab00532028d862b4def2ad",
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_live_obligation_interval.py": "9f9bd160eae098fc7cc2ffa5e3268f9c872c31e0e8c6a4e29735c124e5439394",
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_live_obligation_projection.py": "acaa7948bcc8742cfc338ca76f187431078f631fef1c4c8fe82e44dc81e0b544",
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_preexisting_occupancy_domain.py": "075e1460faaeebe372552b4dc061fe92bcfde4a710e97908f38231d8a7d2c7a3",
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_rolling_overlap_domain.py": "67b367a69b6f71782db92f77d9dd04714d60f44590f3877f53d9c67349295b42",
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_synthetic_reuse_chain.py": "cc5b0aef33bf85d7612e276f3ce216133f332f103418675245c79a317318d086",
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_later_seed.py": "dea07514fa33d08d77a2a55f5ef87239f649203ed273088247c31b8de0f29500"
+        },
+        "source_exit_pins_passed": true,
+        "source_pin_scope": "partial_project_files_private_graph_static_construction_and_seed_factory",
+        "source_pins_are_full_dependency_proof": false,
+        "campaign_full_source_pins_required": true,
+        "cross_request_cache": false,
+        "dynamic_guards_skipped": false,
+        "native_delivery_verified": false,
+        "native_execution_authority": false
+      },
+      "timings": {
+        "actor_choose_wall_ms": 2.9572,
+        "actor_inference_wall_ms": 1.4539,
+        "collection_through_offer_wall_ms": 303.9351,
+        "model_and_guard_wall_ms": 176.1108,
+        "submission_and_local_guard_wall_ms": 18.9598,
+        "collection_to_decision_record_wall_ms": 329.0011,
+        "request_timing_scope": "From collect_native entry through decision record; includes actor/wrapper gaps, excludes earlier message collection, startup, return serialization and later ACK."
+      }
+    },
+    {
+      "owner": "B",
+      "phase": "first_reuse_route",
+      "at": 9.689999999999994,
+      "action_id": "native_default",
+      "candidate_id": "726ffc28c9c5b68cc3e126ec6d703118b892892ded2f7937707a1247e2c9fedb",
+      "full_model_report_json_sha256": "baef2c1b42b5d51cd8e38aac63a5efde9a3677882c0ff1a3fccc809c92b405b9",
+      "evaluation": {
+        "schema": "g31.foundation.request_local_static_context.v1",
+        "counts": {
+          "static_catalog_builds": 1,
+          "static_catalog_reads": 31,
+          "dynamic_later_context_calls": 2
+        },
+        "static_catalog_sha256": "7e2d77ce30ee389faee5eb59e84a3f01de43a6d74cd9d2a5a866c93bc7b7ca9d",
+        "source_sha256": {
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf28_service_potential.py": "992ebc5b33f09acc5935e4c1724d8874da10dd46ca69390f72c74bd5bdd2b52f",
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\domain_guard_historical_service.py": "f929343e46b9f22c7de9584ee2373357659fb64d6ff0d7cb2f513e9896e4b90d",
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\domain_guard_v2.py": "d1803b7b001fa8b4c9ff0f7cdcadb0293227c7a1803d11d6eac905d894254c23",
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_request_context.py": "fe0e0bcbafc100c1bf375d1abf0d7fdb15146b018be2f9c2ef9417b0dc0f931d",
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_delivered_context.py": "af8ca670a59e7a93084c1cf7f1c90aae13e134261c81f964f60c070e4b38709e",
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_domain_guard.py": "61f914a59d2c38e4410001d2287bffd0d246c1ce47056d8abc2419b607492ab7",
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_historical_service.py": "95faa9ed59579ab338f9bd3de3ad35ba842e7ad5e0e6fcf1989f655ae88ff414",
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_lifecycle_state_v2.py": "de55e0e5b4ecfe2de98c8684055080b810156d72b6c08144c51d026cadcfe3da",
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\native_host.py": "03c33fbbaff5049b9068471edf7d7208f4921e977cc008e04461c515635bc48b",
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_live_obligation_event_projection_v2.py": "46a7e358dfb2ff181af2b99f31a68cfc1ecffa8eb2ab00532028d862b4def2ad",
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_live_obligation_interval.py": "9f9bd160eae098fc7cc2ffa5e3268f9c872c31e0e8c6a4e29735c124e5439394",
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_live_obligation_projection.py": "acaa7948bcc8742cfc338ca76f187431078f631fef1c4c8fe82e44dc81e0b544",
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_preexisting_occupancy_domain.py": "075e1460faaeebe372552b4dc061fe92bcfde4a710e97908f38231d8a7d2c7a3",
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_rolling_overlap_domain.py": "67b367a69b6f71782db92f77d9dd04714d60f44590f3877f53d9c67349295b42",
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_synthetic_reuse_chain.py": "cc5b0aef33bf85d7612e276f3ce216133f332f103418675245c79a317318d086",
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_later_seed.py": "dea07514fa33d08d77a2a55f5ef87239f649203ed273088247c31b8de0f29500"
+        },
+        "source_exit_pins_passed": true,
+        "source_pin_scope": "partial_project_files_private_graph_static_construction_and_seed_factory",
+        "source_pins_are_full_dependency_proof": false,
+        "campaign_full_source_pins_required": true,
+        "cross_request_cache": false,
+        "dynamic_guards_skipped": false,
+        "native_delivery_verified": false,
+        "native_execution_authority": false
+      },
+      "timings": {
+        "actor_choose_wall_ms": 4.4704,
+        "actor_inference_wall_ms": 2.3075,
+        "collection_through_offer_wall_ms": 329.7408,
+        "model_and_guard_wall_ms": 198.1852,
+        "submission_and_local_guard_wall_ms": 26.3898,
+        "collection_to_decision_record_wall_ms": 368.9751,
+        "request_timing_scope": "From collect_native entry through decision record; includes actor/wrapper gaps, excludes earlier message collection, startup, return serialization and later ACK."
+      }
+    }
+  ],
+  "physical_summary": {
+    "completion": {
+      "loaded": 7.1999999999999975,
+      "receiver": 10.12,
+      "reuse1": 13.049999999999997,
+      "reuse2": 18.46,
+      "blocker": 11.349999999999998
+    },
+    "receipt_count": 153,
+    "event_counts": {
+      "BAG_ARRIVAL": 5,
+      "LOAD_START": 5,
+      "PROTOCOL_COMMAND_ACK_DELIVERED": 14,
+      "LOAD_COMPLETE": 5,
+      "LEG_START": 10,
+      "MODULE_REQUEST_DELIVERED": 6,
+      "PROTOCOL_ACK_DELIVERED": 22,
+      "RESOURCE_WAIT": 3,
+      "TRANSFER_REJECTED": 3,
+      "RESOURCE_WAKE": 3,
+      "EDGE_ENTER": 18,
+      "EDGE_EXIT": 18,
+      "LEG_COMPLETE": 10,
+      "STORAGE_ENTER": 2,
+      "EXPORT_GRANTED": 3,
+      "EMPTY_RECEIVED": 3,
+      "STORAGE_RELEASE": 2,
+      "UNLOAD_START": 5,
+      "UNLOAD_COMPLETE": 5,
+      "HOLD_START": 5,
+      "HOLD_COMPLETE": 5,
+      "ROUTE_INTENT_updated": 1
+    },
+    "job_count": 5,
+    "tray_count": 3
+  },
+  "read_artifact_sha256": {
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\receipt.json": "174ce6bc3682a2d831c056f2e2772b5d5f606cad5f20c1a1761ab0bc2d069013",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\preregistered_protocol.json": "ca78b49f12c4feef44d6fe49c8fcdb8d738d7cf0ea1bb8b44eccaa35fc6989db",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\raw.json.gz": "f49b8048d018f7a6db1f188ee961dfbfae5281bc171427e152d495f2f98a937d",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\acceptance.json": "7d6f2d4dbcad1398d777a7df26254782e666065094651b681b9ab55951b3b9ba",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\inputs\\mechanism\\incumbent.json": "ce0deb0a3408feb73e5da31efd0610089aa62380074fce1deae8e3ec8f680e62",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\eval\\g4irsf11_experiment_protocol.py": "c8b6022598df7042e7a063da3da5a306849da016ae7b41474c7bfb1ad1d7176f",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\eval\\g4irsf11_fixed_map.py": "26b7f33b997c8d691e3e4d3c8fe093e37ec81cf8749e63d542bdb5e0826ea7b1",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\eval\\g4irsf11_workloads.py": "d46c8acf1dd0c12c2c6d95c68f7a8c8ced021f3ed5cf74e67fc5262d411ddf6e",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\eval\\g4irsf12_reproducible_harness.py": "56c19a159b0cbd3f87140e9f0bf6746c5dd663df0e457ca00e74a5be1df2c362",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\eval\\g4irsf12_size_ladder.py": "e07097f1d3817f9a0b7cd4ddb0f2a83cff3acd188b171d0af4ae6eef7faaaeaa",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\eval\\g4irsf13_runtime_profile.py": "cd663e04ae42e4ffed15f7f8a3d9fa9c397ea64c5b6929c9e83f2079c4cea7a3",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\eval\\g4irsf14_opportunity_census.py": "60bea44339851d367397c359544acf1de3ca0e3d1eae91f5dc8e12fd14b3de4f",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\eval\\g4irsf31_map_adapter.py": "878c0ee31788ab6ff9fb87e8306fe45f90dc2905a9e32356e55f17f2214b95f6",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\eval\\run_g4irsf18_jit_campaign.py": "954c29994c22c1d7b8a7e777e4accee9b9066ff57d2d6a77caeb67da4377ed75",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\eval\\run_g4irsf19_bounded_capacity.py": "efee97d3f8f9b2460e5dedee5b2892aecebe34d5f7ab6d1ad070c1ce3e2837c4",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\eval\\run_g4irsf20_event_hotpath.py": "d5abbae3052d0dabab7d43eecb25b0f8a51b1e5c6c8682be7aa0fafa940d7de6",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\eval\\run_g4irsf24_native_race.py": "e09ac7d266e7d925cccd2055f6fa06c0a6898fa630ed519bd94b884786a3a0ba",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\eval\\run_g4irsf26_paper_experiments.py": "7ac52959104ffc6cd507939a43acfd51a81b4508ba0b6de864fa5be39483792b",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\eval\\run_g4irsf27_fault_values.py": "ecd8558a7971c3ca991956a1cdfb36eb3cf093db156e785c34e8b6f4f496e87a",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\eval\\run_g4irsf28_service_potential.py": "992ebc5b33f09acc5935e4c1724d8874da10dd46ca69390f72c74bd5bdd2b52f",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\eval\\run_g4irsf29_workload.py": "527d48a443c7f0b068c316e2e51cf7746cb1c1bd14382f67e196a0ff18512429",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\eval\\run_g4irsf31_nanning_map.py": "22c7275dc3e6ddc8d26789c0b263e7ec7d92d1ae564671a2c8706b81dd031b6b",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\eval\\run_g4irsf31_nanning_workload.py": "64e0dbfe7bd3e503cb2c2b5e62685eb6c6b34cd3bd99eb9ca1d146d0c462eb13",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\eval\\run_g4irsf5_original_protocol_comparative_validation.py": "55fd1956b92678011876e28cb50c4bdeaa7609fc43d68790c124686de4317c0d",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\eval\\run_g4irsf6_paper_protocol_gap_closure.py": "0b3f750e0b56d830e0eb2fb34a286c40eb61cb8084f857f7af365a9a9f146904",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\__init__.py": "495b29212f548915ec02a3c29999151b9ba4a24e455fc8df58fca68473e23f38",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\analytic_control.py": "a895b79a0adb93dcb61e08da97f68510b0c8e454fb7f69e419952ca7a0854115",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\bounded_windows_job.py": "798ae87c19d5fa61569b1c9301cebe7ef6a5885302f32f42380cf53fd6363cde",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\capture_native025_request_timing.py": "8e63b811852f3b02a152411aa4f5e5c770090464a8114d4356a83d20e595e885",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\capture_native027_request_timing.py": "486d7f9690a056732f47742643fc73dcd0cd0b9696787d89dafc29881f64f471",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\capture_native_request_timing.py": "31573bea57b059d2c1c5b628c3b61198a82c65e659dea36a95236f0503196287",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\domain_guard_historical_service.py": "f929343e46b9f22c7de9584ee2373357659fb64d6ff0d7cb2f513e9896e4b90d",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\domain_guard_v2.py": "d1803b7b001fa8b4c9ff0f7cdcadb0293227c7a1803d11d6eac905d894254c23",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\event_protocol_control.py": "3f8b73b663d44f0d07ba8f5298500b619944fd325a4a103ac30aef531b4276b0",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\foundation_later_campaign.py": "69b4e76b646fe2540a74de24abe840f0cec0681cfd16758ba4dbd34299a6b443",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\foundation_later_control.py": "6f82bec1850e8ef14d974491cc941aa0640c0c4fa48d40b418e2c90a49a6cd85",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\foundation_later_episode.py": "c229d94c1a770589107b264f3cc22e5ba2c9588afe52d56d705d8c54b0b04df8",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\foundation_later_seed.py": "8b90944da589f6e6b8684629269d7bc97825cd6037847baf5697443d3d04f4e9",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\foundation_native_environment.py": "5a2ef3da14be7806f04d7343b92aeb596de1c456bf34145fc1f5318ec6ad93a1",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\live_obligation_bound_future_fork.py": "e3d09c757a25386eae8012dfb4c6475e1015b1c45f4887ea4ce5f96114bc8982",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\live_obligation_bound_future_fork_v3.py": "c861f8be2fcfee8300d7cfe8f02077833a1776d5294aa89e4138870292827c07",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\live_obligation_bound_source_proof.py": "f1a8192016f03154407761ab29e30e75d1de54f8231bdc03ce856717279b0edb",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\live_obligation_bound_source_proof_v2.py": "5f18f931d362d68019bf188c3f7ee5b151326a680eec0fa86d47cbc575d27f13",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\live_obligation_bound_source_proof_v3.py": "f71adc436b84619cc81e7827b0c8ca6b87515d3391b9af0c197904a79d983446",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\live_obligation_component_compatibility.py": "9436c680e841739a02cda71b407ccd2c3fb1041e4cbe753eeba7097cdcef117a",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\live_obligation_conditional_continuation.py": "31ad32a9a74d90dc64400b801a16fceb73abc73db1d9cf9850aa8fa3f4fb6b63",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\live_obligation_delivered_context.py": "af8ca670a59e7a93084c1cf7f1c90aae13e134261c81f964f60c070e4b38709e",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\live_obligation_domain_adapter.py": "98b82758c055a9e16fbadc11a6deeae61f2eb2d0e0ce4766d2e2cf206e975910",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\live_obligation_domain_guard.py": "61f914a59d2c38e4410001d2287bffd0d246c1ce47056d8abc2419b607492ab7",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\live_obligation_full32_suffix_evaluator.py": "f60fc8ac5be08c210adb2a4731e00423bef17fe9913c90be9007466686afd167",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\live_obligation_full32_suffix_partition.py": "423bae431d5a9dc32e44870878a465755ad082f7b4e097039d8dcda99f0e12a7",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\live_obligation_future_later_fork.py": "309c4fad570ffce9ae6ef9606a95ef52e0451896cc29f4c0cf9e2368ceca5a17",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\live_obligation_historical_adapter.py": "c16dcdccddfcd763a90d15cf4e321c35697ffcdcac16e03da69fa097ad04d1cc",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\live_obligation_historical_policy.py": "43af16c3f71b6babc3e672b6386628639f160657cc1235ecf5d809a338d2f1f8",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\live_obligation_historical_service.py": "95faa9ed59579ab338f9bd3de3ad35ba842e7ad5e0e6fcf1989f655ae88ff414",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\live_obligation_initial_candidate_provider.py": "4dc826a6f0ee09b68355912eac9cdb4f870cff903901062aae7f4560f0b253fa",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\live_obligation_initial_decision_adapter.py": "ec23d0fc1e87be39b39d93dff34432af9f97a1ef35bc4ff7cee9fb2031034258",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\live_obligation_initial_decision_adapter_v2.py": "9892ed947f17caa3ee6ae3671aa35759c3f430e2d7c159768c9d206c82cd8611",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\live_obligation_lifecycle_state_v2.py": "de55e0e5b4ecfe2de98c8684055080b810156d72b6c08144c51d026cadcfe3da",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\live_obligation_native_domain_contract.py": "12785e42b63ce632d34dcca5ef7887d9ab8ad768fa4e5864b1d72736f12a9753",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\live_obligation_native_view_v2.py": "26ebf6b14e540365ec77889ca16862d238591503529322ff3278d36f17082a2a",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\live_obligation_online_initial_dispatch.py": "33a377360af73ab97bab342385436704827ead5f025d699a922f4ade36a30204",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\live_obligation_online_retained_policy.py": "6b284683e77ca9a3121f8c02c8641cd000091ad7c815fb0b30391c091d66b462",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\live_obligation_owned_initial_provider.py": "0b7b2416b5b39c5fadc6ecfa6be7a9ffc1db31a1a49ea81ee41ec7378901e86d",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\live_obligation_owned_prefix_evaluator.py": "224c5f1eb2097b519d35bd96e880a2529198cff8246b5e71c486c290c875788a",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\live_obligation_owned_same_information_search.py": "32727c4a0e12816e411b110df698362425cbd63bf12916defaf886685657311a",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\live_obligation_projected_captures.py": "9d097e800eb138daa75032e07abd01537925f7d61fa02a601b57be764ba0c306",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\live_obligation_projection_protocol.py": "b40e96a3bd5ae3fdf864ff6ae4d1419b51e212465cd1e6334c773a20af700e53",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\live_obligation_recollection_adapter.py": "d880063d3a0d0e9edacb87ff62edfda3e0b513483b86503e2653bd22ef7c60f6",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\live_obligation_recollection_policy.py": "f89864910a0147416feb2ccab5cc78d5f7a017f4ea7727a29e5e0661b0937f94",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\live_obligation_recollection_policy_v2.py": "174c4a5e70c2b49e9a6a48407baccd4de928ec80f1cd67b022e25e2c2bff53f1",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\live_obligation_same_information_search.py": "1ef2a98a09cb94f94e2ddd0be0814ca6cc7aff3cd35a719a05eec0202d649770",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\live_obligation_unloading_policy.py": "7f0b286f2858d3e9da03ea237c40802e699c71caa3e313967f7991536f84e5f8",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\native025_request_timing.py": "9395cd47dc521685039d00bb41d1be9fcbb4dd898b3ff5fe9b49417d2899d28c",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\native025_timing_gate.py": "c259b3e74b7cc4eade5d88a673e474a48a0b01de821647cce1dcdb4f8921d449",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\native027_request_timing.py": "38adc52d4c16bbb8e1d836993c78b11d7ee841e8c786ebf811abd6c3d34c71c0",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\native027_run_acceptance.py": "483df6300b28073a1a1e2128d9b3ca4d0ae448d688a9425b820e83cff50b88b4",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\native027_timing_gate.py": "9271a539ad1ae2f481749f6cd15b214f7bef65b621c4ff4a4cfc5db5ae809b70",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\native_host.py": "03c33fbbaff5049b9068471edf7d7208f4921e977cc008e04461c515635bc48b",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\native_preexisting_initial_adapter.py": "6165d2afcfd86dcf9b45200424a7b64ca100a24bc196a9d972e1edc384dd9ea1",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\native_preexisting_rolling_adapter.py": "3d1f47a543e3fb04693fc1b8d3bda2b17cebe8691b8c4964b0f9cd5df73d8c41",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\native_preexisting_v3_bound_adapter.py": "19e7b1534995b6bd8759edd8a37733c0f11c9a68cae143978905f9509dd15330",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\native_request_timing.py": "47a642588ade637228164a282f4ce38e47ecbe13735f6d2a3884cb9f8423cc31",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\original_workload.py": "f61a89a4358e6a1b6d654b03244268537b241ace258005f398810ff53f5a3016",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\planning_capture_v2_contract.py": "a3e9ecc8246c717a21e033603b2cc4461aec40d46603ef5ea50301b4721e1114",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\planning_capture_v2_digest.py": "01fc49cbded5ba70851f1294fce9f5aaa06b66e82bfb5b9862740c310faf9fd5",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\planning_capture_v3_contract.py": "b6fc962ad5c3459981f423e4162874325a2c04778aa189e33e4baa450fb67962",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\preexisting_v3_data_adapter.py": "ce21d2a8f81c7d6ee063f6e6ca5353d5b1e440e4c70310264ba7dae6cb96b5b7",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\preexisting_v3_endpoint_identity.py": "69f44966187e2bd21dcc47e99b4e2a492e8bd7bbefd706584699f7d25b281407",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\profile_request_bundles.py": "9e7e8a67931db308c1b02accedef6b46072f8d906027630317c0ef73225bb6dd",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\protocol_control.py": "3ff5770e11de5c20b203455546829986d8c3e22e6d4a4189bf0214f14fe1da2f",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\public_executable_preference_actions.py": "936c5f1484155687703faa8e7f486fd3894475bd3fbd589edd4bb47751c6bc04",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\public_live_obligation_communication_projection.py": "0c77f130e31f2727d0f6b7f6e6425ae073e3bf5b97515843cf1d03cced5c56ea",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\public_live_obligation_event_projection_v2.py": "46a7e358dfb2ff181af2b99f31a68cfc1ecffa8eb2ab00532028d862b4def2ad",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\public_live_obligation_interval.py": "9f9bd160eae098fc7cc2ffa5e3268f9c872c31e0e8c6a4e29735c124e5439394",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\public_live_obligation_lazy_communication_projection.py": "980f245dc3b3563968015a626ed5e127fd94efb70044eb24b67d9d948835f86f",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\public_live_obligation_projection.py": "acaa7948bcc8742cfc338ca76f187431078f631fef1c4c8fe82e44dc81e0b544",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\public_native_preference_projection.py": "f501e125feb6ddb4fc343f55ddf684781741d13b71d6fa9178b485ff8ce3b4b7",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\public_owned_action_state.py": "427e83ca8d9befce87ceb9e7c98f146c5a3a272ae7e0ffa8b0c153dec865d47c",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\public_preexisting_model.py": "2b8f2f7f633f48b3840dbc35137e0d153c442c635b51c0bc7a55332afeeeccc5",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\public_preexisting_v3_model.py": "522ec0a41193c9598e0c2b86f6c2f5abb7cb8928b9dfdbc365f6c923ece7240e",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\public_preference_request_context.py": "9c64e97e1e954a3639696ba5ca1f72f9f85e07032121f389b7e34507dfa71c3c",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\public_reuse_model.py": "bb1bf8bc35822b671e9db5844e136ff91f187c4d92d465190f5d630f7cb739d1",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\public_route_preference_model.py": "8b5bf70f10c061f1f45a517e8c599fe9d410c81af23c0e75169cf46bcf5f136d",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\reference_reuse_timing.py": "e4914b82ea7c17138b413130128079181affa21a4d8d279a45bc5d9f3f85288a",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\regional_control.py": "78bc3e2723dfb4b66863b6c599ae7752b5fb7a697b3b8eb2f8d4332c207e6997",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\request_bundle_measurement.py": "4d5acf933e1c8eba02b8cf81a65d40aa0c9e971a73d1d736bcc3a72db16382b8",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\research_live_obligation_initial_methods.py": "6e13eb52e93cad7058e5d173e57d1abd8efac130c58dcfd9831ae0ba39940b46",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\research_live_obligation_native_domain.py": "d065cb78e6a37f1ae31d6a7a1a08f42c5f5e31ff746e7d765f5a15159d2a577c",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\research_native_preexisting_v3_bound.py": "f04d9aec586a73500dc79a185571994f2e4b0866c2f43ac9e8674255f7d1c6ca",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\research_preexisting_occupancy_domain.py": "075e1460faaeebe372552b4dc061fe92bcfde4a710e97908f38231d8a7d2c7a3",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\research_rolling_overlap_domain.py": "67b367a69b6f71782db92f77d9dd04714d60f44590f3877f53d9c67349295b42",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\research_synthetic_reuse_chain.py": "cc5b0aef33bf85d7612e276f3ce216133f332f103418675245c79a317318d086",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\research_synthetic_reuse_v2.py": "81b1e193b0b81e712685200d915806b661083e337ed70b6c0222615a3f33b20e",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\run_native027_semantic_gate.py": "dae1b898d16879acc90cc322aa40b2fcd64eb291574f7fd5742d69a9cbe7acb1",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\validate_future_later_paired_suffix.py": "06ac0dfbda2a23373df3716d12858b1f96394a5efd7d22c5d96f4bcd5839c8c5",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\validate_live_conditional_continuation.py": "dae6a437127b4191ee6b23ae58db4ae2715829f3ba14fcbc697c3c1d0c8c2ecf",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\validate_live_phase_b_pause.py": "7a334d4cc7223e430670c467eac311e2318e58b1084e4115c520bff9276b3b63",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\scripts\\experiments\\g31_ics_circulation\\verify_preexisting_delivery.py": "d25979eab4ef952c4e9b0d8e52fdb332a869b60e82ca1a5740243fab9d3ad4b4",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\src\\czr005\\__init__.py": "432d04eebbba673d42defd9a2a97a226a6c43a2b4e5f817882c9f6f8425b28b0",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\src\\czr005\\cpp_backend.py": "a33318264474ee47caa42f33b41e5caf06dbaaf2c6a1bfd57e02be8ad69133b7",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\src\\czr005\\io\\__init__.py": "e2e96b67e5b8e787106b40042959f0edb80ed1583174da92e1aa8b10e278410b",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\src\\czr005\\io\\legacy_map.py": "2fdd7b7446a01b67dafe0f17358a0e30da4ff71c1624466fa2035585f71c9bdd",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\source\\src\\czr005\\io\\legacy_tasks.py": "3e1a01fdf7b0bd3aa8a1293d7f63b37823a0d1bdf360ccb5e4697fe70133d93f",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\receipt.json": "4a59cef1b194c5253277f709889be617eee82728477bf46b58a817c3c5654c06",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\worker_report.json": "1d1504a6c9dfea7e94dc1c9dc55015a2152ab793a851ad29e00823d857ce0481",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\launch.json": "a8d0544a46af5d7b3dc8ce37c686f483c0b8ca35b833727ead95674eb6c62d09",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\plan.json": "6f81ed2ba513bc06a290c01427332d627c99041a2ec76eab4a7a2f28310811b6",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\receipt.json": "3e2656b691600a9c4d951d38070fb499c9fa042474f5eb0627dc2d4ba8ecc522",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\preregistered_protocol.json": "cf646a125d0c57d78ef86a05a7bb801da1a44a9e8a8bab71d77f504dc2e745fb",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\raw.json.gz": "c20033e9c6278022bd3f4ad551126c74e04bfa5e4287ed24ca209489d93a40bd",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\acceptance.json": "c30dfad8afed411f0d38cb4a0a13220dd5e2002d9eb992b43dc31dc3c6c9b9e1",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\inputs\\mechanism\\incumbent.json": "ce0deb0a3408feb73e5da31efd0610089aa62380074fce1deae8e3ec8f680e62",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0000.py": "c8b6022598df7042e7a063da3da5a306849da016ae7b41474c7bfb1ad1d7176f",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0001.py": "26b7f33b997c8d691e3e4d3c8fe093e37ec81cf8749e63d542bdb5e0826ea7b1",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0002.py": "d46c8acf1dd0c12c2c6d95c68f7a8c8ced021f3ed5cf74e67fc5262d411ddf6e",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0003.py": "56c19a159b0cbd3f87140e9f0bf6746c5dd663df0e457ca00e74a5be1df2c362",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0004.py": "e07097f1d3817f9a0b7cd4ddb0f2a83cff3acd188b171d0af4ae6eef7faaaeaa",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0005.py": "cd663e04ae42e4ffed15f7f8a3d9fa9c397ea64c5b6929c9e83f2079c4cea7a3",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0006.py": "60bea44339851d367397c359544acf1de3ca0e3d1eae91f5dc8e12fd14b3de4f",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0007.py": "878c0ee31788ab6ff9fb87e8306fe45f90dc2905a9e32356e55f17f2214b95f6",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0008.py": "954c29994c22c1d7b8a7e777e4accee9b9066ff57d2d6a77caeb67da4377ed75",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0009.py": "efee97d3f8f9b2460e5dedee5b2892aecebe34d5f7ab6d1ad070c1ce3e2837c4",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0010.py": "d5abbae3052d0dabab7d43eecb25b0f8a51b1e5c6c8682be7aa0fafa940d7de6",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0011.py": "e09ac7d266e7d925cccd2055f6fa06c0a6898fa630ed519bd94b884786a3a0ba",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0012.py": "7ac52959104ffc6cd507939a43acfd51a81b4508ba0b6de864fa5be39483792b",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0013.py": "ecd8558a7971c3ca991956a1cdfb36eb3cf093db156e785c34e8b6f4f496e87a",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0014.py": "992ebc5b33f09acc5935e4c1724d8874da10dd46ca69390f72c74bd5bdd2b52f",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0015.py": "527d48a443c7f0b068c316e2e51cf7746cb1c1bd14382f67e196a0ff18512429",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0016.py": "22c7275dc3e6ddc8d26789c0b263e7ec7d92d1ae564671a2c8706b81dd031b6b",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0017.py": "64e0dbfe7bd3e503cb2c2b5e62685eb6c6b34cd3bd99eb9ca1d146d0c462eb13",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0018.py": "55fd1956b92678011876e28cb50c4bdeaa7609fc43d68790c124686de4317c0d",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0019.py": "0b3f750e0b56d830e0eb2fb34a286c40eb61cb8084f857f7af365a9a9f146904",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0020.py": "495b29212f548915ec02a3c29999151b9ba4a24e455fc8df58fca68473e23f38",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0021.py": "a895b79a0adb93dcb61e08da97f68510b0c8e454fb7f69e419952ca7a0854115",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0022.py": "798ae87c19d5fa61569b1c9301cebe7ef6a5885302f32f42380cf53fd6363cde",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0023.py": "8e63b811852f3b02a152411aa4f5e5c770090464a8114d4356a83d20e595e885",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0024.py": "486d7f9690a056732f47742643fc73dcd0cd0b9696787d89dafc29881f64f471",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0025.py": "31573bea57b059d2c1c5b628c3b61198a82c65e659dea36a95236f0503196287",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0026.py": "f929343e46b9f22c7de9584ee2373357659fb64d6ff0d7cb2f513e9896e4b90d",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0027.py": "d1803b7b001fa8b4c9ff0f7cdcadb0293227c7a1803d11d6eac905d894254c23",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0028.py": "3f8b73b663d44f0d07ba8f5298500b619944fd325a4a103ac30aef531b4276b0",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0029.py": "7fb82c930085718f89614022907b941b2acc1f79939c660a71029a00085cfd90",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0030.py": "c90a829c7430df2f821a530bf61bbbd312bc27d3629ef7f5f9bfda2a9f2f6fdc",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0031.py": "c229d94c1a770589107b264f3cc22e5ba2c9588afe52d56d705d8c54b0b04df8",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0032.py": "dea07514fa33d08d77a2a55f5ef87239f649203ed273088247c31b8de0f29500",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0033.py": "383d89857971e63780ee8d1e16785a40caa0c5a73275d9f6f1817fa208a59608",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0034.py": "fe0e0bcbafc100c1bf375d1abf0d7fdb15146b018be2f9c2ef9417b0dc0f931d",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0035.py": "e3d09c757a25386eae8012dfb4c6475e1015b1c45f4887ea4ce5f96114bc8982",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0036.py": "c861f8be2fcfee8300d7cfe8f02077833a1776d5294aa89e4138870292827c07",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0037.py": "f1a8192016f03154407761ab29e30e75d1de54f8231bdc03ce856717279b0edb",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0038.py": "5f18f931d362d68019bf188c3f7ee5b151326a680eec0fa86d47cbc575d27f13",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0039.py": "f71adc436b84619cc81e7827b0c8ca6b87515d3391b9af0c197904a79d983446",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0040.py": "9436c680e841739a02cda71b407ccd2c3fb1041e4cbe753eeba7097cdcef117a",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0041.py": "31ad32a9a74d90dc64400b801a16fceb73abc73db1d9cf9850aa8fa3f4fb6b63",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0042.py": "af8ca670a59e7a93084c1cf7f1c90aae13e134261c81f964f60c070e4b38709e",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0043.py": "98b82758c055a9e16fbadc11a6deeae61f2eb2d0e0ce4766d2e2cf206e975910",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0044.py": "61f914a59d2c38e4410001d2287bffd0d246c1ce47056d8abc2419b607492ab7",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0045.py": "f60fc8ac5be08c210adb2a4731e00423bef17fe9913c90be9007466686afd167",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0046.py": "423bae431d5a9dc32e44870878a465755ad082f7b4e097039d8dcda99f0e12a7",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0047.py": "309c4fad570ffce9ae6ef9606a95ef52e0451896cc29f4c0cf9e2368ceca5a17",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0048.py": "c16dcdccddfcd763a90d15cf4e321c35697ffcdcac16e03da69fa097ad04d1cc",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0049.py": "43af16c3f71b6babc3e672b6386628639f160657cc1235ecf5d809a338d2f1f8",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0050.py": "95faa9ed59579ab338f9bd3de3ad35ba842e7ad5e0e6fcf1989f655ae88ff414",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0051.py": "4dc826a6f0ee09b68355912eac9cdb4f870cff903901062aae7f4560f0b253fa",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0052.py": "ec23d0fc1e87be39b39d93dff34432af9f97a1ef35bc4ff7cee9fb2031034258",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0053.py": "9892ed947f17caa3ee6ae3671aa35759c3f430e2d7c159768c9d206c82cd8611",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0054.py": "de55e0e5b4ecfe2de98c8684055080b810156d72b6c08144c51d026cadcfe3da",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0055.py": "12785e42b63ce632d34dcca5ef7887d9ab8ad768fa4e5864b1d72736f12a9753",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0056.py": "26ebf6b14e540365ec77889ca16862d238591503529322ff3278d36f17082a2a",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0057.py": "33a377360af73ab97bab342385436704827ead5f025d699a922f4ade36a30204",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0058.py": "6b284683e77ca9a3121f8c02c8641cd000091ad7c815fb0b30391c091d66b462",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0059.py": "0b7b2416b5b39c5fadc6ecfa6be7a9ffc1db31a1a49ea81ee41ec7378901e86d",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0060.py": "224c5f1eb2097b519d35bd96e880a2529198cff8246b5e71c486c290c875788a",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0061.py": "32727c4a0e12816e411b110df698362425cbd63bf12916defaf886685657311a",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0062.py": "9d097e800eb138daa75032e07abd01537925f7d61fa02a601b57be764ba0c306",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0063.py": "b40e96a3bd5ae3fdf864ff6ae4d1419b51e212465cd1e6334c773a20af700e53",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0064.py": "d880063d3a0d0e9edacb87ff62edfda3e0b513483b86503e2653bd22ef7c60f6",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0065.py": "f89864910a0147416feb2ccab5cc78d5f7a017f4ea7727a29e5e0661b0937f94",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0066.py": "174c4a5e70c2b49e9a6a48407baccd4de928ec80f1cd67b022e25e2c2bff53f1",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0067.py": "1ef2a98a09cb94f94e2ddd0be0814ca6cc7aff3cd35a719a05eec0202d649770",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0068.py": "7f0b286f2858d3e9da03ea237c40802e699c71caa3e313967f7991536f84e5f8",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0069.py": "9395cd47dc521685039d00bb41d1be9fcbb4dd898b3ff5fe9b49417d2899d28c",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0070.py": "c259b3e74b7cc4eade5d88a673e474a48a0b01de821647cce1dcdb4f8921d449",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0071.py": "38adc52d4c16bbb8e1d836993c78b11d7ee841e8c786ebf811abd6c3d34c71c0",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0072.py": "483df6300b28073a1a1e2128d9b3ca4d0ae448d688a9425b820e83cff50b88b4",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0073.py": "9271a539ad1ae2f481749f6cd15b214f7bef65b621c4ff4a4cfc5db5ae809b70",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0074.py": "03c33fbbaff5049b9068471edf7d7208f4921e977cc008e04461c515635bc48b",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0075.py": "6165d2afcfd86dcf9b45200424a7b64ca100a24bc196a9d972e1edc384dd9ea1",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0076.py": "3d1f47a543e3fb04693fc1b8d3bda2b17cebe8691b8c4964b0f9cd5df73d8c41",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0077.py": "19e7b1534995b6bd8759edd8a37733c0f11c9a68cae143978905f9509dd15330",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0078.py": "47a642588ade637228164a282f4ce38e47ecbe13735f6d2a3884cb9f8423cc31",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0079.py": "f61a89a4358e6a1b6d654b03244268537b241ace258005f398810ff53f5a3016",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0080.py": "a3e9ecc8246c717a21e033603b2cc4461aec40d46603ef5ea50301b4721e1114",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0081.py": "01fc49cbded5ba70851f1294fce9f5aaa06b66e82bfb5b9862740c310faf9fd5",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0082.py": "b6fc962ad5c3459981f423e4162874325a2c04778aa189e33e4baa450fb67962",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0083.py": "ce21d2a8f81c7d6ee063f6e6ca5353d5b1e440e4c70310264ba7dae6cb96b5b7",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0084.py": "69f44966187e2bd21dcc47e99b4e2a492e8bd7bbefd706584699f7d25b281407",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0085.py": "9e7e8a67931db308c1b02accedef6b46072f8d906027630317c0ef73225bb6dd",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0086.py": "3ff5770e11de5c20b203455546829986d8c3e22e6d4a4189bf0214f14fe1da2f",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0087.py": "936c5f1484155687703faa8e7f486fd3894475bd3fbd589edd4bb47751c6bc04",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0088.py": "0c77f130e31f2727d0f6b7f6e6425ae073e3bf5b97515843cf1d03cced5c56ea",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0089.py": "46a7e358dfb2ff181af2b99f31a68cfc1ecffa8eb2ab00532028d862b4def2ad",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0090.py": "9f9bd160eae098fc7cc2ffa5e3268f9c872c31e0e8c6a4e29735c124e5439394",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0091.py": "980f245dc3b3563968015a626ed5e127fd94efb70044eb24b67d9d948835f86f",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0092.py": "acaa7948bcc8742cfc338ca76f187431078f631fef1c4c8fe82e44dc81e0b544",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0093.py": "f501e125feb6ddb4fc343f55ddf684781741d13b71d6fa9178b485ff8ce3b4b7",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0094.py": "427e83ca8d9befce87ceb9e7c98f146c5a3a272ae7e0ffa8b0c153dec865d47c",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0095.py": "2b8f2f7f633f48b3840dbc35137e0d153c442c635b51c0bc7a55332afeeeccc5",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0096.py": "522ec0a41193c9598e0c2b86f6c2f5abb7cb8928b9dfdbc365f6c923ece7240e",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0097.py": "9c64e97e1e954a3639696ba5ca1f72f9f85e07032121f389b7e34507dfa71c3c",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0098.py": "bb1bf8bc35822b671e9db5844e136ff91f187c4d92d465190f5d630f7cb739d1",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0099.py": "8b5bf70f10c061f1f45a517e8c599fe9d410c81af23c0e75169cf46bcf5f136d",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0100.py": "e4914b82ea7c17138b413130128079181affa21a4d8d279a45bc5d9f3f85288a",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0101.py": "78bc3e2723dfb4b66863b6c599ae7752b5fb7a697b3b8eb2f8d4332c207e6997",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0102.py": "4d5acf933e1c8eba02b8cf81a65d40aa0c9e971a73d1d736bcc3a72db16382b8",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0103.py": "6e13eb52e93cad7058e5d173e57d1abd8efac130c58dcfd9831ae0ba39940b46",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0104.py": "d065cb78e6a37f1ae31d6a7a1a08f42c5f5e31ff746e7d765f5a15159d2a577c",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0105.py": "f04d9aec586a73500dc79a185571994f2e4b0866c2f43ac9e8674255f7d1c6ca",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0106.py": "075e1460faaeebe372552b4dc061fe92bcfde4a710e97908f38231d8a7d2c7a3",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0107.py": "67b367a69b6f71782db92f77d9dd04714d60f44590f3877f53d9c67349295b42",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0108.py": "cc5b0aef33bf85d7612e276f3ce216133f332f103418675245c79a317318d086",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0109.py": "81b1e193b0b81e712685200d915806b661083e337ed70b6c0222615a3f33b20e",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0110.py": "dae1b898d16879acc90cc322aa40b2fcd64eb291574f7fd5742d69a9cbe7acb1",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0111.py": "06ac0dfbda2a23373df3716d12858b1f96394a5efd7d22c5d96f4bcd5839c8c5",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0112.py": "dae6a437127b4191ee6b23ae58db4ae2715829f3ba14fcbc697c3c1d0c8c2ecf",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0113.py": "7a334d4cc7223e430670c467eac311e2318e58b1084e4115c520bff9276b3b63",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0114.py": "d25979eab4ef952c4e9b0d8e52fdb332a869b60e82ca1a5740243fab9d3ad4b4",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0115.py": "432d04eebbba673d42defd9a2a97a226a6c43a2b4e5f817882c9f6f8425b28b0",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0116.py": "a33318264474ee47caa42f33b41e5caf06dbaaf2c6a1bfd57e02be8ad69133b7",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0117.py": "e2e96b67e5b8e787106b40042959f0edb80ed1583174da92e1aa8b10e278410b",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0118.py": "2fdd7b7446a01b67dafe0f17358a0e30da4ff71c1624466fa2035585f71c9bdd",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\source\\0119.py": "3e1a01fdf7b0bd3aa8a1293d7f63b37823a0d1bdf360ccb5e4697fe70133d93f",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\receipt.json": "bf16a423932fac8f1b6a151fb21f8d902ec8240df99e7e31d0a4f6e67718b1a5",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\worker_report.json": "f020a53cbf6e8ae54bb07963a8544ab1f2e9b6dfa4ad25fd64579023df47e668",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\launch.json": "18c1f6ddfbd2d52672ce45edb69969f2c4f4f02376f03c0bf5ab2a470c6aba9a",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\plan.json": "1c7ee9cd452ce62f328abdee6aa47d784b694599ef475e8052d43c722aa7a90c"
+  },
+  "checks": [
+    {
+      "name": "reference:closed_native_receipt",
+      "passed": true
+    },
+    {
+      "name": "reference_sha256:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\preregistered_protocol.json",
+      "passed": true
+    },
+    {
+      "name": "reference_path:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\preregistered_protocol.json",
+      "passed": true
+    },
+    {
+      "name": "reference_sha256:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\raw.json.gz",
+      "passed": true
+    },
+    {
+      "name": "reference_path:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\raw.json.gz",
+      "passed": true
+    },
+    {
+      "name": "reference:acceptance_plan_binding",
+      "passed": true,
+      "reference_json_sha256": "4c52e573ffd88572b5cebb91a142ccab0082a07d84ca435e409f42b80bfb3cd3",
+      "actual_json_sha256": "4c52e573ffd88572b5cebb91a142ccab0082a07d84ca435e409f42b80bfb3cd3"
+    },
+    {
+      "name": "reference:acceptance_closed",
+      "passed": true
+    },
+    {
+      "name": "reference:receipt_raw_summary",
+      "passed": true,
+      "reference_json_sha256": "59ebdfe50a24fcfa7e9f173445d2ebd3cca9316836f7ac3068972b3090e36d48",
+      "actual_json_sha256": "59ebdfe50a24fcfa7e9f173445d2ebd3cca9316836f7ac3068972b3090e36d48"
+    },
+    {
+      "name": "reference:registered_input_hash",
+      "passed": true
+    },
+    {
+      "name": "reference:registered_raw_input",
+      "passed": true,
+      "reference_json_sha256": "7bb98e61766002e4121ab90995827e37816058a3a9986e40fb18b7f33123253e",
+      "actual_json_sha256": "7bb98e61766002e4121ab90995827e37816058a3a9986e40fb18b7f33123253e"
+    },
+    {
+      "name": "reference:source_archive_key_coverage",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\g4irsf11_experiment_protocol.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\g4irsf11_fixed_map.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\g4irsf11_workloads.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\g4irsf12_reproducible_harness.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\g4irsf12_size_ladder.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\g4irsf13_runtime_profile.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\g4irsf14_opportunity_census.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\g4irsf31_map_adapter.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf18_jit_campaign.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf19_bounded_capacity.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf20_event_hotpath.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf24_native_race.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf26_paper_experiments.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf27_fault_values.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf28_service_potential.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf29_workload.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf31_nanning_map.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf31_nanning_workload.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf5_original_protocol_comparative_validation.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf6_paper_protocol_gap_closure.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\__init__.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\analytic_control.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\bounded_windows_job.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\capture_native025_request_timing.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\capture_native027_request_timing.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\capture_native_request_timing.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\domain_guard_historical_service.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\domain_guard_v2.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\event_protocol_control.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_later_campaign.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_later_control.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_later_episode.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_later_seed.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_native_environment.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_bound_future_fork.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_bound_future_fork_v3.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_bound_source_proof.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_bound_source_proof_v2.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_bound_source_proof_v3.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_component_compatibility.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_conditional_continuation.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_delivered_context.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_domain_adapter.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_domain_guard.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_full32_suffix_evaluator.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_full32_suffix_partition.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_future_later_fork.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_historical_adapter.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_historical_policy.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_historical_service.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_initial_candidate_provider.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_initial_decision_adapter.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_initial_decision_adapter_v2.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_lifecycle_state_v2.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_native_domain_contract.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_native_view_v2.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_online_initial_dispatch.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_online_retained_policy.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_owned_initial_provider.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_owned_prefix_evaluator.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_owned_same_information_search.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_projected_captures.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_projection_protocol.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_recollection_adapter.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_recollection_policy.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_recollection_policy_v2.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_same_information_search.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_unloading_policy.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\native025_request_timing.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\native025_timing_gate.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\native027_request_timing.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\native027_run_acceptance.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\native027_timing_gate.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\native_host.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\native_preexisting_initial_adapter.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\native_preexisting_rolling_adapter.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\native_preexisting_v3_bound_adapter.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\native_request_timing.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\original_workload.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\planning_capture_v2_contract.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\planning_capture_v2_digest.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\planning_capture_v3_contract.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\preexisting_v3_data_adapter.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\preexisting_v3_endpoint_identity.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\profile_request_bundles.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\protocol_control.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_executable_preference_actions.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_live_obligation_communication_projection.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_live_obligation_event_projection_v2.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_live_obligation_interval.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_live_obligation_lazy_communication_projection.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_live_obligation_projection.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_native_preference_projection.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_owned_action_state.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_preexisting_model.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_preexisting_v3_model.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_preference_request_context.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_reuse_model.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_route_preference_model.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\reference_reuse_timing.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_control.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\request_bundle_measurement.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_live_obligation_initial_methods.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_live_obligation_native_domain.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_native_preexisting_v3_bound.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_preexisting_occupancy_domain.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_rolling_overlap_domain.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_synthetic_reuse_chain.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_synthetic_reuse_v2.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\run_native027_semantic_gate.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\validate_future_later_paired_suffix.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\validate_live_conditional_continuation.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\validate_live_phase_b_pause.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\verify_preexisting_delivery.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\__init__.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\cpp_backend.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\io\\__init__.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\io\\legacy_map.py",
+      "passed": true
+    },
+    {
+      "name": "reference:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\io\\legacy_tasks.py",
+      "passed": true
+    },
+    {
+      "name": "reference:all_archived_source_bytes",
+      "passed": true,
+      "count": 119
+    },
+    {
+      "name": "reference_sha256:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\receipt.json",
+      "passed": true
+    },
+    {
+      "name": "reference_path:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\receipt.json",
+      "passed": true
+    },
+    {
+      "name": "reference_sha256:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\worker_report.json",
+      "passed": true
+    },
+    {
+      "name": "reference_path:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\worker_report.json",
+      "passed": true
+    },
+    {
+      "name": "reference_sha256:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\receipt.json",
+      "passed": true
+    },
+    {
+      "name": "reference_path:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\guarded_default\\episode\\native\\receipt.json",
+      "passed": true
+    },
+    {
+      "name": "reference:bounded_completed_branch",
+      "passed": true
+    },
+    {
+      "name": "reference_sha256:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\plan.json",
+      "passed": true
+    },
+    {
+      "name": "reference_path:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\later_episodes_001\\plan.json",
+      "passed": true
+    },
+    {
+      "name": "reference:campaign_shared_source_binding",
+      "passed": true,
+      "shared_count": 99,
+      "native_archive_only_sources": [
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\g4irsf11_experiment_protocol.py",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\g4irsf11_fixed_map.py",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\g4irsf11_workloads.py",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\g4irsf12_reproducible_harness.py",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\g4irsf12_size_ladder.py",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\g4irsf13_runtime_profile.py",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\g4irsf14_opportunity_census.py",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\g4irsf31_map_adapter.py",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf18_jit_campaign.py",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf19_bounded_capacity.py",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf20_event_hotpath.py",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf24_native_race.py",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf26_paper_experiments.py",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf27_fault_values.py",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf28_service_potential.py",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf29_workload.py",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf31_nanning_map.py",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf31_nanning_workload.py",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf5_original_protocol_comparative_validation.py",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf6_paper_protocol_gap_closure.py"
+      ]
+    },
+    {
+      "name": "reference:no_100ms_certificate",
+      "passed": true
+    },
+    {
+      "name": "current:closed_native_receipt",
+      "passed": true
+    },
+    {
+      "name": "reference_sha256:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\preregistered_protocol.json",
+      "passed": true
+    },
+    {
+      "name": "reference_path:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\preregistered_protocol.json",
+      "passed": true
+    },
+    {
+      "name": "reference_sha256:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\raw.json.gz",
+      "passed": true
+    },
+    {
+      "name": "reference_path:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\raw.json.gz",
+      "passed": true
+    },
+    {
+      "name": "current:acceptance_plan_binding",
+      "passed": true,
+      "reference_json_sha256": "e29768df971dee590b50610a109adc8379e3719eec3629e8e22a7a5a35980f8f",
+      "actual_json_sha256": "e29768df971dee590b50610a109adc8379e3719eec3629e8e22a7a5a35980f8f"
+    },
+    {
+      "name": "current:acceptance_closed",
+      "passed": true
+    },
+    {
+      "name": "current:receipt_raw_summary",
+      "passed": true,
+      "reference_json_sha256": "59ebdfe50a24fcfa7e9f173445d2ebd3cca9316836f7ac3068972b3090e36d48",
+      "actual_json_sha256": "59ebdfe50a24fcfa7e9f173445d2ebd3cca9316836f7ac3068972b3090e36d48"
+    },
+    {
+      "name": "current:registered_input_hash",
+      "passed": true
+    },
+    {
+      "name": "current:registered_raw_input",
+      "passed": true,
+      "reference_json_sha256": "7bb98e61766002e4121ab90995827e37816058a3a9986e40fb18b7f33123253e",
+      "actual_json_sha256": "7bb98e61766002e4121ab90995827e37816058a3a9986e40fb18b7f33123253e"
+    },
+    {
+      "name": "current:source_archive_key_coverage",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\g4irsf11_experiment_protocol.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\g4irsf11_fixed_map.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\g4irsf11_workloads.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\g4irsf12_reproducible_harness.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\g4irsf12_size_ladder.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\g4irsf13_runtime_profile.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\g4irsf14_opportunity_census.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\g4irsf31_map_adapter.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf18_jit_campaign.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf19_bounded_capacity.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf20_event_hotpath.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf24_native_race.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf26_paper_experiments.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf27_fault_values.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf28_service_potential.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf29_workload.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf31_nanning_map.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf31_nanning_workload.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf5_original_protocol_comparative_validation.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf6_paper_protocol_gap_closure.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\__init__.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\analytic_control.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\bounded_windows_job.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\capture_native025_request_timing.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\capture_native027_request_timing.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\capture_native_request_timing.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\domain_guard_historical_service.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\domain_guard_v2.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\event_protocol_control.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_later_campaign.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_later_control.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_later_episode.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_later_seed.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_native_environment.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_request_context.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_bound_future_fork.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_bound_future_fork_v3.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_bound_source_proof.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_bound_source_proof_v2.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_bound_source_proof_v3.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_component_compatibility.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_conditional_continuation.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_delivered_context.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_domain_adapter.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_domain_guard.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_full32_suffix_evaluator.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_full32_suffix_partition.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_future_later_fork.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_historical_adapter.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_historical_policy.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_historical_service.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_initial_candidate_provider.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_initial_decision_adapter.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_initial_decision_adapter_v2.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_lifecycle_state_v2.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_native_domain_contract.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_native_view_v2.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_online_initial_dispatch.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_online_retained_policy.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_owned_initial_provider.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_owned_prefix_evaluator.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_owned_same_information_search.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_projected_captures.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_projection_protocol.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_recollection_adapter.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_recollection_policy.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_recollection_policy_v2.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_same_information_search.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_unloading_policy.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\native025_request_timing.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\native025_timing_gate.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\native027_request_timing.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\native027_run_acceptance.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\native027_timing_gate.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\native_host.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\native_preexisting_initial_adapter.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\native_preexisting_rolling_adapter.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\native_preexisting_v3_bound_adapter.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\native_request_timing.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\original_workload.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\planning_capture_v2_contract.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\planning_capture_v2_digest.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\planning_capture_v3_contract.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\preexisting_v3_data_adapter.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\preexisting_v3_endpoint_identity.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\profile_request_bundles.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\protocol_control.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_executable_preference_actions.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_live_obligation_communication_projection.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_live_obligation_event_projection_v2.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_live_obligation_interval.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_live_obligation_lazy_communication_projection.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_live_obligation_projection.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_native_preference_projection.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_owned_action_state.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_preexisting_model.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_preexisting_v3_model.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_preference_request_context.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_reuse_model.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_route_preference_model.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\reference_reuse_timing.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\regional_control.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\request_bundle_measurement.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_live_obligation_initial_methods.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_live_obligation_native_domain.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_native_preexisting_v3_bound.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_preexisting_occupancy_domain.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_rolling_overlap_domain.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_synthetic_reuse_chain.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_synthetic_reuse_v2.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\run_native027_semantic_gate.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\validate_future_later_paired_suffix.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\validate_live_conditional_continuation.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\validate_live_phase_b_pause.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\verify_preexisting_delivery.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\__init__.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\cpp_backend.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\io\\__init__.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\io\\legacy_map.py",
+      "passed": true
+    },
+    {
+      "name": "current:archive_path_scope:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\io\\legacy_tasks.py",
+      "passed": true
+    },
+    {
+      "name": "current:all_archived_source_bytes",
+      "passed": true,
+      "count": 120
+    },
+    {
+      "name": "reference_sha256:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\receipt.json",
+      "passed": true
+    },
+    {
+      "name": "reference_path:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\receipt.json",
+      "passed": true
+    },
+    {
+      "name": "reference_sha256:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\worker_report.json",
+      "passed": true
+    },
+    {
+      "name": "reference_path:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\worker_report.json",
+      "passed": true
+    },
+    {
+      "name": "reference_sha256:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\receipt.json",
+      "passed": true
+    },
+    {
+      "name": "reference_path:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\episode\\native\\receipt.json",
+      "passed": true
+    },
+    {
+      "name": "current:bounded_completed_branch",
+      "passed": true
+    },
+    {
+      "name": "reference_sha256:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\plan.json",
+      "passed": true
+    },
+    {
+      "name": "reference_path:C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\plan.json",
+      "passed": true
+    },
+    {
+      "name": "current:campaign_shared_source_binding",
+      "passed": true,
+      "shared_count": 100,
+      "native_archive_only_sources": [
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\g4irsf11_experiment_protocol.py",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\g4irsf11_fixed_map.py",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\g4irsf11_workloads.py",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\g4irsf12_reproducible_harness.py",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\g4irsf12_size_ladder.py",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\g4irsf13_runtime_profile.py",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\g4irsf14_opportunity_census.py",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\g4irsf31_map_adapter.py",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf18_jit_campaign.py",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf19_bounded_capacity.py",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf20_event_hotpath.py",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf24_native_race.py",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf26_paper_experiments.py",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf27_fault_values.py",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf28_service_potential.py",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf29_workload.py",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf31_nanning_map.py",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf31_nanning_workload.py",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf5_original_protocol_comparative_validation.py",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf6_paper_protocol_gap_closure.py"
+      ]
+    },
+    {
+      "name": "current:no_100ms_certificate",
+      "passed": true
+    },
+    {
+      "name": "input_exact",
+      "passed": true,
+      "reference_json_sha256": "7bb98e61766002e4121ab90995827e37816058a3a9986e40fb18b7f33123253e",
+      "actual_json_sha256": "7bb98e61766002e4121ab90995827e37816058a3a9986e40fb18b7f33123253e"
+    },
+    {
+      "name": "full_native_receipts_exact",
+      "passed": true,
+      "reference_json_sha256": "150442ca1063496898d06fd5b69cd66f4ccf427ed3fbab93d71174b05cc0333f",
+      "actual_json_sha256": "150442ca1063496898d06fd5b69cd66f4ccf427ed3fbab93d71174b05cc0333f"
+    },
+    {
+      "name": "full_native_jobs_exact",
+      "passed": true,
+      "reference_json_sha256": "5ae91c1691b73a86043253df42bc99f02976b314c774618f026e4188e572122b",
+      "actual_json_sha256": "5ae91c1691b73a86043253df42bc99f02976b314c774618f026e4188e572122b"
+    },
+    {
+      "name": "full_native_trays_exact",
+      "passed": true,
+      "reference_json_sha256": "0e4774a6137e8a80710b2acebec164ef3f339dd5d2eceac03e220e4764af06e9",
+      "actual_json_sha256": "0e4774a6137e8a80710b2acebec164ef3f339dd5d2eceac03e220e4764af06e9"
+    },
+    {
+      "name": "full_calls_exact",
+      "passed": true,
+      "reference_json_sha256": "dad7cead06c13c75f95e2866ef0579eb2326b8a364878ab5634613e4fc956a09",
+      "actual_json_sha256": "dad7cead06c13c75f95e2866ef0579eb2326b8a364878ab5634613e4fc956a09"
+    },
+    {
+      "name": "full_outbox_exact",
+      "passed": true,
+      "reference_json_sha256": "11ab41940074b21d589ff314c02b6f4202605b3ad83c44bb5f1835c593b36b40",
+      "actual_json_sha256": "11ab41940074b21d589ff314c02b6f4202605b3ad83c44bb5f1835c593b36b40"
+    },
+    {
+      "name": "full_request_creations_exact",
+      "passed": true,
+      "reference_json_sha256": "796555074d8497a1d5607c92c54d2392bbca61adfefeb55fdf697d1443d71b88",
+      "actual_json_sha256": "796555074d8497a1d5607c92c54d2392bbca61adfefeb55fdf697d1443d71b88"
+    },
+    {
+      "name": "full_continuation_exact",
+      "passed": true,
+      "reference_json_sha256": "3fd22ba057b012565ca2c12b3abf3944b65cedb86b25e20d8851e21c8675076a",
+      "actual_json_sha256": "3fd22ba057b012565ca2c12b3abf3944b65cedb86b25e20d8851e21c8675076a"
+    },
+    {
+      "name": "full_decision_boundaries_exact",
+      "passed": true,
+      "reference_json_sha256": "eb1b1c270fea2e3e847d4ca6ebf1271b0078b08e52a0befe099cc92daab9d053",
+      "actual_json_sha256": "eb1b1c270fea2e3e847d4ca6ebf1271b0078b08e52a0befe099cc92daab9d053"
+    },
+    {
+      "name": "exact_two_unique_cutpoints",
+      "passed": true
+    },
+    {
+      "name": "A_first_return:complete_nontiming_transition",
+      "passed": true,
+      "reference_json_sha256": "cf8534cc316e18c021024bcd2e4a2b4d61ac7b79c9a5ed09b5e3596dfdc09548",
+      "actual_json_sha256": "cf8534cc316e18c021024bcd2e4a2b4d61ac7b79c9a5ed09b5e3596dfdc09548"
+    },
+    {
+      "name": "A_first_return:full_model_seed",
+      "passed": true,
+      "reference_json_sha256": "07118565e9297ba44fddc3ffc846c120c77d517f2e49392834c204dbccae3dd2",
+      "actual_json_sha256": "07118565e9297ba44fddc3ffc846c120c77d517f2e49392834c204dbccae3dd2"
+    },
+    {
+      "name": "A_first_return:full_model_candidate_results",
+      "passed": true,
+      "reference_json_sha256": "b1313968aed4d2364f0bd13ac16d66023190415bcd7b860fef744d3e1eeee726",
+      "actual_json_sha256": "b1313968aed4d2364f0bd13ac16d66023190415bcd7b860fef744d3e1eeee726"
+    },
+    {
+      "name": "A_first_return:raw_evidence",
+      "passed": true,
+      "reference_json_sha256": "16b4116ea66e23a2e6ec81d82aa986bf6fda3fdb52946a04e88e5d1045e4e1c2",
+      "actual_json_sha256": "16b4116ea66e23a2e6ec81d82aa986bf6fda3fdb52946a04e88e5d1045e4e1c2"
+    },
+    {
+      "name": "A_first_return:original_reference",
+      "passed": true,
+      "reference_json_sha256": "de7fece936fa3f8f95dc2dd0bf30235d181e6d045f87c4343de68b57d86addd2",
+      "actual_json_sha256": "de7fece936fa3f8f95dc2dd0bf30235d181e6d045f87c4343de68b57d86addd2"
+    },
+    {
+      "name": "A_first_return:original_reference_digest",
+      "passed": true
+    },
+    {
+      "name": "A_first_return:one_initial04_reference",
+      "passed": true
+    },
+    {
+      "name": "A_first_return:reference_still_initial04",
+      "passed": true,
+      "reference_json_sha256": "ab4fd4a07822ae29f62ad0a2f7730507fcff000608828a9da047f04ec17d445b",
+      "actual_json_sha256": "ab4fd4a07822ae29f62ad0a2f7730507fcff000608828a9da047f04ec17d445b"
+    },
+    {
+      "name": "A_first_return:request_local_counts",
+      "passed": true,
+      "reference_json_sha256": "d7dde2df5287e111b91e3bf78c4f50561fd7eea2c3f604ae756abf04e4f76553",
+      "actual_json_sha256": "d7dde2df5287e111b91e3bf78c4f50561fd7eea2c3f604ae756abf04e4f76553"
+    },
+    {
+      "name": "A_first_return:request_local_guards_and_scope",
+      "passed": true
+    },
+    {
+      "name": "A_first_return:request_pins_bound_to_native_archive",
+      "passed": true
+    },
+    {
+      "name": "A_first_return:actor_native_state_and_clock_unchanged",
+      "passed": true
+    },
+    {
+      "name": "A_first_return:decision_window_finite",
+      "passed": true
+    },
+    {
+      "name": "B_first_reuse_route:complete_nontiming_transition",
+      "passed": true,
+      "reference_json_sha256": "e237c18cf812da3eb2e63088f3ce2a562c953a2e17cfbe09344121e9db547ec4",
+      "actual_json_sha256": "e237c18cf812da3eb2e63088f3ce2a562c953a2e17cfbe09344121e9db547ec4"
+    },
+    {
+      "name": "B_first_reuse_route:full_model_seed",
+      "passed": true,
+      "reference_json_sha256": "a7811da20384da2f0d279e2d5e4f85542156fbbf4b3c0651dee729a3a2d17ea0",
+      "actual_json_sha256": "a7811da20384da2f0d279e2d5e4f85542156fbbf4b3c0651dee729a3a2d17ea0"
+    },
+    {
+      "name": "B_first_reuse_route:full_model_candidate_results",
+      "passed": true,
+      "reference_json_sha256": "569f36ebf782879caf43b7438bd47cc8834981591c171ee9b368278fc26b921b",
+      "actual_json_sha256": "569f36ebf782879caf43b7438bd47cc8834981591c171ee9b368278fc26b921b"
+    },
+    {
+      "name": "B_first_reuse_route:raw_evidence",
+      "passed": true,
+      "reference_json_sha256": "7255c1f75e8e592dc8dfbf4b0ba6e25e36a7eaa19c0c1ebde1cfecb66940fa80",
+      "actual_json_sha256": "7255c1f75e8e592dc8dfbf4b0ba6e25e36a7eaa19c0c1ebde1cfecb66940fa80"
+    },
+    {
+      "name": "B_first_reuse_route:original_reference",
+      "passed": true,
+      "reference_json_sha256": "6e7509f1a52e64f00c3fbdb0c48fcda5a4348762fc058cfec2d44e96ebd9e057",
+      "actual_json_sha256": "6e7509f1a52e64f00c3fbdb0c48fcda5a4348762fc058cfec2d44e96ebd9e057"
+    },
+    {
+      "name": "B_first_reuse_route:original_reference_digest",
+      "passed": true
+    },
+    {
+      "name": "B_first_reuse_route:one_initial04_reference",
+      "passed": true
+    },
+    {
+      "name": "B_first_reuse_route:reference_still_initial04",
+      "passed": true,
+      "reference_json_sha256": "ab4fd4a07822ae29f62ad0a2f7730507fcff000608828a9da047f04ec17d445b",
+      "actual_json_sha256": "ab4fd4a07822ae29f62ad0a2f7730507fcff000608828a9da047f04ec17d445b"
+    },
+    {
+      "name": "B_first_reuse_route:request_local_counts",
+      "passed": true,
+      "reference_json_sha256": "d7dde2df5287e111b91e3bf78c4f50561fd7eea2c3f604ae756abf04e4f76553",
+      "actual_json_sha256": "d7dde2df5287e111b91e3bf78c4f50561fd7eea2c3f604ae756abf04e4f76553"
+    },
+    {
+      "name": "B_first_reuse_route:request_local_guards_and_scope",
+      "passed": true
+    },
+    {
+      "name": "B_first_reuse_route:request_pins_bound_to_native_archive",
+      "passed": true
+    },
+    {
+      "name": "B_first_reuse_route:actor_native_state_and_clock_unchanged",
+      "passed": true
+    },
+    {
+      "name": "B_first_reuse_route:decision_window_finite",
+      "passed": true
+    },
+    {
+      "name": "complete_five_business_jobs",
+      "passed": true
+    },
+    {
+      "name": "same_finite_three_trays",
+      "passed": true
+    },
+    {
+      "name": "all_shadow_native_states_unchanged",
+      "passed": true
+    },
+    {
+      "name": "all_read_artifacts_unchanged_at_exit",
+      "passed": true,
+      "changed": []
+    }
+  ],
+  "failed_checks": [],
+  "reviewer_source": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\independent_native_review.py",
+    "sha256": "7dbde3973e3fc659531126a59d471040afe18d726c1e0b4ddb910492c68c0d1d"
+  }
+}

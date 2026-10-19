@@ -1,0 +1,44 @@
+{
+  "schema": "g31.foundation_learning.pilot.v1",
+  "run_id": "later_value_001",
+  "pipeline_stage": "later_value",
+  "source_plan": {
+    "path": "C:/Users/38908/Downloads/G31_ICS_REVIEW_da8d39ed_LEARNING_NEXT_20261017.md",
+    "sha256": "86cb48f19d9e42ddcb35eda81cf0cebdfd1a941b707e26026a09ce23d1121658"
+  },
+  "native_contract": "outputs/experiments/g31_ics_lt2_sustained_20261014/native027_accepted_contract_001.json",
+  "runtime_mode": "offline_sync",
+  "information_scope": "owner_local_delivered",
+  "baseline": "retained_incumbent_04",
+  "scenario": "mechanism",
+  "horizon_seconds": 40,
+  "message_tape": "normal",
+  "candidate_budget": 2,
+  "refresh": {"implemented_mode": "retained_initial_reference"},
+  "protection": {"tolerance": 0, "incumbent_index": 4, "takeover_authorized": false},
+  "learner": {
+    "models": ["ridge_continuation_value"],
+    "device": "cpu",
+    "alpha": 1,
+    "seed": 17
+  },
+  "command_override": {
+    "command": "train-later-value",
+    "model": "ridge_continuation_value",
+    "alpha": 1,
+    "split": "entire_scenario_grouped; single mechanism scenario has no independent generalization claim",
+    "data": "new closed native later episodes only; never old initial candidate rows",
+    "objective": "finite episode undiscounted observed-job remaining completion value",
+    "diagnostic_interventions": "allowed as explicitly labeled offline supervised data only",
+    "RL": "not trained without protected effective nondefault temporal decisions"
+  },
+  "compute_delay_mode": "offline_sync_no_realtime_claim",
+  "complete_request_target_ms": 100,
+  "limits": {
+    "command_wall_seconds": 60,
+    "training_wall_seconds": 30,
+    "maximum_training_rows": 100,
+    "maximum_transitions": 100
+  },
+  "output_root": "outputs/experiments/g31_ics_learning_next_20261017"
+}

@@ -1,6 +1,6 @@
 """Stepable native027 baseline, not a new physical simulator or RL action gate.
 
-Only the existing initial dispatch and retained owner policy issue commands.
+Initial dispatch remains unchanged; optional later choices use real collections.
 The actor API returns actual own endpoints; evaluator records are separate.
 Python object privacy is an API discipline, not an adversarial sandbox.
 """
@@ -14,6 +14,7 @@ import time
 import traceback
 
 from . import research_live_obligation_initial_methods as online
+from . import foundation_later_control as later
 
 SCHEMA = 'g31.foundation.native_environment.v1'
 ROOT = Path(__file__).resolve().parents[3]
@@ -68,12 +69,15 @@ def validate_owner_snapshot(owner, view, received):
 class FoundationNativeEnvironment:
     """One admitted session; no implicit reset, fork, checkpoint or future read."""
 
-    def __init__(self, native, accepted_run, branch_key, contract_reference, *, initial_evaluator=None):
+    def __init__(self, native, accepted_run, branch_key, contract_reference, *, initial_evaluator=None, initial_selector=None,
+                 later_model=None, later_mode=None, later_phases=tuple(later.PHASE_ACTIONS), later_control_factory=None):
         self._native = native
         self._run = accepted_run
         self._key = branch_key
         self._contract = contract_reference
         self._initial_evaluator = initial_evaluator
+        require(initial_selector is None or callable(initial_selector), 'explicit_initial_selector')
+        self._initial_selector = initial_selector
         self._session = None
         self._progress = {}
         self._audit = []
@@ -84,6 +88,10 @@ class FoundationNativeEnvironment:
         self._outcome = None
         self._advice = {}
         self._observations = []
+        self._later_mode, self._later_model, self._later_phases = later_mode, later_model, tuple(later_phases)
+        self._later_controls = {}
+        require(later_control_factory is None or callable(later_control_factory), 'explicit_later_control_factory')
+        self._later_control_factory = later.LaterControl if later_control_factory is None else later_control_factory
 
     def reset(self):
         require(self._session is None, 'reset_requires_fresh_admitted_environment')
@@ -132,21 +140,35 @@ class FoundationNativeEnvironment:
 
     def observe(self, owner):
         require(self._session is not None and owner in OWNERS, 'known_owner_and_reset_required')
+        control = self._later_controls.get(owner)
+        if control is not None and control.offer is not None:
+            return control.observation()
         view = self._session.observe_protocol(owner)
         received = self._session.protocol_planning_snapshots(owner)
         self._observations.append(validate_owner_snapshot(owner, view, received))
-        return {'kind': 'OwnerObservation', 'owner': owner, 'event_time_s': self._session.physical_time,
+        result = {'kind': 'OwnerObservation', 'owner': owner, 'event_time_s': self._session.physical_time,
                 'decision_epoch': self._epoch, 'native_local_view': plain(view),
                 'delivered_planning_snapshots': plain(received),
                 'own_outbox': plain(self._client.owned(owner)),
                 'actor_information_scope': 'own native observation, actual delivered peer messages, own outbox',
                 'guard_information_scope': 'existing current own endpoints and delivered capture stability contract; native executes receiving checks',
                 'privileged_evaluator_state_included': False}
+        if self._later_mode is not None:
+            result['delivered_planning_snapshots_v3'] = later.v3_messages(
+                self._session.protocol_planning_snapshots_v3(owner), owner, view['now'])
+        return result
 
     def candidates(self, owner):
         require(owner in OWNERS and self._status == 'running', 'running_known_owner_required')
         due = owner in self._pending
+        control = self._later_controls.get(owner)
+        if control is not None and control.offer is not None:
+            return {'owner': owner, 'decision_epoch': self._epoch, 'scope': 'new_current_later_choices',
+                'actions': control.candidates(), 'later_free_action_mask': {'enabled': True},
+                'timing_mode': 'offline_sync', 'rl_ready': False}
         action = self._row['method'] if self._phase == 'initial' else 'activate_retained_policy'
+        if self._phase != 'initial' and self._later_mode is not None:
+            action = 'advance_collection_protocol'
         return {'owner': owner, 'decision_epoch': self._epoch,
                 'scope': 'registered initial method' if self._phase == 'initial' else 'fixed retained policy; not fresh R1/R2 alternatives',
                 'actions': [{'candidate_id': f'{self._epoch}:{owner}:{action}', 'action': action,
@@ -157,8 +179,9 @@ class FoundationNativeEnvironment:
 
     def submit(self, owner, candidate_id, *, shadow=False):
         require(self._pending and self._pending[0] == owner, 'ordered_current_owner_required')
-        candidate = self.candidates(owner)['actions'][0]
-        require(candidate['enabled'] and candidate['candidate_id'] == candidate_id, 'stale_or_unauthorized_candidate')
+        matches = [row for row in self.candidates(owner)['actions'] if row['candidate_id'] == candidate_id]
+        require(len(matches) == 1 and matches[0]['enabled'], 'stale_or_unauthorized_candidate')
+        candidate = matches[0]
         started, cpu_started = time.perf_counter_ns(), time.process_time_ns()
         if shadow:
             before = self._session.offline_state_sha256()
@@ -172,6 +195,17 @@ class FoundationNativeEnvironment:
             return plain(row)
         before_calls = len(self._client.calls)
         before_time = self._session.physical_time
+        control = self._later_controls.get(owner)
+        if control is not None and control.offer is not None:
+            transition = control.submit(candidate_id)
+            require(self._session.physical_time == before_time, 'later_submit_must_not_advance_native_time')
+            row = {'kind': 'LaterSubmission', 'owner': owner, 'candidate_id': candidate_id,
+                'event_time_s': before_time, 'decision_epoch': self._epoch, 'phase': transition['phase'],
+                'transition': transition, 'calls': plain(self._client.calls[before_calls:]),
+                'submitted_is_not_physical_success': True}
+            self._audit.append(row)
+            self._pending.pop(0)
+            return plain(row)
         self._progress['stage'] = self._phase + '_owner_activation'
         if self._phase == 'initial':
             self._client.activate(owner, self._triggers[owner])
@@ -186,8 +220,13 @@ class FoundationNativeEnvironment:
                 require(self._session.offline_state_sha256() == before, 'initial_evaluator_changed_native_truth')
             online.start_owner(self._native, self._session, self._client, owner, self._planning[owner],
                 self._channels[owner], self._accepted, arm=self._row['method'], incumbent=online.incumbent_index(),
-                progress=self._initial, ledgers=self._ledgers, policies=self._policies)
+                progress=self._initial, ledgers=self._ledgers, policies=self._policies,
+                **({} if self._initial_selector is None else {'initial_selector': self._initial_selector}))
             require(owner in self._policies, 'missing_admitted_retained_policy')
+            if self._later_mode is not None:
+                self._later_controls[owner] = self._later_control_factory(self._policies[owner],
+                    later.initial_reference(self._initial[owner]), model=self._later_model,
+                    mode=self._later_mode, phases=self._later_phases)
         else:
             self._policies[owner].activate(self._triggers[owner])
             self._activations += 1
@@ -200,8 +239,45 @@ class FoundationNativeEnvironment:
                'calls': calls, 'submitted_is_not_physical_success': True,
                'action_contract': 'initial_conditional_component' if self._phase == 'initial' else 'retained_policy_current_local_guards'}
         self._audit.append(row)
-        self._pending.pop(0)
+        for current in self._later_controls.values():
+            current.update_ack()
+        control = self._later_controls.get(owner)
+        if control is not None and control.offer is not None:
+            next_observation = control.observation()
+            for transition in control.transitions:
+                if transition['next_observation'] is None:
+                    require(transition['owner'] == next_observation['owner'] == owner
+                        and next_observation['at'] >= transition['selected_at'], 'same_owner_forward_transition')
+                    transition['next_observation'] = plain(next_observation)
+                    transition['delta_sim_time_s'] = next_observation['at'] - transition['selected_at']
+                    transition['next_state_kind'] = 'same_owner_next_decision'
+            row['later_decision_ready'] = True
+        else:
+            self._pending.pop(0)
         return plain(row)
+
+    def choose_later(self, owner, choose):
+        require(self._status == 'running' and owner in self._pending and callable(choose), 'current_later_actor_required')
+        control = self._later_controls[owner]
+        require(control.offer is not None, 'current_later_offer_required')
+        started = time.perf_counter_ns()
+        before_time = self._session.physical_time
+        before = self._session.offline_state_sha256()
+        actor_started = time.perf_counter_ns()
+        try:
+            chosen = choose(control.observation(), control.candidates())
+        finally:
+            actor_ms = (time.perf_counter_ns() - actor_started) / 1e6
+            after = self._session.offline_state_sha256()
+            after_time = self._session.physical_time
+            unchanged = before == after and before_time == after_time
+            control.offer.update(actor_state_unchanged=unchanged,
+                actor_state_check={'native_state_before': before, 'native_state_after': after,
+                    'physical_time_before': before_time, 'physical_time_after': after_time,
+                    'scope': 'new callback isolation evidence only; hashes are not actor inputs'},
+                actor_inference_wall_ms=actor_ms, actor_choose_wall_ms=(time.perf_counter_ns() - started) / 1e6)
+            require(unchanged, 'later_actor_changed_native_state_or_clock')
+        return chosen
 
     def advance_to_next_decision(self):
         require(self._status == 'running' and not self._pending, 'consume_current_owner_decisions_first')
@@ -252,7 +328,36 @@ class FoundationNativeEnvironment:
         result = self._session.result_at(self._session.physical_time)
         self._progress['result'] = result
         decisions = {owner: policy.decisions for owner, policy in self._policies.items()}
-        summary = online.completed_summary(self._data, result, self._client, continuation, self._initial, decisions)
+        if not self._later_controls:
+            summary = online.completed_summary(self._data, result, self._client, continuation, self._initial, decisions)
+        else:
+            effective = online.retrospective_vector(self._initial)
+            transitions = [transition for control in self._later_controls.values() for transition in control.transitions]
+            for control in self._later_controls.values():
+                control.update_ack()
+            for transition in transitions:
+                if transition['phase'] == 'first_return':
+                    effective['return_delay'] = transition['actual_action']['return_delay']
+                else:
+                    effective['later_action'] = transition['action_id']
+                enters = [receipt for receipt in result['receipts'] if receipt['event'] == 'EDGE_ENTER'
+                    and receipt['tray_id'] == 'L' and receipt['time'] >= transition['selected_at']
+                    and receipt['from'] == (6 if transition['phase'] == 'first_return' else 7)]
+                transition['actual_physical_effect'] = {'next_edge_enter': plain(enters[0]) if enters else None,
+                    'scope': 'terminal evaluator only; no physical receipts used by actor or guard'}
+                transition['terminal_completion'] = {job['business_bag_id']: job['completed_at'] for job in result['jobs']}
+                if transition['next_observation'] is None:
+                    transition['delta_sim_time_s'] = self._session.physical_time - transition['selected_at']
+                    transition['next_state_kind'] = 'terminal_no_next_effective_decision'
+            summary = online.old.assess_cell(self._data, result, self._client, continuation, effective)
+            for transition in transitions:
+                transition['truncated'] = summary['status'] != 'assessed'
+                transition['terminated'] = summary['status'] == 'assessed' and transition['next_observation'] is None
+            summary.update(later_current_choices_enabled=True, behavior_mode=self._later_mode,
+                later_effective_decision_count=len(transitions), effective_vector_evaluator_only=effective,
+                initial_reference_refresh_allowed=False, strict_protected=None, rl_ready=False,
+                native_model_protection_certified=False, complete_request_100ms_certified=False,
+                scope='Actual later submissions and terminal physical assessment; multi-step protected RL not certified.')
         self._outcome = plain({'kind': 'EvaluatorRecord', 'schema': SCHEMA, 'input': self._data, 'result': result,
             'summary': summary, 'specification': self._row, 'initial_owners': self._initial,
             'decisions': decisions, 'continuation': continuation, 'calls': self._client.calls,
@@ -260,6 +365,9 @@ class FoundationNativeEnvironment:
             'owner_activation_admissions': self._client.roots, 'ack_handling': self._client.ack_handling,
             'native_batches': self._batches, 'activation_records': self._audit, 'shadow_records': self._shadows,
             'initial_evaluator_advice': self._advice, 'capabilities': CAPABILITIES,
+            'later_transitions': sorted([plain(transition) for control in self._later_controls.values()
+                for transition in control.transitions], key=lambda transition: transition['selected_at']),
+            'later_collection_failures': {owner: plain(control.collection_failures) for owner, control in self._later_controls.items()},
             'owner_observation_checks': self._observations,
             'native027_acceptance': self._accepted.audit_copy(),
             'retained_ledgers': {owner: ledger.audit_copy() for owner, ledger in self._ledgers.items()}})
@@ -285,7 +393,22 @@ def _saved_baseline_comparison(raw, case, method):
             'scope': 'same input and method against prior closed native execution; no new paired execution or general shadow proof'}
 
 
-def run_baseline(output_dir, *, case='mechanism', method='incumbent', initial_evaluator=None):
+def archive_sources(output, sources):
+    output = Path(output)
+    hashes, archives = {}, {}
+    for index, source in enumerate(sorted(sources)):
+        require(source.is_relative_to(ROOT), 'source_inside_research_workspace')
+        archive = output / 'source' / f'{index:04d}.py'
+        archive.parent.mkdir(parents=True, exist_ok=True)
+        archive.write_bytes(source.read_bytes())
+        hashes[str(source)] = online.old.sha(source)
+        archives[str(source)] = str(archive.relative_to(output))
+    return hashes, archives
+
+
+def run_baseline(output_dir, *, case='mechanism', method='incumbent', initial_evaluator=None, initial_selector=None,
+                 later_choose=None, later_model=None, later_mode=None, later_phases=tuple(later.PHASE_ACTIONS),
+                 later_control_factory=None):
     """One native branch; caller MUST provide a process-level hard timeout.
 
 Output is immutable. Admission validates the existing built binary and saved
@@ -306,13 +429,13 @@ its JSON advice never enters dispatch. Import callback modules before calling.
         'native_contract_reference': online.old.reference(contract_path),
         'semantic_gate_reference': online.old.reference(semantic_path), 'binary': online.old.reference(contract['binary']),
         'source_sha256': {}, 'source_archive': {}, 'input_file_sha256': {},
-        'capabilities': CAPABILITIES, 'initial_evaluator_enabled': initial_evaluator is not None}
-    for source in online.old.bound.imported_sources():
-        archive = output / 'source' / source.relative_to(ROOT)
-        archive.parent.mkdir(parents=True, exist_ok=True)
-        archive.write_bytes(source.read_bytes())
-        plan['source_sha256'][str(source)] = online.old.sha(source)
-        plan['source_archive'][str(source)] = str(archive.relative_to(output))
+        'capabilities': CAPABILITIES, 'initial_evaluator_enabled': initial_evaluator is not None,
+        'initial_selector_enabled': initial_selector is not None,
+        'later_control': {'mode': later_mode, 'phases': list(later_phases), 'enabled': later_mode is not None}}
+    if later_control_factory is not None:
+        require(callable(later_control_factory), 'explicit_later_control_factory')
+        plan['later_control']['factory'] = later_control_factory.__module__ + '.' + later_control_factory.__qualname__
+    plan['source_sha256'], plan['source_archive'] = archive_sources(output, online.old.bound.imported_sources())
     input_path = output / 'inputs' / (key + '.json')
     write(input_path, online.old.native_scene(case))
     plan['input_file_sha256'][key] = online.old.sha(input_path)
@@ -326,20 +449,30 @@ its JSON advice never enters dispatch. Import callback modules before calling.
         accepted = online.old.run_admission.open_run(plan['native_contract_reference'], plan['semantic_gate_reference'], campaign)
         native = online.old.native_host.load_native(Path(plan['binary']['path']))
         accepted.enter_branch(key, campaign)
-        environment = FoundationNativeEnvironment(native, accepted, key, plan['native_contract_reference'], initial_evaluator=initial_evaluator)
+        environment = FoundationNativeEnvironment(native, accepted, key, plan['native_contract_reference'],
+            initial_evaluator=initial_evaluator, initial_selector=initial_selector,
+            later_model=later_model, later_mode=later_mode, later_phases=later_phases,
+            later_control_factory=later_control_factory)
         receipt['native_session_attempted'] = True
         boundary = environment.reset()
         boundaries, shadowed = [boundary], set()
         while boundary['status'] == 'running':
             for owner in boundary['due_owners']:
-                observation = environment.observe(owner)
-                require(observation['owner'] == owner and not observation['privileged_evaluator_state_included'], 'actor_observation_scope')
-                candidate = environment.candidates(owner)['actions'][0]
-                shadow_key = (owner, boundary['phase'])
-                if shadow_key not in shadowed:
-                    environment.submit(owner, candidate['candidate_id'], shadow=True)
-                    shadowed.add(shadow_key)
-                environment.submit(owner, candidate['candidate_id'])
+                while owner in environment._pending:
+                    observation = environment.observe(owner)
+                    require(observation['owner'] == owner and not observation['privileged_evaluator_state_included'], 'actor_observation_scope')
+                    candidates = environment.candidates(owner)['actions']
+                    if observation.get('schema') == later.ACTOR_SCHEMA:
+                        require(any(candidate['enabled'] for candidate in candidates), 'all_later_candidates_unknown_or_rejected')
+                        require(later_choose is not None, 'explicit_later_actor_required')
+                        chosen = environment.choose_later(owner, later_choose)
+                    else:
+                        chosen = candidates[0]['candidate_id']
+                        shadow_key = (owner, boundary['phase'])
+                        if shadow_key not in shadowed:
+                            environment.submit(owner, chosen, shadow=True)
+                            shadowed.add(shadow_key)
+                    environment.submit(owner, chosen)
             boundary = environment.advance_to_next_decision()
             boundaries.append(boundary)
         require(boundary['status'] == 'finished', 'incomplete_native_rollout:' + boundary['status'])
@@ -357,6 +490,7 @@ its JSON advice never enters dispatch. Import callback modules before calling.
         receipt.update(status='unknown_failed', exception=traceback.format_exc())
         if environment is not None:
             partial = online.old.capture_partial(environment._progress, receipt['exception'])
+            partial['later_control'] = {owner: control.audit_copy() for owner, control in environment._later_controls.items()}
             write(output / 'partial.json', partial)
             receipt['partial_artifact'] = online.old.reference(output / 'partial.json')
     finally:

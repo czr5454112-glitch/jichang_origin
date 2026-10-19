@@ -157,3 +157,46 @@ def test_snapshot_rejects_foreign_dynamic_state_and_undelivered_message(leak):
         received[0]['capture']['target_owner'] = 'B'
     with pytest.raises(ValueError):
         foundation.validate_owner_snapshot('A', view, received)
+
+
+def test_source_archive_short_paths_preserve_full_identity(tmp_path, monkeypatch):
+    monkeypatch.setattr(foundation, 'ROOT', tmp_path)
+    directory = tmp_path / 'original' / 'deep'
+    directory.mkdir(parents=True)
+    sources = [directory / ('long_source_name_' * 2 + suffix + '.py') for suffix in ('first', 'second')]
+    for index, source in enumerate(sources):
+        source.write_text(f'VALUE = {index}\n', encoding='utf-8')
+    output = tmp_path / 'evidence'
+    hashes, archives = foundation.archive_sources(output, sources)
+    assert set(hashes) == set(archives) == {str(source) for source in sources}
+    assert len(set(archives.values())) == 2
+    for source in sources:
+        archived = output / archives[str(source)]
+        assert len(archived.name) == 7
+        assert archived.read_bytes() == source.read_bytes()
+        assert hashes[str(source)] == foundation.online.old.sha(archived)
+
+
+def test_new_B_offer_does_not_become_A_next_local_observation():
+    environment = environment_stub()
+    environment._pending = ['B']
+    environment._triggers = {'B': {'periodic_tick': True}}
+    environment._policies['B'].activate = lambda trigger: None
+    observation = {'owner': 'B', 'at': .11}
+    a_transition = {'owner': 'A', 'selected_at': .10, 'next_observation': None}
+    b_transition = {'owner': 'B', 'selected_at': .10, 'next_observation': None}
+    environment._later_controls = {
+        'A': SimpleNamespace(offer=None, transitions=[a_transition], update_ack=lambda: None),
+        'B': SimpleNamespace(offer=None, transitions=[b_transition], update_ack=lambda: None,
+            observation=lambda: copy.deepcopy(observation)),
+    }
+    def activate(trigger):
+        environment._later_controls['B'].offer = {'ready': True}
+    environment._policies['B'].activate = activate
+    candidate = environment.candidates('B')['actions'][0]
+    environment.submit('B', candidate['candidate_id'])
+    assert a_transition['next_observation'] is None
+    assert b_transition['next_observation'] == observation
+    assert b_transition['next_state_kind'] == 'same_owner_next_decision'
+    assert b_transition['delta_sim_time_s'] == pytest.approx(.01)
+

@@ -1,0 +1,330 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="7" skipped="0" tests="33" time="9.180" timestamp="2026-10-17T19:57:41.075786+08:00" hostname="LAPTOP-M3GASC4G"><testcase classname="tests.test_g31_foundation_request_context" name="test_complete_seed_and_predictions_equal_preoptimization_native_saved_models[0]" time="0.578"><failure message="ValueError: historical_adapter:unsupported_public_payload_type">transitions = [{'schema': 'g31.foundation.later_transition.v1', 'owner': 'A', 'phase': 'first_return', 'observation': {'schema': 'g3...ma': 'g31.foundation.later_actor.v1', 'owner': 'B', 'phase': 'first_reuse_route', 'at': 10.219999999999997, ...}, ...}]
+index = 0
+
+    @pytest.mark.parametrize('index', range(4))
+    def test_complete_seed_and_predictions_equal_preoptimization_native_saved_models(transitions, index):
+        expected = transitions[index]['model_report']
+        evidence = saved_evidence(transitions, index)
+        encoded_evidence = later.delivered.encoded(evidence)
+        actual = later.evaluate(evidence, list(expected['candidate_results']))
+        assert actual['status'] == expected['status'] == 'conditional_current_seed'
+        assert later.delivered.encoded(actual['seed']) == later.delivered.encoded(expected['seed'])
+&gt;       assert later.delivered.encoded(actual['candidate_results']) == later.delivered.encoded(expected['candidate_results'])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_foundation_request_context.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\live_obligation_delivered_context.py:28: in encoded
+    return history.payload_encoding(value)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:45: in payload_encoding
+    check(request)
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:41: in check
+    for item in value.values():check(item)
+                               ^^^^^^^^^^^
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:41: in check
+    for item in value.values():check(item)
+                               ^^^^^^^^^^^
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:43: in check
+    for item in value:check(item)
+                      ^^^^^^^^^^^
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:41: in check
+    for item in value.values():check(item)
+                               ^^^^^^^^^^^
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:37: in check
+    require(kind in (dict,list),'unsupported_public_payload_type')
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+value = False, reason = 'unsupported_public_payload_type'
+
+    def require(value,reason):
+&gt;       if not value:raise ValueError('historical_adapter:'+reason)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: historical_adapter:unsupported_public_payload_type
+
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:26: ValueError</failure></testcase><testcase classname="tests.test_g31_foundation_request_context" name="test_complete_seed_and_predictions_equal_preoptimization_native_saved_models[1]" time="0.255"><failure message="ValueError: historical_adapter:unsupported_public_payload_type">transitions = [{'schema': 'g31.foundation.later_transition.v1', 'owner': 'A', 'phase': 'first_return', 'observation': {'schema': 'g3...ma': 'g31.foundation.later_actor.v1', 'owner': 'B', 'phase': 'first_reuse_route', 'at': 10.219999999999997, ...}, ...}]
+index = 1
+
+    @pytest.mark.parametrize('index', range(4))
+    def test_complete_seed_and_predictions_equal_preoptimization_native_saved_models(transitions, index):
+        expected = transitions[index]['model_report']
+        evidence = saved_evidence(transitions, index)
+        encoded_evidence = later.delivered.encoded(evidence)
+        actual = later.evaluate(evidence, list(expected['candidate_results']))
+        assert actual['status'] == expected['status'] == 'conditional_current_seed'
+        assert later.delivered.encoded(actual['seed']) == later.delivered.encoded(expected['seed'])
+&gt;       assert later.delivered.encoded(actual['candidate_results']) == later.delivered.encoded(expected['candidate_results'])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_foundation_request_context.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\live_obligation_delivered_context.py:28: in encoded
+    return history.payload_encoding(value)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:45: in payload_encoding
+    check(request)
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:41: in check
+    for item in value.values():check(item)
+                               ^^^^^^^^^^^
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:41: in check
+    for item in value.values():check(item)
+                               ^^^^^^^^^^^
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:43: in check
+    for item in value:check(item)
+                      ^^^^^^^^^^^
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:41: in check
+    for item in value.values():check(item)
+                               ^^^^^^^^^^^
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:37: in check
+    require(kind in (dict,list),'unsupported_public_payload_type')
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+value = False, reason = 'unsupported_public_payload_type'
+
+    def require(value,reason):
+&gt;       if not value:raise ValueError('historical_adapter:'+reason)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: historical_adapter:unsupported_public_payload_type
+
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:26: ValueError</failure></testcase><testcase classname="tests.test_g31_foundation_request_context" name="test_complete_seed_and_predictions_equal_preoptimization_native_saved_models[2]" time="0.221"><failure message="ValueError: historical_adapter:unsupported_public_payload_type">transitions = [{'schema': 'g31.foundation.later_transition.v1', 'owner': 'A', 'phase': 'first_return', 'observation': {'schema': 'g3...ma': 'g31.foundation.later_actor.v1', 'owner': 'B', 'phase': 'first_reuse_route', 'at': 10.219999999999997, ...}, ...}]
+index = 2
+
+    @pytest.mark.parametrize('index', range(4))
+    def test_complete_seed_and_predictions_equal_preoptimization_native_saved_models(transitions, index):
+        expected = transitions[index]['model_report']
+        evidence = saved_evidence(transitions, index)
+        encoded_evidence = later.delivered.encoded(evidence)
+        actual = later.evaluate(evidence, list(expected['candidate_results']))
+        assert actual['status'] == expected['status'] == 'conditional_current_seed'
+        assert later.delivered.encoded(actual['seed']) == later.delivered.encoded(expected['seed'])
+&gt;       assert later.delivered.encoded(actual['candidate_results']) == later.delivered.encoded(expected['candidate_results'])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_foundation_request_context.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\live_obligation_delivered_context.py:28: in encoded
+    return history.payload_encoding(value)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:45: in payload_encoding
+    check(request)
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:41: in check
+    for item in value.values():check(item)
+                               ^^^^^^^^^^^
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:41: in check
+    for item in value.values():check(item)
+                               ^^^^^^^^^^^
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:43: in check
+    for item in value:check(item)
+                      ^^^^^^^^^^^
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:41: in check
+    for item in value.values():check(item)
+                               ^^^^^^^^^^^
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:37: in check
+    require(kind in (dict,list),'unsupported_public_payload_type')
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+value = False, reason = 'unsupported_public_payload_type'
+
+    def require(value,reason):
+&gt;       if not value:raise ValueError('historical_adapter:'+reason)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: historical_adapter:unsupported_public_payload_type
+
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:26: ValueError</failure></testcase><testcase classname="tests.test_g31_foundation_request_context" name="test_complete_seed_and_predictions_equal_preoptimization_native_saved_models[3]" time="0.226"><failure message="ValueError: historical_adapter:unsupported_public_payload_type">transitions = [{'schema': 'g31.foundation.later_transition.v1', 'owner': 'A', 'phase': 'first_return', 'observation': {'schema': 'g3...ma': 'g31.foundation.later_actor.v1', 'owner': 'B', 'phase': 'first_reuse_route', 'at': 10.219999999999997, ...}, ...}]
+index = 3
+
+    @pytest.mark.parametrize('index', range(4))
+    def test_complete_seed_and_predictions_equal_preoptimization_native_saved_models(transitions, index):
+        expected = transitions[index]['model_report']
+        evidence = saved_evidence(transitions, index)
+        encoded_evidence = later.delivered.encoded(evidence)
+        actual = later.evaluate(evidence, list(expected['candidate_results']))
+        assert actual['status'] == expected['status'] == 'conditional_current_seed'
+        assert later.delivered.encoded(actual['seed']) == later.delivered.encoded(expected['seed'])
+&gt;       assert later.delivered.encoded(actual['candidate_results']) == later.delivered.encoded(expected['candidate_results'])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_foundation_request_context.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\live_obligation_delivered_context.py:28: in encoded
+    return history.payload_encoding(value)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:45: in payload_encoding
+    check(request)
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:41: in check
+    for item in value.values():check(item)
+                               ^^^^^^^^^^^
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:41: in check
+    for item in value.values():check(item)
+                               ^^^^^^^^^^^
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:43: in check
+    for item in value:check(item)
+                      ^^^^^^^^^^^
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:41: in check
+    for item in value.values():check(item)
+                               ^^^^^^^^^^^
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:37: in check
+    require(kind in (dict,list),'unsupported_public_payload_type')
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+value = False, reason = 'unsupported_public_payload_type'
+
+    def require(value,reason):
+&gt;       if not value:raise ValueError('historical_adapter:'+reason)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: historical_adapter:unsupported_public_payload_type
+
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:26: ValueError</failure></testcase><testcase classname="tests.test_g31_foundation_request_context" name="test_legacy_rebuild_and_two_predicts_remain_independent_reference[0]" time="0.908"><failure message="ValueError: historical_adapter:unsupported_public_payload_type">transitions = [{'schema': 'g31.foundation.later_transition.v1', 'owner': 'A', 'phase': 'first_return', 'observation': {'schema': 'g3...ma': 'g31.foundation.later_actor.v1', 'owner': 'B', 'phase': 'first_reuse_route', 'at': 10.219999999999997, ...}, ...}]
+index = 0
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000002EC9D66AC90&gt;
+
+    @pytest.mark.parametrize('index', [0, 1, 3])
+    def test_legacy_rebuild_and_two_predicts_remain_independent_reference(transitions, index, monkeypatch):
+        evidence = saved_evidence(transitions, index)
+        original = later.build_seed
+        calls = []
+        def counted(source):
+            calls.append(source)
+            return original(source)
+        monkeypatch.setattr(later, 'build_seed', counted)
+        seed = later.build_seed(evidence)
+        actions = later.ACTIONS[seed['phase']]
+        predicted = {action: later.predict(seed, action) for action in actions}
+        assert len(calls) == 3
+        expected = transitions[index]['model_report']
+&gt;       assert later.delivered.encoded(predicted) == later.delivered.encoded(expected['candidate_results'])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_foundation_request_context.py:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\live_obligation_delivered_context.py:28: in encoded
+    return history.payload_encoding(value)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:45: in payload_encoding
+    check(request)
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:41: in check
+    for item in value.values():check(item)
+                               ^^^^^^^^^^^
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:41: in check
+    for item in value.values():check(item)
+                               ^^^^^^^^^^^
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:43: in check
+    for item in value:check(item)
+                      ^^^^^^^^^^^
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:41: in check
+    for item in value.values():check(item)
+                               ^^^^^^^^^^^
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:37: in check
+    require(kind in (dict,list),'unsupported_public_payload_type')
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+value = False, reason = 'unsupported_public_payload_type'
+
+    def require(value,reason):
+&gt;       if not value:raise ValueError('historical_adapter:'+reason)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: historical_adapter:unsupported_public_payload_type
+
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:26: ValueError</failure></testcase><testcase classname="tests.test_g31_foundation_request_context" name="test_legacy_rebuild_and_two_predicts_remain_independent_reference[1]" time="0.981"><failure message="ValueError: historical_adapter:unsupported_public_payload_type">transitions = [{'schema': 'g31.foundation.later_transition.v1', 'owner': 'A', 'phase': 'first_return', 'observation': {'schema': 'g3...ma': 'g31.foundation.later_actor.v1', 'owner': 'B', 'phase': 'first_reuse_route', 'at': 10.219999999999997, ...}, ...}]
+index = 1
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000002EC9AEFDC50&gt;
+
+    @pytest.mark.parametrize('index', [0, 1, 3])
+    def test_legacy_rebuild_and_two_predicts_remain_independent_reference(transitions, index, monkeypatch):
+        evidence = saved_evidence(transitions, index)
+        original = later.build_seed
+        calls = []
+        def counted(source):
+            calls.append(source)
+            return original(source)
+        monkeypatch.setattr(later, 'build_seed', counted)
+        seed = later.build_seed(evidence)
+        actions = later.ACTIONS[seed['phase']]
+        predicted = {action: later.predict(seed, action) for action in actions}
+        assert len(calls) == 3
+        expected = transitions[index]['model_report']
+&gt;       assert later.delivered.encoded(predicted) == later.delivered.encoded(expected['candidate_results'])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_foundation_request_context.py:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\live_obligation_delivered_context.py:28: in encoded
+    return history.payload_encoding(value)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:45: in payload_encoding
+    check(request)
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:41: in check
+    for item in value.values():check(item)
+                               ^^^^^^^^^^^
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:41: in check
+    for item in value.values():check(item)
+                               ^^^^^^^^^^^
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:43: in check
+    for item in value:check(item)
+                      ^^^^^^^^^^^
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:41: in check
+    for item in value.values():check(item)
+                               ^^^^^^^^^^^
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:37: in check
+    require(kind in (dict,list),'unsupported_public_payload_type')
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+value = False, reason = 'unsupported_public_payload_type'
+
+    def require(value,reason):
+&gt;       if not value:raise ValueError('historical_adapter:'+reason)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: historical_adapter:unsupported_public_payload_type
+
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:26: ValueError</failure></testcase><testcase classname="tests.test_g31_foundation_request_context" name="test_legacy_rebuild_and_two_predicts_remain_independent_reference[3]" time="1.059"><failure message="ValueError: historical_adapter:unsupported_public_payload_type">transitions = [{'schema': 'g31.foundation.later_transition.v1', 'owner': 'A', 'phase': 'first_return', 'observation': {'schema': 'g3...ma': 'g31.foundation.later_actor.v1', 'owner': 'B', 'phase': 'first_reuse_route', 'at': 10.219999999999997, ...}, ...}]
+index = 3
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000002EC9CD8F650&gt;
+
+    @pytest.mark.parametrize('index', [0, 1, 3])
+    def test_legacy_rebuild_and_two_predicts_remain_independent_reference(transitions, index, monkeypatch):
+        evidence = saved_evidence(transitions, index)
+        original = later.build_seed
+        calls = []
+        def counted(source):
+            calls.append(source)
+            return original(source)
+        monkeypatch.setattr(later, 'build_seed', counted)
+        seed = later.build_seed(evidence)
+        actions = later.ACTIONS[seed['phase']]
+        predicted = {action: later.predict(seed, action) for action in actions}
+        assert len(calls) == 3
+        expected = transitions[index]['model_report']
+&gt;       assert later.delivered.encoded(predicted) == later.delivered.encoded(expected['candidate_results'])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_foundation_request_context.py:70: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\live_obligation_delivered_context.py:28: in encoded
+    return history.payload_encoding(value)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:45: in payload_encoding
+    check(request)
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:41: in check
+    for item in value.values():check(item)
+                               ^^^^^^^^^^^
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:41: in check
+    for item in value.values():check(item)
+                               ^^^^^^^^^^^
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:43: in check
+    for item in value:check(item)
+                      ^^^^^^^^^^^
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:41: in check
+    for item in value.values():check(item)
+                               ^^^^^^^^^^^
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:37: in check
+    require(kind in (dict,list),'unsupported_public_payload_type')
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+value = False, reason = 'unsupported_public_payload_type'
+
+    def require(value,reason):
+&gt;       if not value:raise ValueError('historical_adapter:'+reason)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       ValueError: historical_adapter:unsupported_public_payload_type
+
+scripts\experiments\g31_ics_circulation\live_obligation_historical_adapter.py:26: ValueError</failure></testcase><testcase classname="tests.test_g31_foundation_request_context" name="test_private_graph_rebinds_aliases_and_nested_namespaces_without_global_mutation" time="0.044" /><testcase classname="tests.test_g31_foundation_request_context" name="test_static_catalog_is_once_per_request_and_every_read_is_isolated" time="0.076" /><testcase classname="tests.test_g31_foundation_request_context" name="test_every_changed_dynamic_fact_matches_legacy_unknown[missing_entry]" time="0.084" /><testcase classname="tests.test_g31_foundation_request_context" name="test_every_changed_dynamic_fact_matches_legacy_unknown[entry_generation]" time="0.092" /><testcase classname="tests.test_g31_foundation_request_context" name="test_every_changed_dynamic_fact_matches_legacy_unknown[expired]" time="0.083" /><testcase classname="tests.test_g31_foundation_request_context" name="test_every_changed_dynamic_fact_matches_legacy_unknown[undelivered]" time="0.069" /><testcase classname="tests.test_g31_foundation_request_context" name="test_every_changed_dynamic_fact_matches_legacy_unknown[wrong_status]" time="0.113" /><testcase classname="tests.test_g31_foundation_request_context" name="test_every_changed_dynamic_fact_matches_legacy_unknown[peer_owner]" time="0.078" /><testcase classname="tests.test_g31_foundation_request_context" name="test_every_changed_dynamic_fact_matches_legacy_unknown[receiving]" time="0.183" /><testcase classname="tests.test_g31_foundation_request_context" name="test_every_changed_dynamic_fact_matches_legacy_unknown[own_generation]" time="0.070" /><testcase classname="tests.test_g31_foundation_request_context" name="test_every_changed_dynamic_fact_matches_legacy_unknown[own_owner]" time="0.073" /><testcase classname="tests.test_g31_foundation_request_context" name="test_every_changed_dynamic_fact_matches_legacy_unknown[pending]" time="0.187" /><testcase classname="tests.test_g31_foundation_request_context" name="test_every_changed_dynamic_fact_matches_legacy_unknown[calls]" time="0.082" /><testcase classname="tests.test_g31_foundation_request_context" name="test_actions_are_explicit_bounded_and_never_silently_fallback[actions0]" time="0.008" /><testcase classname="tests.test_g31_foundation_request_context" name="test_actions_are_explicit_bounded_and_never_silently_fallback[actions1]" time="0.006" /><testcase classname="tests.test_g31_foundation_request_context" name="test_actions_are_explicit_bounded_and_never_silently_fallback[actions2]" time="0.210" /><testcase classname="tests.test_g31_foundation_request_context" name="test_actions_are_explicit_bounded_and_never_silently_fallback[actions3]" time="0.008" /><testcase classname="tests.test_g31_foundation_request_context" name="test_actions_are_explicit_bounded_and_never_silently_fallback[actions4]" time="0.008" /><testcase classname="tests.test_g31_foundation_request_context" name="test_actions_are_explicit_bounded_and_never_silently_fallback[actions5]" time="0.007" /><testcase classname="tests.test_g31_foundation_request_context" name="test_external_seed_dictionary_cannot_bypass_fresh_evidence_validation" time="0.009" /><testcase classname="tests.test_g31_foundation_request_context" name="test_mutation_between_candidates_invalidates_whole_request" time="0.223" /><testcase classname="tests.test_g31_foundation_request_context" name="test_source_pins_cover_static_generation_and_seed_factory" time="0.210" /><testcase classname="tests.test_g31_foundation_request_context" name="test_changed_pinned_bytes_fail_closed" time="0.030" /><testcase classname="tests.test_g31_foundation_request_context" name="test_filesystem_failures_are_unknown_not_unhandled[source_check]" time="0.005" /><testcase classname="tests.test_g31_foundation_request_context" name="test_filesystem_failures_are_unknown_not_unhandled[read_pins]" time="0.022" /><testcase classname="tests.test_g31_foundation_request_context" name="test_filesystem_failures_are_unknown_not_unhandled[exit]" time="0.195" /></testsuite></testsuites>

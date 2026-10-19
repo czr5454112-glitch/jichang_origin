@@ -157,20 +157,75 @@ def _measure(timings, stage):
         timings[stage] = timings.get(stage, 0) + time.perf_counter_ns() - started
 
 
-def _requested(public, actions, budget, incumbent_index, scorer, model_version, indices):
+def public_compatible_indices(owner, actions):
+    domain.partition(actions)
+    require(owner in compatibility.OWNER_FIELDS, 'known_public_contract_owner')
+    baseline = actions[4]
+    require(teacher.encoding(baseline) == teacher.encoding(compatibility.protocol.incumbent_action()),
+        'unchanged_public_incumbent')
+    indices = ([4] if owner == 'A' else [index for index, action in enumerate(actions)
+        if all(domain.token(action[field]) == domain.token(baseline[field])
+            for field in compatibility.OWNER_FIELDS['A'])])
+    require(indices == ([4] if owner == 'A' else [0, 1, 4, 5, 8, 9, 12, 13]),
+        'frozen_public_compatible_domain')
+    return indices
+
+
+def _requested(public, actions, budget, incumbent_index, scorer, model_version, indices,
+               *, allowed_indices=None, prefix_budget=None, ranking_policy='score'):
     require(type(budget) is int and 1 <= budget <= len(actions), 'candidate_budget')
     require(type(incumbent_index) is int and incumbent_index == 4, 'frozen_incumbent04')
+    allowed = list(range(len(actions))) if allowed_indices is None else list(allowed_indices)
+    require(allowed and len(allowed) == len(set(allowed)) and incumbent_index in allowed
+        and all(type(index) is int and 0 <= index < len(actions) for index in allowed), 'public_candidate_domain')
+    groups = domain.partition(actions)['groups']
+    prefixes = {index: group['prefix_index'] for group in groups for index in group['candidate_indices']}
+    require(prefix_budget is None or type(prefix_budget) is int and 1 <= prefix_budget <= len(groups), 'prefix_budget')
+    require(ranking_policy in ('score', 'marginal_prefix_cost'), 'ranking_policy')
+    limit = len(groups) if prefix_budget is None else prefix_budget
+    accounting = {'eligible_candidate_indices': allowed, 'legal_domain_size': len(allowed),
+        'scored_candidate_indices': [], 'scoring_row_count': 0, 'candidate_budget': budget,
+        'prefix_budget': prefix_budget, 'ranking_policy': ranking_policy,
+        'incremental_cost_scope': 'Unit prefix setup plus unit suffix; ranking heuristic, not milliseconds or calibrated prediction.',
+        'incremental_cost_units': {'new_prefix': 1, 'suffix': 1}, 'selection_steps': []}
     if indices is not None:
         require(type(indices) in (tuple, list) and 1 <= len(indices) <= budget
-            and all(type(index) is int and 0 <= index < len(actions) for index in indices)
+            and all(type(index) is int and index in allowed for index in indices)
             and len(set(indices)) == len(indices) and incumbent_index in indices, 'explicit_budget_includes_incumbent')
-        return (incumbent_index, *(index for index in indices if index != incumbent_index)), None
-    function = score_candidates if scorer is None else scorer
-    values = function(observation=copy.deepcopy(public), candidates=copy.deepcopy(actions), model_version=model_version)
-    require(type(values) in (list, tuple) and len(values) == len(actions)
-        and all(type(value) in (int, float) and math.isfinite(value) for value in values), 'finite_same_order_scores')
-    ranked = sorted(range(len(actions)), key=lambda index: (-values[index], index))
-    return (incumbent_index, *[index for index in ranked if index != incumbent_index][:budget - 1]), list(values)
+        requested = [incumbent_index, *(index for index in indices if index != incumbent_index)]
+        require(len({prefixes[index] for index in requested}) <= limit, 'explicit_prefix_budget')
+        scores = None
+    else:
+        function = score_candidates if scorer is None else scorer
+        values = function(observation=copy.deepcopy(public), candidates=copy.deepcopy([actions[index] for index in allowed]),
+            model_version=model_version)
+        require(type(values) in (list, tuple) and len(values) == len(allowed)
+            and all(type(value) in (int, float) and math.isfinite(value) for value in values), 'finite_same_order_scores')
+        scores = [None] * len(actions)
+        for index, value in zip(allowed, values, strict=True):
+            scores[index] = value
+        accounting.update(scored_candidate_indices=list(allowed), scoring_row_count=len(allowed))
+        requested, used_prefixes = [incumbent_index], {prefixes[incumbent_index]}
+        while len(requested) < budget:
+            available = [index for index in allowed if index not in requested
+                and (prefixes[index] in used_prefixes or len(used_prefixes) < limit)]
+            if not available:
+                break
+            selected = min(available, key=lambda index: (
+                int(prefixes[index] not in used_prefixes) if ranking_policy == 'marginal_prefix_cost' else 0,
+                -scores[index], index))
+            requested.append(selected)
+            used_prefixes.add(prefixes[selected])
+    used_prefixes = set()
+    for index in requested:
+        new_prefix = prefixes[index] not in used_prefixes
+        accounting['selection_steps'].append({'candidate_index': index, 'prefix_index': prefixes[index],
+            'new_prefix': new_prefix, 'incremental_cost_units': 1 + int(new_prefix)})
+        used_prefixes.add(prefixes[index])
+    accounting.update(requested_prefix_indices=sorted(used_prefixes), requested_prefix_count=len(used_prefixes),
+        requested_candidate_count=len(requested), eligible_candidates_not_requested=len(allowed) - len(requested),
+        estimated_total_cost_units=len(used_prefixes) + len(requested))
+    return tuple(requested), scores, accounting
 
 
 def _selection(result, decision, incumbent_index):
@@ -195,7 +250,8 @@ def _selection(result, decision, incumbent_index):
 
 
 def evaluate_budgeted(decision, *, budget=8, incumbent_index=4, scorer=None,
-                      model_version='semantic_rule_v1', candidate_indices=None):
+                      model_version='semantic_rule_v1', candidate_indices=None, compatible_only=False,
+                      prefix_budget=None, ranking_policy='score'):
     """Rank legal observation data before any rollout; K includes incumbent04.
 
 Only a real, still-current InitialDecision is accepted. This returns advice,
@@ -222,8 +278,15 @@ actual submission, ACK and physical outcomes remain the caller's obligation.
             origin.require_current(decision)
             audit = decision.audit_copy()
             result.update(owner=audit['owner'], initial_public_sha256=audit['public_sha256'], actual_collection_at=audit['at'])
-            requested, scores = _requested(audit['public'], actions, budget, incumbent_index, scorer, model_version, candidate_indices)
-            result.update(requested_indices=list(requested), scores=scores, candidate_budget=budget)
+            require(type(compatible_only) is bool, 'compatible_only_boolean')
+            allowed = public_compatible_indices(audit['owner'], actions) if compatible_only else list(range(len(actions)))
+            requested, scores, accounting = _requested(audit['public'], actions, budget, incumbent_index,
+                scorer, model_version, candidate_indices, allowed_indices=allowed,
+                prefix_budget=prefix_budget, ranking_policy=ranking_policy)
+            result.update(requested_indices=list(requested), scores=scores, candidate_budget=budget,
+                allocation=accounting, public_compatibility_filter={'enabled': compatible_only,
+                    'contract': compatibility.CONTRACT if compatible_only else None,
+                    'source': 'current owner and unchanged public action components only; no teacher or protection labels'})
             result['counts']['requested_candidates'] = len(requested)
             for index in requested:
                 result['rows'][index]['status'] = 'unknown_unexecuted'
@@ -287,6 +350,7 @@ actual submission, ACK and physical outcomes remain the caller's obligation.
             result['rows'][index].update(status='unknown_origin_or_provider', completion=None)
     result['counts']['known_candidate_predictions'] = sum(compatibility.known(row) for row in result['rows'])
     result['evaluated_candidate_count'] = result['counts']['future_resumes']
+    result['evaluated_prefix_count'] = result['counts']['initial_engines']
     if 'owner' in result and result['requested_indices']:
         try:
             with _measure(timings, 'protected_selection_and_current_revalidation'):

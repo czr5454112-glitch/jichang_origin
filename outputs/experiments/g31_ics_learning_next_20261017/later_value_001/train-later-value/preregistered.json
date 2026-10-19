@@ -1,0 +1,80 @@
+{
+  "schema": "g31.foundation_learning.pilot.v1",
+  "command": "train-later-value",
+  "config": {
+    "schema": "g31.foundation_learning.pilot.v1",
+    "run_id": "later_value_001",
+    "pipeline_stage": "later_value",
+    "source_plan": {
+      "path": "C:/Users/38908/Downloads/G31_ICS_REVIEW_da8d39ed_LEARNING_NEXT_20261017.md",
+      "sha256": "86cb48f19d9e42ddcb35eda81cf0cebdfd1a941b707e26026a09ce23d1121658"
+    },
+    "native_contract": "outputs/experiments/g31_ics_lt2_sustained_20261014/native027_accepted_contract_001.json",
+    "runtime_mode": "offline_sync",
+    "information_scope": "owner_local_delivered",
+    "baseline": "retained_incumbent_04",
+    "scenario": "mechanism",
+    "horizon_seconds": 40,
+    "message_tape": "normal",
+    "candidate_budget": 2,
+    "refresh": {
+      "implemented_mode": "retained_initial_reference"
+    },
+    "protection": {
+      "tolerance": 0,
+      "incumbent_index": 4,
+      "takeover_authorized": false
+    },
+    "learner": {
+      "models": [
+        "ridge_continuation_value"
+      ],
+      "device": "cpu",
+      "alpha": 1,
+      "seed": 17
+    },
+    "command_override": {
+      "command": "train-later-value",
+      "model": "ridge_continuation_value",
+      "alpha": 1,
+      "split": "entire_scenario_grouped; single mechanism scenario has no independent generalization claim",
+      "data": "new closed native later episodes only; never old initial candidate rows",
+      "objective": "finite episode undiscounted observed-job remaining completion value",
+      "diagnostic_interventions": "allowed as explicitly labeled offline supervised data only",
+      "RL": "not trained without protected effective nondefault temporal decisions"
+    },
+    "compute_delay_mode": "offline_sync_no_realtime_claim",
+    "complete_request_target_ms": 100,
+    "limits": {
+      "command_wall_seconds": 60,
+      "training_wall_seconds": 30,
+      "maximum_training_rows": 100,
+      "maximum_transitions": 100
+    },
+    "output_root": "outputs/experiments/g31_ics_learning_next_20261017"
+  },
+  "config_path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\configs\\g31_ics_circulation\\learning_next_value_v1.json",
+  "config_sha256": "ad7a379e614423b6c8c0f648b62e5fd3d49a2a581ddd5fb9b2689727977ad55e",
+  "dataset_argument": "outputs/experiments/g31_ics_learning_next_20261017/later_native_training_manifest_001.json",
+  "model_dir_argument": null,
+  "source_sha256_before": {
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_budgeted_probe.py": "884323fec200821312130ebd37e166cf45e32bcc96eccb01fa27352aaa20a0c6",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_budgeted_provider.py": "89073f7177a35662094fe8e885aed51c56402f0780d577ae1754af411bc7c869",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_compatible_probe.py": "76e5a3c3359c8de66c48f33e1b164bd93f1da9fcdcdf79d2c0e4c6a995be9815",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_later_campaign.py": "7fb82c930085718f89614022907b941b2acc1f79939c660a71029a00085cfd90",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_later_control.py": "6f82bec1850e8ef14d974491cc941aa0640c0c4fa48d40b418e2c90a49a6cd85",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_later_episode.py": "c229d94c1a770589107b264f3cc22e5ba2c9588afe52d56d705d8c54b0b04df8",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_later_learning.py": "3d51749da96c701dd7fdbbdbf611e932ab0615257c4f78c0da328ce2a87d55fe",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_later_seed.py": "8b90944da589f6e6b8684629269d7bc97825cd6037847baf5697443d3d04f4e9",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_learning_data.py": "9824ee0f507f01cc82a83ff838e00b532f69322823d05adcb41759028bd956e9",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_native_environment.py": "383d89857971e63780ee8d1e16785a40caa0c5a73275d9f6f1817fa208a59608",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_ranker.py": "141b67108bd18506aa9b89a3efa05c325303b86977735f3100fee706519832ed",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\run_learning_pipeline.py": "7af4fb589ddd34bb463c5cc01d1beca73178802d27596bdb61b5b73bce5026bc"
+  },
+  "python": "3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]",
+  "platform": "Windows-10-10.0.26200-SP0",
+  "processor": "Intel64 Family 6 Model 170 Stepping 4, GenuineIntel",
+  "logical_cpu_count": 22,
+  "clock_scope": "Full child lifecycle, separately from worker wall and CPU.",
+  "source_scope": "Foundation Python sources only; native and dataset identities are recorded by their stages."
+}

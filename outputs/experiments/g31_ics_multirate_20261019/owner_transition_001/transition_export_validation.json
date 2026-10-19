@@ -1,0 +1,74 @@
+{
+  "status": "passed",
+  "sources": [
+    {
+      "receipt_path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_multirate_20261019\\owner_transition_001\\guarded_default\\episode\\native\\receipt.json",
+      "receipt_sha256": "e08db0316c42d52ea008ed2f96412c35497a6383f6c791229da8ce31a4a77f28",
+      "raw_path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_multirate_20261019\\owner_transition_001\\guarded_default\\episode\\native\\raw.json.gz",
+      "raw_sha256": "28c73a19a1a67587ec5dcafa870125ccd033b307d1d57449b79b23e0b1991833"
+    }
+  ],
+  "transitions": [
+    {
+      "schema": "g31.foundation.later_transition.v2",
+      "owner": "A",
+      "phase": "first_return",
+      "selected_at": 7.339999999999996,
+      "next_observation": null,
+      "delta_sim_time_s": 32.660000000000004,
+      "terminated": true,
+      "truncated": false,
+      "ACK_status": "received"
+    },
+    {
+      "schema": "g31.foundation.later_transition.v2",
+      "owner": "B",
+      "phase": "first_reuse_route",
+      "selected_at": 9.689999999999994,
+      "next_observation": null,
+      "delta_sim_time_s": 30.310000000000006,
+      "terminated": true,
+      "truncated": false,
+      "ACK_status": "not_applicable_no_command"
+    }
+  ],
+  "saved_baseline_comparison": {
+    "status": "exact_saved_baseline_trajectory",
+    "reference": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\compatible_initial_native_20261017_004\\mechanism\\incumbent.raw.json.gz",
+      "sha256": "afc3f1cd434832be891ea28f400bc74a121ba7dbff058885d9f544643db37ade"
+    },
+    "input_exact": true,
+    "compared_native_result_fields": [
+      "receipts",
+      "jobs",
+      "trays"
+    ],
+    "all_fields_exact": true,
+    "trajectory_equivalence": true,
+    "scope": "same input and method against prior closed native execution; no new paired execution or general shadow proof"
+  },
+  "extracted_rows": 2,
+  "training_performed": false,
+  "same_owner_multi_decision_support": false,
+  "rl_support": {
+    "status": "blocked_L1_not_certified",
+    "training_started": false,
+    "actual_native_rows": 2,
+    "independent_scene_count": 1,
+    "actual_temporal_points_by_episode": {
+      "28c73a19a1a67587ec5dcafa870125ccd033b307d1d57449b79b23e0b1991833": 2
+    },
+    "multiple_protected_actions_at_point_by_episode": {
+      "28c73a19a1a67587ec5dcafa870125ccd033b307d1d57449b79b23e0b1991833": 0
+    },
+    "protected_executed_nondefault_rows": 0,
+    "missing_capabilities": [
+      "Protected nondefault action with attributable actual effects and at least two meaningful temporal choice points.",
+      "Independent native evaluation of a trained multi-step policy; continuation-value fitting is not RL."
+    ],
+    "allowed_next_training": "supervised_value_only_on_explicit_actual_behavior_data",
+    "L1_certified": false,
+    "complete_request_100ms_certified": false
+  }
+}

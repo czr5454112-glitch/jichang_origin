@@ -1,0 +1,49 @@
+........................................................................ [ 10%]
+........................................................................ [ 20%]
+........................................................................ [ 30%]
+........................................................................ [ 41%]
+........................................................................ [ 51%]
+........................................................................ [ 61%]
+........................................................................ [ 72%]
+.............................................F.......................... [ 82%]
+........................................................................ [ 92%]
+...................................................                      [100%]
+================================== FAILURES ===================================
+___________ test_source_archive_short_paths_preserve_full_identity ____________
+
+tmp_path = WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_learning_next_20261017/final_validation_002/pytest_tmp/test_source_archive_short_path0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001CEBB702F10>
+
+    def test_source_archive_short_paths_preserve_full_identity(tmp_path, monkeypatch):
+        monkeypatch.setattr(foundation, 'ROOT', tmp_path)
+        directory = tmp_path / 'original' / 'deep'
+        directory.mkdir(parents=True)
+        sources = [directory / ('long_source_name_' * 5 + suffix + '.py') for suffix in ('first', 'second')]
+        for index, source in enumerate(sources):
+>           source.write_text(f'VALUE = {index}\n', encoding='utf-8')
+
+tests\test_g31_foundation_native_environment.py:168: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+..\..\python3.11.9\Lib\pathlib.py:1078: in write_text
+    with self.open(mode='w', encoding=encoding, errors=errors, newline=newline) as f:
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_learning_next_20261017/fin...ort_path0/original/deep/long_source_name_long_source_name_long_source_name_long_source_name_long_source_name_first.py')
+mode = 'w', buffering = -1, encoding = 'utf-8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+>       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_learning_next_20261017\\final_validation_002\\pytest_tmp\\test_source_archive_short_path0\\original\\deep\\long_source_name_long_source_name_long_source_name_long_source_name_long_source_name_first.py'
+
+..\..\python3.11.9\Lib\pathlib.py:1044: FileNotFoundError
+=========================== short test summary info ===========================
+FAILED tests/test_g31_foundation_native_environment.py::test_source_archive_short_paths_preserve_full_identity

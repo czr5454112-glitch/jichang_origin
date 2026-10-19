@@ -86,7 +86,7 @@ def _secondary(progress, phase, error):
 
 
 def choose_and_submit(native, session, client, owner, publication_id, accepted, *,
-                      arm, incumbent_index, progress):
+                      arm, incumbent_index, progress, initial_selector=None):
     """One owner invocation; native exceptions propagate with partial evidence.
 
 The enclosing caller must start its complete request clock before publications
@@ -97,6 +97,7 @@ as JSON. The selected suffix is initially nonbinding, not a rolling replan.
 """
     started = time.perf_counter_ns()
     require(type(progress) is dict and not progress, 'fresh_progress_sink')
+    require(initial_selector is None or callable(initial_selector), 'explicit_initial_selector')
     require(owner in ('A', 'B') and arm in ARMS and type(incumbent_index) is int
             and 0 <= incumbent_index < 32, 'predeclared_arm_and_incumbent')
     progress.update(schema=SCHEMA, owner=owner, arm=arm, incumbent_index=incumbent_index,
@@ -119,8 +120,19 @@ as JSON. The selected suffix is initially nonbinding, not a rolling replan.
         progress['collection'] = decision.audit_copy()
         method, restriction = ARMS[arm]
         progress['stage'] = 'same32_provider_and_selection'
-        selection = search.propose_initial(decision, method=method,
-            incumbent_index=incumbent_index, restriction=restriction)
+        if initial_selector is None:
+            selection = search.propose_initial(decision, method=method,
+                incumbent_index=incumbent_index, restriction=restriction)
+        else:
+            progress['stage'] = 'explicit_budgeted_initial_selection'
+            before_state, before_time = session.offline_state_sha256(), session.physical_time
+            selection = initial_selector(decision)
+            origin.require_current(decision)
+            require(session.offline_state_sha256() == before_state and session.physical_time == before_time,
+                'initial_selector_changed_native_truth')
+            require(type(selection) is dict, 'initial_selector_plain_proposal')
+            restriction = 'explicit_queried_protected_selection'
+            progress['initial_selector_enabled'] = True
         progress['selection'] = selection
         action = selection.get('selected_action')
         if action is None:
@@ -156,6 +168,9 @@ as JSON. The selected suffix is initially nonbinding, not a rolling replan.
             'local_initial_estimate_vector': copy.deepcopy(action),
             'component_compatibility_contract': compatible['contract'],
             'peer_proposal_read': False, 'later_model_reestimation_performed': False}
+        if initial_selector is not None:
+            causal['initial_selector'] = {key: copy.deepcopy(selection[key])
+                for key in ('selector_mode', 'model_version', 'selected_index')}
         payload = {k: v for k, v in component.items() if k != 'kind'}
         creating_root = client.context['root_id']
         before_submit = _own_ids(client, owner)

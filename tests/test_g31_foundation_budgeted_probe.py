@@ -61,6 +61,24 @@ def test_full_prediction_not_only_endpoint_comparison(comparison):
     assert result['conditional_protected_regret_s'] is None
 
 
+@pytest.mark.parametrize('original,changed', [(1, True), (0, False), (1, 1.), (0., -0.)])
+def test_strict_prediction_encoding_rejects_python_numeric_equality(comparison, original, changed):
+    measured, teacher = comparison
+    measured['report']['rows'][0]['prediction']['typed_field'] = changed
+    teacher['selection']['provider_evidence']['rows'][0]['prediction']['typed_field'] = original
+    assert measured['report']['rows'][0]['prediction'] == teacher['selection']['provider_evidence']['rows'][0]['prediction']
+    result = probe.compare_variant(*comparison)
+    row = next(row for row in result['comparisons'] if row['candidate_index'] == 0)
+    assert not row['prediction_exact']
+    assert row['budgeted_prediction_sha256'] != row['teacher_prediction_sha256']
+    assert not result['all_requested_prediction_parity']
+    assert result['conditional_protected_regret_s'] is None
+
+
+def test_canonical_strict_comparison_ignores_dictionary_insertion_order():
+    assert probe.strict_equal({'first': 1, 'second': [True, 1.]}, {'second': [True, 1.], 'first': 1})
+
+
 def test_unknown_teacher_not_hidden_as_complete_optimum(comparison):
     comparison[1]['selection']['provider_evidence']['rows'][31].update(status='unknown', completion=None)
     result = probe.compare_variant(*comparison)

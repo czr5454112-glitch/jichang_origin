@@ -42,8 +42,16 @@ def sha(path):
     return hashlib.sha256(Path(path).read_bytes()).hexdigest()
 
 
+def canonical_encoding(value):
+    return json.dumps(value, sort_keys=True, allow_nan=False, separators=(',', ':'))
+
+
 def digest(value):
-    return hashlib.sha256(provider.teacher.encoding(value).encode()).hexdigest()
+    return hashlib.sha256(canonical_encoding(value).encode()).hexdigest()
+
+
+def strict_equal(left, right):
+    return canonical_encoding(left) == canonical_encoding(right)
 
 
 def reference(path):
@@ -130,14 +138,13 @@ def compare_variant(measured, teacher):
     report = measured['report']
     rows = teacher['selection']['provider_evidence']['rows']
     evidence = teacher['selection']['provider_evidence']
-    same_context = (report['owner'] == evidence['owner']
-        and report['initial_public_sha256'] == evidence['initial_public_sha256']
-        and report['actual_collection_at'] == evidence['actual_collection_at'])
+    same_context = all(strict_equal(report[field], evidence[field])
+        for field in ('owner', 'initial_public_sha256', 'actual_collection_at'))
     requested = report['requested_indices']
     comparisons = [{
-        'candidate_index': index, 'action_exact': report['rows'][index]['action'] == rows[index]['action'],
-        'completion_exact': report['rows'][index]['completion'] == rows[index]['completion'],
-        'prediction_exact': report['rows'][index].get('prediction') == rows[index].get('prediction'),
+        'candidate_index': index, 'action_exact': strict_equal(report['rows'][index]['action'], rows[index]['action']),
+        'completion_exact': strict_equal(report['rows'][index]['completion'], rows[index]['completion']),
+        'prediction_exact': strict_equal(report['rows'][index].get('prediction'), rows[index].get('prediction')),
         'both_known': provider.compatibility.known(report['rows'][index]) and provider.compatibility.known(rows[index]),
         'budgeted_prediction_sha256': digest(report['rows'][index].get('prediction')),
         'teacher_prediction_sha256': digest(rows[index].get('prediction'))} for index in requested]
@@ -161,6 +168,7 @@ def compare_variant(measured, teacher):
     closed = report['source_binding'].get('close_completed') is True
     proof_uses = report['source_binding'].get('before_close', {}).get('proof_binding', {}).get('proof_uses')
     return {'status': 'same_context_exact_requested_predictions' if parity and closed else 'unknown_or_mismatched_predictions',
+        'parity_encoding': 'sorted_json_preserving_bool_int_float_and_negative_zero',
         'same_context': same_context, 'all_requested_prediction_parity': parity, 'comparisons': comparisons,
         'requested_indices': requested, 'budget_including_incumbent': report['candidate_budget'],
         'counts': report['counts'], 'teacher_counts': evidence['counts'], 'closed_source_binding': closed,

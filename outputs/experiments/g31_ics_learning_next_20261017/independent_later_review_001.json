@@ -1,0 +1,487 @@
+{
+  "schema": "g31.independent_later_evidence_review.v1",
+  "status": "passed_with_conditional_and_diagnostic_limitations",
+  "branches": {
+    "guarded_default": {
+      "references": {
+        "raw": {
+          "path": "outputs/experiments/g31_ics_learning_next_20261017/later_episodes_001/guarded_default/episode/native/raw.json.gz",
+          "sha256": "f49b8048d018f7a6db1f188ee961dfbfae5281bc171427e152d495f2f98a937d"
+        },
+        "native_receipt": {
+          "path": "outputs/experiments/g31_ics_learning_next_20261017/later_episodes_001/guarded_default/episode/native/receipt.json",
+          "sha256": "174ce6bc3682a2d831c056f2e2772b5d5f606cad5f20c1a1761ab0bc2d069013"
+        },
+        "outer_receipt": {
+          "path": "outputs/experiments/g31_ics_learning_next_20261017/later_episodes_001/guarded_default/receipt.json",
+          "sha256": "4a59cef1b194c5253277f709889be617eee82728477bf46b58a817c3c5654c06"
+        },
+        "worker_report": {
+          "path": "outputs/experiments/g31_ics_learning_next_20261017/later_episodes_001/guarded_default/worker_report.json",
+          "sha256": "1d1504a6c9dfea7e94dc1c9dc55015a2152ab793a851ad29e00823d857ce0481"
+        }
+      },
+      "process_wall_s": 52.296000000002095,
+      "completion_from_five_unload_receipts": {
+        "loaded": 7.1999999999999975,
+        "receiver": 10.12,
+        "blocker": 11.349999999999998,
+        "reuse1": 13.049999999999997,
+        "reuse2": 18.46
+      },
+      "transitions": [
+        {
+          "owner": "A",
+          "at": 7.339999999999996,
+          "action": "return_now",
+          "behavior_mode": "guarded",
+          "guard_status": "passed",
+          "command_id": "live:1:A:return-0",
+          "request": {
+            "request_id": "live:1:A:return-0",
+            "owner_id": "A",
+            "tray_id": "L",
+            "source": 6,
+            "destination": 7,
+            "earliest_departure": 7.339999999999996,
+            "expiry": 39.0,
+            "message_delay": 0.01
+          },
+          "ACK": {
+            "sequence": 6,
+            "attempt": 6,
+            "observed_at": 9.579999999999995,
+            "delivered_at": 9.599999999999994,
+            "status": "received",
+            "reason": "",
+            "received_at": 9.549999999999995
+          },
+          "ACK_status": "received",
+          "ACK_observed_at": 9.599999999999994,
+          "next_edge_enter": {
+            "time": 7.449999999999996,
+            "event": "EDGE_ENTER",
+            "business_bag_id": "",
+            "transport_leg_id": "live:1:A:return-0:empty_return:4",
+            "tray_id": "L",
+            "traversal_id": 7,
+            "node": 6,
+            "from": 6,
+            "to": 7,
+            "reason": ""
+          },
+          "actor_state_check": {
+            "native_state_before": "77667887ba972f2ce44814e4c6c2f9859ecd0ee3683b30d759d445db83d21b6d",
+            "native_state_after": "77667887ba972f2ce44814e4c6c2f9859ecd0ee3683b30d759d445db83d21b6d",
+            "physical_time_before": 7.339999999999996,
+            "physical_time_after": 7.339999999999996,
+            "scope": "new callback isolation evidence only; hashes are not actor inputs"
+          },
+          "guard_deltas": {
+            "return_now": {
+              "reuse1": 0.0,
+              "reuse2": 0.0,
+              "receiver": 0.0,
+              "blocker": 0.0,
+              "loaded": 0.0
+            },
+            "return_not_before_7_84": {
+              "reuse1": 0.08999999999999986,
+              "reuse2": 0.08999999999999986,
+              "receiver": 0.0,
+              "blocker": 0.0,
+              "loaded": 0.0
+            }
+          },
+          "next_observation_exact": true,
+          "delta_sim_time_s": 2.349999999999998,
+          "terminated": false,
+          "truncated": false,
+          "selected_conditional_prediction_matches_actual_terminal": true
+        },
+        {
+          "owner": "B",
+          "at": 9.689999999999994,
+          "action": "native_default",
+          "behavior_mode": "guarded",
+          "guard_status": "passed",
+          "command_id": null,
+          "request": null,
+          "ACK": null,
+          "ACK_status": "not_applicable_no_command",
+          "ACK_observed_at": null,
+          "next_edge_enter": {
+            "time": 10.149999999999999,
+            "event": "EDGE_ENTER",
+            "business_bag_id": "reuse1",
+            "transport_leg_id": "reuse1:direct:7",
+            "tray_id": "L",
+            "traversal_id": 12,
+            "node": 7,
+            "from": 7,
+            "to": 3,
+            "reason": ""
+          },
+          "actor_state_check": {
+            "native_state_before": "bc481141e2dc0aeeb23bc0a180c7d435e1d3274f520c25468a583adc6ce46ff6",
+            "native_state_after": "bc481141e2dc0aeeb23bc0a180c7d435e1d3274f520c25468a583adc6ce46ff6",
+            "physical_time_before": 9.689999999999994,
+            "physical_time_after": 9.689999999999994,
+            "scope": "new callback isolation evidence only; hashes are not actor inputs"
+          },
+          "guard_deltas": {
+            "native_default": {
+              "reuse1": 0.0,
+              "reuse2": 0.0,
+              "receiver": 0.0,
+              "blocker": 0.0,
+              "loaded": 0.0
+            },
+            "prefer_8": {
+              "reuse1": 0.899999999999995,
+              "reuse2": 0.8999999999999986,
+              "receiver": 0.0,
+              "blocker": 0.0,
+              "loaded": 0.0
+            }
+          },
+          "next_observation_exact": true,
+          "delta_sim_time_s": 30.310000000000006,
+          "terminated": true,
+          "truncated": false,
+          "selected_conditional_prediction_matches_actual_terminal": true
+        }
+      ],
+      "same_tray_returns": [
+        {
+          "time": 9.549999999999995,
+          "event": "EMPTY_RECEIVED",
+          "business_bag_id": "",
+          "transport_leg_id": "live:1:A:return-0:empty_return:4",
+          "tray_id": "L",
+          "traversal_id": 7,
+          "node": 7,
+          "from": -1,
+          "to": 7,
+          "reason": "live:1:A:return-0"
+        },
+        {
+          "time": 15.359999999999996,
+          "event": "EMPTY_RECEIVED",
+          "business_bag_id": "",
+          "transport_leg_id": "live:1:A:return-1:empty_return:8",
+          "tray_id": "L",
+          "traversal_id": 15,
+          "node": 7,
+          "from": -1,
+          "to": 7,
+          "reason": "live:1:A:return-1"
+        }
+      ],
+      "same_tray_reloads": [
+        {
+          "time": 9.549999999999995,
+          "event": "LOAD_START",
+          "business_bag_id": "reuse1",
+          "transport_leg_id": "",
+          "tray_id": "L",
+          "traversal_id": 7,
+          "node": 7,
+          "from": -1,
+          "to": -1,
+          "reason": ""
+        },
+        {
+          "time": 15.359999999999996,
+          "event": "LOAD_START",
+          "business_bag_id": "reuse2",
+          "transport_leg_id": "",
+          "tray_id": "L",
+          "traversal_id": 15,
+          "node": 7,
+          "from": -1,
+          "to": -1,
+          "reason": ""
+        }
+      ],
+      "status": "passed_with_conditional_and_diagnostic_limitations"
+    },
+    "diagnostic_prefer8": {
+      "references": {
+        "raw": {
+          "path": "outputs/experiments/g31_ics_learning_next_20261017/later_episodes_001/diagnostic_prefer8/episode/native/raw.json.gz",
+          "sha256": "7bbf7bd112245edd3b025c58496f96678ed9b4e8a73331c7f40c97e922ae50b5"
+        },
+        "native_receipt": {
+          "path": "outputs/experiments/g31_ics_learning_next_20261017/later_episodes_001/diagnostic_prefer8/episode/native/receipt.json",
+          "sha256": "d0f9a6a7c70c62c62256567b9c9d4f06736bf3fd5526fbc3ab4afe175b0f9628"
+        },
+        "outer_receipt": {
+          "path": "outputs/experiments/g31_ics_learning_next_20261017/later_episodes_001/diagnostic_prefer8/receipt.json",
+          "sha256": "ac0c9c1479769eb5c4fdcd5d3f5c97969433ec46623af12ac322689e0da2caae"
+        },
+        "worker_report": {
+          "path": "outputs/experiments/g31_ics_learning_next_20261017/later_episodes_001/diagnostic_prefer8/worker_report.json",
+          "sha256": "b83dce310b9890aa99e48457954b65d5c2cb0ab6718016670642cbdfc07a5f8a"
+        }
+      },
+      "process_wall_s": 53.125,
+      "completion_from_five_unload_receipts": {
+        "loaded": 7.1999999999999975,
+        "receiver": 10.12,
+        "blocker": 11.349999999999998,
+        "reuse1": 13.949999999999992,
+        "reuse2": 19.36
+      },
+      "transitions": [
+        {
+          "owner": "A",
+          "at": 7.339999999999996,
+          "action": "return_now",
+          "behavior_mode": "diagnostic_intervention",
+          "guard_status": "passed",
+          "command_id": "live:1:A:return-0",
+          "request": {
+            "request_id": "live:1:A:return-0",
+            "owner_id": "A",
+            "tray_id": "L",
+            "source": 6,
+            "destination": 7,
+            "earliest_departure": 7.339999999999996,
+            "expiry": 39.0,
+            "message_delay": 0.01
+          },
+          "ACK": {
+            "sequence": 6,
+            "attempt": 6,
+            "observed_at": 9.579999999999995,
+            "delivered_at": 9.599999999999994,
+            "status": "received",
+            "reason": "",
+            "received_at": 9.549999999999995
+          },
+          "ACK_status": "received",
+          "ACK_observed_at": 9.599999999999994,
+          "next_edge_enter": {
+            "time": 7.449999999999996,
+            "event": "EDGE_ENTER",
+            "business_bag_id": "",
+            "transport_leg_id": "live:1:A:return-0:empty_return:4",
+            "tray_id": "L",
+            "traversal_id": 7,
+            "node": 6,
+            "from": 6,
+            "to": 7,
+            "reason": ""
+          },
+          "actor_state_check": {
+            "native_state_before": "77667887ba972f2ce44814e4c6c2f9859ecd0ee3683b30d759d445db83d21b6d",
+            "native_state_after": "77667887ba972f2ce44814e4c6c2f9859ecd0ee3683b30d759d445db83d21b6d",
+            "physical_time_before": 7.339999999999996,
+            "physical_time_after": 7.339999999999996,
+            "scope": "new callback isolation evidence only; hashes are not actor inputs"
+          },
+          "guard_deltas": {
+            "return_now": {
+              "reuse1": 0.0,
+              "reuse2": 0.0,
+              "receiver": 0.0,
+              "blocker": 0.0,
+              "loaded": 0.0
+            },
+            "return_not_before_7_84": {
+              "reuse1": 0.08999999999999986,
+              "reuse2": 0.08999999999999986,
+              "receiver": 0.0,
+              "blocker": 0.0,
+              "loaded": 0.0
+            }
+          },
+          "next_observation_exact": true,
+          "delta_sim_time_s": 2.349999999999998,
+          "terminated": false,
+          "truncated": false,
+          "selected_conditional_prediction_matches_actual_terminal": false
+        },
+        {
+          "owner": "B",
+          "at": 9.689999999999994,
+          "action": "prefer_8",
+          "behavior_mode": "diagnostic_intervention",
+          "guard_status": "rejected",
+          "command_id": "live:1:B:later-route-0",
+          "request": {
+            "request_id": "live:1:B:later-route-0",
+            "owner_id": "B",
+            "business_bag_id": "reuse1",
+            "tray_id": "L",
+            "from": 7,
+            "next": 8,
+            "expected_generation": 5,
+            "expected_traversal": 5,
+            "expiry": 14.689999999999994,
+            "message_delay": 0.01,
+            "kind": "route"
+          },
+          "ACK": {
+            "sequence": 1,
+            "attempt": 1,
+            "observed_at": 9.699999999999994,
+            "delivered_at": 9.719999999999994,
+            "executed_at": 9.699999999999994,
+            "completed_at": 9.699999999999994,
+            "status": "updated",
+            "reason": "allowed",
+            "result_id": "live:1:B:later-route-0"
+          },
+          "ACK_status": "updated",
+          "ACK_observed_at": 9.719999999999994,
+          "next_edge_enter": {
+            "time": 9.749999999999995,
+            "event": "EDGE_ENTER",
+            "business_bag_id": "reuse1",
+            "transport_leg_id": "reuse1:direct:7",
+            "tray_id": "L",
+            "traversal_id": 11,
+            "node": 7,
+            "from": 7,
+            "to": 8,
+            "reason": ""
+          },
+          "actor_state_check": {
+            "native_state_before": "bc481141e2dc0aeeb23bc0a180c7d435e1d3274f520c25468a583adc6ce46ff6",
+            "native_state_after": "bc481141e2dc0aeeb23bc0a180c7d435e1d3274f520c25468a583adc6ce46ff6",
+            "physical_time_before": 9.689999999999994,
+            "physical_time_after": 9.689999999999994,
+            "scope": "new callback isolation evidence only; hashes are not actor inputs"
+          },
+          "guard_deltas": {
+            "native_default": {
+              "reuse1": 0.0,
+              "reuse2": 0.0,
+              "receiver": 0.0,
+              "blocker": 0.0,
+              "loaded": 0.0
+            },
+            "prefer_8": {
+              "reuse1": 0.899999999999995,
+              "reuse2": 0.8999999999999986,
+              "receiver": 0.0,
+              "blocker": 0.0,
+              "loaded": 0.0
+            }
+          },
+          "next_observation_exact": true,
+          "delta_sim_time_s": 30.310000000000006,
+          "terminated": true,
+          "truncated": false,
+          "selected_conditional_prediction_matches_actual_terminal": true
+        }
+      ],
+      "same_tray_returns": [
+        {
+          "time": 9.549999999999995,
+          "event": "EMPTY_RECEIVED",
+          "business_bag_id": "",
+          "transport_leg_id": "live:1:A:return-0:empty_return:4",
+          "tray_id": "L",
+          "traversal_id": 7,
+          "node": 7,
+          "from": -1,
+          "to": 7,
+          "reason": "live:1:A:return-0"
+        },
+        {
+          "time": 16.25999999999999,
+          "event": "EMPTY_RECEIVED",
+          "business_bag_id": "",
+          "transport_leg_id": "live:1:A:return-1:empty_return:8",
+          "tray_id": "L",
+          "traversal_id": 15,
+          "node": 7,
+          "from": -1,
+          "to": 7,
+          "reason": "live:1:A:return-1"
+        }
+      ],
+      "same_tray_reloads": [
+        {
+          "time": 9.549999999999995,
+          "event": "LOAD_START",
+          "business_bag_id": "reuse1",
+          "transport_leg_id": "",
+          "tray_id": "L",
+          "traversal_id": 7,
+          "node": 7,
+          "from": -1,
+          "to": -1,
+          "reason": ""
+        },
+        {
+          "time": 16.25999999999999,
+          "event": "LOAD_START",
+          "business_bag_id": "reuse2",
+          "transport_leg_id": "",
+          "tray_id": "L",
+          "traversal_id": 15,
+          "node": 7,
+          "from": -1,
+          "to": -1,
+          "reason": ""
+        }
+      ],
+      "status": "passed_with_conditional_and_diagnostic_limitations"
+    }
+  },
+  "comparisons": {
+    "guarded_default": {
+      "baseline": "guarded_default",
+      "same_input": true,
+      "prefix_cutoff": 40.0,
+      "all_receipts_prefix_exact": true,
+      "baseline_prefix_count": 153,
+      "per_job_actual_delta": {
+        "reuse1": 0.0,
+        "reuse2": 0.0,
+        "receiver": 0.0,
+        "blocker": 0.0,
+        "loaded": 0.0
+      },
+      "strict_protected_zero_tolerance": true
+    },
+    "diagnostic_prefer8": {
+      "baseline": "guarded_default",
+      "same_input": true,
+      "prefix_cutoff": 9.689999999999994,
+      "all_receipts_prefix_exact": true,
+      "baseline_prefix_count": 95,
+      "per_job_actual_delta": {
+        "reuse1": 0.899999999999995,
+        "reuse2": 0.8999999999999986,
+        "receiver": 0.0,
+        "blocker": 0.0,
+        "loaded": 0.0
+      },
+      "strict_protected_zero_tolerance": false
+    }
+  },
+  "old_default_reference": {
+    "path": "outputs/experiments/g31_ics_foundation_learning_20261017/native_001/raw.json.gz",
+    "sha256": "a8e3c61e447dc7654d83e8f216d2dec33c2c082c868215fdf5987ad0e5d04902"
+  },
+  "old_default_parity": {
+    "input": true,
+    "receipts": true,
+    "jobs": true,
+    "trays": true
+  },
+  "independent_scene_count": 1,
+  "scope": "Saved actual receipt/identity/observation/guard arithmetic only; no model inference, retraining or new native run.",
+  "limitations": [
+    "Not a full re-audit of the native FIFO/capacity model or hidden state.",
+    "Earlier conditional forecasts assume default future behavior; later diagnostic interventions can invalidate them.",
+    "Diagnostic rejected actions are not protected deployment successes.",
+    "Same-scene repeated episodes are not independent-scene generalization or protected multi-step RL.",
+    "No 100ms or full R1/R2 authority certification."
+  ]
+}

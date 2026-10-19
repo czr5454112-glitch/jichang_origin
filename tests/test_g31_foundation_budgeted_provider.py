@@ -273,3 +273,93 @@ def test_native_adapter_callback_returns_detached_json_and_charges_export(provid
     assert result['diagnostic_through_export_wall_ms'] >= result['compute_wall_ms']
     assert result['report']['dispatch_authorized'] is False
     assert json.loads(json.dumps(result)) == result
+
+
+def test_public_mask_is_exact_existing_component_contract():
+    assert subject.public_compatible_indices('A', actions()) == [4]
+    assert subject.public_compatible_indices('B', actions()) == [0, 1, 4, 5, 8, 9, 12, 13]
+    with pytest.raises(ValueError, match='known_public_contract_owner'):
+        subject.public_compatible_indices('other', actions())
+
+
+def test_compatible_exhaustive8_uses_only_four_prefixes_before_teacher(provider_fixture):
+    decision, request, events, _ = provider_fixture
+    indices = subject.public_compatible_indices('B', actions())
+    report = subject.evaluate_budgeted(decision, budget=8, candidate_indices=indices,
+        compatible_only=True, prefix_budget=4)['batch'].audit_copy()
+    assert report['status'] == 'conditional_forecasts_complete'
+    assert set(report['requested_indices']) == set(indices)
+    assert report['allocation']['legal_domain_size'] == 8
+    assert report['allocation']['scoring_row_count'] == 0
+    assert report['allocation']['requested_prefix_count'] == report['evaluated_prefix_count'] == 4
+    assert report['counts']['context_constructions'] == 4
+    assert report['counts']['future_forks'] == report['counts']['future_resumes'] == 8
+    assert request.uses == 17 and request.closed
+    assert all(set(item[2]) <= set(indices) for item in events if type(item) is tuple)
+    assert all(row['status'] == 'not_requested' and 'prediction' not in row
+        for index, row in enumerate(report['rows']) if index not in indices)
+
+
+def test_compatible_ranker_receives_only_legal_semantics_before_binding(provider_fixture):
+    decision, _, events, _ = provider_fixture
+    eligible = [0, 1, 4, 5, 8, 9, 12, 13]
+
+    def scorer(observation, candidates, model_version):
+        assert 'bind' not in events
+        assert candidates == [actions()[index] for index in eligible]
+        assert all('candidate_index' not in candidate for candidate in candidates)
+        return [1., 0., 2., 3., 5., 4., 9., 8.]
+
+    report = subject.evaluate_budgeted(decision, budget=4, scorer=scorer, compatible_only=True,
+        prefix_budget=2)['batch'].audit_copy()
+    assert report['requested_indices'] == [4, 12, 13, 5]
+    assert report['allocation']['scoring_row_count'] == 8
+    assert report['allocation']['requested_prefix_indices'] == [2, 6]
+    assert report['evaluated_prefix_count'] == 2
+    assert all(score is None for index, score in enumerate(report['scores']) if index not in eligible)
+
+
+@pytest.mark.parametrize('prefix_budget,expected_count', [(1, 2), (2, 4)])
+def test_prefix_limit_does_not_force_candidate_budget_fill(provider_fixture, prefix_budget, expected_count):
+    decision, request, _, _ = provider_fixture
+    report = subject.evaluate_budgeted(decision, budget=8, compatible_only=True,
+        prefix_budget=prefix_budget)['batch'].audit_copy()
+    assert report['status'] == 'conditional_forecasts_complete'
+    assert len(report['requested_indices']) == expected_count
+    assert report['evaluated_prefix_count'] == prefix_budget
+    assert request.uses == 1 + 2 * expected_count
+
+
+def test_cost_rule_pays_shared_prefix_once(provider_fixture):
+    decision, _, _, _ = provider_fixture
+    report = subject.evaluate_budgeted(decision, budget=4, compatible_only=True,
+        prefix_budget=2, ranking_policy='marginal_prefix_cost')['batch'].audit_copy()
+    allocation = report['allocation']
+    assert report['requested_indices'] == [4, 5, 0, 1]
+    assert [step['incremental_cost_units'] for step in allocation['selection_steps']] == [2, 1, 2, 1]
+    assert allocation['estimated_total_cost_units'] == 6
+    assert report['evaluated_prefix_count'] == 2
+    assert 'not milliseconds' in allocation['incremental_cost_scope']
+
+
+@pytest.mark.parametrize('kwargs', [
+    {'candidate_indices': [4, 16]}, {'candidate_indices': [4, 0], 'prefix_budget': 1},
+    {'prefix_budget': True}, {'prefix_budget': 0}, {'prefix_budget': 17}, {'ranking_policy': 'unknown'},
+])
+def test_invalid_compatible_request_never_binds(provider_fixture, kwargs):
+    decision, _, events, _ = provider_fixture
+    report = subject.evaluate_budgeted(decision, budget=4, compatible_only=True, **kwargs)['batch'].audit_copy()
+    assert report['status'] == 'unknown_origin_or_provider'
+    assert 'bind' not in events
+    assert report['counts']['future_resumes'] == 0
+
+
+def test_owner_A_only_incumbent_even_when_budget_is_larger(provider_fixture):
+    decision, _, _, _ = provider_fixture
+    original = decision.audit_copy
+    decision.audit_copy = lambda: {**original(), 'owner': 'A'}
+    report = subject.evaluate_budgeted(decision, budget=8, compatible_only=True,
+        prefix_budget=4)['batch'].audit_copy()
+    assert report['requested_indices'] == [4]
+    assert report['allocation']['legal_domain_size'] == report['allocation']['scoring_row_count'] == 1
+    assert report['evaluated_prefix_count'] == 1

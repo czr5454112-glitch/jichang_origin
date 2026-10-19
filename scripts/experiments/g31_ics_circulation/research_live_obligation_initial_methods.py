@@ -116,14 +116,15 @@ def _aggregate(status, policies):
 
 
 def start_owner(native, session, client, owner, publication, channel, accepted,
-                *, arm, incumbent, progress, ledgers, policies):
+                *, arm, incumbent, progress, ledgers, policies, initial_selector=None):
     """Only this owner's dispatch result can create this owner's policy."""
     require(owner in ('A', 'B') and owner not in progress and owner not in policies,
             'fresh_owner_step')
     record = {}
     progress[owner] = record  # Preserve the actual sink before any fallible work.
+    selector_options = {} if initial_selector is None else {'initial_selector': initial_selector}
     result, ledger = dispatch.choose_and_submit(native, session, client, owner,
-        publication, accepted, arm=arm, incumbent_index=incumbent, progress=record)
+        publication, accepted, arm=arm, incumbent_index=incumbent, progress=record, **selector_options)
     require(result is record, 'actual_progress_identity')
     ledgers[owner] = ledger
     expected = ('selected_native_default_no_command' if owner == 'A' and

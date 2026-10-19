@@ -1,0 +1,206 @@
+{
+  "schema": "g31.foundation.service_update_stage.v1",
+  "status": "completed_bounded_optimization_stage",
+  "date": "2026-10-17",
+  "source_pins_still_unchanged": true,
+  "tests": {
+    "tests": 787,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "pytest_seconds": 122.182,
+  "source_pin_count": 768,
+  "saved_abba": {
+    "contexts": [
+      {
+        "context": "default_A",
+        "timings": {
+          "legacy": {
+            "min_ms": 720.4035,
+            "median_ms": 794.7352,
+            "max_ms": 807.2238,
+            "samples": 4
+          },
+          "request_shared": {
+            "min_ms": 155.4278,
+            "median_ms": 161.88305,
+            "max_ms": 173.5085,
+            "samples": 4
+          },
+          "median_ratio_legacy_over_shared": 4.909316942076394
+        }
+      },
+      {
+        "context": "default_B",
+        "timings": {
+          "legacy": {
+            "min_ms": 843.2031,
+            "median_ms": 876.0971999999999,
+            "max_ms": 892.4881,
+            "samples": 4
+          },
+          "request_shared": {
+            "min_ms": 196.4005,
+            "median_ms": 224.78175,
+            "max_ms": 231.7669,
+            "samples": 4
+          },
+          "median_ratio_legacy_over_shared": 3.8975459529076537
+        }
+      },
+      {
+        "context": "delayed_B",
+        "timings": {
+          "legacy": {
+            "min_ms": 882.0128,
+            "median_ms": 942.8162,
+            "max_ms": 967.0839,
+            "samples": 4
+          },
+          "request_shared": {
+            "min_ms": 199.276,
+            "median_ms": 232.16155,
+            "max_ms": 241.7049,
+            "samples": 4
+          },
+          "median_ratio_legacy_over_shared": 4.061035085267134
+        }
+      }
+    ],
+    "reports": 24,
+    "candidate_predictions": 48,
+    "all_complete_seed_and_prediction_exact": true,
+    "scope": "Saved evidence copy, source checks where implemented, all seed/prediction work and JSON detachment; excludes native collection, actor, submit, ACK, startup and report writes."
+  },
+  "native": {
+    "review_status": "passed_exact_native_and_current_model_parity",
+    "checks": 325,
+    "physical_summary": {
+      "completion": {
+        "loaded": 7.1999999999999975,
+        "receiver": 10.12,
+        "reuse1": 13.049999999999997,
+        "reuse2": 18.46,
+        "blocker": 11.349999999999998
+      },
+      "receipt_count": 153,
+      "event_counts": {
+        "BAG_ARRIVAL": 5,
+        "LOAD_START": 5,
+        "PROTOCOL_COMMAND_ACK_DELIVERED": 14,
+        "LOAD_COMPLETE": 5,
+        "LEG_START": 10,
+        "MODULE_REQUEST_DELIVERED": 6,
+        "PROTOCOL_ACK_DELIVERED": 22,
+        "RESOURCE_WAIT": 3,
+        "TRANSFER_REJECTED": 3,
+        "RESOURCE_WAKE": 3,
+        "EDGE_ENTER": 18,
+        "EDGE_EXIT": 18,
+        "LEG_COMPLETE": 10,
+        "STORAGE_ENTER": 2,
+        "EXPORT_GRANTED": 3,
+        "EMPTY_RECEIVED": 3,
+        "STORAGE_RELEASE": 2,
+        "UNLOAD_START": 5,
+        "UNLOAD_COMPLETE": 5,
+        "HOLD_START": 5,
+        "HOLD_COMPLETE": 5,
+        "ROUTE_INTENT_updated": 1
+      },
+      "job_count": 5,
+      "tray_count": 3
+    },
+    "timing": [
+      {
+        "owner": "A",
+        "phase": "first_return",
+        "at": 7.339999999999996,
+        "timings": {
+          "actor_choose_wall_ms": 2.9572,
+          "actor_inference_wall_ms": 1.4539,
+          "collection_through_offer_wall_ms": 303.9351,
+          "model_and_guard_wall_ms": 176.1108,
+          "submission_and_local_guard_wall_ms": 18.9598,
+          "collection_to_decision_record_wall_ms": 329.0011,
+          "request_timing_scope": "From collect_native entry through decision record; includes actor/wrapper gaps, excludes earlier message collection, startup, return serialization and later ACK."
+        }
+      },
+      {
+        "owner": "B",
+        "phase": "first_reuse_route",
+        "at": 9.689999999999994,
+        "timings": {
+          "actor_choose_wall_ms": 4.4704,
+          "actor_inference_wall_ms": 2.3075,
+          "collection_through_offer_wall_ms": 329.7408,
+          "model_and_guard_wall_ms": 198.1852,
+          "submission_and_local_guard_wall_ms": 26.3898,
+          "collection_to_decision_record_wall_ms": 368.9751,
+          "request_timing_scope": "From collect_native entry through decision record; includes actor/wrapper gaps, excludes earlier message collection, startup, return serialization and later ACK."
+        }
+      }
+    ]
+  },
+  "refresh": {
+    "status": "passed_saved_refresh_invalidation_checks",
+    "checks": 5,
+    "actual_same_owner_two_fresh_later_contexts_available": false,
+    "cross_event_saved_calls_avoided": 0
+  },
+  "unchanged_requirements": [
+    "original_per_job_reference_zero_tolerance",
+    "finite_trays_native_physics",
+    "complete_necessary_request_100ms"
+  ],
+  "complete_request_100ms_certified": false,
+  "cross_event_cache_enabled": false,
+  "local_suffix_repair_verified": false,
+  "new_RL_training_performed": false,
+  "new_business_improvement_claimed": false,
+  "git_commit_or_push_performed": false,
+  "preserved_failures": [
+    "profiling_001/report.json",
+    "request_context_tests_001",
+    "independent_native_001/report.json"
+  ],
+  "references": {
+    "profile": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\profiling_001\\repaired_002\\report.json",
+      "sha256": "30553f73fc2ed1ee81c2de32fa52d2ba3d3ab90ebe69c2400086109b22979b6f"
+    },
+    "abba": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\abba_002\\receipt.json",
+      "sha256": "4a3031ff02fe4bf67fab9dff2484076afd0eab2bec61441b1b37da2162b9a93f"
+    },
+    "native": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\native_002\\guarded_default\\receipt.json",
+      "sha256": "bf16a423932fac8f1b6a151fb21f8d902ec8240df99e7e31d0a4f6e67718b1a5"
+    },
+    "independent": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\independent_native_002\\receipt.json",
+      "sha256": "213e65caafcd64bfd5526ccc86fcf639735a40e86307e15b3ec28a986440d711"
+    },
+    "refresh": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\refresh_audit_001\\receipt.json",
+      "sha256": "604028a08fecc1bd6b4f87858554f0989f77acb3feafe253d5643c3796535ea8"
+    },
+    "tests": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_service_update_20261017\\final_validation_001\\receipt.json",
+      "sha256": "862a4959d2dbc54ee073856845c3f9f17c3bddcab4b21980be47762b6f1bf67c"
+    }
+  },
+  "attachment": {
+    "path": "C:\\Users\\38908\\Downloads\\LEARNING_NEXT_STAGE_20261017.md",
+    "sha256": "ead055df5a5ca852e429ac1d451f3762d503b09f89b35271563b47aacec8e6ae"
+  },
+  "report": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\docs\\g31_ics_circulation\\SERVICE_UPDATE_STAGE_20261017.md",
+    "sha256": "d95b3879b423e9cae5a79780fcc19adb1919983cec0f5e8a1f1932e91513ae82"
+  },
+  "literature": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\docs\\g31_ics_circulation\\SERVICE_REFRESH_LITERATURE_20261017.md",
+    "sha256": "552447be0b5b0140eecf00ffab27aeff268ee28f9c00512acb62a854b1fb9bde"
+  }
+}

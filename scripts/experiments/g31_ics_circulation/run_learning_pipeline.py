@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[3]
 MODULE = "scripts.experiments.g31_ics_circulation.run_learning_pipeline"
 SCHEMA = "g31.foundation_learning.pilot.v1"
 ADMISSION = "g31_foundation_learning_worker_v1"
-COMMANDS = ("smoke", "baseline", "collect", "train-ranker", "train-rl", "evaluate")
+COMMANDS = ("smoke", "baseline", "collect", "train-ranker", "train-later-value", "train-rl", "evaluate")
 
 
 def write_json(path, value):
@@ -72,12 +72,16 @@ def validate_config(config):
         if type(value) is not int or not 0 < value <= 20000:
             raise ValueError("foundation_pipeline:invalid_" + field)
     learner = config.get("learner", {})
-    if learner.get("models") != ["linear", "mlp"] or learner.get("device") != "cpu":
-        raise ValueError("foundation_pipeline:registered_cpu_linear_and_mlp_required")
-    if learner.get("hidden_width") != 64 or learner.get("hidden_layers") != 2:
-        raise ValueError("foundation_pipeline:registered_MLP_shape_required")
-    if type(learner.get("epochs")) is not int or not 1 <= learner["epochs"] <= 1000:
-        raise ValueError("foundation_pipeline:invalid_epochs")
+    if config.get("pipeline_stage") == "later_value":
+        if learner.get("models") != ["ridge_continuation_value"] or learner.get("device") != "cpu" or learner.get("alpha") != 1:
+            raise ValueError("foundation_pipeline:registered_later_value_learner_required")
+    else:
+        if learner.get("models") != ["linear", "mlp"] or learner.get("device") != "cpu":
+            raise ValueError("foundation_pipeline:registered_cpu_linear_and_mlp_required")
+        if learner.get("hidden_width") != 64 or learner.get("hidden_layers") != 2:
+            raise ValueError("foundation_pipeline:registered_MLP_shape_required")
+        if type(learner.get("epochs")) is not int or not 1 <= learner["epochs"] <= 1000:
+            raise ValueError("foundation_pipeline:invalid_epochs")
     if type(learner.get("seed")) is not int or learner["seed"] < 0:
         raise ValueError("foundation_pipeline:invalid_seed")
     output = resolve_input(config["output_root"])
@@ -153,6 +157,21 @@ def train_ranker(config, output, dataset=None):
         "dataset_path": str(dataset_path), "report": report, "closed_loop_RL_trained": False}
 
 
+def train_later_value(config, output, dataset=None):
+    from . import foundation_later_learning as learning
+
+    if not dataset:
+        raise ValueError("foundation_pipeline:later_native_episode_manifest_required")
+    manifest = resolve_input(dataset)
+    rows, sources = learning.load_manifest(manifest, config["limits"]["maximum_training_rows"])
+    report = learning.train(rows, Path(output) / "models", max_wall_seconds=config["limits"]["training_wall_seconds"])
+    write_json(Path(output) / "episode_sources.json", sources)
+    return {"status": "completed", "stage": "later_actual_native_supervised_value_only",
+        "manifest_sha256": hashlib.sha256(manifest.read_bytes()).hexdigest(),
+        "training_rows": len(rows), "report": report, "closed_loop_RL_trained": False,
+        "scope": "New real later trajectories, not the old initial ranking table or protected RL takeover."}
+
+
 def baseline(config, output):
     from .foundation_native_environment import run_baseline
 
@@ -177,13 +196,24 @@ def rl_readiness(config):
 
 def execute(command, config, output, *, dataset=None, model_dir=None):
     output = Path(output)
+    if config.get("pipeline_stage") == "later_value" and command not in ("train-later-value", "train-rl"):
+        raise ValueError("foundation_pipeline:later_value_config_command_scope")
     if command == "collect":
         return collect(config, output)
     if command == "train-ranker":
         return train_ranker(config, output, dataset)
+    if command == "train-later-value":
+        return train_later_value(config, output, dataset)
     if command == "baseline":
         return baseline(config, output)
     if command == "train-rl":
+        if config.get("pipeline_stage") == "later_value":
+            from . import foundation_later_learning as learning
+
+            if not dataset:
+                raise ValueError("foundation_pipeline:later_native_episode_manifest_required")
+            rows, _ = learning.load_manifest(resolve_input(dataset), config["limits"]["maximum_training_rows"])
+            return learning.rl_support(rows)
         return rl_readiness(config)
     if command == "evaluate":
         from .foundation_ranker import evaluate_models
@@ -236,7 +266,7 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("command", choices=COMMANDS)
     parser.add_argument("--config", type=Path, required=True)
-    parser.add_argument("--dataset", help="Explicit dataset JSONL; otherwise use this run's collect manifest.")
+    parser.add_argument("--dataset", help="Initial JSONL, or a closed native episode manifest for train-later-value.")
     parser.add_argument("--model-dir", help="Explicit trained fold models directory for evaluate.")
     parser.add_argument("--worker", action="store_true", help=argparse.SUPPRESS)
     parser.add_argument("--output", type=Path, help=argparse.SUPPRESS)
