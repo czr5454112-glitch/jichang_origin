@@ -106,6 +106,15 @@ void fingerprint_circulation_state(Writer& w, const CirculationState& s) {
     w.i64(n.export_min_stock); w.boolean(n.allow_export); w.boolean(n.allow_receive);
     w.string(n.control_partition); w.string(n.resource_owner);
   }
+  const auto receiving_policy_count=std::count_if(s.input.nodes.begin(),s.input.nodes.end(),
+      [](const auto& n){return n.empty_receive_transit_reserve != 0;});
+  if(receiving_policy_count) {
+    // Omitted/default-zero policy contributes no byte to the old state seal.
+    w.string("g31.receiver_empty_transit_admission.v1");w.u64(receiving_policy_count);
+    for(const auto& n:s.input.nodes) if(n.empty_receive_transit_reserve != 0) {
+      w.i64(n.node);w.i64(n.empty_receive_transit_reserve);
+    }
+  }
   w.u64(s.input.edges.size());
   for (const auto& e : s.input.edges) {
     w.i64(e.from); w.i64(e.to); w.i64(e.capacity); w.floating(e.entry_headway);

@@ -1,0 +1,31 @@
+{
+  "task_id": "B1_forecast_training_001",
+  "module": "scripts.experiments.g31_ics_circulation.foundation_flight_training",
+  "args": [
+    "--plan",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\B1_plan_001.json",
+    "--output",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\B1_training_001",
+    "--admission",
+    "g31_flight_B1_001"
+  ],
+  "inner_admission": "g31_flight_B1_001",
+  "sources": [
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_flight_training.py",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_flight_data.py",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_flight_forecaster.py",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_flight_context.py",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\B1_plan_001.json",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\legacy\\jichang_origin_readonly\\inputdata.txt"
+  ],
+  "native_branches": 0,
+  "hard_seconds": 600,
+  "requires": [],
+  "assessment": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\B1_training_001\\receipt.json",
+    "allowed_statuses": [
+      "completed_forecaster_training_and_causal_evaluation"
+    ]
+  },
+  "next_action": "Audit causal held-out metrics and consume this frozen forecaster in C10/C11; action-condition training follows actual native labels."
+}

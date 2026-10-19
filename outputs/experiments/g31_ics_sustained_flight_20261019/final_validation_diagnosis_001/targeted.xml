@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="3" skipped="0" tests="4" time="2.699" timestamp="2026-10-19T22:54:17.418483+08:00" hostname="LAPTOP-M3GASC4G"><testcase classname="tests.test_g31_foundation_initial_campaign" name="test_preparation_archives_sources_and_exact_preexisting_model_without_native" time="0.019"><failure message="FileNotFoundError: [Errno 2] No such file or directory: 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\final_validation_diagnosis_001\\targeted_scratch\\test_preparation_archives_sour0\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\native027_accepted_contract_001.json'">tmp_path = WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_sustained_flight_20261019/final_validation_diagnosis_001/targeted_scratch/test_preparation_archives_sour0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001FD28061E50&gt;
+
+    def test_preparation_archives_sources_and_exact_preexisting_model_without_native(tmp_path, monkeypatch):
+        monkeypatch.setattr(campaign, 'ROOT', tmp_path)
+        model = tmp_path / 'models/model.json'
+        campaign.write_new(model, {'model_version': 'frozen', 'feature_schema': 'features43'})
+        campaign.write_new(model.parent / 'folds.json', [])
+        campaign.write_new(model.parent / 'registration.json', {})
+        monkeypatch.setattr(campaign, 'MODEL_SHA256', campaign.sha(model))
+        monkeypatch.setattr(campaign, 'validate_model', lambda path: campaign.read(path))
+        source = tmp_path / 'source.py'
+        source.write_text('VALUE = 1\n')
+        monkeypatch.setattr(campaign, 'source_pins', lambda: {str(source): campaign.sha(source)})
+        binary = tmp_path / 'native.pyd'
+        binary.write_bytes(b'not-a-native-test')
+        directory = tmp_path / 'outputs/experiments/g31_ics_lt2_sustained_20261014'
+&gt;       campaign.write_new(directory / 'native027_accepted_contract_001.json', {'binary': str(binary)})
+
+tests\test_g31_foundation_initial_campaign.py:254: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+path = WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_sustained_flight_20261019/...st_preparation_archives_sour0/outputs/experiments/g31_ics_lt2_sustained_20261014/native027_accepted_contract_001.json')
+value = {'binary': 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\final_validation_diagnosis_001\\targeted_scratch\\test_preparation_archives_sour0\\native.pyd'}
+
+    def write_new(path, value):
+        path = Path(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+&gt;       with path.open('x', encoding='utf8') as stream:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+scripts\experiments\g31_ics_circulation\foundation_initial_campaign.py:60: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_sustained_flight_20261019/...st_preparation_archives_sour0/outputs/experiments/g31_ics_lt2_sustained_20261014/native027_accepted_contract_001.json')
+mode = 'x', buffering = -1, encoding = 'utf8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+&gt;       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\final_validation_diagnosis_001\\targeted_scratch\\test_preparation_archives_sour0\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\native027_accepted_contract_001.json'
+
+..\..\python3.11.9\Lib\pathlib.py:1044: FileNotFoundError</failure></testcase><testcase classname="tests.test_g31_foundation_later_campaign" name="test_prepare_evaluation_registers_checkpoint_and_only_one_fresh_episode" time="0.012"><failure message="FileNotFoundError: [Errno 2] No such file or directory: 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\final_validation_diagnosis_001\\targeted_scratch\\test_prepare_evaluation_regist0\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\native027_accepted_contract_001.json'">tmp_path = WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_sustained_flight_20261019/final_validation_diagnosis_001/targeted_scratch/test_prepare_evaluation_regist0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001FD2A6C0C50&gt;
+
+    def test_prepare_evaluation_registers_checkpoint_and_only_one_fresh_episode(tmp_path, monkeypatch):
+        monkeypatch.setattr(campaign, 'ROOT', tmp_path)
+        monkeypatch.setattr(campaign, 'source_pins', lambda: {})
+        binary = tmp_path / 'native.pyd'
+        binary.write_bytes(b'non-native-unit-fixture')
+        contract = tmp_path / 'outputs/experiments/g31_ics_lt2_sustained_20261014/native027_accepted_contract_001.json'
+&gt;       campaign.write_new(contract, {'binary': str(binary)})
+
+tests\test_g31_foundation_later_campaign.py:152: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+path = WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_sustained_flight_20261019/...st_prepare_evaluation_regist0/outputs/experiments/g31_ics_lt2_sustained_20261014/native027_accepted_contract_001.json')
+value = {'binary': 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\final_validation_diagnosis_001\\targeted_scratch\\test_prepare_evaluation_regist0\\native.pyd'}
+
+    def write_new(path, value):
+        path = Path(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+&gt;       with path.open('x', encoding='utf8') as stream:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+scripts\experiments\g31_ics_circulation\foundation_later_campaign.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_sustained_flight_20261019/...st_prepare_evaluation_regist0/outputs/experiments/g31_ics_lt2_sustained_20261014/native027_accepted_contract_001.json')
+mode = 'x', buffering = -1, encoding = 'utf8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+&gt;       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\final_validation_diagnosis_001\\targeted_scratch\\test_prepare_evaluation_regist0\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\native027_accepted_contract_001.json'
+
+..\..\python3.11.9\Lib\pathlib.py:1044: FileNotFoundError</failure></testcase><testcase classname="tests.test_g31_foundation_later_campaign" name="test_prepare_only_registered_branch_keeps_exact_spec_and_budget" time="0.012"><failure message="FileNotFoundError: [Errno 2] No such file or directory: 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\final_validation_diagnosis_001\\targeted_scratch\\test_prepare_only_registered_b0\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\native027_accepted_contract_001.json'">tmp_path = WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_sustained_flight_20261019/final_validation_diagnosis_001/targeted_scratch/test_prepare_only_registered_b0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001FD2A68B990&gt;
+
+    def test_prepare_only_registered_branch_keeps_exact_spec_and_budget(tmp_path, monkeypatch):
+        monkeypatch.setattr(campaign, 'ROOT', tmp_path)
+        monkeypatch.setattr(campaign, 'source_pins', lambda: {})
+        binary = tmp_path / 'native.pyd'
+        binary.write_bytes(b'non-native-unit-fixture')
+        contract = tmp_path / 'outputs/experiments/g31_ics_lt2_sustained_20261014/native027_accepted_contract_001.json'
+&gt;       campaign.write_new(contract, {'binary': str(binary)})
+
+tests\test_g31_foundation_later_campaign.py:174: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+path = WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_sustained_flight_20261019/...st_prepare_only_registered_b0/outputs/experiments/g31_ics_lt2_sustained_20261014/native027_accepted_contract_001.json')
+value = {'binary': 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\final_validation_diagnosis_001\\targeted_scratch\\test_prepare_only_registered_b0\\native.pyd'}
+
+    def write_new(path, value):
+        path = Path(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+&gt;       with path.open('x', encoding='utf8') as stream:
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+scripts\experiments\g31_ics_circulation\foundation_later_campaign.py:64: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_sustained_flight_20261019/...st_prepare_only_registered_b0/outputs/experiments/g31_ics_lt2_sustained_20261014/native027_accepted_contract_001.json')
+mode = 'x', buffering = -1, encoding = 'utf8', errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+&gt;       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\final_validation_diagnosis_001\\targeted_scratch\\test_prepare_only_registered_b0\\outputs\\experiments\\g31_ics_lt2_sustained_20261014\\native027_accepted_contract_001.json'
+
+..\..\python3.11.9\Lib\pathlib.py:1044: FileNotFoundError</failure></testcase><testcase classname="tests.test_g31_foundation_later_control" name="test_submit_rechecks_current_authority_and_identity[outbox]" time="0.197" /></testsuite></testsuites>

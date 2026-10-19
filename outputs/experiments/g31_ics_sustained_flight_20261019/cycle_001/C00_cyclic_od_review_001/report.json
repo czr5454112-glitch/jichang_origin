@@ -1,0 +1,1012 @@
+{
+  "schema": "g31.independent.airport_cyclic_od_native_audit.v1",
+  "run": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\C00_cyclic_od_001",
+  "evidence_method": "Standard library inspection of raw physical receipts, public callback records, ACKs and historical source bytes; no controller/model/native imports or native run.",
+  "closed_evidence": {
+    "plan_sha256": "f4a3a6023ca3abb8a85cb455dd114fcfe5a0bedb65d43066a43b7006a51851c8",
+    "input_sha256": "628d6dbd9b0f90e1f0367570bdafebd7c91c6d4c700f2bc984014f7f78994587",
+    "raw_sha256": "8e79201d6b2a42e61a5fd13f53f1578b85fe3c3a1690e2ac18c582196646ffc3",
+    "archived_source_count": 102,
+    "archive_mismatches": [],
+    "acceptance_bound_file_count": 574,
+    "evidence_mismatches": [],
+    "native_acceptance_status": "closed_run_acceptance_passed",
+    "verifier_reexecuted": false,
+    "session_count": 1,
+    "reset_count": 0,
+    "physical_end": 59400,
+    "full_86400_horizon_completed": false
+  },
+  "business": {
+    "offered_total": 28506,
+    "offered_by_horizon": 20924,
+    "observed": 20924,
+    "loaded": 19,
+    "completed": 7,
+    "status_counts": {
+      "completed": 7,
+      "in_transit": 12,
+      "waiting_for_tray": 20905,
+      "unreleased": 7582
+    },
+    "completed_ids": [
+      "projected:1x:0",
+      "projected:1x:1",
+      "projected:1x:2",
+      "projected:1x:3",
+      "projected:1x:8",
+      "projected:1x:9",
+      "projected:1x:10"
+    ],
+    "native_completed_legs": 29,
+    "native_legs_breakdown": {
+      "storage_in": 17,
+      "business_unload": 7,
+      "empty_return": 5
+    },
+    "unresolved_offered_total": 28499
+  },
+  "movement": {
+    "last_edge_enter": {
+      "time": 21380.123999999993,
+      "event": "EDGE_ENTER",
+      "business_bag_id": "projected:1x:22",
+      "transport_leg_id": "projected:1x:22:storage_in:45",
+      "tray_id": "initial:136:0",
+      "traversal_id": 541,
+      "node": 48,
+      "from": 48,
+      "to": 40,
+      "reason": ""
+    },
+    "last_edge_exit": {
+      "time": 21386.478999999992,
+      "event": "EDGE_EXIT",
+      "business_bag_id": "projected:1x:22",
+      "transport_leg_id": "projected:1x:22:storage_in:45",
+      "tray_id": "initial:136:0",
+      "traversal_id": 541,
+      "node": 40,
+      "from": 48,
+      "to": 40,
+      "reason": ""
+    },
+    "last_physical_business_completion": {
+      "time": 20886.597,
+      "event": "UNLOAD_COMPLETE",
+      "business_bag_id": "projected:1x:8",
+      "transport_leg_id": "",
+      "tray_id": "initial:49:0",
+      "traversal_id": 437,
+      "node": 46,
+      "from": -1,
+      "to": -1,
+      "reason": ""
+    },
+    "last_storage_release": {
+      "time": 22200.0,
+      "event": "STORAGE_RELEASE",
+      "business_bag_id": "projected:1x:19",
+      "transport_leg_id": "",
+      "tray_id": "initial:57:1",
+      "traversal_id": 413,
+      "node": 53,
+      "from": -1,
+      "to": -1,
+      "reason": ""
+    },
+    "last_resource_wait": {
+      "time": 22200.001,
+      "event": "RESOURCE_WAIT",
+      "business_bag_id": "",
+      "transport_leg_id": "live:21:owner:system_domestic:transfer:116:empty_return:23",
+      "tray_id": "initial:138:0",
+      "traversal_id": 400,
+      "node": 112,
+      "from": 112,
+      "to": -1,
+      "reason": "committed_resource_change_required"
+    },
+    "no_edge_motion_interval": [
+      21386.478999999992,
+      59400
+    ],
+    "no_edge_motion_duration": 38013.52100000001
+  },
+  "final_tray_mode_counts": {
+    "empty_transit": 8,
+    "loaded": 12,
+    "empty": 1,
+    "quarantined": 1
+  },
+  "nodes": {
+    "28": {
+      "capacity": 4,
+      "physical_trays": [
+        "initial:49:0",
+        "initial:57:0",
+        "initial:92:1",
+        "initial:149:0"
+      ],
+      "leased_trays": [],
+      "counted_occupancy": [
+        "initial:49:0",
+        "initial:57:0",
+        "initial:92:1",
+        "initial:149:0"
+      ],
+      "outgoing": [
+        [
+          28,
+          29,
+          5.0,
+          2.0
+        ]
+      ]
+    },
+    "29": {
+      "capacity": 4,
+      "physical_trays": [
+        "initial:24:1",
+        "initial:26:1",
+        "initial:95:1",
+        "initial:134:0"
+      ],
+      "leased_trays": [],
+      "counted_occupancy": [
+        "initial:24:1",
+        "initial:26:1",
+        "initial:95:1",
+        "initial:134:0"
+      ],
+      "outgoing": [
+        [
+          29,
+          30,
+          19.0,
+          2.0
+        ],
+        [
+          29,
+          41,
+          5.31,
+          2.0
+        ],
+        [
+          29,
+          112,
+          58.7,
+          2.0
+        ],
+        [
+          29,
+          146,
+          106.9,
+          2.0
+        ]
+      ]
+    },
+    "40": {
+      "capacity": 4,
+      "physical_trays": [
+        "initial:134:1",
+        "initial:136:0"
+      ],
+      "leased_trays": [],
+      "counted_occupancy": [
+        "initial:134:1",
+        "initial:136:0"
+      ],
+      "outgoing": [
+        [
+          40,
+          28,
+          15.74,
+          2.0
+        ],
+        [
+          40,
+          52,
+          109.26,
+          2.0
+        ]
+      ]
+    },
+    "49": {
+      "capacity": 4,
+      "physical_trays": [],
+      "leased_trays": [
+        "initial:0:0",
+        "initial:24:0",
+        "initial:138:0",
+        "initial:138:1"
+      ],
+      "counted_occupancy": [
+        "initial:0:0",
+        "initial:24:0",
+        "initial:138:0",
+        "initial:138:1"
+      ],
+      "outgoing": [
+        [
+          49,
+          50,
+          40.93,
+          2.0
+        ]
+      ]
+    },
+    "53": {
+      "capacity": 4,
+      "physical_trays": [
+        "initial:49:1",
+        "initial:57:1",
+        "initial:92:0",
+        "initial:149:1"
+      ],
+      "leased_trays": [],
+      "counted_occupancy": [
+        "initial:49:1",
+        "initial:57:1",
+        "initial:92:0",
+        "initial:149:1"
+      ],
+      "outgoing": [
+        [
+          53,
+          49,
+          150.25,
+          2.0
+        ]
+      ]
+    },
+    "112": {
+      "capacity": 4,
+      "physical_trays": [
+        "initial:0:1",
+        "initial:95:0",
+        "initial:138:0",
+        "initial:138:1"
+      ],
+      "leased_trays": [],
+      "counted_occupancy": [
+        "initial:0:1",
+        "initial:95:0",
+        "initial:138:0",
+        "initial:138:1"
+      ],
+      "outgoing": [
+        [
+          112,
+          53,
+          139.5,
+          2.0
+        ],
+        [
+          112,
+          113,
+          3.0,
+          2.0
+        ]
+      ]
+    },
+    "116": {
+      "capacity": 4,
+      "physical_trays": [
+        "initial:26:0"
+      ],
+      "leased_trays": [],
+      "counted_occupancy": [
+        "initial:26:0"
+      ],
+      "outgoing": [
+        [
+          116,
+          119,
+          14.7,
+          2.0
+        ]
+      ]
+    },
+    "136": {
+      "capacity": 4,
+      "physical_trays": [
+        "initial:136:1"
+      ],
+      "leased_trays": [],
+      "counted_occupancy": [
+        "initial:136:1"
+      ],
+      "outgoing": [
+        [
+          136,
+          137,
+          63.3,
+          2.0
+        ]
+      ]
+    },
+    "137": {
+      "capacity": 4,
+      "physical_trays": [
+        "initial:0:0",
+        "initial:24:0"
+      ],
+      "leased_trays": [],
+      "counted_occupancy": [
+        "initial:0:0",
+        "initial:24:0"
+      ],
+      "outgoing": [
+        [
+          137,
+          112,
+          64.7,
+          2.0
+        ]
+      ]
+    }
+  },
+  "receiving49_grants": [
+    {
+      "time": 11342.0,
+      "event": "EXPORT_GRANTED",
+      "business_bag_id": "",
+      "transport_leg_id": "",
+      "tray_id": "initial:138:0",
+      "traversal_id": 0,
+      "node": 138,
+      "from": 138,
+      "to": 49,
+      "reason": "live:21:owner:system_domestic:transfer:116"
+    },
+    {
+      "time": 11342.0,
+      "event": "EXPORT_GRANTED",
+      "business_bag_id": "",
+      "transport_leg_id": "",
+      "tray_id": "initial:138:1",
+      "traversal_id": 0,
+      "node": 138,
+      "from": 138,
+      "to": 49,
+      "reason": "live:21:owner:system_domestic:transfer:117"
+    },
+    {
+      "time": 20863.652000000002,
+      "event": "EXPORT_GRANTED",
+      "business_bag_id": "",
+      "transport_leg_id": "",
+      "tray_id": "initial:24:0",
+      "traversal_id": 424,
+      "node": 114,
+      "from": 114,
+      "to": 49,
+      "reason": "live:21:owner:system_domestic:transfer:1044"
+    },
+    {
+      "time": 20942.0,
+      "event": "EXPORT_GRANTED",
+      "business_bag_id": "",
+      "transport_leg_id": "",
+      "tray_id": "initial:0:0",
+      "traversal_id": 404,
+      "node": 114,
+      "from": 114,
+      "to": 49,
+      "reason": "live:21:owner:system_domestic:transfer:1052"
+    }
+  ],
+  "causal_interpretation": {
+    "hard_cycle": "Four remote empty-return reservations fill node49. Its only incoming edge is53->49. Four loaded trays occupy53; at112 the FIFO head empty initial:138:0 needs53 before49. Node112 is full;29/137 feed112;28 feeds29;40 feeds28. The reservations cannot be cleared by cancelling already departed transfers.",
+    "source_limits": "Trace_limit=0 omits per-decision rankings and internal queue dump. The exact FIFO head/shortest route beyond the observed RESOURCE_WAIT is a source-grounded inference, not an exported full scheduler snapshot. Node53->49 and lease-capacity closure are directly proved.",
+    "quarantine": "Transfer115 cannot enter136->137 because137 is occupied by4 real trays during its entire lease; native failure at11839.48900001 releases its unused node26 reservation, leaves the actual empty tray quarantined. Failed ACK arrives11882.2. No recovery command occurs.",
+    "old_recovery_api": "recover_empty_tray exists only behind require_legacy_control_endpoint; protocol mode rejects that endpoint, and protocol command whitelist has no recovery kind. Direct use would violate the pinned R2 contract.",
+    "repeated_rejection": "642 attempts for actual empty tray initial:26:0 at116 target49 and fail receiving_full; other cross-zone legal ports exist in the public candidate pool but old minimum-cost matching repeatedly chooses49."
+  },
+  "transfer_status_counts": {
+    "received": 5,
+    "departed": 8,
+    "rejected": 958,
+    "failed": 1,
+    "pending": 5,
+    "undelivered": 1
+  },
+  "transfer_rejection_reasons": {
+    "departure_lease_expired": 314,
+    "receiving_full": 644
+  },
+  "calls": {
+    "total": 18798,
+    "unique_requests": 9001,
+    "retries": 9797,
+    "kinds": {
+      "demand": 1407,
+      "service_forecast": 3316,
+      "withdraw_service_forecast": 3300,
+      "transfer": 978
+    },
+    "terminal_recovery_count": 0
+  },
+  "observations": {
+    "count": 946,
+    "owners": [
+      "owner:system_domestic",
+      "owner:system_international"
+    ],
+    "first": 43200.0,
+    "last": 59400.0,
+    "integrity_and_owner_scope_checks_passed": true,
+    "actual_available_tray": "initial:26:0@116 domestic",
+    "raw_sha256": "70976ed9216577bafb800d3c6de53b80f009334c72e16279a33f755b65def4d6",
+    "counts": [
+      {
+        "owner": "owner:system_domestic",
+        "actual_available": 0,
+        "intent_count": 0,
+        "count": 271
+      },
+      {
+        "owner": "owner:system_domestic",
+        "actual_available": 1,
+        "intent_count": 1,
+        "count": 271
+      },
+      {
+        "owner": "owner:system_domestic",
+        "actual_available": 1,
+        "intent_count": 2,
+        "count": 25
+      },
+      {
+        "owner": "owner:system_international",
+        "actual_available": 0,
+        "intent_count": 0,
+        "count": 271
+      },
+      {
+        "owner": "owner:system_international",
+        "actual_available": 0,
+        "intent_count": 1,
+        "count": 77
+      },
+      {
+        "owner": "owner:system_international",
+        "actual_available": 0,
+        "intent_count": 2,
+        "count": 28
+      },
+      {
+        "owner": "owner:system_international",
+        "actual_available": 0,
+        "intent_count": 3,
+        "count": 3
+      }
+    ],
+    "conditional_labels_available": false,
+    "all_recorded_physical_outcomes_stagnant": true,
+    "learning_readiness": false
+  },
+  "C10_readonly_decision": {
+    "activate_at": 57660.0,
+    "actual_callback_count": 105,
+    "gate_counts": {
+      "baseline_intents_returned": 45,
+      "no_actual_available_supply": 60
+    },
+    "forecast_branch_reachable_on_recorded_observations": false,
+    "recommendation": "Do not spend another native run on the current unchanged C10. This is a guard-branch audit, not a native C10 trial or a measured effect.",
+    "same_action_induction_scope": "Same input, native/controller configuration and warmup; current C10 adds no forecast/action at every recorded callback."
+  },
+  "segments": [
+    {
+      "path": "segment_00.json.gz",
+      "sha256": "884cf2f39a19392ac0c89ced4048b8e7ad73eb20188c46e566bb07f573d3929e",
+      "time": 0.0,
+      "population": {
+        "offered_by_horizon": 0,
+        "observed": 0,
+        "loaded": 0,
+        "completed": 0
+      },
+      "native_summary": {
+        "event_count": 0,
+        "completed_count": 0,
+        "failed_count": 0,
+        "runtime_seconds": 0.0,
+        "edge_enter_event_count": 0,
+        "edge_exit_event_count": 0,
+        "reservation_conflicts": 0,
+        "physical_fault_edge_entry_violation_count": 0,
+        "merge_grant_timing_mode": "jit_fair_aging_deadline",
+        "g4irsf20_event_hotpath_policy": "E2",
+        "local_queue_capacity": 0
+      },
+      "wall_seconds": 0.03722200001357123
+    },
+    {
+      "path": "segment_01.json.gz",
+      "sha256": "4703d8c2b23eac73dcd151ae8c1ef041512dda171fbf6edd3e0470c67224ead2",
+      "time": 3600.0,
+      "population": {
+        "offered_by_horizon": 0,
+        "observed": 0,
+        "loaded": 0,
+        "completed": 0
+      },
+      "native_summary": {
+        "event_count": 8,
+        "completed_count": 0,
+        "failed_count": 0,
+        "runtime_seconds": 0.0,
+        "edge_enter_event_count": 0,
+        "edge_exit_event_count": 0,
+        "reservation_conflicts": 0,
+        "physical_fault_edge_entry_violation_count": 0,
+        "merge_grant_timing_mode": "jit_fair_aging_deadline",
+        "g4irsf20_event_hotpath_policy": "E2",
+        "local_queue_capacity": 0
+      },
+      "wall_seconds": 0.2985116000054404
+    },
+    {
+      "path": "segment_02.json.gz",
+      "sha256": "571db81b2341c2bdf8b41733297710b56aad24c99a9e5a07afc58201d8a45d79",
+      "time": 7200.0,
+      "population": {
+        "offered_by_horizon": 0,
+        "observed": 0,
+        "loaded": 0,
+        "completed": 0
+      },
+      "native_summary": {
+        "event_count": 8,
+        "completed_count": 0,
+        "failed_count": 0,
+        "runtime_seconds": 0.0,
+        "edge_enter_event_count": 0,
+        "edge_exit_event_count": 0,
+        "reservation_conflicts": 0,
+        "physical_fault_edge_entry_violation_count": 0,
+        "merge_grant_timing_mode": "jit_fair_aging_deadline",
+        "g4irsf20_event_hotpath_policy": "E2",
+        "local_queue_capacity": 0
+      },
+      "wall_seconds": 0.28306630003498867
+    },
+    {
+      "path": "segment_03.json.gz",
+      "sha256": "6bbf9a59bffd3c88bce46d333079587801874a11450dd594c85e4d364dd07ab0",
+      "time": 10800.0,
+      "population": {
+        "offered_by_horizon": 22,
+        "observed": 22,
+        "loaded": 15,
+        "completed": 0
+      },
+      "native_summary": {
+        "event_count": 2244,
+        "completed_count": 5,
+        "failed_count": 0,
+        "runtime_seconds": 0.0,
+        "edge_enter_event_count": 162,
+        "edge_exit_event_count": 157,
+        "reservation_conflicts": 0,
+        "physical_fault_edge_entry_violation_count": 0,
+        "merge_grant_timing_mode": "jit_fair_aging_deadline",
+        "g4irsf20_event_hotpath_policy": "E2",
+        "local_queue_capacity": 0
+      },
+      "wall_seconds": 0.417217799986247
+    },
+    {
+      "path": "segment_04.json.gz",
+      "sha256": "766a654b348569601a535dddf850632164f0c2dcba1ceb2d53774abc3c306072",
+      "time": 14400.0,
+      "population": {
+        "offered_by_horizon": 191,
+        "observed": 191,
+        "loaded": 17,
+        "completed": 0
+      },
+      "native_summary": {
+        "event_count": 7056,
+        "completed_count": 7,
+        "failed_count": 1,
+        "runtime_seconds": 0.0,
+        "edge_enter_event_count": 221,
+        "edge_exit_event_count": 221,
+        "reservation_conflicts": 0,
+        "physical_fault_edge_entry_violation_count": 0,
+        "merge_grant_timing_mode": "jit_fair_aging_deadline",
+        "g4irsf20_event_hotpath_policy": "E2",
+        "local_queue_capacity": 0
+      },
+      "wall_seconds": 0.7679491000017151
+    },
+    {
+      "path": "segment_05.json.gz",
+      "sha256": "943c3600bec332516731f63b842ee502c63634c167010245e1addf69e1d5cdd7",
+      "time": 18000.0,
+      "population": {
+        "offered_by_horizon": 986,
+        "observed": 986,
+        "loaded": 17,
+        "completed": 0
+      },
+      "native_summary": {
+        "event_count": 12075,
+        "completed_count": 7,
+        "failed_count": 1,
+        "runtime_seconds": 0.0,
+        "edge_enter_event_count": 221,
+        "edge_exit_event_count": 221,
+        "reservation_conflicts": 0,
+        "physical_fault_edge_entry_violation_count": 0,
+        "merge_grant_timing_mode": "jit_fair_aging_deadline",
+        "g4irsf20_event_hotpath_policy": "E2",
+        "local_queue_capacity": 0
+      },
+      "wall_seconds": 1.0690237000235356
+    },
+    {
+      "path": "segment_06.json.gz",
+      "sha256": "cbc6c88ec20071aa6d137f87f2342e4d5d2b3e290cd607995de9fd21903f644a",
+      "time": 21600.0,
+      "population": {
+        "offered_by_horizon": 3485,
+        "observed": 3485,
+        "loaded": 19,
+        "completed": 7
+      },
+      "native_summary": {
+        "event_count": 23408,
+        "completed_count": 29,
+        "failed_count": 1,
+        "runtime_seconds": 0.0,
+        "edge_enter_event_count": 541,
+        "edge_exit_event_count": 541,
+        "reservation_conflicts": 0,
+        "physical_fault_edge_entry_violation_count": 0,
+        "merge_grant_timing_mode": "jit_fair_aging_deadline",
+        "g4irsf20_event_hotpath_policy": "E2",
+        "local_queue_capacity": 0
+      },
+      "wall_seconds": 1.879628800030332
+    },
+    {
+      "path": "segment_07.json.gz",
+      "sha256": "c08c19886cd6a3ebf0bbadaea28d30d6a157121f1afe18efa47cdb41bd395211",
+      "time": 25200.0,
+      "population": {
+        "offered_by_horizon": 6592,
+        "observed": 6592,
+        "loaded": 19,
+        "completed": 7
+      },
+      "native_summary": {
+        "event_count": 31544,
+        "completed_count": 29,
+        "failed_count": 1,
+        "runtime_seconds": 0.0,
+        "edge_enter_event_count": 541,
+        "edge_exit_event_count": 541,
+        "reservation_conflicts": 0,
+        "physical_fault_edge_entry_violation_count": 0,
+        "merge_grant_timing_mode": "jit_fair_aging_deadline",
+        "g4irsf20_event_hotpath_policy": "E2",
+        "local_queue_capacity": 0
+      },
+      "wall_seconds": 3.1921012999955565
+    },
+    {
+      "path": "segment_08.json.gz",
+      "sha256": "497837db9f06f7109ebdc836fdaeb0710e30b6102ffb3006a7c5accf02cc34c2",
+      "time": 28800.0,
+      "population": {
+        "offered_by_horizon": 8740,
+        "observed": 8740,
+        "loaded": 19,
+        "completed": 7
+      },
+      "native_summary": {
+        "event_count": 38698,
+        "completed_count": 29,
+        "failed_count": 1,
+        "runtime_seconds": 0.0,
+        "edge_enter_event_count": 541,
+        "edge_exit_event_count": 541,
+        "reservation_conflicts": 0,
+        "physical_fault_edge_entry_violation_count": 0,
+        "merge_grant_timing_mode": "jit_fair_aging_deadline",
+        "g4irsf20_event_hotpath_policy": "E2",
+        "local_queue_capacity": 0
+      },
+      "wall_seconds": 3.6741514000459574
+    },
+    {
+      "path": "segment_09.json.gz",
+      "sha256": "1d7cd63a03a9c7cafa113c3b5d10e5eafeed1ee9a971371a1c5f040fea5e45b0",
+      "time": 32400.0,
+      "population": {
+        "offered_by_horizon": 10029,
+        "observed": 10029,
+        "loaded": 19,
+        "completed": 7
+      },
+      "native_summary": {
+        "event_count": 44939,
+        "completed_count": 29,
+        "failed_count": 1,
+        "runtime_seconds": 0.0,
+        "edge_enter_event_count": 541,
+        "edge_exit_event_count": 541,
+        "reservation_conflicts": 0,
+        "physical_fault_edge_entry_violation_count": 0,
+        "merge_grant_timing_mode": "jit_fair_aging_deadline",
+        "g4irsf20_event_hotpath_policy": "E2",
+        "local_queue_capacity": 0
+      },
+      "wall_seconds": 3.984515799966175
+    },
+    {
+      "path": "segment_10.json.gz",
+      "sha256": "7e40173b0bd0abb8ff914c113ffb97bb671affce42ac781f9409dba823a03279",
+      "time": 36000.0,
+      "population": {
+        "offered_by_horizon": 11367,
+        "observed": 11367,
+        "loaded": 19,
+        "completed": 7
+      },
+      "native_summary": {
+        "event_count": 51255,
+        "completed_count": 29,
+        "failed_count": 1,
+        "runtime_seconds": 0.0,
+        "edge_enter_event_count": 541,
+        "edge_exit_event_count": 541,
+        "reservation_conflicts": 0,
+        "physical_fault_edge_entry_violation_count": 0,
+        "merge_grant_timing_mode": "jit_fair_aging_deadline",
+        "g4irsf20_event_hotpath_policy": "E2",
+        "local_queue_capacity": 0
+      },
+      "wall_seconds": 4.3738782000145875
+    },
+    {
+      "path": "segment_11.json.gz",
+      "sha256": "82a1179ef68ed9fd92fe82e41b47a6a69dcec705bd2fea5e8cbf5a08cbc99943",
+      "time": 39600.0,
+      "population": {
+        "offered_by_horizon": 13143,
+        "observed": 13143,
+        "loaded": 19,
+        "completed": 7
+      },
+      "native_summary": {
+        "event_count": 58032,
+        "completed_count": 29,
+        "failed_count": 1,
+        "runtime_seconds": 0.0,
+        "edge_enter_event_count": 541,
+        "edge_exit_event_count": 541,
+        "reservation_conflicts": 0,
+        "physical_fault_edge_entry_violation_count": 0,
+        "merge_grant_timing_mode": "jit_fair_aging_deadline",
+        "g4irsf20_event_hotpath_policy": "E2",
+        "local_queue_capacity": 0
+      },
+      "wall_seconds": 5.302328799967654
+    },
+    {
+      "path": "segment_12.json.gz",
+      "sha256": "0272162466b39f5b5b1960ef7a739a666f6d3d99914be02199a6fedcccc5b6fe",
+      "time": 43200.0,
+      "population": {
+        "offered_by_horizon": 14464,
+        "observed": 14464,
+        "loaded": 19,
+        "completed": 7
+      },
+      "native_summary": {
+        "event_count": 64317,
+        "completed_count": 29,
+        "failed_count": 1,
+        "runtime_seconds": 0.0,
+        "edge_enter_event_count": 541,
+        "edge_exit_event_count": 541,
+        "reservation_conflicts": 0,
+        "physical_fault_edge_entry_violation_count": 0,
+        "merge_grant_timing_mode": "jit_fair_aging_deadline",
+        "g4irsf20_event_hotpath_policy": "E2",
+        "local_queue_capacity": 0
+      },
+      "wall_seconds": 5.335409999999683
+    },
+    {
+      "path": "segment_13.json.gz",
+      "sha256": "cebd9d53a58fe459b984d60cfe7c704b0a89c534db5a47281a020ab9c4cd0552",
+      "time": 46800.0,
+      "population": {
+        "offered_by_horizon": 15931,
+        "observed": 15931,
+        "loaded": 19,
+        "completed": 7
+      },
+      "native_summary": {
+        "event_count": 70723,
+        "completed_count": 29,
+        "failed_count": 1,
+        "runtime_seconds": 0.0,
+        "edge_enter_event_count": 541,
+        "edge_exit_event_count": 541,
+        "reservation_conflicts": 0,
+        "physical_fault_edge_entry_violation_count": 0,
+        "merge_grant_timing_mode": "jit_fair_aging_deadline",
+        "g4irsf20_event_hotpath_policy": "E2",
+        "local_queue_capacity": 0
+      },
+      "wall_seconds": 10.451974599971436
+    },
+    {
+      "path": "segment_14.json.gz",
+      "sha256": "a32238fd065be45fb65f2f311ad49caa088270f4d7ece3a39afcea461806f0c6",
+      "time": 50400.0,
+      "population": {
+        "offered_by_horizon": 17333,
+        "observed": 17333,
+        "loaded": 19,
+        "completed": 7
+      },
+      "native_summary": {
+        "event_count": 77077,
+        "completed_count": 29,
+        "failed_count": 1,
+        "runtime_seconds": 0.0,
+        "edge_enter_event_count": 541,
+        "edge_exit_event_count": 541,
+        "reservation_conflicts": 0,
+        "physical_fault_edge_entry_violation_count": 0,
+        "merge_grant_timing_mode": "jit_fair_aging_deadline",
+        "g4irsf20_event_hotpath_policy": "E2",
+        "local_queue_capacity": 0
+      },
+      "wall_seconds": 11.22790250001708
+    },
+    {
+      "path": "segment_15.json.gz",
+      "sha256": "c4c23c4eddda5f8d06bd7b380ef84139367eaa6d60850eb3443eb847866ecdee",
+      "time": 54000.0,
+      "population": {
+        "offered_by_horizon": 18753,
+        "observed": 18753,
+        "loaded": 19,
+        "completed": 7
+      },
+      "native_summary": {
+        "event_count": 83440,
+        "completed_count": 29,
+        "failed_count": 1,
+        "runtime_seconds": 0.0,
+        "edge_enter_event_count": 541,
+        "edge_exit_event_count": 541,
+        "reservation_conflicts": 0,
+        "physical_fault_edge_entry_violation_count": 0,
+        "merge_grant_timing_mode": "jit_fair_aging_deadline",
+        "g4irsf20_event_hotpath_policy": "E2",
+        "local_queue_capacity": 0
+      },
+      "wall_seconds": 12.274812099989504
+    },
+    {
+      "path": "segment_16.json.gz",
+      "sha256": "9dde01ce51eb6377fb53e3f0e2340f3f680cd1146d44a8ae6a9c2f5ebe714a56",
+      "time": 57600.0,
+      "population": {
+        "offered_by_horizon": 20195,
+        "observed": 20195,
+        "loaded": 19,
+        "completed": 7
+      },
+      "native_summary": {
+        "event_count": 89846,
+        "completed_count": 29,
+        "failed_count": 1,
+        "runtime_seconds": 0.0,
+        "edge_enter_event_count": 541,
+        "edge_exit_event_count": 541,
+        "reservation_conflicts": 0,
+        "physical_fault_edge_entry_violation_count": 0,
+        "merge_grant_timing_mode": "jit_fair_aging_deadline",
+        "g4irsf20_event_hotpath_policy": "E2",
+        "local_queue_capacity": 0
+      },
+      "wall_seconds": 13.297429299971554
+    },
+    {
+      "path": "segment_17.json.gz",
+      "sha256": "7c537e71e96d25d0474c466cfd9d3c69a1f7979f1878fbf3a5c79608226fa426",
+      "time": 58200.0,
+      "population": {
+        "offered_by_horizon": 20433,
+        "observed": 20433,
+        "loaded": 19,
+        "completed": 7
+      },
+      "native_summary": {
+        "event_count": 90899,
+        "completed_count": 29,
+        "failed_count": 1,
+        "runtime_seconds": 0.0,
+        "edge_enter_event_count": 541,
+        "edge_exit_event_count": 541,
+        "reservation_conflicts": 0,
+        "physical_fault_edge_entry_violation_count": 0,
+        "merge_grant_timing_mode": "jit_fair_aging_deadline",
+        "g4irsf20_event_hotpath_policy": "E2",
+        "local_queue_capacity": 0
+      },
+      "wall_seconds": 3.2272344999946654
+    },
+    {
+      "path": "segment_18.json.gz",
+      "sha256": "1dcd925683140052af3f11d702c5230e00c3877e5bdd84f174aaefd85fef68a6",
+      "time": 58800.0,
+      "population": {
+        "offered_by_horizon": 20672,
+        "observed": 20672,
+        "loaded": 19,
+        "completed": 7
+      },
+      "native_summary": {
+        "event_count": 91961,
+        "completed_count": 29,
+        "failed_count": 1,
+        "runtime_seconds": 0.0,
+        "edge_enter_event_count": 541,
+        "edge_exit_event_count": 541,
+        "reservation_conflicts": 0,
+        "physical_fault_edge_entry_violation_count": 0,
+        "merge_grant_timing_mode": "jit_fair_aging_deadline",
+        "g4irsf20_event_hotpath_policy": "E2",
+        "local_queue_capacity": 0
+      },
+      "wall_seconds": 3.4084031999809667
+    },
+    {
+      "path": "segment_19.json.gz",
+      "sha256": "0cba6a609ae924041db7aaa851833668df6f53bfe98cec81664f510d15a7cec5",
+      "time": 59400.0,
+      "population": {
+        "offered_by_horizon": 20924,
+        "observed": 20924,
+        "loaded": 19,
+        "completed": 7
+      },
+      "native_summary": {
+        "event_count": 93052,
+        "completed_count": 29,
+        "failed_count": 1,
+        "runtime_seconds": 0.0,
+        "edge_enter_event_count": 541,
+        "edge_exit_event_count": 541,
+        "reservation_conflicts": 0,
+        "physical_fault_edge_entry_violation_count": 0,
+        "merge_grant_timing_mode": "jit_fair_aging_deadline",
+        "g4irsf20_event_hotpath_policy": "E2",
+        "local_queue_capacity": 0
+      },
+      "wall_seconds": 3.3196887000231072
+    }
+  ],
+  "excluded_claims": [
+    "full-flow success",
+    "sustained circulation",
+    "forecast effect",
+    "strict per-job nonharm",
+    "native C10 comparison",
+    "conditional action-value labels",
+    "true multi-step RL"
+  ]
+}

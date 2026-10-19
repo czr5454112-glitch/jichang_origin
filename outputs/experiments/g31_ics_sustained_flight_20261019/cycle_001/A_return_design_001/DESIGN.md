@@ -1,0 +1,23 @@
+# Independent A return-choice helper
+
+New module: foundation_return_choice_domain.py. New evidence schema and model version isolate this proposal from the historical first-return contract. No native or training was run, and no historical source, raw or reference was edited.
+
+The learning owner is A. The first return is unchanged. At actual return indices 1 and 2, the actions submit a new immutable R2 request with earliest_departure equal to now or now+0.5. Message delay remains0.01 and absolute expiry remains39. The not-before difference does not imply an exactly0.5-second physical arrival difference: with no other constraints, delivery consumes0.01 before the immediate request, so the physical difference is0.49. Preserve native full rejection/receiving/retry semantics and bind each selected action to its own final ACK and EMPTY_RECEIVED request identity.
+
+API: peer_policy_contract(), action_contract(now, action_id, return_index), build_seed(evidence, *, return_index, peer_policy_contract), evaluate(evidence, action_ids, *, return_index, peer_policy_contract). Only return_now and return_delay_0_5 are supported. The helper accepts only newly registered hold3 business cases and return indices1/2. Its predictions carry no execution authority.
+
+A must collect fresh own and delivered B endpoints. The helper invokes the same endpoint validator, rejects foreign requests in A's own history, verifies complete source action IDs and terminal delivered ACKs, and uses the received B transfer ACK plus0.5 before the capture floor to prove the short5→1 headway expired. This uses public delivered source action summaries, not B's private outbox. It also checks completed reuse identities and all prior A returns have actual received ACKs. The live endpoint binding, same-current owner admission, target generation/traversal and real native session capabilities remain the controller's responsibility.
+
+The detached projection uses the existing fixed graph/service/recovery loop and the peer_route_choice hook to model later B preference8. Its future-peer contract is explicit and conditional. Future native B fresh-guard success is not certified. If the actual B guard falls back to3, that is a continuation mismatch, not a successful use of this prediction. The native branch must record and assess all actual B choices and all business completions against the original same-input reference. The helper must never be used to suppress B's guard or relabel fallback as8.
+
+Required integration steps, not performed here:
+
+- Register a new A-learning collection contract, ownerA, frozen B peer identity, candidate budget2, fresh domain/source SHA, immutable parent split and unchanged original all-job reference. Do not reuse the B-learning contract or relabel its data.
+- Intercept A second/third return before the inherited default return_now submits. Enter a new cycle_return collection and preserve the same original fallback if collection or current guard fails.
+- Add B's reply path for distinct A cycle_return invitations. The old invitation_phase calls every A-empty-at6 invitation first_return and answered_phases prevents subsequent replies. Use delivered tray generation/traversal and actual lifecycle to identify each new opportunity; keep independent0.08-second admission quiet periods and immutable retries.
+- Pass only owned A calls/outbox plus delivered endpoints to the new evidence schema; retain target identity and complete prior return provenance.
+- Recompute full-job deltas for both candidates against the frozen original reference, require exact complete business ID coverage and all deltas<=0, revalidate current owner/session/target before one submit, then preserve actual received ACKs and all raw failures.
+- Extend semantic export/guard recomputation for protected transfer choices: current code's protected semantic validator assumes a route arrival bound and imports the repeated route evaluator. It must dispatch by the new evidence/model schema and compare R2 source/destination/earliest against the immutable submitted request.
+- Use A same-owner successors and peerB identity in training; do not cross to B's next decision. Two genuine A choice moments plus a paired early-action effect and closed native origin remain mandatory.
+
+Pure tests passed23: relative timing and expiry; historical absolute7.84 behavior unchanged; forbidden first/unregistered returns; stale/incomplete/unresolved peer history; wrong cycle; unavailable source; private peer-state rejection; endpoint failure; and peer route hook scope. These tests do not claim a successful full current-state projection or native mechanism.

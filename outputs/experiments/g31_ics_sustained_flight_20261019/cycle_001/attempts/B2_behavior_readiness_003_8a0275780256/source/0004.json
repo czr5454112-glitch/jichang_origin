@@ -1,0 +1,46 @@
+{
+  "schema": "g31.airport_behavior_train_only_preregistration.v1",
+  "created_utc": "2026-10-19T13:46:01.784797+00:00",
+  "collection_plan": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\C00_receiver_recorded_v2_001\\plan.json",
+    "sha256": "c089ede73233d223661f82f7dbca8fc05fac231c666a69b4cad847fbfc35926e"
+  },
+  "new_collection_results_read": false,
+  "new_collection_labels_read": false,
+  "contract": {
+    "schema": "g31.foundation.airport_behavior_evidence.v1",
+    "split": "train",
+    "parent_group": "C00_receiver_recorded_v2_001",
+    "all_windows_and_flight_parents_same_split": true,
+    "independent_development_or_test": false,
+    "seeds": [
+      17,
+      29,
+      43
+    ],
+    "epochs": 100,
+    "checkpoint_selection": "fixed_last_epoch_no_development_selection",
+    "objective": "supervised_realized_300s_behavior_value_not_optimal_Q_or_RL",
+    "earliest_model_use_sim_time": 57600.0,
+    "native_population_deleted": 0,
+    "forecast_frozen_at": 43200.0,
+    "labels_closed_at": 57600.0,
+    "native_consumption_scope": "same_trajectory_continuation_or_shadow_diagnostic_no_control_benefit_claim"
+  },
+  "minimum": {
+    "unique_executed_requests": 12,
+    "disjoint_300s_windows": 4,
+    "source_destination_pairs": 2,
+    "nonconstant_targets": true
+  },
+  "label_population": 28506,
+  "reward_window_seconds": 300,
+  "label_selection_uses_only_events_and_acks_through_label_end": true,
+  "all_other_actual_actions_retained_in_exclusion_counts": true,
+  "old_cyclic_is_development_only_zero_executed_eligible_actions": true,
+  "model_selection": "none_all_three_seeds_fixed_final_epoch",
+  "control_benefit_claim_permitted": false,
+  "multistep_RL_claim_permitted": false,
+  "training_registration_requires_completed_readiness_and_distinct_budget": true,
+  "implementation_status": "source validation and independent reader integration finish before any actual new-collection readiness run; no source/criterion changes after evidence inspection without an explicit versioned addendum"
+}

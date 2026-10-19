@@ -1,0 +1,463 @@
+{
+  "schema": "g31.independent.airport_source_contract_review.v1",
+  "status": "read_only_static_feasibility_proposal_not_native_validation",
+  "sources": [
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\maps\\nanning_airport_profile.json",
+      "sha256": "70aeeafe2c774d415fe9f922eedec36e8e35132bcba04596c2b1c486ffb3d1df"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\legacy\\jichang_origin_readonly\\inputdata.txt",
+      "sha256": "0f39d359b47a3f243ab077e4a294cbab56ec306a0f89bcc0ccc1d946caceef87"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\C00_calibration_001\\inputs\\C00.json",
+      "sha256": "4c80aeed25902ad0b2dfb8ff67ec25bc7acef679fefa7d766db76844f5090b58"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\C00_calibration_001\\business_crosswalk.json.gz",
+      "sha256": "373fefaa85f8420e966706bd100cfeecc94fd91f8f5ef387fb159e7d4ad3384f"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\map_nanning\\附件：拓扑结构示例2.xlsx",
+      "sha256": "3cf4b4ccc8d2a503050d58d6e93684992c81785e7fd9a405d0a32ff33382eb93"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\map_nanning\\附件：拓扑结构示例1.xlsx",
+      "sha256": "802fec3d6640e6a7ed2c087c03cd6a7f4eba1178809789694d621a263b7cd1ce"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf31_nanning_map.py",
+      "sha256": "22c7275dc3e6ddc8d26789c0b263e7ec7d92d1ae564671a2c8706b81dd031b6b"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf31_nanning_workload.py",
+      "sha256": "64e0dbfe7bd3e503cb2c2b5e62685eb6c6b34cd3bd99eb9ca1d146d0c462eb13"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\original_workload.py",
+      "sha256": "f61a89a4358e6a1b6d654b03244268537b241ace258005f398810ff53f5a3016"
+    }
+  ],
+  "workbook_to_profile_exact_edges": 227,
+  "capacity_formula_consistent_edges": 227,
+  "zero_edge": {
+    "profile_edge": {
+      "start": 97,
+      "end": 98,
+      "length": 0.6,
+      "speed": 2.0,
+      "capacity": 0,
+      "pallet_capacity": 0,
+      "travel_time_seconds": 0.3,
+      "system": "国内=0",
+      "source": {
+        "workbook": "附件：拓扑结构示例2.xlsx",
+        "sheet": "邻接表",
+        "row": 7,
+        "raw_start": "ICS103",
+        "raw_end": "ICS104",
+        "resolved_start_key": "domestic:ICS103",
+        "resolved_end_key": "domestic:ICS104"
+      }
+    },
+    "row_cells": {
+      "A": {
+        "cell": "A7",
+        "value": "ICS103",
+        "formula": null,
+        "xml": "<ns0:c xmlns:ns0=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" r=\"A7\" t=\"s\"><ns0:v>89</ns0:v></ns0:c>"
+      },
+      "B": {
+        "cell": "B7",
+        "value": "ICS104",
+        "formula": null,
+        "xml": "<ns0:c xmlns:ns0=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" r=\"B7\" t=\"s\"><ns0:v>91</ns0:v></ns0:c>"
+      },
+      "C": {
+        "cell": "C7",
+        "value": 0.6,
+        "formula": null,
+        "xml": "<ns0:c xmlns:ns0=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" r=\"C7\"><ns0:v>0.6</ns0:v></ns0:c>"
+      },
+      "D": {
+        "cell": "D7",
+        "value": 2,
+        "formula": null,
+        "xml": "<ns0:c xmlns:ns0=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" r=\"D7\"><ns0:v>2</ns0:v></ns0:c>"
+      },
+      "E": {
+        "cell": "E7",
+        "value": "国内=0",
+        "formula": null,
+        "xml": "<ns0:c xmlns:ns0=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" r=\"E7\" t=\"s\"><ns0:v>8</ns0:v></ns0:c>"
+      },
+      "F": {
+        "cell": "F7",
+        "value": 0,
+        "formula": {
+          "text": null,
+          "t": "shared",
+          "si": "0"
+        },
+        "xml": "<ns0:c xmlns:ns0=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" r=\"F7\"><ns0:f t=\"shared\" si=\"0\" /><ns0:v>0</ns0:v></ns0:c>"
+      }
+    },
+    "shared_formula_anchor": {
+      "cell": "F5",
+      "value": 58,
+      "formula": {
+        "text": "FLOOR(C5/2,1)",
+        "t": "shared",
+        "ref": "F5:F36",
+        "si": "0"
+      },
+      "xml": "<ns0:c xmlns:ns0=\"http://schemas.openxmlformats.org/spreadsheetml/2006/main\" r=\"F5\"><ns0:f t=\"shared\" ref=\"F5:F36\" si=\"0\">FLOOR(C5/2,1)</ns0:f><ns0:v>58</ns0:v></ns0:c>"
+    },
+    "expanded_formula": "FLOOR(C7/2,1)",
+    "exact_value": 0,
+    "finding": "faithful source formula/cached value; no parser or missing-to-zero error; source does not prove intentional closure or authorize capacity=1"
+  },
+  "projection_defect": {
+    "function": "run_g4irsf31_nanning_workload.build_original_projection",
+    "finding": "independent whole-group load balancing across role lists without positive-capacity reachability or empty-return-cycle constraints",
+    "storage_selector": "_service_aware_distances also includes zero-capacity edges; original input separately preserves literal capacities"
+  },
+  "original": {
+    "offered_jobs": 28506,
+    "flight_groups": 360,
+    "trays": 22,
+    "unreachable_jobs": 4001,
+    "unreachable_complete_flight_groups": 48,
+    "unreachable_destinations": [
+      99,
+      101,
+      103,
+      106,
+      108,
+      110
+    ],
+    "main_positive_capacity_scc": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      24,
+      25,
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49,
+      50,
+      51,
+      52,
+      53,
+      54,
+      55,
+      56,
+      57,
+      58,
+      59,
+      60,
+      61,
+      62,
+      63,
+      64,
+      65,
+      66,
+      67,
+      68,
+      69,
+      70,
+      71,
+      72,
+      73,
+      74,
+      75,
+      76,
+      77,
+      78,
+      79,
+      80,
+      81,
+      82,
+      83,
+      84,
+      85,
+      86,
+      87,
+      88,
+      89,
+      90,
+      91,
+      94,
+      95,
+      96,
+      97,
+      112,
+      113,
+      114,
+      115,
+      116,
+      117,
+      118,
+      119,
+      120,
+      121,
+      122,
+      123,
+      124,
+      125,
+      126,
+      127,
+      128,
+      129,
+      130,
+      132,
+      133,
+      134,
+      135,
+      136,
+      137,
+      138,
+      139,
+      140,
+      141,
+      142,
+      143,
+      144,
+      145,
+      146,
+      147,
+      148,
+      149,
+      150
+    ],
+    "cyclic_loaders": [
+      0,
+      24,
+      26,
+      49,
+      57,
+      95,
+      134,
+      136,
+      138,
+      149
+    ],
+    "cyclic_unloaders": [
+      16,
+      17,
+      18,
+      19,
+      20,
+      21,
+      22,
+      23,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      60,
+      62,
+      64,
+      67,
+      69,
+      71,
+      73,
+      77,
+      79,
+      81,
+      83,
+      85,
+      87,
+      114,
+      116,
+      118,
+      120,
+      122,
+      124,
+      126
+    ],
+    "source92": {
+      "business_count": 3102,
+      "early_storage_count": 1457,
+      "scc": [
+        92
+      ],
+      "upstream_nodes": [
+        92,
+        98,
+        99,
+        100,
+        101,
+        102,
+        103,
+        104,
+        105,
+        106,
+        107,
+        108,
+        109,
+        110,
+        111,
+        131
+      ],
+      "initial_trays_with_any_path_to_92": [
+        "initial:92:0",
+        "initial:92:1"
+      ],
+      "unloader_roundtrips_to_92": 0,
+      "business_completion_upper_bound_from_physical_supply": 2,
+      "incomplete_business_lower_bound_if_origin_kept": 3100,
+      "legacy_lanes": [
+        {
+          "loader": "A1",
+          "original_start": 2,
+          "count": 392
+        },
+        {
+          "loader": "B2",
+          "original_start": 2,
+          "count": 1848
+        },
+        {
+          "loader": "D1",
+          "original_start": 3,
+          "count": 862
+        }
+      ]
+    }
+  },
+  "review_proposal": {
+    "operational_input_emitted": false,
+    "implemented": false,
+    "native_executed": false,
+    "name": "explicit_static_same_role_cyclic_projection_new_business_version",
+    "origin_map": {
+      "92": 95
+    },
+    "destination_map": {
+      "99": 114,
+      "101": 116,
+      "103": 118,
+      "106": 120,
+      "108": 122,
+      "110": 124
+    },
+    "changed_job_fields": {
+      "destination": 4001,
+      "any": 6673,
+      "both": 430,
+      "origin": 3102
+    },
+    "offered_jobs_preserved": 28506,
+    "atomic_flight_groups_preserved": 360,
+    "all_original_arrivals_std_storage_release_service_deadline_ids_preserved": true,
+    "all_non_job_input_fields_and_22_initial_trays_preserved": true,
+    "all_loaded_business_paths_positive_capacity_reachable": true,
+    "all_new_business_unloaders_can_return_to_all_10_used_loaders": true,
+    "origin_loads": {
+      "0": 3375,
+      "24": 2906,
+      "26": 2906,
+      "49": 2807,
+      "57": 2801,
+      "95": 6124,
+      "134": 1418,
+      "136": 1420,
+      "138": 1416,
+      "149": 3333
+    },
+    "destination_loads": {
+      "16": 695,
+      "17": 661,
+      "18": 698,
+      "19": 698,
+      "20": 695,
+      "21": 691,
+      "22": 681,
+      "23": 681,
+      "41": 655,
+      "42": 655,
+      "43": 655,
+      "44": 655,
+      "45": 654,
+      "46": 654,
+      "47": 696,
+      "48": 695,
+      "60": 695,
+      "62": 695,
+      "64": 694,
+      "67": 694,
+      "69": 694,
+      "71": 694,
+      "73": 656,
+      "77": 656,
+      "79": 634,
+      "81": 693,
+      "83": 693,
+      "85": 655,
+      "87": 696,
+      "114": 1330,
+      "116": 1362,
+      "118": 1362,
+      "120": 1364,
+      "122": 1364,
+      "124": 1361,
+      "126": 695
+    },
+    "selection_rule": "fixed same-role domestic substitution, independent of learned predictions, observed completion, or branch performance; no deleted jobs",
+    "authorization_boundary": "candidate new research business projection only under explicitly accepted new-domain scope; never relabel C00/C10, never claim same-scenario gain; physical interpretation of 0 capacity needs external source-owner evidence",
+    "limitations": [
+      "static paths are necessary, not sufficient for finite-buffer FIFO throughput or no-gridlock",
+      "increased same-role endpoint load can create different bottlenecks; no measured benefit asserted",
+      "new baseline and all methods must share new input; full 28506 evaluator and strict per-item checks remain",
+      "role-uniform forecast mapping must separately version away inactive origin92 or remain explicit unknown; no historical group-size leakage to actor"
+    ]
+  }
+}

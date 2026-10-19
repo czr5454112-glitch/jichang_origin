@@ -38,6 +38,14 @@ inline std::string EventDrivenJunctionRuntime::publish_circulation_planning_snap
     contract.string(circulation_.owner(n.node));contract.i64(n.capacity);contract.i64(n.export_min_stock);
     contract.boolean(n.allow_export);contract.boolean(n.allow_receive);
   }
+  const auto receiving_policy_count=std::count_if(circulation_.input.nodes.begin(),circulation_.input.nodes.end(),
+      [](const auto& n){return n.empty_receive_transit_reserve != 0;});
+  if(receiving_policy_count) {
+    contract.string("g31.receiver_empty_transit_admission.v1");contract.u64(receiving_policy_count);
+    for(const auto& n:circulation_.input.nodes) if(n.empty_receive_transit_reserve != 0) {
+      contract.i64(n.node);contract.i64(n.empty_receive_transit_reserve);
+    }
+  }
   contract.u64(circulation_.input.edges.size());
   for(const auto& e:circulation_.input.edges) {
     const auto& physical=graph_.edge(e.from,e.to);

@@ -1,0 +1,948 @@
+{
+  "schema": "g31.independent.R1_full_request_audit.v2",
+  "status": "passed_with_explicit_timing_scope",
+  "raw": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\R1_async_v2_001\\raw.json.gz",
+    "sha256": "0075f6eeeb3370c2b3e4a9b71ab53383cdbf6ac46ef8b4faf627ca24ac5945b1"
+  },
+  "comparison_raw": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A5_train_async_001\\raw.json.gz",
+    "sha256": "fdb82070d3583d31d8fb04e3705c94e3ec5a7a80cb410ce9008338b245cff340"
+  },
+  "audit_script": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\async_audit_tool_001\\audit_R1_v2.py",
+    "sha256": "363e8c194cafb7de1006fb273ee880ca1db47cf21ffafd9db48fbdd01d845c39"
+  },
+  "chain_auditor": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\async_audit_tool_001\\audit_async.py",
+    "sha256": "67cae1b1597cc9254a2cba0c9f7e670033aa4849dbb91e653ff9c6f39ca078b6"
+  },
+  "native_started_by_audit": false,
+  "source_mutated": false,
+  "completion": {
+    "loaded": 7.250999999999998,
+    "receiver": 5.449999999999999,
+    "reuse1": 12.700999999999993,
+    "reuse2": 19.410999999999998,
+    "blocker": 28.800000000000004,
+    "reuse3": 26.121000000000013
+  },
+  "delta_from_original_fixed_rule": {
+    "loaded": 0.0,
+    "receiver": 0.0,
+    "reuse1": 0.0,
+    "reuse2": -11.08900000000001,
+    "blocker": 0.0,
+    "reuse3": -9.789000000000005
+  },
+  "exact_completion_equal_to_pre_R1": true,
+  "physical_summary": {
+    "status": "assessed",
+    "completion": {
+      "loaded": 7.250999999999998,
+      "receiver": 5.449999999999999,
+      "reuse1": 12.700999999999993,
+      "reuse2": 19.410999999999998,
+      "blocker": 28.800000000000004,
+      "reuse3": 26.121000000000013
+    },
+    "business_complete": true,
+    "common_horizon_complete": true,
+    "completion_sum": 99.73400000000001,
+    "supply_recovery_valid": true,
+    "all_original_and_new_returns_received": true,
+    "same_L_all_reuse_loads": true,
+    "all_routes_updated_and_match_edges": true,
+    "stock_preserved": true,
+    "audit": {
+      "status": "passed",
+      "completed_traversals": 21,
+      "open_traversals": 0,
+      "tray_count": 3,
+      "optimality": "unknown",
+      "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+    },
+    "all_input_business_in_evaluator": true,
+    "native_model_protection_certified": false
+  },
+  "current_chains": [
+    {
+      "status": "passed",
+      "decision_id": "53f23b62941377e819a37912b3cd7aec2e570ec5f8e3ba60e43219470028cce7",
+      "target_job": "reuse2",
+      "chosen": "prefer_8",
+      "command_id": "live:1:B:later-route-1",
+      "ack": {
+        "sequence": 1,
+        "attempt": 1,
+        "observed_at": 15.16099999999999,
+        "delivered_at": 15.18099999999999,
+        "executed_at": 15.16099999999999,
+        "completed_at": 15.16099999999999,
+        "status": "updated",
+        "reason": "allowed",
+        "result_id": "live:1:B:later-route-1"
+      },
+      "edge": {
+        "time": 15.210999999999991,
+        "event": "EDGE_ENTER",
+        "business_bag_id": "reuse2",
+        "transport_leg_id": "reuse2:direct:8",
+        "tray_id": "L",
+        "traversal_id": 14,
+        "node": 7,
+        "from": 7,
+        "to": 8,
+        "reason": ""
+      },
+      "source_ages_sim_s": {
+        "B": 0.02999999999999936,
+        "A": 0.009999999999999787
+      },
+      "enabled_ids": [
+        "native_default",
+        "prefer_3",
+        "prefer_8"
+      ],
+      "old_collect_plus_evaluate_envelope_ms": 52.6474,
+      "worker": {
+        "status": "passed_consumed_worker_ranking",
+        "worker_request_id": "B-00001",
+        "target_job": "reuse2",
+        "source_evidence_sha256": "3568462ccc0732b957e677dd96a87eb510242b4690165dca430692d6a0d8ac99",
+        "body_file": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\R1_async_v2_001\\resident_B\\B-00001.json",
+          "sha256": "a12a88d47f55b8a3277923712bc0af14a291ed0a565e6cd8e9cc26bb7bab541b"
+        },
+        "rankable_authorized_ids": [
+          "native_default",
+          "prefer_3",
+          "prefer_8"
+        ],
+        "worker_candidate_order": [
+          "prefer_8",
+          "native_default",
+          "prefer_3"
+        ],
+        "selected_with_worker_order": "prefer_8",
+        "selection_without_worker_order": "prefer_8",
+        "worker_order_changes_choice": false,
+        "native_progress_during_worker_observed": true,
+        "native_activations_during_worker": 5,
+        "progressed_sim_times_during_worker": [
+          12.810999999999993,
+          12.819999999999999,
+          12.830999999999992,
+          12.86
+        ],
+        "progress_scope": {
+          "observed": true,
+          "native_activations": 5,
+          "distinct_sim_times": [
+            12.810999999999993,
+            12.819999999999999,
+            12.830999999999992,
+            12.86
+          ],
+          "scope": "at_least_two_distinct_native_owner_activation_sim_times_inside_actual_worker_wall_interval",
+          "physical_events_bound_to_worker_wall_interval": false
+        },
+        "sim_seconds": {
+          "preview": 12.799999999999999,
+          "body_collected": 12.91,
+          "fresh_collection_started": 15.110999999999992,
+          "selected": 15.150999999999991,
+          "ack_delivered": 15.18099999999999,
+          "edge": 15.210999999999991
+        },
+        "wall_milliseconds": {
+          "worker_projection_envelope": 25.9079,
+          "worker_cpu": 15.625,
+          "enqueue_record_to_completed_body": 47.0919,
+          "completed_body_to_foreground_poll": 16.5365,
+          "enqueue_record_to_foreground_poll": 63.6284,
+          "pack_and_enqueue": 12.26,
+          "nonblocking_poll_and_body_read": 2.4735
+        },
+        "body_wait_caveat": "Queue residence/completion/read interval is elapsed wall time, not a foreground blocking wait. Enqueue record is emitted after put_nowait.",
+        "wall_and_sim_are_not_interchangeable": true
+      },
+      "physical_latency_sim_s": 0.0600000000000005,
+      "physical_edge_possible_native_advance_envelopes": [
+        {
+          "start_wall_ns": 387751511642800,
+          "end_wall_ns": 387751511929100,
+          "before_sim_s": 15.21,
+          "after_sim_s": 15.210999999999991,
+          "timestamp_complete": true
+        },
+        {
+          "start_wall_ns": 387751519115800,
+          "end_wall_ns": 387751519157700,
+          "before_sim_s": 15.210999999999991,
+          "after_sim_s": 15.22099999999999,
+          "timestamp_complete": true
+        }
+      ],
+      "physical_edge_exact_wall_ns": null
+    },
+    {
+      "status": "passed",
+      "decision_id": "cc494a8d0fa4ac8b22846564f1e8d37b595a7e5629045c4a32b5b65c1f823aa7",
+      "target_job": "reuse3",
+      "chosen": "prefer_8",
+      "command_id": "live:1:B:later-route-2",
+      "ack": {
+        "sequence": 1,
+        "attempt": 1,
+        "observed_at": 21.871000000000013,
+        "delivered_at": 21.891000000000012,
+        "executed_at": 21.871000000000013,
+        "completed_at": 21.871000000000013,
+        "status": "updated",
+        "reason": "allowed",
+        "result_id": "live:1:B:later-route-2"
+      },
+      "edge": {
+        "time": 21.921000000000006,
+        "event": "EDGE_ENTER",
+        "business_bag_id": "reuse3",
+        "transport_leg_id": "reuse3:direct:10",
+        "tray_id": "L",
+        "traversal_id": 18,
+        "node": 7,
+        "from": 7,
+        "to": 8,
+        "reason": ""
+      },
+      "source_ages_sim_s": {
+        "B": 0.03000000000000469,
+        "A": 0.010000000000001563
+      },
+      "enabled_ids": [
+        "native_default",
+        "prefer_8"
+      ],
+      "old_collect_plus_evaluate_envelope_ms": 55.6086,
+      "worker": {
+        "status": "passed_consumed_worker_ranking",
+        "worker_request_id": "B-00002",
+        "target_job": "reuse3",
+        "source_evidence_sha256": "fb9064ca9bfbf0763142140397acdbc0b103987b2a7760780c0387eb520f944c",
+        "body_file": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\R1_async_v2_001\\resident_B\\B-00002.json",
+          "sha256": "2a3f9c68aebb1dfd626dc866a507a37a407e8fd9dfe356ab9511c68a6b3af026"
+        },
+        "rankable_authorized_ids": [
+          "native_default",
+          "prefer_8"
+        ],
+        "worker_candidate_order": [
+          "prefer_8",
+          "native_default",
+          "prefer_3"
+        ],
+        "selected_with_worker_order": "prefer_8",
+        "selection_without_worker_order": "prefer_8",
+        "worker_order_changes_choice": false,
+        "native_progress_during_worker_observed": true,
+        "native_activations_during_worker": 4,
+        "progressed_sim_times_during_worker": [
+          15.31,
+          15.36
+        ],
+        "progress_scope": {
+          "observed": true,
+          "native_activations": 4,
+          "distinct_sim_times": [
+            15.31,
+            15.36
+          ],
+          "scope": "at_least_two_distinct_native_owner_activation_sim_times_inside_actual_worker_wall_interval",
+          "physical_events_bound_to_worker_wall_interval": false
+        },
+        "sim_seconds": {
+          "preview": 15.260999999999989,
+          "body_collected": 15.41,
+          "fresh_collection_started": 21.821000000000005,
+          "selected": 21.86100000000001,
+          "ack_delivered": 21.891000000000012,
+          "edge": 21.921000000000006
+        },
+        "wall_milliseconds": {
+          "worker_projection_envelope": 28.2085,
+          "worker_cpu": 31.25,
+          "enqueue_record_to_completed_body": 46.7717,
+          "completed_body_to_foreground_poll": 14.9544,
+          "enqueue_record_to_foreground_poll": 61.7261,
+          "pack_and_enqueue": 12.0957,
+          "nonblocking_poll_and_body_read": 1.8904
+        },
+        "body_wait_caveat": "Queue residence/completion/read interval is elapsed wall time, not a foreground blocking wait. Enqueue record is emitted after put_nowait.",
+        "wall_and_sim_are_not_interchangeable": true
+      },
+      "physical_latency_sim_s": 0.05999999999999517,
+      "physical_edge_possible_native_advance_envelopes": [
+        {
+          "start_wall_ns": 387754503090700,
+          "end_wall_ns": 387754503196500,
+          "before_sim_s": 21.91,
+          "after_sim_s": 21.921000000000006,
+          "timestamp_complete": true
+        },
+        {
+          "start_wall_ns": 387754517006900,
+          "end_wall_ns": 387754517034100,
+          "before_sim_s": 21.921000000000006,
+          "after_sim_s": 21.96,
+          "timestamp_complete": true
+        }
+      ],
+      "physical_edge_exact_wall_ns": null
+    }
+  ],
+  "timing": {
+    "groups": {
+      "all_logical_requests": {
+        "count": 5,
+        "status_counts": {
+          "preview_worker_enqueued": 2,
+          "protected_current": 2,
+          "preview_refused_or_no_current_target": 1
+        },
+        "submitted": 2,
+        "metrics": {
+          "logical_wait_to_ready_wall_ms": {
+            "population": 5,
+            "measured": 5,
+            "missing_or_not_applicable": 0,
+            "median_ms": 22.8552,
+            "max_ms": 31.9152
+          },
+          "open_to_controller_done_wall_ms": {
+            "population": 5,
+            "measured": 5,
+            "missing_or_not_applicable": 0,
+            "median_ms": 63.4843,
+            "max_ms": 126.5302
+          },
+          "ready_to_controller_done_wall_ms": {
+            "population": 5,
+            "measured": 5,
+            "missing_or_not_applicable": 0,
+            "median_ms": 37.2393,
+            "max_ms": 94.615
+          },
+          "open_to_route_dispatch_return_wall_ms": {
+            "population": 5,
+            "measured": 2,
+            "missing_or_not_applicable": 3,
+            "median_ms": 104.91040000000001,
+            "max_ms": 120.7466
+          },
+          "open_to_native_submit_return_wall_ms": {
+            "population": 5,
+            "measured": 2,
+            "missing_or_not_applicable": 3,
+            "median_ms": 104.86185,
+            "max_ms": 120.697
+          },
+          "actual_native_submit_wall_ms": {
+            "population": 5,
+            "measured": 2,
+            "missing_or_not_applicable": 3,
+            "median_ms": 0.03655,
+            "max_ms": 0.04
+          }
+        },
+        "stages": {
+          "collect": {
+            "population": 5,
+            "measured": 5,
+            "missing_or_not_applicable": 0,
+            "median_ms": 25.0283,
+            "max_ms": 34.1085
+          },
+          "all_candidate_evaluate": {
+            "population": 5,
+            "measured": 5,
+            "missing_or_not_applicable": 0,
+            "median_ms": 0.0042,
+            "max_ms": 28.3964
+          },
+          "mask": {
+            "population": 5,
+            "measured": 2,
+            "missing_or_not_applicable": 3,
+            "median_ms": 0.18555000000000002,
+            "max_ms": 0.2664
+          },
+          "public_observation": {
+            "population": 5,
+            "measured": 2,
+            "missing_or_not_applicable": 3,
+            "median_ms": 9.582550000000001,
+            "max_ms": 10.1734
+          },
+          "inference": {
+            "population": 5,
+            "measured": 2,
+            "missing_or_not_applicable": 3,
+            "median_ms": 0.00145,
+            "max_ms": 0.0017
+          },
+          "ranking": {
+            "population": 5,
+            "measured": 2,
+            "missing_or_not_applicable": 3,
+            "median_ms": 0.019049999999999997,
+            "max_ms": 0.0208
+          },
+          "require_current": {
+            "population": 5,
+            "measured": 2,
+            "missing_or_not_applicable": 3,
+            "median_ms": 8.58775,
+            "max_ms": 9.2988
+          },
+          "route_dispatch_envelope": {
+            "population": 5,
+            "measured": 2,
+            "missing_or_not_applicable": 3,
+            "median_ms": 10.8674,
+            "max_ms": 13.5751
+          }
+        }
+      },
+      "current_cycle_route": {
+        "count": 2,
+        "status_counts": {
+          "protected_current": 2
+        },
+        "submitted": 2,
+        "metrics": {
+          "logical_wait_to_ready_wall_ms": {
+            "population": 2,
+            "measured": 2,
+            "missing_or_not_applicable": 0,
+            "median_ms": 21.494349999999997,
+            "max_ms": 31.9152
+          },
+          "open_to_controller_done_wall_ms": {
+            "population": 2,
+            "measured": 2,
+            "missing_or_not_applicable": 0,
+            "median_ms": 110.0512,
+            "max_ms": 126.5302
+          },
+          "ready_to_controller_done_wall_ms": {
+            "population": 2,
+            "measured": 2,
+            "missing_or_not_applicable": 0,
+            "median_ms": 88.55685,
+            "max_ms": 94.615
+          },
+          "open_to_route_dispatch_return_wall_ms": {
+            "population": 2,
+            "measured": 2,
+            "missing_or_not_applicable": 0,
+            "median_ms": 104.91040000000001,
+            "max_ms": 120.7466
+          },
+          "open_to_native_submit_return_wall_ms": {
+            "population": 2,
+            "measured": 2,
+            "missing_or_not_applicable": 0,
+            "median_ms": 104.86185,
+            "max_ms": 120.697
+          },
+          "actual_native_submit_wall_ms": {
+            "population": 2,
+            "measured": 2,
+            "missing_or_not_applicable": 0,
+            "median_ms": 0.03655,
+            "max_ms": 0.04
+          }
+        },
+        "stages": {
+          "collect": {
+            "population": 2,
+            "measured": 2,
+            "missing_or_not_applicable": 0,
+            "median_ms": 26.7065,
+            "max_ms": 29.2187
+          },
+          "all_candidate_evaluate": {
+            "population": 2,
+            "measured": 2,
+            "missing_or_not_applicable": 0,
+            "median_ms": 27.36075,
+            "max_ms": 28.3964
+          },
+          "mask": {
+            "population": 2,
+            "measured": 2,
+            "missing_or_not_applicable": 0,
+            "median_ms": 0.18555000000000002,
+            "max_ms": 0.2664
+          },
+          "public_observation": {
+            "population": 2,
+            "measured": 2,
+            "missing_or_not_applicable": 0,
+            "median_ms": 9.582550000000001,
+            "max_ms": 10.1734
+          },
+          "inference": {
+            "population": 2,
+            "measured": 2,
+            "missing_or_not_applicable": 0,
+            "median_ms": 0.00145,
+            "max_ms": 0.0017
+          },
+          "ranking": {
+            "population": 2,
+            "measured": 2,
+            "missing_or_not_applicable": 0,
+            "median_ms": 0.019049999999999997,
+            "max_ms": 0.0208
+          },
+          "require_current": {
+            "population": 2,
+            "measured": 2,
+            "missing_or_not_applicable": 0,
+            "median_ms": 8.58775,
+            "max_ms": 9.2988
+          },
+          "route_dispatch_envelope": {
+            "population": 2,
+            "measured": 2,
+            "missing_or_not_applicable": 0,
+            "median_ms": 10.8674,
+            "max_ms": 13.5751
+          }
+        }
+      },
+      "nonexecuting_preview": {
+        "count": 3,
+        "status_counts": {
+          "preview_worker_enqueued": 2,
+          "preview_refused_or_no_current_target": 1
+        },
+        "submitted": 0,
+        "metrics": {
+          "logical_wait_to_ready_wall_ms": {
+            "population": 3,
+            "measured": 3,
+            "missing_or_not_applicable": 0,
+            "median_ms": 22.8552,
+            "max_ms": 29.2918
+          },
+          "open_to_controller_done_wall_ms": {
+            "population": 3,
+            "measured": 3,
+            "missing_or_not_applicable": 0,
+            "median_ms": 60.0945,
+            "max_ms": 63.4843
+          },
+          "ready_to_controller_done_wall_ms": {
+            "population": 3,
+            "measured": 3,
+            "missing_or_not_applicable": 0,
+            "median_ms": 34.1925,
+            "max_ms": 37.2393
+          },
+          "open_to_route_dispatch_return_wall_ms": {
+            "population": 3,
+            "measured": 0,
+            "missing_or_not_applicable": 3,
+            "median_ms": null,
+            "max_ms": null
+          },
+          "open_to_native_submit_return_wall_ms": {
+            "population": 3,
+            "measured": 0,
+            "missing_or_not_applicable": 3,
+            "median_ms": null,
+            "max_ms": null
+          },
+          "actual_native_submit_wall_ms": {
+            "population": 3,
+            "measured": 0,
+            "missing_or_not_applicable": 3,
+            "median_ms": null,
+            "max_ms": null
+          }
+        },
+        "stages": {
+          "collect": {
+            "population": 3,
+            "measured": 3,
+            "missing_or_not_applicable": 0,
+            "median_ms": 25.0283,
+            "max_ms": 34.1085
+          },
+          "all_candidate_evaluate": {
+            "population": 3,
+            "measured": 3,
+            "missing_or_not_applicable": 0,
+            "median_ms": 0.0027,
+            "max_ms": 0.0042
+          },
+          "mask": {
+            "population": 3,
+            "measured": 0,
+            "missing_or_not_applicable": 3,
+            "median_ms": null,
+            "max_ms": null
+          },
+          "public_observation": {
+            "population": 3,
+            "measured": 0,
+            "missing_or_not_applicable": 3,
+            "median_ms": null,
+            "max_ms": null
+          },
+          "inference": {
+            "population": 3,
+            "measured": 0,
+            "missing_or_not_applicable": 3,
+            "median_ms": null,
+            "max_ms": null
+          },
+          "ranking": {
+            "population": 3,
+            "measured": 0,
+            "missing_or_not_applicable": 3,
+            "median_ms": null,
+            "max_ms": null
+          },
+          "require_current": {
+            "population": 3,
+            "measured": 0,
+            "missing_or_not_applicable": 3,
+            "median_ms": null,
+            "max_ms": null
+          },
+          "route_dispatch_envelope": {
+            "population": 3,
+            "measured": 0,
+            "missing_or_not_applicable": 3,
+            "median_ms": null,
+            "max_ms": null
+          }
+        }
+      }
+    },
+    "requests": [
+      {
+        "owner": "B",
+        "phase": "preview_next_route",
+        "root_id": "activation:601:B",
+        "target_job": "reuse2",
+        "generation": null,
+        "traversal_id": null,
+        "open_wall_ns": 387750597889500,
+        "open_sim_s": 12.76,
+        "request_id": "live:1:B:rolling-preview_next_route-7",
+        "status": "preview_worker_enqueued",
+        "milestones_ns": {
+          "ready_entry": 387750604852800,
+          "collect_start": 387750604899900,
+          "collect_end": 387750624694600,
+          "evaluate_start": 387750624697800,
+          "evaluate_end": 387750624700500
+        },
+        "ready_entry_sim_s": 12.799999999999999,
+        "close_wall_ns": 387750637000300,
+        "close_sim_s": 12.799999999999999,
+        "command_id": null,
+        "decision_id": null,
+        "stage_wall_ms": {
+          "collect": 19.7947,
+          "all_candidate_evaluate": 0.0027,
+          "mask": null,
+          "public_observation": null,
+          "inference": null,
+          "ranking": null,
+          "require_current": null,
+          "route_dispatch_envelope": null
+        },
+        "logical_wait_to_ready_wall_ms": 6.9633,
+        "open_to_controller_done_wall_ms": 39.1108,
+        "ready_to_controller_done_wall_ms": 32.1475,
+        "open_to_route_dispatch_return_wall_ms": null,
+        "actual_native_submit_wall_ms": null,
+        "open_to_native_submit_return_wall_ms": null,
+        "submit_to_ack_read_envelopes": []
+      },
+      {
+        "owner": "B",
+        "phase": "cycle_route",
+        "root_id": "activation:718:B",
+        "target_job": "reuse2",
+        "generation": 8,
+        "traversal_id": 9,
+        "open_wall_ns": 387751347335300,
+        "open_sim_s": 15.110999999999992,
+        "request_id": "live:1:B:rolling-cycle_route-9",
+        "status": "protected_current",
+        "milestones_ns": {
+          "ready_entry": 387751358408800,
+          "collect_start": 387751358463800,
+          "collect_end": 387751382658100,
+          "evaluate_start": 387751382663000,
+          "evaluate_end": 387751411059400,
+          "mask_start": 387751411067300,
+          "mask_end": 387751411333700,
+          "public_start": 387751411345900,
+          "public_end": 387751420337600,
+          "inference_start": 387751420340200,
+          "inference_end": 387751420341900,
+          "ranking_start": 387751420344400,
+          "ranking_end": 387751420365200,
+          "require_current_start": 387751420366800,
+          "require_current_end": 387751428243500,
+          "route_dispatch_start": 387751428249800,
+          "route_dispatch_end": 387751436409500
+        },
+        "ready_entry_sim_s": 15.150999999999991,
+        "inference_status": "not_applicable_no_value_model",
+        "close_wall_ns": 387751440907500,
+        "close_sim_s": 15.150999999999991,
+        "command_id": "live:1:B:later-route-1",
+        "decision_id": "53f23b62941377e819a37912b3cd7aec2e570ec5f8e3ba60e43219470028cce7",
+        "stage_wall_ms": {
+          "collect": 24.1943,
+          "all_candidate_evaluate": 28.3964,
+          "mask": 0.2664,
+          "public_observation": 8.9917,
+          "inference": 0.0017,
+          "ranking": 0.0208,
+          "require_current": 7.8767,
+          "route_dispatch_envelope": 8.1597
+        },
+        "logical_wait_to_ready_wall_ms": 11.0735,
+        "open_to_controller_done_wall_ms": 93.5722,
+        "ready_to_controller_done_wall_ms": 82.4987,
+        "open_to_route_dispatch_return_wall_ms": 89.0742,
+        "actual_native_submit_wall_ms": 0.0331,
+        "open_to_native_submit_return_wall_ms": 89.0267,
+        "submit_to_ack_read_envelopes": [
+          {
+            "request_id": "live:1:B:later-route-1",
+            "owner": "B",
+            "sequence": 1,
+            "status": "updated",
+            "delivered_sim_s": 15.18099999999999,
+            "read_start_wall_ns": 387751484251100,
+            "read_end_wall_ns": 387751492650700,
+            "scope": "owner_activation_envelope_contains_actual_delivered_ack_read",
+            "submit_return_to_read_end_wall_ms": 56.2887
+          }
+        ]
+      },
+      {
+        "owner": "B",
+        "phase": "preview_next_route",
+        "root_id": "activation:726:B",
+        "target_job": "reuse3",
+        "generation": 8,
+        "traversal_id": 9,
+        "open_wall_ns": 387751492368200,
+        "open_sim_s": 15.18099999999999,
+        "request_id": "live:1:B:rolling-preview_next_route-10",
+        "status": "preview_refused_or_no_current_target",
+        "milestones_ns": {
+          "ready_entry": 387751521660000,
+          "collect_start": 387751521720400,
+          "collect_end": 387751555828900,
+          "evaluate_start": 387751555832700,
+          "evaluate_end": 387751555835200
+        },
+        "ready_entry_sim_s": 15.22099999999999,
+        "close_wall_ns": 387751555852500,
+        "close_sim_s": 15.22099999999999,
+        "command_id": null,
+        "decision_id": null,
+        "stage_wall_ms": {
+          "collect": 34.1085,
+          "all_candidate_evaluate": 0.0025,
+          "mask": null,
+          "public_observation": null,
+          "inference": null,
+          "ranking": null,
+          "require_current": null,
+          "route_dispatch_envelope": null
+        },
+        "logical_wait_to_ready_wall_ms": 29.2918,
+        "open_to_controller_done_wall_ms": 63.4843,
+        "ready_to_controller_done_wall_ms": 34.1925,
+        "open_to_route_dispatch_return_wall_ms": null,
+        "actual_native_submit_wall_ms": null,
+        "open_to_native_submit_return_wall_ms": null,
+        "submit_to_ack_read_envelopes": []
+      },
+      {
+        "owner": "B",
+        "phase": "preview_next_route",
+        "root_id": "activation:731:B",
+        "target_job": "reuse3",
+        "generation": 8,
+        "traversal_id": 10,
+        "open_wall_ns": 387751563823200,
+        "open_sim_s": 15.22099999999999,
+        "request_id": "live:1:B:rolling-preview_next_route-11",
+        "status": "preview_worker_enqueued",
+        "milestones_ns": {
+          "ready_entry": 387751586678400,
+          "collect_start": 387751586742200,
+          "collect_end": 387751611770500,
+          "evaluate_start": 387751611775400,
+          "evaluate_end": 387751611779600
+        },
+        "ready_entry_sim_s": 15.260999999999989,
+        "close_wall_ns": 387751623917700,
+        "close_sim_s": 15.260999999999989,
+        "command_id": null,
+        "decision_id": null,
+        "stage_wall_ms": {
+          "collect": 25.0283,
+          "all_candidate_evaluate": 0.0042,
+          "mask": null,
+          "public_observation": null,
+          "inference": null,
+          "ranking": null,
+          "require_current": null,
+          "route_dispatch_envelope": null
+        },
+        "logical_wait_to_ready_wall_ms": 22.8552,
+        "open_to_controller_done_wall_ms": 60.0945,
+        "ready_to_controller_done_wall_ms": 37.2393,
+        "open_to_route_dispatch_return_wall_ms": null,
+        "actual_native_submit_wall_ms": null,
+        "open_to_native_submit_return_wall_ms": null,
+        "submit_to_ack_read_envelopes": []
+      },
+      {
+        "owner": "B",
+        "phase": "cycle_route",
+        "root_id": "activation:1029:B",
+        "target_job": "reuse3",
+        "generation": 11,
+        "traversal_id": 13,
+        "open_wall_ns": 387754328461900,
+        "open_sim_s": 21.821000000000005,
+        "request_id": "live:1:B:rolling-cycle_route-13",
+        "status": "protected_current",
+        "milestones_ns": {
+          "ready_entry": 387754360377100,
+          "collect_start": 387754360459400,
+          "collect_end": 387754389678100,
+          "evaluate_start": 387754389681300,
+          "evaluate_end": 387754416006400,
+          "mask_start": 387754416014500,
+          "mask_end": 387754416119200,
+          "public_start": 387754416131100,
+          "public_end": 387754426304500,
+          "inference_start": 387754426306800,
+          "inference_end": 387754426308000,
+          "ranking_start": 387754426310300,
+          "ranking_end": 387754426327600,
+          "require_current_start": 387754426328400,
+          "require_current_end": 387754435627200,
+          "route_dispatch_start": 387754435633400,
+          "route_dispatch_end": 387754449208500
+        },
+        "ready_entry_sim_s": 21.86100000000001,
+        "inference_status": "not_applicable_no_value_model",
+        "close_wall_ns": 387754454992100,
+        "close_sim_s": 21.86100000000001,
+        "command_id": "live:1:B:later-route-2",
+        "decision_id": "cc494a8d0fa4ac8b22846564f1e8d37b595a7e5629045c4a32b5b65c1f823aa7",
+        "stage_wall_ms": {
+          "collect": 29.2187,
+          "all_candidate_evaluate": 26.3251,
+          "mask": 0.1047,
+          "public_observation": 10.1734,
+          "inference": 0.0012,
+          "ranking": 0.0173,
+          "require_current": 9.2988,
+          "route_dispatch_envelope": 13.5751
+        },
+        "logical_wait_to_ready_wall_ms": 31.9152,
+        "open_to_controller_done_wall_ms": 126.5302,
+        "ready_to_controller_done_wall_ms": 94.615,
+        "open_to_route_dispatch_return_wall_ms": 120.7466,
+        "actual_native_submit_wall_ms": 0.04,
+        "open_to_native_submit_return_wall_ms": 120.697,
+        "submit_to_ack_read_envelopes": [
+          {
+            "request_id": "live:1:B:later-route-2",
+            "owner": "B",
+            "sequence": 1,
+            "status": "updated",
+            "delivered_sim_s": 21.891000000000012,
+            "read_start_wall_ns": 387754472961100,
+            "read_end_wall_ns": 387754484594000,
+            "scope": "owner_activation_envelope_contains_actual_delivered_ack_read",
+            "submit_return_to_read_end_wall_ms": 35.4351
+          }
+        ]
+      }
+    ],
+    "owner_activations": {
+      "population": 1780,
+      "measured": 1780,
+      "missing_or_not_applicable": 0,
+      "median_ms": 6.920299999999999,
+      "max_ms": 106.4457
+    },
+    "all_client_roots": 1780,
+    "measured_owner_roots": 1780,
+    "unmeasured_root_counts": {},
+    "unmeasured_roots": [],
+    "all_owner_activations_timed_claim_validated": true,
+    "actual_submit_calls": 63,
+    "actual_ack_reads": 63,
+    "measured_ack_reads": 63,
+    "unmeasured_ack_read_keys": [],
+    "exception_path_timing_persistence_validated_by_this_successful_run": false,
+    "exception_path_note": "v2 exception persistence is checked by session_016 pure failure fixtures; this successful native branch does not exercise process failure.",
+    "overlapping_envelopes_must_not_be_summed": true,
+    "physical_effect_exact_wall_time_measured": false
+  },
+  "static_registry_initialization": {
+    "schema": "g31.foundation.repeated_static_registry.v1",
+    "case_count": 10,
+    "contract_field_count": 13,
+    "compilation_wall_ns": 321749600,
+    "dynamic_state_cached": false,
+    "compilation_included_in_current_request": false,
+    "initialization_wall_ns": 327668000
+  },
+  "resident_cold_start_shutdown": {
+    "cold_start_and_ready_wall_ms": 2575.5499,
+    "static_registry_initialization": {
+      "schema": "g31.foundation.repeated_static_registry.v1",
+      "case_count": 10,
+      "contract_field_count": 13,
+      "compilation_wall_ns": 320719000,
+      "dynamic_state_cached": false,
+      "compilation_included_in_current_request": false,
+      "initialization_wall_ns": 327118700
+    },
+    "after_native_shutdown_wall_ms": 40.2327
+  },
+  "whole_bounded_process_wall_seconds": 38.60899999999674,
+  "full_request_100ms_certified": false,
+  "realtime_async_certified": false,
+  "limits": [
+    "Two submitted current requests per arm do not establish a latency distribution or 100 ms guarantee.",
+    "Report actual missing root and ACK counts; v1 excludes four initialization and two final client roots.",
+    "Native advance envelopes bound possible edge processing; physical receipts have no exact wall timestamp.",
+    "Current request begins at collection publication; process cold initialization and worker startup remain separate.",
+    "The no-model inference stage is a measured bypass, not NN inference latency; preview evaluate stages are not worker projection latency.",
+    "Prior runs have collect-plus-projection envelopes, not identical full-request instrumentation; do not claim paired full-path speedup."
+  ]
+}

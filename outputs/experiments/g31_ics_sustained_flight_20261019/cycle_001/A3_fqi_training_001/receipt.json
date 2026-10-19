@@ -1,0 +1,1289 @@
+{
+  "schema": "g31.foundation.supported_fqi_training.v1",
+  "status": "completed_actual_fqi_training",
+  "gate": {
+    "schema": "g31.foundation.multistep_gate.v1",
+    "status": "passed",
+    "reasons": [],
+    "contract_sha256": "145c9984e749162dde4d8e747fe6bd80b937518d662ff08cd7424f821a484a07",
+    "episodes_sha256": "0e5445a8f378752c7f0c65417261dfb55fcd912e8a81e3a3038b4847f633013c",
+    "witnesses_sha256": "8b03753482202edf51ed99e20c9630caa2dd84a7085c6c7077d13ab29b7cd45b",
+    "training_rows": 9,
+    "same_owner_nonterminal_rows": 6,
+    "supported_next_action_total": 11,
+    "paired_early_effect_count": 4,
+    "training_paired_early_effect_count": 2,
+    "next_support_counts": [
+      2,
+      2,
+      2,
+      1,
+      2,
+      2
+    ],
+    "multi_action_supported_successors": 5,
+    "choice_moments": [
+      {
+        "source_sha256": "8c9714bc27b9cb433af409bc4b2ca5529cc5e18379e38e23fff9d09cefd96c1b",
+        "split": "train",
+        "different_conditional_consequence_choice_count": 2
+      },
+      {
+        "source_sha256": "ad78f5ee8bf8af8843c5bb44b0b4f9563e18f988f4d3f42bd9933ae450831609",
+        "split": "train",
+        "different_conditional_consequence_choice_count": 1
+      },
+      {
+        "source_sha256": "aa8bc2b2d61721748acc7eab2d7e9c1937186110aee0fb3dd5c3556b58779d64",
+        "split": "train",
+        "different_conditional_consequence_choice_count": 2
+      },
+      {
+        "source_sha256": "93e08adb307c006dafcfd1bd17e4f05cf678f3960c4d692575bea0c546f44bc9",
+        "split": "development",
+        "different_conditional_consequence_choice_count": 2
+      },
+      {
+        "source_sha256": "23cb33f03dfa6c218b5cdb4a1a54a60b611519211ce30a8e8a75161587107d81",
+        "split": "development",
+        "different_conditional_consequence_choice_count": 1
+      },
+      {
+        "source_sha256": "9b8ecfec874d7bb2b7d4bf9a98de68dcd9de378f1ed0b52a423aa8b31e01f47b",
+        "split": "development",
+        "different_conditional_consequence_choice_count": 2
+      }
+    ],
+    "failed_or_censored_episode_count": 0,
+    "statistical_generalization_claim": false
+  },
+  "contract": {
+    "owner": "B",
+    "peer_policy_id": "fixed_original_A_repeated_returns_v1",
+    "reward_schema": "g31.foundation.exact_arrived_unfinished_integral.v1",
+    "gamma": 1.0,
+    "training_seeds": [
+      17,
+      29,
+      43
+    ],
+    "iterations": 5,
+    "epochs": 100,
+    "checkpoint_selection": "minimum_development_behavior_return_mse_then_earliest_iteration",
+    "train_parent_groups": [
+      "hold3_11_65_release27_5"
+    ],
+    "development_parent_groups": [
+      "hold3_11_67_release27_6"
+    ],
+    "evaluation_plan": {
+      "held_out_parent_groups": [
+        "hold3_11_66_release27_7",
+        "hold3_11_69_release27_7"
+      ],
+      "registration_before_first_training": true,
+      "native_pairs": [
+        "original_fixed",
+        "guarded_score",
+        "learned_seed17",
+        "learned_seed29",
+        "learned_seed43"
+      ],
+      "no_test_based_parameter_selection": true,
+      "negative_control_retained": true
+    },
+    "decision_contract_sha256": "3bf1f2d520362eda81be1110b01a1698bacf677b7b5507222bac98d1e021afa2",
+    "behavior_policy": {
+      "protected_preferences": [
+        "score",
+        "prefer_3",
+        "prefer_8",
+        "native_default",
+        "prefer_8_then_default"
+      ],
+      "fallback": "original_fixed",
+      "probability": "deterministic per preregistered branch; no unrecorded stochastic exploration"
+    },
+    "candidate_budget": 3,
+    "frozen_before_collection": true,
+    "created_utc_epoch": 1792411404.0836036,
+    "scope": "Explicit revised business storage contract, unchanged physical graph/capacity/service; finite mechanism pilot; preregistered fixed 8/default branch for actual successor multi-action support",
+    "native_budget_initial": 12,
+    "repairs": "A failed mechanism may receive one explicit new registered revision; old raw retained; revised inputs get new parent groups",
+    "revision_reason": "Mechanism proven in contract002; new behavior branch increases observed successor coverage; no old data relabeled"
+  },
+  "models": [
+    {
+      "seed": 17,
+      "selected_iteration": 0,
+      "development_mse": 28.544397197362393,
+      "checkpoint": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_training_001\\checkpoint_seed_17.json",
+        "sha256": "dfa3ec4acd8ed75e4839fcc1e7645b7bb1b5601a80f15f2306d80af62a5eaa2e"
+      }
+    },
+    {
+      "seed": 29,
+      "selected_iteration": 0,
+      "development_mse": 28.552720077858808,
+      "checkpoint": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_training_001\\checkpoint_seed_29.json",
+        "sha256": "ded35ddc0aa8140ba791d2e8438783f6b674db6fd75d70c92476def984398cc5"
+      }
+    },
+    {
+      "seed": 43,
+      "selected_iteration": 0,
+      "development_mse": 28.546358738125598,
+      "checkpoint": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_training_001\\checkpoint_seed_43.json",
+        "sha256": "d786b8e399f03b71bfb34713dd9333170ffc324ba8cf7bacf816b734f009636e"
+      }
+    }
+  ],
+  "history": [
+    {
+      "seed": 17,
+      "iteration": 0,
+      "development_behavior_return_mse": 28.544397197362393,
+      "training_curve": [
+        {
+          "epoch": 0,
+          "mse": 356.5717281494604
+        },
+        {
+          "epoch": 10,
+          "mse": 46.60847219690076
+        },
+        {
+          "epoch": 20,
+          "mse": 32.2805251164017
+        },
+        {
+          "epoch": 30,
+          "mse": 28.420251541168504
+        },
+        {
+          "epoch": 40,
+          "mse": 28.398329768176428
+        },
+        {
+          "epoch": 50,
+          "mse": 28.18343720944729
+        },
+        {
+          "epoch": 60,
+          "mse": 28.037290063459473
+        },
+        {
+          "epoch": 70,
+          "mse": 28.008899962576084
+        },
+        {
+          "epoch": 80,
+          "mse": 28.0037677449285
+        },
+        {
+          "epoch": 90,
+          "mse": 28.002619945524497
+        },
+        {
+          "epoch": 100,
+          "mse": 28.00225528008885
+        }
+      ],
+      "model_sha256": "1cfbdec6519bfbdf10113562953b98ed7819c09301f081e9876cce2b57cba7c9",
+      "targets_sha256": "0e6436b88f34af5f34bd5c21d20e4d6c9e1f8d5deb371e392f7cb273f38624a6",
+      "saved_intermediate": {
+        "checkpoint": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_training_001\\iterations\\seed_17_iteration_0_checkpoint.json",
+          "sha256": "dfa3ec4acd8ed75e4839fcc1e7645b7bb1b5601a80f15f2306d80af62a5eaa2e"
+        },
+        "targets": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_training_001\\iterations\\seed_17_iteration_0_targets.json",
+          "sha256": "1c92ee91d6545233da8334b646e3f2c9b32314fcc41dc3c1ca914af1e56d5414"
+        }
+      }
+    },
+    {
+      "seed": 17,
+      "iteration": 1,
+      "development_behavior_return_mse": 43.517597076781755,
+      "training_curve": [
+        {
+          "epoch": 0,
+          "mse": 263.2093808331586
+        },
+        {
+          "epoch": 10,
+          "mse": 10.723924082932374
+        },
+        {
+          "epoch": 20,
+          "mse": 1.3781449998854418
+        },
+        {
+          "epoch": 30,
+          "mse": 0.8208228694600235
+        },
+        {
+          "epoch": 40,
+          "mse": 0.4613515461873631
+        },
+        {
+          "epoch": 50,
+          "mse": 0.06958774572838386
+        },
+        {
+          "epoch": 60,
+          "mse": 0.016515852040720504
+        },
+        {
+          "epoch": 70,
+          "mse": 0.013688538949334599
+        },
+        {
+          "epoch": 80,
+          "mse": 0.006993930801208881
+        },
+        {
+          "epoch": 90,
+          "mse": 0.002856289076088887
+        },
+        {
+          "epoch": 100,
+          "mse": 0.0010823585644944304
+        }
+      ],
+      "model_sha256": "7145bad401ca4a8f31ab11eb6bc338c6a37d45de1a1ce07bbdc03614e4b4bc31",
+      "targets_sha256": "016b1ac47da8b0bf8ee53de1ac31d55ba5be49fb52f766714b7486bc3bc90112",
+      "saved_intermediate": {
+        "checkpoint": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_training_001\\iterations\\seed_17_iteration_1_checkpoint.json",
+          "sha256": "271e3fbf4fb1e242000a68ba2dbeda8cfdcce96d55d262d94c312828bd246243"
+        },
+        "targets": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_training_001\\iterations\\seed_17_iteration_1_targets.json",
+          "sha256": "c4c25e63cf346bf06e9f52278707a24751712ab63ca8508a801f9329a284843b"
+        }
+      }
+    },
+    {
+      "seed": 17,
+      "iteration": 2,
+      "development_behavior_return_mse": 54.99223926526601,
+      "training_curve": [
+        {
+          "epoch": 0,
+          "mse": 241.3093353654223
+        },
+        {
+          "epoch": 10,
+          "mse": 8.845018670410818
+        },
+        {
+          "epoch": 20,
+          "mse": 1.0049253618933705
+        },
+        {
+          "epoch": 30,
+          "mse": 0.7724957007274316
+        },
+        {
+          "epoch": 40,
+          "mse": 0.41343378555919347
+        },
+        {
+          "epoch": 50,
+          "mse": 0.05513880195480824
+        },
+        {
+          "epoch": 60,
+          "mse": 0.012349031241347083
+        },
+        {
+          "epoch": 70,
+          "mse": 0.012032118161114557
+        },
+        {
+          "epoch": 80,
+          "mse": 0.005931625910212738
+        },
+        {
+          "epoch": 90,
+          "mse": 0.0025018452790406395
+        },
+        {
+          "epoch": 100,
+          "mse": 0.000846934775232539
+        }
+      ],
+      "model_sha256": "fc59cc6f6dee16e3d50662671c721ca5a4284907b44f7bf9fe6c917292a71ee1",
+      "targets_sha256": "c1cf9bcfe4df8cead55390dc2fec4450d392d04e8829ba6a329d7a6469b9b246",
+      "saved_intermediate": {
+        "checkpoint": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_training_001\\iterations\\seed_17_iteration_2_checkpoint.json",
+          "sha256": "8480e31e77add719782776303b8e03d24011fcc2b73c49130e52198d39331519"
+        },
+        "targets": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_training_001\\iterations\\seed_17_iteration_2_targets.json",
+          "sha256": "11d206e11cc3d5e2c26196198c458cbeea0cf1b65382345e749256f5d18ab270"
+        }
+      }
+    },
+    {
+      "seed": 17,
+      "iteration": 3,
+      "development_behavior_return_mse": 54.99554222485188,
+      "training_curve": [
+        {
+          "epoch": 0,
+          "mse": 241.1773293737634
+        },
+        {
+          "epoch": 10,
+          "mse": 8.824856699121378
+        },
+        {
+          "epoch": 20,
+          "mse": 1.0017719980564186
+        },
+        {
+          "epoch": 30,
+          "mse": 0.7752239824610416
+        },
+        {
+          "epoch": 40,
+          "mse": 0.4131346349641878
+        },
+        {
+          "epoch": 50,
+          "mse": 0.05486416728839489
+        },
+        {
+          "epoch": 60,
+          "mse": 0.012510956712749124
+        },
+        {
+          "epoch": 70,
+          "mse": 0.012123343059310305
+        },
+        {
+          "epoch": 80,
+          "mse": 0.005968330878846869
+        },
+        {
+          "epoch": 90,
+          "mse": 0.0025150322495979044
+        },
+        {
+          "epoch": 100,
+          "mse": 0.0008545602862893386
+        }
+      ],
+      "model_sha256": "d029af314e87bcbfa0240dae9dd9851dda3b007eef62754e15f636bc357ec663",
+      "targets_sha256": "35e783982eaa7cff355de48d7104c93df875e1dcfd18e2a3a7eac0eb04c9d309",
+      "saved_intermediate": {
+        "checkpoint": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_training_001\\iterations\\seed_17_iteration_3_checkpoint.json",
+          "sha256": "19b720d891f7990cc8e8ccbcdd243cdd2c4d3cf589fa25e8f7a90661a47666a2"
+        },
+        "targets": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_training_001\\iterations\\seed_17_iteration_3_targets.json",
+          "sha256": "57c2226b2ea47f88b923102f1f7642b552eeba48ce75fce730a63e3d5623dfc2"
+        }
+      }
+    },
+    {
+      "seed": 17,
+      "iteration": 4,
+      "development_behavior_return_mse": 54.924835743426655,
+      "training_curve": [
+        {
+          "epoch": 0,
+          "mse": 241.2915075474572
+        },
+        {
+          "epoch": 10,
+          "mse": 8.856982278841015
+        },
+        {
+          "epoch": 20,
+          "mse": 1.0079986502700875
+        },
+        {
+          "epoch": 30,
+          "mse": 0.7728210767460756
+        },
+        {
+          "epoch": 40,
+          "mse": 0.41434170247097624
+        },
+        {
+          "epoch": 50,
+          "mse": 0.05548193535496327
+        },
+        {
+          "epoch": 60,
+          "mse": 0.012459477795437176
+        },
+        {
+          "epoch": 70,
+          "mse": 0.01205516966528823
+        },
+        {
+          "epoch": 80,
+          "mse": 0.005944159312557736
+        },
+        {
+          "epoch": 90,
+          "mse": 0.002505425674999773
+        },
+        {
+          "epoch": 100,
+          "mse": 0.0008490698497787254
+        }
+      ],
+      "model_sha256": "75a04fe20fa21bb3b0082c0c9b7b07f222d6086a22a108c9b015aaca8ae2a3a4",
+      "targets_sha256": "76455fd25f0bc7e4a459c6e06ffb2d3f769011a1fa0a045df35af9179f8e8802",
+      "saved_intermediate": {
+        "checkpoint": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_training_001\\iterations\\seed_17_iteration_4_checkpoint.json",
+          "sha256": "9d4477809a682e651177db9668353f8bee67fb3ce446eaeef65090be59fdca43"
+        },
+        "targets": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_training_001\\iterations\\seed_17_iteration_4_targets.json",
+          "sha256": "fe714f5aabcb4546ce7ab70be1116da639fb19a4dbce3979bd76acf02065cd76"
+        }
+      }
+    },
+    {
+      "seed": 17,
+      "iteration": 5,
+      "development_behavior_return_mse": 54.92299473915467,
+      "training_curve": [
+        {
+          "epoch": 0,
+          "mse": 241.2953945979756
+        },
+        {
+          "epoch": 10,
+          "mse": 8.858252801035645
+        },
+        {
+          "epoch": 20,
+          "mse": 1.0082398539873438
+        },
+        {
+          "epoch": 30,
+          "mse": 0.7727059820298193
+        },
+        {
+          "epoch": 40,
+          "mse": 0.4143856658289816
+        },
+        {
+          "epoch": 50,
+          "mse": 0.055506329060258666
+        },
+        {
+          "epoch": 60,
+          "mse": 0.01245585320037469
+        },
+        {
+          "epoch": 70,
+          "mse": 0.01205157471839559
+        },
+        {
+          "epoch": 80,
+          "mse": 0.005942799196131134
+        },
+        {
+          "epoch": 90,
+          "mse": 0.002504808132444603
+        },
+        {
+          "epoch": 100,
+          "mse": 0.0008488078318444286
+        }
+      ],
+      "model_sha256": "8ab8b10a219eb9b75034f5dfb9fd1cc4811924868091dc0ecc5f80e3d0b0f05b",
+      "targets_sha256": "69dea48a61ad091a09cb1351f0f7ecfe5b310dc4245770a16ab552d199a90aa2",
+      "saved_intermediate": {
+        "checkpoint": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_training_001\\iterations\\seed_17_iteration_5_checkpoint.json",
+          "sha256": "ce481ed2abd041f82f23cd3bcebf7e0ca51361b537f5b677a755426d3d7ab96e"
+        },
+        "targets": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_training_001\\iterations\\seed_17_iteration_5_targets.json",
+          "sha256": "a50feac80e3e8d816a3c320a9686381a2aa0613ba10f75f3c4b71e5d7ab9f6a0"
+        }
+      }
+    },
+    {
+      "seed": 29,
+      "iteration": 0,
+      "development_behavior_return_mse": 28.552720077858808,
+      "training_curve": [
+        {
+          "epoch": 0,
+          "mse": 422.04120182931325
+        },
+        {
+          "epoch": 10,
+          "mse": 33.3533738171355
+        },
+        {
+          "epoch": 20,
+          "mse": 31.264943834369188
+        },
+        {
+          "epoch": 30,
+          "mse": 30.63533401442027
+        },
+        {
+          "epoch": 40,
+          "mse": 28.343910924558514
+        },
+        {
+          "epoch": 50,
+          "mse": 28.096787321627907
+        },
+        {
+          "epoch": 60,
+          "mse": 28.09828484116282
+        },
+        {
+          "epoch": 70,
+          "mse": 28.048116442212855
+        },
+        {
+          "epoch": 80,
+          "mse": 28.017959806309243
+        },
+        {
+          "epoch": 90,
+          "mse": 28.007659502282696
+        },
+        {
+          "epoch": 100,
+          "mse": 28.00366013873437
+        }
+      ],
+      "model_sha256": "412fce728fc25efd626fe09097b62ad3aea92330094cb91b3ae88f76bad7e4ca",
+      "targets_sha256": "0e6436b88f34af5f34bd5c21d20e4d6c9e1f8d5deb371e392f7cb273f38624a6",
+      "saved_intermediate": {
+        "checkpoint": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_training_001\\iterations\\seed_29_iteration_0_checkpoint.json",
+          "sha256": "ded35ddc0aa8140ba791d2e8438783f6b674db6fd75d70c92476def984398cc5"
+        },
+        "targets": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_training_001\\iterations\\seed_29_iteration_0_targets.json",
+          "sha256": "1c92ee91d6545233da8334b646e3f2c9b32314fcc41dc3c1ca914af1e56d5414"
+        }
+      }
+    },
+    {
+      "seed": 29,
+      "iteration": 1,
+      "development_behavior_return_mse": 43.611691520679514,
+      "training_curve": [
+        {
+          "epoch": 0,
+          "mse": 311.7398915203064
+        },
+        {
+          "epoch": 10,
+          "mse": 1.8089470572757755
+        },
+        {
+          "epoch": 20,
+          "mse": 3.642978014525136
+        },
+        {
+          "epoch": 30,
+          "mse": 1.5677923568009666
+        },
+        {
+          "epoch": 40,
+          "mse": 0.05442915387916856
+        },
+        {
+          "epoch": 50,
+          "mse": 0.1684884058656766
+        },
+        {
+          "epoch": 60,
+          "mse": 0.0775136201396237
+        },
+        {
+          "epoch": 70,
+          "mse": 0.015574620567537376
+        },
+        {
+          "epoch": 80,
+          "mse": 0.001873286839192422
+        },
+        {
+          "epoch": 90,
+          "mse": 0.000522855865257946
+        },
+        {
+          "epoch": 100,
+          "mse": 0.0002229797641304656
+        }
+      ],
+      "model_sha256": "e95474123cf13f46531ca192803050805a0a33695ae7fdb3347263b3ddde69ee",
+      "targets_sha256": "2bc5908f2ccd9266ebe8101b499f7e45d2d296bbfd58ddcee2e44348f3a9ddf5",
+      "saved_intermediate": {
+        "checkpoint": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_training_001\\iterations\\seed_29_iteration_1_checkpoint.json",
+          "sha256": "725de4694bc5a950f420de1b52fce1c7846ee5bdd45a0bcb8052f8183e8d28a7"
+        },
+        "targets": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_training_001\\iterations\\seed_29_iteration_1_targets.json",
+          "sha256": "d94e3ce2e1d19930da5d69e4ef87a3b2bbd46813da57b2d7cd1abe17dcf24656"
+        }
+      }
+    },
+    {
+      "seed": 29,
+      "iteration": 2,
+      "development_behavior_return_mse": 54.116469112265264,
+      "training_curve": [
+        {
+          "epoch": 0,
+          "mse": 287.45778295353676
+        },
+        {
+          "epoch": 10,
+          "mse": 1.3992778839595952
+        },
+        {
+          "epoch": 20,
+          "mse": 4.25258147123153
+        },
+        {
+          "epoch": 30,
+          "mse": 0.978594191597361
+        },
+        {
+          "epoch": 40,
+          "mse": 0.1957043422623165
+        },
+        {
+          "epoch": 50,
+          "mse": 0.24574083123645513
+        },
+        {
+          "epoch": 60,
+          "mse": 0.03296937216592047
+        },
+        {
+          "epoch": 70,
+          "mse": 0.0033172870091463472
+        },
+        {
+          "epoch": 80,
+          "mse": 0.005257260919182786
+        },
+        {
+          "epoch": 90,
+          "mse": 0.003568113289543685
+        },
+        {
+          "epoch": 100,
+          "mse": 0.001401353862971216
+        }
+      ],
+      "model_sha256": "ccf2be83d5a3cf73d5290d4ee18ff212388699cd311f35ce6d1bc19cec970081",
+      "targets_sha256": "eee40d1323d47bdee736e2f5395da6bcc0b92e25d86769346aaa27423e98bfe1",
+      "saved_intermediate": {
+        "checkpoint": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_training_001\\iterations\\seed_29_iteration_2_checkpoint.json",
+          "sha256": "540afd60d1e13274a2ea6d081bf21dc3114d4584d1329a6fec651574606db80c"
+        },
+        "targets": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_training_001\\iterations\\seed_29_iteration_2_targets.json",
+          "sha256": "6f86ea19374e4e8735ad2261369da07efc004310654e740b8bbd4c698e1d3075"
+        }
+      }
+    },
+    {
+      "seed": 29,
+      "iteration": 3,
+      "development_behavior_return_mse": 54.150284959562576,
+      "training_curve": [
+        {
+          "epoch": 0,
+          "mse": 287.28348522363154
+        },
+        {
+          "epoch": 10,
+          "mse": 1.400571757285296
+        },
+        {
+          "epoch": 20,
+          "mse": 4.243581665101847
+        },
+        {
+          "epoch": 30,
+          "mse": 0.9791214314831781
+        },
+        {
+          "epoch": 40,
+          "mse": 0.19515397601589027
+        },
+        {
+          "epoch": 50,
+          "mse": 0.24556955822633972
+        },
+        {
+          "epoch": 60,
+          "mse": 0.03261486720662727
+        },
+        {
+          "epoch": 70,
+          "mse": 0.0033101378500818676
+        },
+        {
+          "epoch": 80,
+          "mse": 0.00531608984718265
+        },
+        {
+          "epoch": 90,
+          "mse": 0.0036010042306911976
+        },
+        {
+          "epoch": 100,
+          "mse": 0.0014154016112053632
+        }
+      ],
+      "model_sha256": "597d97b02a6fd77564e05ac1339d8774a714feb0c5a632d1b203aee7bd0a183a",
+      "targets_sha256": "2d742496893d0d151cf2c44c786545c900409f1de0dba7bf9d3df8ed0a3793d9",
+      "saved_intermediate": {
+        "checkpoint": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_training_001\\iterations\\seed_29_iteration_3_checkpoint.json",
+          "sha256": "b3914cd128ee40841c6e1ea3b96bd71a5bf0a19d6f1ff361efa90222e7f630cd"
+        },
+        "targets": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_training_001\\iterations\\seed_29_iteration_3_targets.json",
+          "sha256": "7a53c5bc7152e9bd2447cadf73bdc37d80b3c061600555dfad7238e61d5cdf2d"
+        }
+      }
+    },
+    {
+      "seed": 29,
+      "iteration": 4,
+      "development_behavior_return_mse": 54.38847608060012,
+      "training_curve": [
+        {
+          "epoch": 0,
+          "mse": 286.8276213767812
+        },
+        {
+          "epoch": 10,
+          "mse": 1.4008023696016647
+        },
+        {
+          "epoch": 20,
+          "mse": 4.263284329271019
+        },
+        {
+          "epoch": 30,
+          "mse": 0.9676315193736774
+        },
+        {
+          "epoch": 40,
+          "mse": 0.19946312512163467
+        },
+        {
+          "epoch": 50,
+          "mse": 0.24577735057159497
+        },
+        {
+          "epoch": 60,
+          "mse": 0.03196746898480148
+        },
+        {
+          "epoch": 70,
+          "mse": 0.003455091701323484
+        },
+        {
+          "epoch": 80,
+          "mse": 0.005452389117691116
+        },
+        {
+          "epoch": 90,
+          "mse": 0.0036364831029445507
+        },
+        {
+          "epoch": 100,
+          "mse": 0.0014199022342963035
+        }
+      ],
+      "model_sha256": "effe7010d07c74401765cf9ed6a271a0b3f518c1ede2d314ffe5c4f2fb88bc36",
+      "targets_sha256": "6e9f3b724a6bea7b7b7f4b1d24caf8209b11debc2ea6eb6dc81012106781dbf3",
+      "saved_intermediate": {
+        "checkpoint": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_training_001\\iterations\\seed_29_iteration_4_checkpoint.json",
+          "sha256": "dc65c69756caff931173fde716d4d3390887974e7f9577e4c70de20c8f675af3"
+        },
+        "targets": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_training_001\\iterations\\seed_29_iteration_4_targets.json",
+          "sha256": "5d181b2d916de26261b15afb35673d11489da7b0375bf937a39050204743acb9"
+        }
+      }
+    },
+    {
+      "seed": 29,
+      "iteration": 5,
+      "development_behavior_return_mse": 54.3883251553774,
+      "training_curve": [
+        {
+          "epoch": 0,
+          "mse": 286.82323859381165
+        },
+        {
+          "epoch": 10,
+          "mse": 1.4009271135822456
+        },
+        {
+          "epoch": 20,
+          "mse": 4.262963945345958
+        },
+        {
+          "epoch": 30,
+          "mse": 0.9678868462059462
+        },
+        {
+          "epoch": 40,
+          "mse": 0.19933049302783695
+        },
+        {
+          "epoch": 50,
+          "mse": 0.2457668166727783
+        },
+        {
+          "epoch": 60,
+          "mse": 0.03200133807713479
+        },
+        {
+          "epoch": 70,
+          "mse": 0.003450037858502784
+        },
+        {
+          "epoch": 80,
+          "mse": 0.0054455279394381535
+        },
+        {
+          "epoch": 90,
+          "mse": 0.0036341070351781453
+        },
+        {
+          "epoch": 100,
+          "mse": 0.0014193294073196231
+        }
+      ],
+      "model_sha256": "a7cb9bba0daa9c931e1ef821949e1f76e9ede9a375a2b8f3d31c5a7b71b0038b",
+      "targets_sha256": "053a5c6c66040f4d01cab4260dd552c476ac16c41808228972b4481f95f9ef6d",
+      "saved_intermediate": {
+        "checkpoint": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_training_001\\iterations\\seed_29_iteration_5_checkpoint.json",
+          "sha256": "a3b644ab7be752334e4e88d262e5d04ff756b11601deec0e02432be79d4594d7"
+        },
+        "targets": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_training_001\\iterations\\seed_29_iteration_5_targets.json",
+          "sha256": "514f1f9fc38ff86871ab5f50d873f506a3e5e05c609cce13bb6396ef2378dc89"
+        }
+      }
+    },
+    {
+      "seed": 43,
+      "iteration": 0,
+      "development_behavior_return_mse": 28.546358738125598,
+      "training_curve": [
+        {
+          "epoch": 0,
+          "mse": 381.84990572371925
+        },
+        {
+          "epoch": 10,
+          "mse": 37.828476305930124
+        },
+        {
+          "epoch": 20,
+          "mse": 30.864816179636225
+        },
+        {
+          "epoch": 30,
+          "mse": 29.22959957403802
+        },
+        {
+          "epoch": 40,
+          "mse": 28.656635448113217
+        },
+        {
+          "epoch": 50,
+          "mse": 28.124603522809295
+        },
+        {
+          "epoch": 60,
+          "mse": 28.016402505555376
+        },
+        {
+          "epoch": 70,
+          "mse": 28.006413063867413
+        },
+        {
+          "epoch": 80,
+          "mse": 28.004075618206134
+        },
+        {
+          "epoch": 90,
+          "mse": 28.002545219000798
+        },
+        {
+          "epoch": 100,
+          "mse": 28.00208191455387
+        }
+      ],
+      "model_sha256": "2860d405515a7748fe29868fd35adddd3fcd1486331bcad3f28cda4699613c2d",
+      "targets_sha256": "0e6436b88f34af5f34bd5c21d20e4d6c9e1f8d5deb371e392f7cb273f38624a6",
+      "saved_intermediate": {
+        "checkpoint": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_training_001\\iterations\\seed_43_iteration_0_checkpoint.json",
+          "sha256": "d786b8e399f03b71bfb34713dd9333170ffc324ba8cf7bacf816b734f009636e"
+        },
+        "targets": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_training_001\\iterations\\seed_43_iteration_0_targets.json",
+          "sha256": "1c92ee91d6545233da8334b646e3f2c9b32314fcc41dc3c1ca914af1e56d5414"
+        }
+      }
+    },
+    {
+      "seed": 43,
+      "iteration": 1,
+      "development_behavior_return_mse": 43.279326236753235,
+      "training_curve": [
+        {
+          "epoch": 0,
+          "mse": 282.3632612917243
+        },
+        {
+          "epoch": 10,
+          "mse": 6.91425486366629
+        },
+        {
+          "epoch": 20,
+          "mse": 2.4205900737137505
+        },
+        {
+          "epoch": 30,
+          "mse": 1.0932536896118297
+        },
+        {
+          "epoch": 40,
+          "mse": 0.638746898196334
+        },
+        {
+          "epoch": 50,
+          "mse": 0.13883456828592547
+        },
+        {
+          "epoch": 60,
+          "mse": 0.028095407664558515
+        },
+        {
+          "epoch": 70,
+          "mse": 0.008741992949751677
+        },
+        {
+          "epoch": 80,
+          "mse": 0.003801371423868704
+        },
+        {
+          "epoch": 90,
+          "mse": 0.0013880817147702543
+        },
+        {
+          "epoch": 100,
+          "mse": 0.0005756172166190315
+        }
+      ],
+      "model_sha256": "72ba20b016a063402ca40896da63c9e2840bb32d72581caa87fa7180c0c1680e",
+      "targets_sha256": "dfd42d7e565800b1c14fcd73a5c5d8798cbb052b00dd90e1059b5cdbd84d226d",
+      "saved_intermediate": {
+        "checkpoint": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_training_001\\iterations\\seed_43_iteration_1_checkpoint.json",
+          "sha256": "bb3d4d5fdf563cabae48a81e98ceaabaecaf232306fd2e530ec2ba161ce701a8"
+        },
+        "targets": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_training_001\\iterations\\seed_43_iteration_1_targets.json",
+          "sha256": "f2e89bae89513f74d1af38bc351bc5e3139e709f7e809ba7936cfb10d43f73c5"
+        }
+      }
+    },
+    {
+      "seed": 43,
+      "iteration": 2,
+      "development_behavior_return_mse": 54.32082384806747,
+      "training_curve": [
+        {
+          "epoch": 0,
+          "mse": 259.06788952765123
+        },
+        {
+          "epoch": 10,
+          "mse": 4.438957778826712
+        },
+        {
+          "epoch": 20,
+          "mse": 1.7508419414156193
+        },
+        {
+          "epoch": 30,
+          "mse": 1.790965867323577
+        },
+        {
+          "epoch": 40,
+          "mse": 0.2393596949433978
+        },
+        {
+          "epoch": 50,
+          "mse": 0.12259772785587403
+        },
+        {
+          "epoch": 60,
+          "mse": 0.07292912455731751
+        },
+        {
+          "epoch": 70,
+          "mse": 0.012809842731141117
+        },
+        {
+          "epoch": 80,
+          "mse": 0.0020067536817722146
+        },
+        {
+          "epoch": 90,
+          "mse": 0.00127042293734223
+        },
+        {
+          "epoch": 100,
+          "mse": 0.000677556834043945
+        }
+      ],
+      "model_sha256": "a759c57908cc0d56ea5e796359cd417a175c193757386977da3d1aeb339fa7d1",
+      "targets_sha256": "51277a73fbb38411143c4fb44b40f73c4f950dd0cdc046d40d357eeb22b5b5af",
+      "saved_intermediate": {
+        "checkpoint": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_training_001\\iterations\\seed_43_iteration_2_checkpoint.json",
+          "sha256": "2ed6a79ceddc8cd552f67e4534d31050835af23fe4dcb609468ed7ba8134fd7d"
+        },
+        "targets": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_training_001\\iterations\\seed_43_iteration_2_targets.json",
+          "sha256": "bde87c0b86881c6ef3e44371e131f965b1504811ba728544002cab95cba1518d"
+        }
+      }
+    },
+    {
+      "seed": 43,
+      "iteration": 3,
+      "development_behavior_return_mse": 54.21300036754027,
+      "training_curve": [
+        {
+          "epoch": 0,
+          "mse": 259.20243856422843
+        },
+        {
+          "epoch": 10,
+          "mse": 4.445932864401013
+        },
+        {
+          "epoch": 20,
+          "mse": 1.7613673624653956
+        },
+        {
+          "epoch": 30,
+          "mse": 1.7912564395754575
+        },
+        {
+          "epoch": 40,
+          "mse": 0.24024282926654747
+        },
+        {
+          "epoch": 50,
+          "mse": 0.1201782629892982
+        },
+        {
+          "epoch": 60,
+          "mse": 0.07222768869125393
+        },
+        {
+          "epoch": 70,
+          "mse": 0.012638002340774458
+        },
+        {
+          "epoch": 80,
+          "mse": 0.0019171052641997195
+        },
+        {
+          "epoch": 90,
+          "mse": 0.0012265037802479566
+        },
+        {
+          "epoch": 100,
+          "mse": 0.0006650459222896556
+        }
+      ],
+      "model_sha256": "3d0edb720c5b1a19b6b4ef9e8d94efc548080a1d714beb94614ce96f1a71cfd6",
+      "targets_sha256": "754a26c468c53f46d3dc22c1e6115335ef91a9b26231c816b78c69968c35a70a",
+      "saved_intermediate": {
+        "checkpoint": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_training_001\\iterations\\seed_43_iteration_3_checkpoint.json",
+          "sha256": "cf5c10341af208aacda035fa7e42ddab1bd076fcdb200c30745f0c3f99545006"
+        },
+        "targets": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_training_001\\iterations\\seed_43_iteration_3_targets.json",
+          "sha256": "55aed65d17253737612106006851fb84a68519b1373a89ec7b7fd9863057c640"
+        }
+      }
+    },
+    {
+      "seed": 43,
+      "iteration": 4,
+      "development_behavior_return_mse": 54.322116333060016,
+      "training_curve": [
+        {
+          "epoch": 0,
+          "mse": 259.003223076053
+        },
+        {
+          "epoch": 10,
+          "mse": 4.448826485751252
+        },
+        {
+          "epoch": 20,
+          "mse": 1.7604118744267474
+        },
+        {
+          "epoch": 30,
+          "mse": 1.7900212287472923
+        },
+        {
+          "epoch": 40,
+          "mse": 0.24115832966633308
+        },
+        {
+          "epoch": 50,
+          "mse": 0.1205627453324143
+        },
+        {
+          "epoch": 60,
+          "mse": 0.07242225310507393
+        },
+        {
+          "epoch": 70,
+          "mse": 0.012751423777151188
+        },
+        {
+          "epoch": 80,
+          "mse": 0.0019639815727798527
+        },
+        {
+          "epoch": 90,
+          "mse": 0.0012328047937579108
+        },
+        {
+          "epoch": 100,
+          "mse": 0.0006646807430020823
+        }
+      ],
+      "model_sha256": "c0a0e2c3a2aa968be155a08f16e43034595a148f5f4646022ae10cbc433166cb",
+      "targets_sha256": "e60ba7aafd62e29e0b3f84b7dfd389b4e2ede3d0529901a6a976c9d1d420c766",
+      "saved_intermediate": {
+        "checkpoint": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_training_001\\iterations\\seed_43_iteration_4_checkpoint.json",
+          "sha256": "67ef1b701bc076dc082717b8cf05fb2e0a90b90fd9472ea361cf97208fca61b7"
+        },
+        "targets": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_training_001\\iterations\\seed_43_iteration_4_targets.json",
+          "sha256": "b22ed326f70dd82e5d46ff36e76c027695e1ee9030ef8085730da7dee5df9d9b"
+        }
+      }
+    },
+    {
+      "seed": 43,
+      "iteration": 5,
+      "development_behavior_return_mse": 54.32563588174011,
+      "training_curve": [
+        {
+          "epoch": 0,
+          "mse": 258.9987535049535
+        },
+        {
+          "epoch": 10,
+          "mse": 4.448960617741539
+        },
+        {
+          "epoch": 20,
+          "mse": 1.7603635691618016
+        },
+        {
+          "epoch": 30,
+          "mse": 1.7899956657166778
+        },
+        {
+          "epoch": 40,
+          "mse": 0.24117428100504038
+        },
+        {
+          "epoch": 50,
+          "mse": 0.12058710061129375
+        },
+        {
+          "epoch": 60,
+          "mse": 0.07242878450425938
+        },
+        {
+          "epoch": 70,
+          "mse": 0.012753356730373958
+        },
+        {
+          "epoch": 80,
+          "mse": 0.0019655569093500196
+        },
+        {
+          "epoch": 90,
+          "mse": 0.0012333640443541547
+        },
+        {
+          "epoch": 100,
+          "mse": 0.0006647892829993264
+        }
+      ],
+      "model_sha256": "63edde44c070c2cd4b692952c91d7ed1b652e1e3da1fdb34bee2bfa7f01319e5",
+      "targets_sha256": "9f82255c23cca6e832d788e0a5830782d4ead5cb7434cff65cc0264000566404",
+      "saved_intermediate": {
+        "checkpoint": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_training_001\\iterations\\seed_43_iteration_5_checkpoint.json",
+          "sha256": "9b28cf2fa7f58f7e138b525670f4bb870969096703325831427ae5e9c8ad4f50"
+        },
+        "targets": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_training_001\\iterations\\seed_43_iteration_5_targets.json",
+          "sha256": "c33854c1330c4dcb2208c71de5aba35d815501c45c1c7d43e2e3992af65f16bf"
+        }
+      }
+    }
+  ],
+  "native_policy_evaluation_completed": false,
+  "native_improvement_established": false,
+  "training_performed": true,
+  "native_executed": false,
+  "training_wall_seconds": 33.95299999997951,
+  "excluded_prior_attempts": [
+    "A1: only aliased admissible choices",
+    "A2: historical controller revision used only for independent mechanism evidence"
+  ]
+}

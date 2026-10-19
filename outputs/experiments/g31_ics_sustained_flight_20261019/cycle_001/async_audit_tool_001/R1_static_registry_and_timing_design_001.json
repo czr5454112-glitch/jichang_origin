@@ -1,0 +1,120 @@
+{
+  "schema": "g31.foundation.R1_static_registry_design.v1",
+  "status": "design_only_shared_sources_frozen_until_root_formal_complete",
+  "native_started": false,
+  "training_or_model_selection": false,
+  "existing_domain": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_domain.py",
+    "sha256": "3bf1f2d520362eda81be1110b01a1698bacf677b7b5507222bac98d1e021afa2"
+  },
+  "profile": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\async_audit_tool_001\\profile_001\\current_00.pstats",
+    "sha256": "4026252ea7645955d33a65986f4632fe332ee53c3c7edce32847acd4de4632ef"
+  },
+  "exact_profile_rows": [
+    {
+      "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_domain.py",
+      "line": 41,
+      "function": "scene",
+      "calls": 10,
+      "cumulative_profile_seconds": 1.0705225
+    },
+    {
+      "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_domain.py",
+      "line": 82,
+      "function": "identify",
+      "calls": 1,
+      "cumulative_profile_seconds": 1.0910882000000002
+    },
+    {
+      "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_synthetic_reuse_chain.py",
+      "line": 33,
+      "function": "scene",
+      "calls": 765,
+      "cumulative_profile_seconds": 0.18312230000000002
+    },
+    {
+      "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_domain.py",
+      "line": 445,
+      "function": "evaluate",
+      "calls": 1,
+      "cumulative_profile_seconds": 1.1607051000000002
+    },
+    {
+      "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_live_obligation_native_domain.py",
+      "line": 40,
+      "function": "native_scene",
+      "calls": 10,
+      "cumulative_profile_seconds": 1.0697753
+    },
+    {
+      "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_live_obligation_interval.py",
+      "line": 190,
+      "function": "fixed_contracts",
+      "calls": 51,
+      "cumulative_profile_seconds": 1.0087601000000002
+    }
+  ],
+  "profile_count_correction": "Old optimization_proposal.json registered_scene_builds_per_evaluate=765 combined the wrong same-named scene function. Exact repeated_domain.scene executes10 times; research_synthetic_reuse_chain.scene executes765 underneath. Both rows are kept here with file identity; timing is diagnostic cProfile, not benchmark.",
+  "static_cache_scope": {
+    "compile_once": "Build the10 predeclared registered cases using current scene() and supported_contract(later=True) once per process before NativeSession starts; resident process compiles before ready. Charge this to cold setup.",
+    "retain": "Private immutable tuples of case identity, sorted business ids, ordered CONTRACT_FIELDS scalar tuples, and canonical supported physical contract string. No mutable input dictionaries are returned.",
+    "every_identify": "Recompute canonical(actual contract) and compare to frozen physical canonical; compare actual complete business keyset and every original field value to compiled tuples; require exactly one registered match. Python scalar equality semantics remain those of old per-field comparison.",
+    "mutation_defense": "Freeze the field ordering and exact CASES/REUSE_COUNTS/HOLD3_CASES declarations at compile time; compare current immutable descriptor to it per identify and refuse changes. Source archive remains whole-dependency SHA bound. Never hash dynamic observations into a cache or memoize a guard result.",
+    "no_dynamic_cache": [
+      "native handle",
+      "actual current view",
+      "source digests/ages/delivery",
+      "current generation/traversal",
+      "physical requests/terminal ACKs/headway",
+      "full per-job prediction",
+      "immutable paired reference check",
+      "mask or admission",
+      "model score"
+    ]
+  },
+  "source_scope_after_authorization": [
+    "foundation_repeated_domain.py: private immutable registry compile + identify lookup only.",
+    "foundation_repeated_native.py: explicitly timed cold initialize, detailed current-path milestones, no action scheduling change.",
+    "foundation_repeated_worker.py: time worker registry initialization before ready; old process behavior unchanged.",
+    "foundation_repeated_campaign.py: new performance/instrumentation contract and explicit initialization if needed; preserve historical archives.",
+    "tests: all actual evidence exact parity and mutation/refusal cases; no native started by tests."
+  ],
+  "timing_plan": {
+    "clock": "time.perf_counter_ns for wall, process_time_ns for CPU. Store ns boundaries and derived ms; native sim time stays a separately named field.",
+    "logical_request": "At start of actual loaded-opportunity begin_new, before publication, store request_open_ns with actual owner root, target job/generation/traversal and later request_id. Keep it in audit-only policy state, outside actor observation/evidence. Close in finally after actual route/no-command handling and audit-record work.",
+    "end_to_end": [
+      "request_open_to_submit_return_ms includes real fresh collection wait, intervening scheduling and native IPC.",
+      "request_open_to_controller_done_ms adds record/cleanup; distinguish guarded command, no_command, fallback, departed, expired and exception.",
+      "selected_activation_entry_to_controller_done_ms includes current ready callback processing only; it is not total fresh request latency.",
+      "delivered_ACK_observed_wall_ms and uniqueedge callback wall envelope, if recorded, are separate downstream observations; receipt sim times are never substituted for wall."
+    ],
+    "disjoint_ready_stages": [
+      "collect_wall_ns: before/after collect(view), including native endpoints and current validator.",
+      "evaluate_wall_ns: separate domain.evaluate over all3 actions.",
+      "mask_wall_ns: complete protected deltas/local capacity mask.",
+      "public_observation_wall_ns: legal observation construction.",
+      "inference_wall_ns: existing model prediction, including explicit zero/not-applicable and failures.",
+      "ranking_wall_ns: selection among enabled actions.",
+      "presubmit_revalidation_wall_ns: handle/reference/local view/ownoutbox rereads.",
+      "route_dispatch_envelope_wall_ns: before/after route_tray invocation, includes its native admission and client wrapper.",
+      "controller_recording_wall_ns: final retained evidence/decision/body-consumption logs."
+    ],
+    "submit_boundary": "Do not call route_tray envelope submit-only. Add an optional timing observer at the actual route client send boundary only if a shared-client hook can be scoped without changing authority; otherwise report exact native submit-only as missing and route dispatch envelope as measured.",
+    "body_timing": "Keep worker residence/computation/poll/read and cold/shutdown separate. Body may already exist before logical request; do not add these intervals to full current latency or sum overlapping measures.",
+    "non_success": "Record every denied/expired/fallback/error path in the same denominator. Separate positive authorized paths from cheap refusal paths.",
+    "concurrency_metadata": "Record root task/native ledger identity, actual worker intervals and host/process conditions. No cProfile in performance runs. Do not run a second native collector concurrently."
+  },
+  "verification_before_new_native": [
+    "Compare entire status, reasons, seed fields, candidate completion vectors and final masks on frozen historical positives and negatives. Wall-only fields excluded from parity.",
+    "Cover all10 static cases, incorrect/missing/extra jobs, every changed business field, changed physical contract, repeated registry mutation and unknown registry.",
+    "Re-run .05 expiry, source ACK/headway/unresolved request, generation/traversal and same-timestamp resource-change negatives without changing their outcomes.",
+    "Source/archive binding/version pins separate R1 performance controller from the completed formal evaluation and original training contract. Frozen weights are consumed without retraining or reselection.",
+    "Only after pure parity and root registration: run paired old/new finite hold3 current paths under same conditions, full jobs/physics/protection constant; disclose cold setup and denominator."
+  ],
+  "claim_rules": [
+    "No predicted 100ms claim before complete logical request endpoints are instrumented and measured.",
+    "A lower projection envelope alone does not establish full request SLA.",
+    "No claims of airport generalization, optimality, marginal RL gain or asynchronous benefit from this performance batch."
+  ]
+}

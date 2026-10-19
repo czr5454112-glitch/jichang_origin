@@ -1,0 +1,429 @@
+{
+  "schema": "g31.airport_reference_selected_shadow_callbacks.v2",
+  "selection_scope": "POSTHOC selection after inspecting this baseline: first2 actual late baseline callbacks with source delivered positive ACK AND physical first edge both within300s. Training-trajectory mechanism diagnostic only; not heldout, policy gain, or random sample.",
+  "native_sessions": 0,
+  "reference_plan": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\C00_receiver_recorded_budget_002\\plan.json",
+    "sha256": "acd87e90e9e06d143a67e18eba74907620a0a832e3be196f60eb04327d37392e"
+  },
+  "reference_raw": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\C00_receiver_recorded_budget_002\\C00\\raw.json.gz",
+    "sha256": "be5d7e0d3262e0b0c005f142f5ccb13ed8e906b7ea4bbfd28c9bb0b229d869ee"
+  },
+  "reference_observations": {
+    "contract": {
+      "schema": "g31.foundation.airport_policy_observation.v2",
+      "start_at": 43200.0,
+      "end_at": 59400.0,
+      "scope": "actual owner policy callback arguments and returned decision, including residual calls",
+      "readonly": true,
+      "extra_native_queries": 0,
+      "future_truth_join": false,
+      "candidate_labels_created": false,
+      "storage": "lossless content-addressed64-item chunks and complete gzip reference records",
+      "chunk_items": 64,
+      "same_actor_fields_and_values": true,
+      "reconstructed_record_schema_change": {
+        "from": "g31.foundation.airport_policy_observation.v1",
+        "to": "g31.foundation.airport_policy_observation.v2"
+      },
+      "all_other_reconstructed_fields_exact": true,
+      "unknown_values_and_group_counts_preserved": true,
+      "partial_rule": "only complete gzip members and reference rows with all blobs present are reconstructable"
+    },
+    "record_count": 3978,
+    "first_at": 43200.0,
+    "last_at": 59400.0,
+    "owners": [
+      "owner:system_domestic",
+      "owner:system_international"
+    ],
+    "artifact": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\C00_receiver_recorded_budget_002\\C00\\policy_observations.jsonl.gz",
+      "sha256": "628059ff2713cd698283640e19d431803a7f72b55b4d508724c09effddd94bf1"
+    },
+    "blobs": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\C00_receiver_recorded_budget_002\\C00\\policy_observations.blobs.jsonl.gz",
+      "sha256": "fc3b8d99eb29da20ce37c4fe3fa1be1178d641e60fe9fe5f197a0fe11827eef1"
+    },
+    "unique_blob_count": 38758,
+    "uncompressed_blob_bytes": 689435450,
+    "uncompressed_reference_bytes": 63185053,
+    "capture_seconds": 147.49722779879812,
+    "contains_true_conditional_outcome_labels": false,
+    "native_training_readiness_established": false
+  },
+  "request_calls_sha256": "9e07146d0c6a955ad7e3cd931121266e795eb7c74f40c42e429ebaae2d0257e2",
+  "public_ack_views_sha256": "cd8b6d569b3566f9b712a7dacca52fa18b1353f4e6c77eae2e068c4bc810b357",
+  "total_late_nonretry_transfer_attempts": 397,
+  "first_edge_within300_and_positive_ack_candidates": 19,
+  "excluded_positive_ack_after300": [
+    {
+      "callback": {
+        "owner_id": "owner:system_international",
+        "now": 57840.0,
+        "tick": 964,
+        "trace_sequence": 11,
+        "segment_index": 17,
+        "segment_raw": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\C00_receiver_recorded_budget_002\\C00\\segment_17.json.gz",
+          "sha256": "d432b505896044135768283c0b2484e08ec19f29fb77ab70d6e8033793df1dfd"
+        },
+        "sequence": 3583,
+        "residual_index": 1,
+        "request_prefix": "protocol:964:residual"
+      },
+      "request_id": "live:26:owner:system_international:transfer:1943",
+      "first_edge_delay_seconds": 245.3660000000018,
+      "first_positive_ack_delay_seconds": 302.1999999999971,
+      "reason": "positive_delivered_ACK_after300s"
+    }
+  ],
+  "eligible_callback_count": 18,
+  "selected_count": 2,
+  "selected": [
+    {
+      "callback": {
+        "owner_id": "owner:system_international",
+        "now": 57840.0,
+        "tick": 964,
+        "trace_sequence": 11,
+        "segment_index": 17,
+        "segment_raw": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\C00_receiver_recorded_budget_002\\C00\\segment_17.json.gz",
+          "sha256": "d432b505896044135768283c0b2484e08ec19f29fb77ab70d6e8033793df1dfd"
+        },
+        "sequence": 3582,
+        "residual_index": 0,
+        "request_prefix": "protocol:964"
+      },
+      "actual_request": {
+        "request_id": "live:26:owner:system_international:transfer:1942",
+        "tray_id": "initial:0:0",
+        "source": 41,
+        "destination": 138,
+        "issued_at": 57840.0,
+        "message_delay": 2.0,
+        "earliest_departure": 57840.0,
+        "expiry": 58336.418,
+        "forecast_dependency": "initial:0:0:projected:1x:2110:loaded",
+        "forecast_ledger": "conditional_release",
+        "control_reason": "observed_source_queue",
+        "service_window": {
+          "earliest_departure": 57840.0,
+          "conditional_dependencies": [],
+          "hard_guarantee": false
+        },
+        "owner_id": "owner:system_international"
+      },
+      "native_transfer": {
+        "request_id": "live:26:owner:system_international:transfer:1942",
+        "status": "received",
+        "reason": "",
+        "tray": 0,
+        "delivered_at": 57842.0,
+        "departed_at": 57972.850000000006,
+        "received_at": 58276.41800000002
+      },
+      "positive_source_delivered_acks": [
+        {
+          "request_id": "live:26:owner:system_international:transfer:1942",
+          "sequence": 4,
+          "attempt": 4,
+          "observed_at": 58022.0,
+          "delivered_at": 58022.2,
+          "status": "departed",
+          "reason": "",
+          "received_at": -1.0,
+          "delivered_copies": 1
+        },
+        {
+          "request_id": "live:26:owner:system_international:transfer:1942",
+          "sequence": 5,
+          "attempt": 5,
+          "observed_at": 58082.0,
+          "delivered_at": 58082.2,
+          "status": "departed",
+          "reason": "",
+          "received_at": -1.0,
+          "delivered_copies": 1
+        },
+        {
+          "request_id": "live:26:owner:system_international:transfer:1942",
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 58142.0,
+          "delivered_at": 58142.2,
+          "status": "departed",
+          "reason": "",
+          "received_at": -1.0,
+          "delivered_copies": 1
+        },
+        {
+          "request_id": "live:26:owner:system_international:transfer:1942",
+          "sequence": 7,
+          "attempt": 7,
+          "observed_at": 58202.0,
+          "delivered_at": 58202.2,
+          "status": "departed",
+          "reason": "",
+          "received_at": -1.0,
+          "delivered_copies": 1
+        },
+        {
+          "request_id": "live:26:owner:system_international:transfer:1942",
+          "sequence": 8,
+          "attempt": 8,
+          "observed_at": 58262.0,
+          "delivered_at": 58262.2,
+          "status": "departed",
+          "reason": "",
+          "received_at": -1.0,
+          "delivered_copies": 1
+        },
+        {
+          "request_id": "live:26:owner:system_international:transfer:1942",
+          "sequence": 9,
+          "attempt": 9,
+          "observed_at": 58322.0,
+          "delivered_at": 58322.2,
+          "status": "received",
+          "reason": "",
+          "received_at": 58276.41800000002,
+          "delivered_copies": 1
+        }
+      ],
+      "first_edge": {
+        "time": 57972.850000000006,
+        "event": "EDGE_ENTER",
+        "business_bag_id": "",
+        "transport_leg_id": "live:26:owner:system_international:transfer:1942:empty_return:1206",
+        "tray_id": "initial:0:0",
+        "traversal_id": 17493,
+        "node": 41,
+        "from": 41,
+        "to": 30,
+        "reason": ""
+      },
+      "first_edge_delay_seconds": 132.85000000000582,
+      "first_positive_ack_delay_seconds": 182.1999999999971,
+      "legs": [
+        {
+          "runtime_id": 1206,
+          "transport_leg_id": "live:26:owner:system_international:transfer:1942:empty_return:1206",
+          "tray": 0,
+          "job": -1,
+          "kind": "empty_return"
+        }
+      ],
+      "first_intents_blob_sha256": "1319541462f028a3655fc65177f9406aa160e0c39968d7a19882c2e52569a941",
+      "record_reference_json_sha256": "a9c993af85e8fffd2d3363cea34a8abf0a041d28141ee0d57e096430354a32ab",
+      "recorded_first_intent": {
+        "request_id": "live:protocol:964:0:initial:0:0:projected:1x:3364",
+        "tray_id": "initial:0:0",
+        "source": 41,
+        "destination": 138,
+        "issued_at": 57840.0,
+        "message_delay": 2.0,
+        "earliest_departure": 57840.0,
+        "expiry": 58336.418,
+        "forecast_dependency": "initial:0:0:projected:1x:2110:loaded",
+        "forecast_ledger": "conditional_release",
+        "control_reason": "observed_source_queue",
+        "service_window": {
+          "earliest_departure": 57840.0,
+          "conditional_dependencies": [],
+          "hard_guarantee": false
+        },
+        "owner_id": "owner:system_international",
+        "expected_version": 0
+      },
+      "first_intent_to_actual_request_exact_under_original_ProtocolClient_identity_assignment": true
+    },
+    {
+      "callback": {
+        "owner_id": "owner:system_domestic",
+        "now": 57900.0,
+        "tick": 965,
+        "trace_sequence": 14,
+        "segment_index": 17,
+        "segment_raw": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\C00_receiver_recorded_budget_002\\C00\\segment_17.json.gz",
+          "sha256": "d432b505896044135768283c0b2484e08ec19f29fb77ab70d6e8033793df1dfd"
+        },
+        "sequence": 3585,
+        "residual_index": 0,
+        "request_prefix": "protocol:965"
+      },
+      "actual_request": {
+        "request_id": "live:21:owner:system_domestic:transfer:9017",
+        "tray_id": "initial:24:1",
+        "source": 81,
+        "destination": 49,
+        "issued_at": 57900.0,
+        "message_delay": 2.0,
+        "earliest_departure": 57900.0,
+        "expiry": 58429.729,
+        "forecast_dependency": "initial:24:1:empty",
+        "forecast_ledger": "actual_available",
+        "control_reason": "observed_source_queue",
+        "service_window": {
+          "earliest_departure": 57900.0,
+          "conditional_dependencies": [],
+          "hard_guarantee": false
+        },
+        "owner_id": "owner:system_domestic"
+      },
+      "native_transfer": {
+        "request_id": "live:21:owner:system_domestic:transfer:9017",
+        "status": "received",
+        "reason": "",
+        "tray": 3,
+        "delivered_at": 57902.0,
+        "departed_at": 57905.0,
+        "received_at": 58369.729
+      },
+      "positive_source_delivered_acks": [
+        {
+          "request_id": "live:21:owner:system_domestic:transfer:9017",
+          "sequence": 2,
+          "attempt": 2,
+          "observed_at": 57962.0,
+          "delivered_at": 57962.2,
+          "status": "departed",
+          "reason": "",
+          "received_at": -1.0,
+          "delivered_copies": 1
+        },
+        {
+          "request_id": "live:21:owner:system_domestic:transfer:9017",
+          "sequence": 3,
+          "attempt": 3,
+          "observed_at": 58022.0,
+          "delivered_at": 58022.2,
+          "status": "departed",
+          "reason": "",
+          "received_at": -1.0,
+          "delivered_copies": 1
+        },
+        {
+          "request_id": "live:21:owner:system_domestic:transfer:9017",
+          "sequence": 4,
+          "attempt": 4,
+          "observed_at": 58082.0,
+          "delivered_at": 58082.2,
+          "status": "departed",
+          "reason": "",
+          "received_at": -1.0,
+          "delivered_copies": 1
+        },
+        {
+          "request_id": "live:21:owner:system_domestic:transfer:9017",
+          "sequence": 5,
+          "attempt": 5,
+          "observed_at": 58142.0,
+          "delivered_at": 58142.2,
+          "status": "departed",
+          "reason": "",
+          "received_at": -1.0,
+          "delivered_copies": 1
+        },
+        {
+          "request_id": "live:21:owner:system_domestic:transfer:9017",
+          "sequence": 6,
+          "attempt": 6,
+          "observed_at": 58202.0,
+          "delivered_at": 58202.2,
+          "status": "departed",
+          "reason": "",
+          "received_at": -1.0,
+          "delivered_copies": 1
+        },
+        {
+          "request_id": "live:21:owner:system_domestic:transfer:9017",
+          "sequence": 7,
+          "attempt": 7,
+          "observed_at": 58262.0,
+          "delivered_at": 58262.2,
+          "status": "departed",
+          "reason": "",
+          "received_at": -1.0,
+          "delivered_copies": 1
+        },
+        {
+          "request_id": "live:21:owner:system_domestic:transfer:9017",
+          "sequence": 8,
+          "attempt": 8,
+          "observed_at": 58322.0,
+          "delivered_at": 58322.2,
+          "status": "departed",
+          "reason": "",
+          "received_at": -1.0,
+          "delivered_copies": 1
+        },
+        {
+          "request_id": "live:21:owner:system_domestic:transfer:9017",
+          "sequence": 9,
+          "attempt": 9,
+          "observed_at": 58382.0,
+          "delivered_at": 58382.2,
+          "status": "received",
+          "reason": "",
+          "received_at": 58369.729,
+          "delivered_copies": 1
+        }
+      ],
+      "first_edge": {
+        "time": 57905.0,
+        "event": "EDGE_ENTER",
+        "business_bag_id": "",
+        "transport_leg_id": "live:21:owner:system_domestic:transfer:9017:empty_return:1203",
+        "tray_id": "initial:24:1",
+        "traversal_id": 17455,
+        "node": 81,
+        "from": 81,
+        "to": 82,
+        "reason": ""
+      },
+      "first_edge_delay_seconds": 5.0,
+      "first_positive_ack_delay_seconds": 62.19999999999709,
+      "legs": [
+        {
+          "runtime_id": 1203,
+          "transport_leg_id": "live:21:owner:system_domestic:transfer:9017:empty_return:1203",
+          "tray": 3,
+          "job": -1,
+          "kind": "empty_return"
+        }
+      ],
+      "first_intents_blob_sha256": "113230e2502fce25eef02eba87929c5d7f7c3010221ec0eb64459a5ff04bf2c3",
+      "record_reference_json_sha256": "3d4683bd70822ec0b004856749c26d4782184c41d586f8deaf9cf9be136e0548",
+      "recorded_first_intent": {
+        "request_id": "live:protocol:965:0:initial:24:1:projected:1x:2232",
+        "tray_id": "initial:24:1",
+        "source": 81,
+        "destination": 49,
+        "issued_at": 57900.0,
+        "message_delay": 2.0,
+        "earliest_departure": 57900.0,
+        "expiry": 58429.729,
+        "forecast_dependency": "initial:24:1:empty",
+        "forecast_ledger": "actual_available",
+        "control_reason": "observed_source_queue",
+        "service_window": {
+          "earliest_departure": 57900.0,
+          "conditional_dependencies": [],
+          "hard_guarantee": false
+        },
+        "owner_id": "owner:system_domestic",
+        "expected_version": 0
+      },
+      "first_intent_to_actual_request_exact_under_original_ProtocolClient_identity_assignment": true
+    }
+  ],
+  "future_receipts_used_only_offline_for_witness_selection": true,
+  "runtime_model_must_read_only_then_available_public_observation": true,
+  "scores_select_or_modify_native_action": false,
+  "positive_ACK_within300_required": true,
+  "full_observation_materialization_audit_pending": true
+}

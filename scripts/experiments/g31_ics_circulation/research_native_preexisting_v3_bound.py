@@ -17,6 +17,7 @@ import subprocess
 import sys
 import time
 import traceback
+from types import ModuleType
 from . import native_preexisting_v3_bound_adapter as adapter
 from . import native027_run_acceptance as run_admission
 from . import native027_request_timing as native_acceptance
@@ -85,7 +86,9 @@ def imported_sources():
     root = Path(__file__).resolve().parents[3]
     paths = {Path(__file__).resolve()}
     for module in list(sys.modules.values()):
-        name = getattr(module, "__file__", None)
+        # Module proxies can inherit or fabricate __file__ (torch.classes is
+        # one example). Only actual instance metadata identifies loaded code.
+        name = vars(module).get("__file__") if isinstance(module, ModuleType) else None
         if name:
             path = Path(name).resolve()
             if path.suffix == ".py" and path.is_relative_to(root): paths.add(path)

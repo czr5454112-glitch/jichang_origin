@@ -1,0 +1,129 @@
+{
+  "schema": "g31.foundation.preregistered_native_fqi_evaluation.v1",
+  "created_utc_epoch": 1792413153.5360844,
+  "source_collection_contract": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A_learning_contract_003.json",
+    "sha256": "48101effd1bfe73c7dd810f09f18f53fbd1a180129b2009d196644b0ebe0822c"
+  },
+  "frozen_selection": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_selection_002\\receipt.json",
+    "sha256": "1038b3cbccf35eee2f31841893b1c228b2485d71cb8d6ec9c26de7f2a0e89453"
+  },
+  "rows": [
+    {
+      "task_id": "A_eval_positive_baseline_001",
+      "case": "hold3_11_66_release27_7",
+      "mode": "baseline",
+      "selection": "score",
+      "model": null,
+      "reference": null
+    },
+    {
+      "task_id": "A_eval_positive_rule_001",
+      "case": "hold3_11_66_release27_7",
+      "mode": "guarded",
+      "selection": "score",
+      "model": null,
+      "reference": "A_eval_positive_baseline_001"
+    },
+    {
+      "task_id": "A_eval_positive_seed17_001",
+      "case": "hold3_11_66_release27_7",
+      "mode": "guarded",
+      "selection": "score",
+      "model": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_selection_002\\checkpoint_seed_17.json",
+        "sha256": "ce481ed2abd041f82f23cd3bcebf7e0ca51361b537f5b677a755426d3d7ab96e"
+      },
+      "reference": "A_eval_positive_baseline_001"
+    },
+    {
+      "task_id": "A_eval_positive_seed29_001",
+      "case": "hold3_11_66_release27_7",
+      "mode": "guarded",
+      "selection": "score",
+      "model": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_selection_002\\checkpoint_seed_29.json",
+        "sha256": "540afd60d1e13274a2ea6d081bf21dc3114d4584d1329a6fec651574606db80c"
+      },
+      "reference": "A_eval_positive_baseline_001"
+    },
+    {
+      "task_id": "A_eval_positive_seed43_001",
+      "case": "hold3_11_66_release27_7",
+      "mode": "guarded",
+      "selection": "score",
+      "model": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_selection_002\\checkpoint_seed_43.json",
+        "sha256": "2ed6a79ceddc8cd552f67e4534d31050835af23fe4dcb609468ed7ba8134fd7d"
+      },
+      "reference": "A_eval_positive_baseline_001"
+    },
+    {
+      "task_id": "A_eval_negative_baseline_001",
+      "case": "hold3_11_69_release27_7",
+      "mode": "baseline",
+      "selection": "score",
+      "model": null,
+      "reference": null
+    },
+    {
+      "task_id": "A_eval_negative_rule_001",
+      "case": "hold3_11_69_release27_7",
+      "mode": "guarded",
+      "selection": "score",
+      "model": null,
+      "reference": "A_eval_negative_baseline_001"
+    },
+    {
+      "task_id": "A_eval_negative_seed17_001",
+      "case": "hold3_11_69_release27_7",
+      "mode": "guarded",
+      "selection": "score",
+      "model": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_selection_002\\checkpoint_seed_17.json",
+        "sha256": "ce481ed2abd041f82f23cd3bcebf7e0ca51361b537f5b677a755426d3d7ab96e"
+      },
+      "reference": "A_eval_negative_baseline_001"
+    },
+    {
+      "task_id": "A_eval_negative_seed29_001",
+      "case": "hold3_11_69_release27_7",
+      "mode": "guarded",
+      "selection": "score",
+      "model": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_selection_002\\checkpoint_seed_29.json",
+        "sha256": "540afd60d1e13274a2ea6d081bf21dc3114d4584d1329a6fec651574606db80c"
+      },
+      "reference": "A_eval_negative_baseline_001"
+    },
+    {
+      "task_id": "A_eval_negative_seed43_001",
+      "case": "hold3_11_69_release27_7",
+      "mode": "guarded",
+      "selection": "score",
+      "model": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_selection_002\\checkpoint_seed_43.json",
+        "sha256": "2ed6a79ceddc8cd552f67e4534d31050835af23fe4dcb609468ed7ba8134fd7d"
+      },
+      "reference": "A_eval_negative_baseline_001"
+    }
+  ],
+  "native_branch_budget": 10,
+  "native_parallelism": 1,
+  "per_branch_hard_seconds": 150,
+  "outer_hard_seconds": 180,
+  "automatic_retries": 0,
+  "heldout_native_previously_executed": false,
+  "test_based_selection_allowed": false,
+  "metrics": [
+    "every offered job completion delta vs identical-input original baseline",
+    "actual guarded score selection request/ACK/unique physical edge",
+    "aggregate completion sum with identical arrivals",
+    "native inventory lifecycle audit",
+    "each training seed reported independently"
+  ],
+  "strong_baseline": "same candidate count and full current guard, score ordering; original baseline separate",
+  "independent_data_scope": "two preregistered synthetic six-job parent groups, not independent airport days",
+  "failed_and_censored_branches": "retain denominator, no aggregate rank across different clocks"
+}

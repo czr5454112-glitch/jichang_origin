@@ -1,0 +1,164 @@
+"""Prepare one declared repeated-domain branch, then run in one bounded job."""
+from __future__ import annotations
+import sys
+if __name__ == '__main__' and '--worker' in sys.argv:
+    if '--admission' not in sys.argv or sys.stdin.readline().strip() != sys.argv[sys.argv.index('--admission') + 1]:
+        raise SystemExit('repeated_campaign:missing_parent_job_admission')
+
+import argparse
+import gzip
+import json
+from pathlib import Path
+import secrets
+import traceback
+from . import foundation_repeated_native as implementation
+from . import foundation_repeated_domain as domain
+from . import foundation_native_environment as environment
+from . import foundation_later_campaign as campaign
+from . import bounded_windows_job
+from . import run_sustained_learning as sustained_budget  # Pin the actual bounded outer scheduler in every entry point.
+
+ROOT = environment.ROOT
+MODULE = 'scripts.experiments.g31_ics_circulation.foundation_repeated_campaign'
+SCHEMA = 'g31.foundation.repeated_campaign.v1'
+HARD_SECONDS = 150
+require = domain.require
+
+
+def prepare(output, case, mode, reference_path=None, selection='score'):
+    output = Path(output).resolve()
+    require(not output.exists(), 'fresh_repeated_output')
+    reference, binding = None, None
+    if mode != 'baseline':
+        require(reference_path is not None, 'same_input_original_reference_required')
+        reference_path = Path(reference_path).resolve()
+        raw = json.loads(gzip.decompress(reference_path.read_bytes()))
+        require(raw['input'] == domain.scene(case) and raw['specification']['mode'] == 'baseline'
+            and raw['summary']['status'] == 'assessed' and set(raw['summary']['completion']) == set(domain.manifest(case)['business_ids'])
+            and all(domain.finite(value) and value >= 0 for value in raw['summary']['completion'].values()),
+            'complete_same_input_fixed_original_reference')
+        reference = {'completion': raw['summary']['completion'], 'input_sha256': domain.digest(raw['input']),
+            'reference_refresh_allowed': False, 'kind': 'frozen_paired_actual_baseline', 'actor_access': False}
+        binding = campaign.reference(reference_path)
+    require(selection in ('score', 'prefer_3', 'prefer_8', 'native_default'), 'fixed_current_selection')
+    row = {'case': case, 'mode': mode, 'domain': domain.manifest(case), 'reference': reference, 'selection': selection}
+    old = environment.online.old
+    contract_path = old.OUT / 'native027_accepted_contract_001.json'
+    semantic_path = old.OUT / 'native027_semantic_native_002/receipt.json'
+    contract = old.read(contract_path)
+    key = case + '/' + mode
+    output.mkdir(parents=True)
+    hashes, archives = environment.archive_sources(output, old.bound.imported_sources())
+    input_path = output / 'inputs' / (key + '.json')
+    environment.write(input_path, domain.scene(case))
+    plan = {'schema': SCHEMA, 'status': 'prepared_unexecuted', 'rows': {key: row}, 'branch_order': [key],
+        'native_branch_budget': 1, 'hard_seconds': HARD_SECONDS, 'automatic_retries': 0,
+        'source_sha256': hashes, 'source_archive': archives, 'input_file_sha256': {key: old.sha(input_path)},
+        'native_contract_reference': old.reference(contract_path), 'semantic_gate_reference': old.reference(semantic_path),
+        'binary': old.reference(contract['binary']), 'original_reference': binding,
+        'timing_mode': 'event_clock_resident_process' if mode == 'async' else 'offline_sync', 'realtime_async': False}
+    environment.write(output / 'plan.json', plan)
+    return plan
+
+
+def verify(plan):
+    require(plan['schema'] == SCHEMA and plan['native_branch_budget'] == 1 and plan['hard_seconds'] == HARD_SECONDS
+        and plan['automatic_retries'] == 0 and len(plan['rows']) == 1, 'bounded_repeated_plan')
+    require(plan['source_sha256'] == {str(path): campaign.sha(path) for path in implementation.bound.imported_sources()},
+        'repeated_source_inventory_or_bytes_changed')
+    for item in (plan['native_contract_reference'], plan['semantic_gate_reference'], plan['binary'], plan['original_reference']):
+        if item:
+            require(campaign.sha(item['path']) == item['sha256'], 'repeated_reference_changed')
+    for row in plan['rows'].values():
+        domain.validate_scene(domain.scene(row['case']), row['domain'])
+
+
+def worker(output, expected):
+    output = Path(output).resolve(); plan = campaign.read(output / 'plan.json')
+    report = {'schema': SCHEMA, 'status': 'unknown_failed', 'native_execution_attempted': False}
+    accepted, resident, progress = None, None, {}
+    try:
+        require(campaign.sha(output / 'plan.json') == expected, 'repeated_plan_changed')
+        verify(plan)
+        key = plan['branch_order'][0]; row = plan['rows'][key]
+        if row['mode'] == 'async':
+            resident = implementation.worker.ResidentWorker('B', output / 'resident_B'); resident.start()
+        binding = campaign.reference(output / 'plan.json')
+        accepted = implementation.physical.run_admission.open_run(plan['native_contract_reference'],
+            plan['semantic_gate_reference'], binding)
+        native = implementation.physical.native_host.load_native(Path(plan['binary']['path']))
+        accepted.enter_branch(key, binding)
+        report['native_execution_attempted'] = True
+        raw = implementation.run_branch(native, accepted, key, plan['native_contract_reference'], row, resident=resident, progress=progress)
+        path = output / 'raw.json.gz'
+        path.write_bytes(gzip.compress(json.dumps(raw, allow_nan=False).encode(), compresslevel=1, mtime=0))
+        report.update(status='completed_native_branch', raw=campaign.reference(path), summary=raw['summary'],
+            decision_count=len(raw['repeated_decisions']), guarded_nondefault_count=sum(
+                item['current_admission']['execution_mode'] == 'protected_current'
+                and item['selected_action_id'] == 'prefer_8' for item in raw['repeated_decisions']))
+        accepted.finish_branch(key)
+    except Exception:
+        report['exception'] = traceback.format_exc()
+        partial = implementation.physical.capture_partial(progress, report['exception'])
+        partial['repeated_attempts'] = {owner: policy.repeated_attempts for owner, policy in progress.get('policies', {}).items()}
+        environment.write(output / 'partial.json', partial)
+        report['partial'] = campaign.reference(output / 'partial.json')
+    finally:
+        if resident:
+            resident.close()
+            environment.write(output / 'resident_audit.json', {'timing': resident.timing, 'records': resident.records})
+            report['resident_audit'] = campaign.reference(output / 'resident_audit.json')
+        if accepted:
+            closed = accepted.close(); environment.write(output / 'acceptance.json', closed)
+            report['run_acceptance_status'] = closed['status']
+            if closed['status'] != 'closed_run_acceptance_passed':
+                report['status'] = 'unknown_invalidated_runtime_evidence'
+        try:
+            verify(plan); report['source_exit_pins_passed'] = True
+        except Exception:
+            report['source_exit_pins_passed'] = False; report['exit_exception'] = traceback.format_exc()
+            report['status'] = 'unknown_failed'
+    environment.write(output / 'worker_report.json', report)
+    return report
+
+
+def launch(output):
+    output = Path(output).resolve(); plan = campaign.read(output / 'plan.json'); verify(plan)
+    require(not (output / 'launch_started.json').exists(), 'no_automatic_branch_retry')
+    expected = campaign.sha(output / 'plan.json'); token = secrets.token_hex(24)
+    environment.write(output / 'launch_started.json', {'plan_sha256': expected, 'native_branch_budget': 1})
+    with (output / 'stdout.log').open('x') as stdout, (output / 'stderr.log').open('x') as stderr:
+        process = bounded_windows_job.run([sys.executable, '-m', MODULE, '--worker', '--output', str(output),
+            '--plan-sha256', expected, '--admission', token], timeout=HARD_SECONDS,
+            admission=token, stdout=stdout, stderr=stderr, cwd=ROOT)
+    report_path = output / 'worker_report.json'
+    report = campaign.read(report_path) if report_path.exists() else {}
+    result = {'schema': SCHEMA, 'status': 'completed_native_branch' if process.get('exitcode') == 0
+        and report.get('status') == 'completed_native_branch' else 'unknown_failed', 'process': process,
+        'worker_report': campaign.reference(report_path) if report_path.exists() else None}
+    environment.write(output / 'receipt.json', result)
+    return result
+
+
+def main():
+    parser = argparse.ArgumentParser(); options = parser.add_mutually_exclusive_group(required=True)
+    for action in ('prepare', 'launch', 'worker'):
+        options.add_argument('--' + action, action='store_true')
+    parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--case', choices=tuple(domain.CASES), default='legacy_mechanism')
+    parser.add_argument('--mode', choices=('baseline', 'guarded', 'async'), default='baseline')
+    parser.add_argument('--reference', type=Path); parser.add_argument('--plan-sha256'); parser.add_argument('--admission')
+    parser.add_argument('--selection', choices=('score', 'prefer_3', 'prefer_8', 'native_default'), default='score')
+    args = parser.parse_args()
+    if args.worker:
+        result = worker(args.output, args.plan_sha256)
+    elif args.prepare:
+        result = prepare(args.output, args.case, args.mode, args.reference, args.selection)
+    else:
+        result = launch(args.output)
+    print(json.dumps({'status': result['status']}))
+    return 0 if result['status'] in ('prepared_unexecuted', 'completed_native_branch') else 1
+
+
+if __name__ == '__main__':
+    raise SystemExit(main())

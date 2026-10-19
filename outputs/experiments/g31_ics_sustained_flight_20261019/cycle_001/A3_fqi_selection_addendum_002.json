@@ -1,0 +1,31 @@
+{
+  "schema": "g31.foundation.fqi_selection_addendum.v1",
+  "criterion": "minimum_development_supported_empirical_optimal_mse_then_earliest_iteration",
+  "prior_criterion": "minimum_development_behavior_return_mse_then_earliest_iteration",
+  "development_already_inspected": true,
+  "formal_holdout_accessed": false,
+  "selection_only": true,
+  "fit_count": 0,
+  "native_branches": 0,
+  "maximum_revisions": 1,
+  "training_seeds": [
+    17,
+    29,
+    43
+  ],
+  "allowed_iterations": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "row_weighting": "original_development_rows_equal",
+  "collection_contract_sha256": "145c9984e749162dde4d8e747fe6bd80b937518d662ff08cd7424f821a484a07",
+  "training_receipt_sha256": "9681b17eca6445179e441c07a15b962d6d791a09b010959aa25e473f391c631c",
+  "created_utc_epoch": 1792412869.0068543,
+  "reason": "Behavior Monte Carlo values average mixed exploratory continuations, while FQI bootstraps the best supported continuation. Preserve original run/selection; make one explicit development-only checkpoint-selection repair using the closed actually observed development graph.",
+  "scope": "All existing weights unchanged; no refit, no new data, no forced positive iteration; no formal heldout access.",
+  "historical_source_audit": "A3_fqi_independent_audit_001"
+}

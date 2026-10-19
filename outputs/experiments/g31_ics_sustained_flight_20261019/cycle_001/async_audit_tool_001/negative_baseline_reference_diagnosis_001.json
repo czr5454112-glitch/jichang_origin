@@ -1,0 +1,274 @@
+{
+  "schema": "g31.independent.original_baseline_capacity_refusal_diagnosis.v1",
+  "status": "all_original_jobs_closed_default_continues_after_capacity_refusal",
+  "raw": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A_eval_negative_baseline_001\\raw.json.gz",
+    "sha256": "af8aeb702528b40c568ffd364a65ec46c1abe5137ac69f292cf7e639ba6548ce"
+  },
+  "script": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\async_audit_tool_001\\diagnose_negative_reference.py",
+    "sha256": "d6da202cfd7b41cc43a472e7bdf58a5797272c401078edd0db44d176faa1ca1a"
+  },
+  "physical_clock": 40.0,
+  "raw_summary_preserved": {
+    "status": "unknown_incomplete_or_unexecuted",
+    "completion": {
+      "loaded": 7.250999999999998,
+      "receiver": 5.449999999999999,
+      "reuse1": 12.700999999999993,
+      "reuse2": 18.110999999999997,
+      "blocker": 29.000000000000004,
+      "reuse3": 30.700000000000006
+    },
+    "business_complete": true,
+    "common_horizon_complete": true,
+    "completion_sum": 103.213,
+    "supply_recovery_valid": true,
+    "all_original_and_new_returns_received": true,
+    "same_L_all_reuse_loads": true,
+    "all_routes_updated_and_match_edges": false,
+    "stock_preserved": true,
+    "audit": {
+      "status": "passed",
+      "completed_traversals": 21,
+      "open_traversals": 0,
+      "tray_count": 3,
+      "optimality": "unknown",
+      "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+    },
+    "all_input_business_in_evaluator": true,
+    "native_model_protection_certified": false
+  },
+  "actual_job_completions": {
+    "loaded": {
+      "time": 7.250999999999998,
+      "event": "UNLOAD_COMPLETE",
+      "business_bag_id": "loaded",
+      "transport_leg_id": "",
+      "tray_id": "L",
+      "traversal_id": 6,
+      "node": 6,
+      "from": -1,
+      "to": -1,
+      "reason": ""
+    },
+    "receiver": {
+      "time": 5.449999999999999,
+      "event": "UNLOAD_COMPLETE",
+      "business_bag_id": "receiver",
+      "transport_leg_id": "",
+      "tray_id": "P",
+      "traversal_id": 3,
+      "node": 4,
+      "from": -1,
+      "to": -1,
+      "reason": ""
+    },
+    "reuse1": {
+      "time": 12.700999999999993,
+      "event": "UNLOAD_COMPLETE",
+      "business_bag_id": "reuse1",
+      "transport_leg_id": "",
+      "tray_id": "L",
+      "traversal_id": 11,
+      "node": 6,
+      "from": -1,
+      "to": -1,
+      "reason": ""
+    },
+    "reuse2": {
+      "time": 18.110999999999997,
+      "event": "UNLOAD_COMPLETE",
+      "business_bag_id": "reuse2",
+      "transport_leg_id": "",
+      "tray_id": "L",
+      "traversal_id": 16,
+      "node": 6,
+      "from": -1,
+      "to": -1,
+      "reason": ""
+    },
+    "blocker": {
+      "time": 29.000000000000004,
+      "event": "UNLOAD_COMPLETE",
+      "business_bag_id": "blocker",
+      "transport_leg_id": "",
+      "tray_id": "E",
+      "traversal_id": 18,
+      "node": 10,
+      "from": -1,
+      "to": -1,
+      "reason": ""
+    },
+    "reuse3": {
+      "time": 30.700000000000006,
+      "event": "UNLOAD_COMPLETE",
+      "business_bag_id": "reuse3",
+      "transport_leg_id": "",
+      "tray_id": "L",
+      "traversal_id": 21,
+      "node": 6,
+      "from": -1,
+      "to": -1,
+      "reason": ""
+    }
+  },
+  "route_proofs": [
+    {
+      "request": {
+        "request_id": "live:1:B:later-route-1",
+        "owner_id": "B",
+        "business_bag_id": "reuse2",
+        "tray_id": "L",
+        "from": 7,
+        "next": 3,
+        "expected_generation": 8,
+        "expected_traversal": 9,
+        "expiry": 20.11099999999999,
+        "message_delay": 0.01,
+        "kind": "route"
+      },
+      "at": 15.110999999999992,
+      "ack": {
+        "sequence": 1,
+        "attempt": 1,
+        "observed_at": 15.120999999999992,
+        "delivered_at": 15.140999999999991,
+        "executed_at": 15.120999999999992,
+        "completed_at": 15.120999999999992,
+        "status": "updated",
+        "reason": "allowed",
+        "result_id": "live:1:B:later-route-1"
+      },
+      "load": {
+        "time": 15.110999999999992,
+        "event": "LOAD_COMPLETE",
+        "business_bag_id": "reuse2",
+        "transport_leg_id": "",
+        "tray_id": "L",
+        "traversal_id": 12,
+        "node": 7,
+        "from": -1,
+        "to": -1,
+        "reason": ""
+      },
+      "leg": {
+        "time": 15.110999999999992,
+        "event": "LEG_START",
+        "business_bag_id": "reuse2",
+        "transport_leg_id": "reuse2:direct:7",
+        "tray_id": "L",
+        "traversal_id": 12,
+        "node": 7,
+        "from": 7,
+        "to": 6,
+        "reason": "direct"
+      },
+      "edge": {
+        "time": 15.210999999999991,
+        "event": "EDGE_ENTER",
+        "business_bag_id": "reuse2",
+        "transport_leg_id": "reuse2:direct:7",
+        "tray_id": "L",
+        "traversal_id": 13,
+        "node": 7,
+        "from": 7,
+        "to": 3,
+        "reason": ""
+      },
+      "completion": {
+        "time": 18.110999999999997,
+        "event": "UNLOAD_COMPLETE",
+        "business_bag_id": "reuse2",
+        "transport_leg_id": "",
+        "tray_id": "L",
+        "traversal_id": 16,
+        "node": 6,
+        "from": -1,
+        "to": -1,
+        "reason": ""
+      },
+      "claims_rejected_request_took_effect": false
+    },
+    {
+      "request": {
+        "request_id": "live:1:B:later-route-2",
+        "owner_id": "B",
+        "business_bag_id": "reuse3",
+        "tray_id": "L",
+        "from": 7,
+        "next": 3,
+        "expected_generation": 11,
+        "expected_traversal": 13,
+        "expiry": 25.521000000000004,
+        "message_delay": 0.01,
+        "kind": "route"
+      },
+      "at": 20.521000000000004,
+      "ack": {
+        "sequence": 1,
+        "attempt": 1,
+        "observed_at": 20.531000000000006,
+        "delivered_at": 20.551000000000005,
+        "executed_at": 20.531000000000006,
+        "completed_at": 20.531000000000006,
+        "status": "rejected",
+        "reason": "circulation:receiving_full",
+        "result_id": "live:1:B:later-route-2"
+      },
+      "load": {
+        "time": 20.521000000000004,
+        "event": "LOAD_COMPLETE",
+        "business_bag_id": "reuse3",
+        "transport_leg_id": "",
+        "tray_id": "L",
+        "traversal_id": 17,
+        "node": 7,
+        "from": -1,
+        "to": -1,
+        "reason": ""
+      },
+      "leg": {
+        "time": 20.521000000000004,
+        "event": "LEG_START",
+        "business_bag_id": "reuse3",
+        "transport_leg_id": "reuse3:direct:10",
+        "tray_id": "L",
+        "traversal_id": 17,
+        "node": 7,
+        "from": 7,
+        "to": 6,
+        "reason": "direct"
+      },
+      "edge": {
+        "time": 27.8,
+        "event": "EDGE_ENTER",
+        "business_bag_id": "reuse3",
+        "transport_leg_id": "reuse3:direct:10",
+        "tray_id": "L",
+        "traversal_id": 19,
+        "node": 7,
+        "from": 7,
+        "to": 3,
+        "reason": ""
+      },
+      "completion": {
+        "time": 30.700000000000006,
+        "event": "UNLOAD_COMPLETE",
+        "business_bag_id": "reuse3",
+        "transport_leg_id": "",
+        "tray_id": "L",
+        "traversal_id": 21,
+        "node": 6,
+        "from": -1,
+        "to": -1,
+        "reason": ""
+      },
+      "claims_rejected_request_took_effect": false
+    }
+  ],
+  "rejected_route_count": 1,
+  "original_reference_gate_changed": false,
+  "native_started": false,
+  "interpretation": "An original route request rejected for capacity has no command effect; the native fixed default later executes its own same-job edge. Complete original business outcomes remain legitimate finite baseline values. A separate reference-only check is needed; protected refresh guards remain unchanged."
+}

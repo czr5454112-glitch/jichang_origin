@@ -1,0 +1,70 @@
+{
+  "schema": "g31.airport_behavior_training_implementation_freeze.v1",
+  "created_utc": "2026-10-19T14:23:32.442780+00:00",
+  "source_sha256": {
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_airport_behavior_training.py": "c16775b189416dbc83c6953292d3b960a069a4a6e943502a15fe210c1c470da0",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_airport_behavior_consumer.py": "4a4e8ef0c79eb12362dcf481d8169652c723371a5c0a323d658321d0f6f87d4f",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_airport_learning_public.py": "36df2f20db92347e7573d6999d3ba5232c9679bbaffe48c119783d7517e2ba92",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_airport_learning_audit.py": "3d1e247c56d6bfa7ed33a915c6506e55115e678368022c16658b98e8fcf250de",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_action_value.py": "8da0557c6c4c9a39b7d80108251194ba2b5ac00ded7e720d47a507cf514a34d5",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_flight_forecaster_arrays.py": "401a283b890da04408b45e1a9cc7ac4a2db0b579ac95c418b9a263611d55cf64",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_flight_forecaster.py": "d2ebed6eb50533fde8e5a5a9e40dbcbdbe97e61b0f294803a3805a631bfde8d0",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_flight_context.py": "2f44fba75a34cf6f09f56820ea6b75ffd5c38f3e1b8aa4507a468136460d87e6",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\analytic_control.py": "a895b79a0adb93dcb61e08da97f68510b0c8e454fb7f69e419952ca7a0854115",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\__init__.py": "495b29212f548915ec02a3c29999151b9ba4a24e455fc8df58fca68473e23f38"
+  },
+  "preregistration": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\B2_behavior_pretraining_preregistration_001.json",
+    "sha256": "338dd82b1a10f3bda3c2e3c4cea222e61a4411f862d78eba2db362de1a2aeea0"
+  },
+  "readiness_expected_output": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\B2_behavior_readiness_003",
+  "readiness_status_at_freeze": "running_no_completed_rows_consumed",
+  "actual_fit_calls": 0,
+  "native_calls": 0,
+  "training_contract": {
+    "seeds": [
+      17,
+      29,
+      43
+    ],
+    "epochs": 100,
+    "split": "same_trajectory_train_only",
+    "no_development_or_test_selection": true,
+    "all_final_weights_saved": true,
+    "soft_wall_seconds": 240,
+    "outer_hard_seconds": 270,
+    "fit_seconds_per_seed": 45
+  },
+  "diagnostic_contract": {
+    "max_pairs": 3,
+    "pair_selection": "first_eligible_callbacks_in_sequence_with_distinct_proposed_semantics",
+    "variants": [
+      "actual_forecast",
+      "forecast_values_masked",
+      "zero_new_demand"
+    ],
+    "all_seeds": [
+      17,
+      29,
+      43
+    ],
+    "numerical_tolerance": 1e-08,
+    "model_selection": false,
+    "physical_benefit_claim": false,
+    "labels_generated": false
+  },
+  "consumer_available_at_sim_time": 57600.0,
+  "independent_source_review": "async_probe reviewed final evidence/archive/diagnostic/consumer gates; last exact outer-assessment binding suggestion added with negative tests",
+  "regression_tests": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\airport_behavior_training_tests_004.xml",
+    "sha256": "f6dbbd3da440aff7c39edce50a83f75d801baa9ddeabb8b1ee669ee2d1cbcac3"
+  },
+  "prior_partial_one_row_evidence_smoke": {
+    "callback_sequence": 28,
+    "passed": true,
+    "fit_calls": 0,
+    "features_or_forecasts_computed": 0,
+    "does_not_authorize_partial_training": true
+  },
+  "claim": "Prepared implementation only; separate completed readiness and registered actual fit are required."
+}

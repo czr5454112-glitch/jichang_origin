@@ -1,0 +1,14 @@
+{
+  "schema": "g31.R1_preregistered_native_calibration.v3",
+  "case": "hold3_11_65_release27_5",
+  "reference": "A2_train_baseline_001",
+  "arms": [
+    "R1_guarded_v3_001",
+    "R1_async_v3_001"
+  ],
+  "previous_calibration_preserved": "R1_native_calibration_v2_001.json",
+  "change": "Remove discarded duplicate observation only on protected current dispatch; preserve original super dispatch side effects, all guard checks and complete v2 timing. R2 in implementation artifact means optimization revision, not architectural R2 service.",
+  "source_freeze_sha256": "7fda52c01479672953f8944cb4675229d9fcfce8555130494d91ea04c7fd0224",
+  "100ms_certified": false,
+  "acceptance": "Exact all-job outcomes against A2/A5; complete roots/request/ACK/effect audit; separate wall-only latency and offline profiling CPU; no concurrent training or heavy audit during native measurement."
+}

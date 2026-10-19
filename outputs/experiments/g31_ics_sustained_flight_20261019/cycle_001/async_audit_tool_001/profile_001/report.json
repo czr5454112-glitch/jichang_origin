@@ -1,0 +1,1148 @@
+{
+  "schema": "g31.independent.current_profile.v1",
+  "status": "diagnostic_not_benchmark",
+  "raw_reference": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A2_train_prefer8_001\\raw.json.gz",
+    "sha256": "ab3f47f63cf17e422603f3e933f3e13f5a967a6c296ead39ac3204f03656b62f"
+  },
+  "script": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\async_audit_tool_001\\profile_current.py",
+    "sha256": "7c20ae23602c96a15494974203e0e8c66362395765b57caf687aa674a2af6225"
+  },
+  "domain_source": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_domain.py",
+    "sha256": "3bf1f2d520362eda81be1110b01a1698bacf677b7b5507222bac98d1e021afa2"
+  },
+  "python": "3.11.9 (tags/v3.11.9:de54cf5, Apr  2 2024, 10:12:12) [MSC v.1938 64 bit (AMD64)]",
+  "platform": "Windows-10-10.0.26200-SP0",
+  "native_started": false,
+  "source_edited": false,
+  "input_or_case_changed": false,
+  "only_saved_current_evidence_used": true,
+  "conditions": [
+    "Single profiling process, cases sequential, one cProfile call per saved current evidence.",
+    "Get-Process -Name python,pythonw immediately before launch reported no Python process; this is only a point-in-time observation.",
+    "No exclusive CPU reservation; concurrent processes may start or run. CIM process inventory was unavailable.",
+    "Imports completed before profile, no unprofiled warmup; file caches inherited from this desktop session.",
+    "cProfile adds overhead; these elapsed values are diagnostic and must not replace real run timings.",
+    "Only domain.evaluate is profiled. Collect, submit, native progression and end-to-end path are excluded."
+  ],
+  "rows": [
+    {
+      "actual_evidence_sha256": "7dd63151e41f9cea1efbe4474dc7af67c4d95758e3979826135ac316f55ee63b",
+      "sim_at": 15.150999999999991,
+      "target_job": "reuse2",
+      "profiled_call": "domain.evaluate(existing_actual_evidence, three_registered_candidates)",
+      "profile_wall_ms_not_benchmark": 1160.7819,
+      "profile_cpu_ms_not_benchmark": 1140.625,
+      "saved_actual_collect_plus_projection_ms": 781.7769,
+      "predicted_completion_exactly_matches_closed_actual_run_report": true,
+      "profile": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\async_audit_tool_001\\profile_001\\current_00.pstats",
+        "sha256": "4026252ea7645955d33a65986f4632fe332ee53c3c7edce32847acd4de4632ef"
+      },
+      "top_cumulative": [
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_domain.py",
+          "line": 445,
+          "function": "evaluate",
+          "primitive_calls": 1,
+          "total_calls": 1,
+          "self_seconds": 0.0002021,
+          "cumulative_seconds": 1.1607051000000002
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_domain.py",
+          "line": 297,
+          "function": "build_seed",
+          "primitive_calls": 1,
+          "total_calls": 1,
+          "self_seconds": 0.0002569,
+          "cumulative_seconds": 1.1253181
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_domain.py",
+          "line": 270,
+          "function": "validate_endpoints",
+          "primitive_calls": 1,
+          "total_calls": 1,
+          "self_seconds": 6.68e-05,
+          "cumulative_seconds": 1.1196080000000002
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_domain_guard.py",
+          "line": 453,
+          "function": "validate_collected_endpoints",
+          "primitive_calls": 1,
+          "total_calls": 1,
+          "self_seconds": 0.0001461,
+          "cumulative_seconds": 1.1195332
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_domain_guard.py",
+          "line": 316,
+          "function": "validate_later_pair",
+          "primitive_calls": 1,
+          "total_calls": 1,
+          "self_seconds": 0.0002471,
+          "cumulative_seconds": 1.098513
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_domain.py",
+          "line": 282,
+          "function": "bundle",
+          "primitive_calls": 1,
+          "total_calls": 1,
+          "self_seconds": 6.400000000000001e-05,
+          "cumulative_seconds": 1.0920828
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_domain.py",
+          "line": 112,
+          "function": "later_bundle",
+          "primitive_calls": 1,
+          "total_calls": 1,
+          "self_seconds": 0.0002055,
+          "cumulative_seconds": 1.0920188000000002
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_domain.py",
+          "line": 82,
+          "function": "identify",
+          "primitive_calls": 1,
+          "total_calls": 1,
+          "self_seconds": 0.00017690000000000002,
+          "cumulative_seconds": 1.0910882000000002
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_domain.py",
+          "line": 41,
+          "function": "scene",
+          "primitive_calls": 10,
+          "total_calls": 10,
+          "self_seconds": 0.0001842,
+          "cumulative_seconds": 1.0705225
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_live_obligation_native_domain.py",
+          "line": 40,
+          "function": "native_scene",
+          "primitive_calls": 10,
+          "total_calls": 10,
+          "self_seconds": 0.00032740000000000004,
+          "cumulative_seconds": 1.0697753
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_domain_guard.py",
+          "line": 26,
+          "function": "public_input",
+          "primitive_calls": 51,
+          "total_calls": 51,
+          "self_seconds": 0.0007839,
+          "cumulative_seconds": 1.0107476
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_live_obligation_projection.py",
+          "line": 42,
+          "function": "inputs",
+          "primitive_calls": 51,
+          "total_calls": 51,
+          "self_seconds": 0.0007776,
+          "cumulative_seconds": 1.0099439000000001
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_live_obligation_interval.py",
+          "line": 190,
+          "function": "fixed_contracts",
+          "primitive_calls": 51,
+          "total_calls": 51,
+          "self_seconds": 0.0081171,
+          "cumulative_seconds": 1.0087601000000002
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_live_obligation_native_domain.py",
+          "line": 48,
+          "function": "validate_runtime_input",
+          "primitive_calls": 10,
+          "total_calls": 10,
+          "self_seconds": 0.0002922,
+          "cumulative_seconds": 0.8453177000000001
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_live_obligation_native_domain.py",
+          "line": 55,
+          "function": "<listcomp>",
+          "primitive_calls": 10,
+          "total_calls": 10,
+          "self_seconds": 0.00038700000000000003,
+          "cumulative_seconds": 0.6007722000000001
+        },
+        {
+          "path": "C:\\PROGRAMING\\python3.11.9\\Lib\\copy.py",
+          "line": 128,
+          "function": "deepcopy",
+          "primitive_calls": 570,
+          "total_calls": 228065,
+          "self_seconds": 0.32033490000000003,
+          "cumulative_seconds": 0.6000928000000001
+        },
+        {
+          "path": "C:\\PROGRAMING\\python3.11.9\\Lib\\copy.py",
+          "line": 227,
+          "function": "_deepcopy_dict",
+          "primitive_calls": 819,
+          "total_calls": 10821,
+          "self_seconds": 0.07139090000000001,
+          "cumulative_seconds": 0.5838652000000001
+        },
+        {
+          "path": "C:\\PROGRAMING\\python3.11.9\\Lib\\copy.py",
+          "line": 201,
+          "function": "_deepcopy_list",
+          "primitive_calls": 2712,
+          "total_calls": 12756,
+          "self_seconds": 0.0505152,
+          "cumulative_seconds": 0.5321725
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_live_obligation_interval.py",
+          "line": 46,
+          "function": "source_contract",
+          "primitive_calls": 102,
+          "total_calls": 102,
+          "self_seconds": 0.0012703,
+          "cumulative_seconds": 0.40802140000000003
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_live_obligation_interval.py",
+          "line": 88,
+          "function": "derive",
+          "primitive_calls": 51,
+          "total_calls": 51,
+          "self_seconds": 0.0034692000000000004,
+          "cumulative_seconds": 0.316253
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_domain_guard.py",
+          "line": 29,
+          "function": "supported_contract",
+          "primitive_calls": 11,
+          "total_calls": 11,
+          "self_seconds": 0.0001194,
+          "cumulative_seconds": 0.2330382
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\native_host.py",
+          "line": 60,
+          "function": "prepare_input",
+          "primitive_calls": 1020,
+          "total_calls": 1020,
+          "self_seconds": 0.0041241,
+          "cumulative_seconds": 0.2054496
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf28_service_potential.py",
+          "line": 59,
+          "function": "service_aware_potential",
+          "primitive_calls": 1023,
+          "total_calls": 1023,
+          "self_seconds": 0.14527900000000002,
+          "cumulative_seconds": 0.20203390000000002
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_preexisting_occupancy_domain.py",
+          "line": 75,
+          "function": "make_bundle",
+          "primitive_calls": 102,
+          "total_calls": 102,
+          "self_seconds": 0.0031112,
+          "cumulative_seconds": 0.19062900000000002
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_synthetic_reuse_chain.py",
+          "line": 33,
+          "function": "scene",
+          "primitive_calls": 765,
+          "total_calls": 765,
+          "self_seconds": 0.0070539,
+          "cumulative_seconds": 0.18312230000000002
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_rolling_overlap_domain.py",
+          "line": 27,
+          "function": "public_domain",
+          "primitive_calls": 510,
+          "total_calls": 510,
+          "self_seconds": 0.0078073000000000005,
+          "cumulative_seconds": 0.154229
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_preexisting_occupancy_domain.py",
+          "line": 29,
+          "function": "domain",
+          "primitive_calls": 153,
+          "total_calls": 153,
+          "self_seconds": 0.004326,
+          "cumulative_seconds": 0.14247120000000002
+        },
+        {
+          "path": "C:\\PROGRAMING\\python3.11.9\\Lib\\json\\__init__.py",
+          "line": 183,
+          "function": "dumps",
+          "primitive_calls": 446,
+          "total_calls": 446,
+          "self_seconds": 0.0018529000000000002,
+          "cumulative_seconds": 0.0900505
+        },
+        {
+          "path": "C:\\PROGRAMING\\python3.11.9\\Lib\\json\\encoder.py",
+          "line": 183,
+          "function": "encode",
+          "primitive_calls": 446,
+          "total_calls": 446,
+          "self_seconds": 0.0016975,
+          "cumulative_seconds": 0.08761680000000001
+        },
+        {
+          "path": "C:\\PROGRAMING\\python3.11.9\\Lib\\json\\encoder.py",
+          "line": 205,
+          "function": "iterencode",
+          "primitive_calls": 446,
+          "total_calls": 446,
+          "self_seconds": 0.0854643,
+          "cumulative_seconds": 0.0854643
+        }
+      ],
+      "top_self": [
+        {
+          "path": "C:\\PROGRAMING\\python3.11.9\\Lib\\copy.py",
+          "line": 128,
+          "function": "deepcopy",
+          "primitive_calls": 570,
+          "total_calls": 228065,
+          "self_seconds": 0.32033490000000003,
+          "cumulative_seconds": 0.6000928000000001
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf28_service_potential.py",
+          "line": 59,
+          "function": "service_aware_potential",
+          "primitive_calls": 1023,
+          "total_calls": 1023,
+          "self_seconds": 0.14527900000000002,
+          "cumulative_seconds": 0.20203390000000002
+        },
+        {
+          "path": "C:\\PROGRAMING\\python3.11.9\\Lib\\json\\encoder.py",
+          "line": 205,
+          "function": "iterencode",
+          "primitive_calls": 446,
+          "total_calls": 446,
+          "self_seconds": 0.0854643,
+          "cumulative_seconds": 0.0854643
+        },
+        {
+          "path": "C:\\PROGRAMING\\python3.11.9\\Lib\\copy.py",
+          "line": 227,
+          "function": "_deepcopy_dict",
+          "primitive_calls": 819,
+          "total_calls": 10821,
+          "self_seconds": 0.07139090000000001,
+          "cumulative_seconds": 0.5838652000000001
+        },
+        {
+          "path": "~",
+          "line": 0,
+          "function": "<method 'get' of 'dict' objects>",
+          "primitive_calls": 459904,
+          "total_calls": 459904,
+          "self_seconds": 0.0570319,
+          "cumulative_seconds": 0.0570319
+        },
+        {
+          "path": "C:\\PROGRAMING\\python3.11.9\\Lib\\copy.py",
+          "line": 201,
+          "function": "_deepcopy_list",
+          "primitive_calls": 2712,
+          "total_calls": 12756,
+          "self_seconds": 0.0505152,
+          "cumulative_seconds": 0.5321725
+        },
+        {
+          "path": "~",
+          "line": 0,
+          "function": "<built-in method builtins.id>",
+          "primitive_calls": 278645,
+          "total_calls": 278645,
+          "self_seconds": 0.0320835,
+          "cumulative_seconds": 0.0320835
+        },
+        {
+          "path": "C:\\PROGRAMING\\python3.11.9\\Lib\\fractions.py",
+          "line": 62,
+          "function": "__new__",
+          "primitive_calls": 8772,
+          "total_calls": 8772,
+          "self_seconds": 0.027071500000000002,
+          "cumulative_seconds": 0.043649200000000006
+        },
+        {
+          "path": "C:\\PROGRAMING\\python3.11.9\\Lib\\copy.py",
+          "line": 182,
+          "function": "_deepcopy_atomic",
+          "primitive_calls": 201683,
+          "total_calls": 201683,
+          "self_seconds": 0.023653700000000003,
+          "cumulative_seconds": 0.023653700000000003
+        },
+        {
+          "path": "C:\\PROGRAMING\\python3.11.9\\Lib\\copy.py",
+          "line": 243,
+          "function": "_keep_alive",
+          "primitive_calls": 23577,
+          "total_calls": 23577,
+          "self_seconds": 0.0178179,
+          "cumulative_seconds": 0.0243095
+        },
+        {
+          "path": "~",
+          "line": 0,
+          "function": "<method 'append' of 'list' objects>",
+          "primitive_calls": 107583,
+          "total_calls": 107583,
+          "self_seconds": 0.0160766,
+          "cumulative_seconds": 0.0160766
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_synthetic_reuse_chain.py",
+          "line": 53,
+          "function": "<listcomp>",
+          "primitive_calls": 6885,
+          "total_calls": 6885,
+          "self_seconds": 0.012645900000000002,
+          "cumulative_seconds": 0.012645900000000002
+        },
+        {
+          "path": "~",
+          "line": 0,
+          "function": "<built-in method _heapq.heappop>",
+          "primitive_calls": 59051,
+          "total_calls": 59051,
+          "self_seconds": 0.0119962,
+          "cumulative_seconds": 0.0119962
+        },
+        {
+          "path": "~",
+          "line": 0,
+          "function": "<built-in method math.isfinite>",
+          "primitive_calls": 94623,
+          "total_calls": 94623,
+          "self_seconds": 0.0111874,
+          "cumulative_seconds": 0.0111874
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_live_obligation_interval.py",
+          "line": 24,
+          "function": "rational",
+          "primitive_calls": 4947,
+          "total_calls": 4947,
+          "self_seconds": 0.010416400000000001,
+          "cumulative_seconds": 0.043077300000000006
+        },
+        {
+          "path": "~",
+          "line": 0,
+          "function": "<built-in method builtins.isinstance>",
+          "primitive_calls": 33842,
+          "total_calls": 33842,
+          "self_seconds": 0.009315,
+          "cumulative_seconds": 0.015488700000000001
+        },
+        {
+          "path": "~",
+          "line": 0,
+          "function": "<built-in method _heapq.heappush>",
+          "primitive_calls": 49426,
+          "total_calls": 49426,
+          "self_seconds": 0.0092736,
+          "cumulative_seconds": 0.0092736
+        },
+        {
+          "path": "C:\\PROGRAMING\\python3.11.9\\Lib\\fractions.py",
+          "line": 452,
+          "function": "_add",
+          "primitive_calls": 2805,
+          "total_calls": 2805,
+          "self_seconds": 0.0086867,
+          "cumulative_seconds": 0.0150001
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_live_obligation_interval.py",
+          "line": 190,
+          "function": "fixed_contracts",
+          "primitive_calls": 51,
+          "total_calls": 51,
+          "self_seconds": 0.0081171,
+          "cumulative_seconds": 1.0087601000000002
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_rolling_overlap_domain.py",
+          "line": 27,
+          "function": "public_domain",
+          "primitive_calls": 510,
+          "total_calls": 510,
+          "self_seconds": 0.0078073000000000005,
+          "cumulative_seconds": 0.154229
+        },
+        {
+          "path": "C:\\PROGRAMING\\python3.11.9\\Lib\\copy.py",
+          "line": 210,
+          "function": "_deepcopy_tuple",
+          "primitive_calls": 2805,
+          "total_calls": 2805,
+          "self_seconds": 0.007264400000000001,
+          "cumulative_seconds": 0.0324377
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_synthetic_reuse_chain.py",
+          "line": 33,
+          "function": "scene",
+          "primitive_calls": 765,
+          "total_calls": 765,
+          "self_seconds": 0.0070539,
+          "cumulative_seconds": 0.18312230000000002
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf28_service_potential.py",
+          "line": 78,
+          "function": "<dictcomp>",
+          "primitive_calls": 1023,
+          "total_calls": 1023,
+          "self_seconds": 0.006771900000000001,
+          "cumulative_seconds": 0.0091366
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_rolling_overlap_domain.py",
+          "line": 38,
+          "function": "<listcomp>",
+          "primitive_calls": 510,
+          "total_calls": 510,
+          "self_seconds": 0.006362100000000001,
+          "cumulative_seconds": 0.006362100000000001
+        },
+        {
+          "path": "C:\\PROGRAMING\\python3.11.9\\Lib\\fractions.py",
+          "line": 468,
+          "function": "_sub",
+          "primitive_calls": 1734,
+          "total_calls": 1734,
+          "self_seconds": 0.006146700000000001,
+          "cumulative_seconds": 0.010578800000000001
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_synthetic_reuse_chain.py",
+          "line": 55,
+          "function": "<listcomp>",
+          "primitive_calls": 765,
+          "total_calls": 765,
+          "self_seconds": 0.0058817,
+          "cumulative_seconds": 0.0058817
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_synthetic_reuse_chain.py",
+          "line": 52,
+          "function": "<listcomp>",
+          "primitive_calls": 765,
+          "total_calls": 765,
+          "self_seconds": 0.0055720000000000006,
+          "cumulative_seconds": 0.018217900000000002
+        },
+        {
+          "path": "C:\\PROGRAMING\\python3.11.9\\Lib\\fractions.py",
+          "line": 357,
+          "function": "forward",
+          "primitive_calls": 5304,
+          "total_calls": 5304,
+          "self_seconds": 0.0053042,
+          "cumulative_seconds": 0.036881300000000006
+        },
+        {
+          "path": "C:\\PROGRAMING\\python3.11.9\\Lib\\copy.py",
+          "line": 211,
+          "function": "<listcomp>",
+          "primitive_calls": 2805,
+          "total_calls": 2805,
+          "self_seconds": 0.0048446,
+          "cumulative_seconds": 0.024852600000000002
+        },
+        {
+          "path": "~",
+          "line": 0,
+          "function": "<built-in method builtins.sum>",
+          "primitive_calls": 2835,
+          "total_calls": 2835,
+          "self_seconds": 0.0046188,
+          "cumulative_seconds": 0.008896000000000001
+        }
+      ]
+    },
+    {
+      "actual_evidence_sha256": "c29f14e6a451cb46f7aac2fd3ff32a6c24a0b682bc24a331e40661e5e36ad34f",
+      "sim_at": 21.86100000000001,
+      "target_job": "reuse3",
+      "profiled_call": "domain.evaluate(existing_actual_evidence, three_registered_candidates)",
+      "profile_wall_ms_not_benchmark": 1176.4876,
+      "profile_cpu_ms_not_benchmark": 1156.25,
+      "saved_actual_collect_plus_projection_ms": 656.7172,
+      "predicted_completion_exactly_matches_closed_actual_run_report": true,
+      "profile": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\async_audit_tool_001\\profile_001\\current_01.pstats",
+        "sha256": "af5ef36b7b74c641d16bebdc2b0cb17c3da28302e9e2ee91c2a9b2544d0836b7"
+      },
+      "top_cumulative": [
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_domain.py",
+          "line": 445,
+          "function": "evaluate",
+          "primitive_calls": 1,
+          "total_calls": 1,
+          "self_seconds": 0.00023060000000000002,
+          "cumulative_seconds": 1.1763619
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_domain.py",
+          "line": 297,
+          "function": "build_seed",
+          "primitive_calls": 1,
+          "total_calls": 1,
+          "self_seconds": 6.18e-05,
+          "cumulative_seconds": 1.1484617000000001
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_domain.py",
+          "line": 270,
+          "function": "validate_endpoints",
+          "primitive_calls": 1,
+          "total_calls": 1,
+          "self_seconds": 3.93e-05,
+          "cumulative_seconds": 1.1424554
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_domain_guard.py",
+          "line": 453,
+          "function": "validate_collected_endpoints",
+          "primitive_calls": 1,
+          "total_calls": 1,
+          "self_seconds": 7.81e-05,
+          "cumulative_seconds": 1.1424118
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_domain_guard.py",
+          "line": 316,
+          "function": "validate_later_pair",
+          "primitive_calls": 1,
+          "total_calls": 1,
+          "self_seconds": 0.00015560000000000001,
+          "cumulative_seconds": 1.1164516
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_domain.py",
+          "line": 282,
+          "function": "bundle",
+          "primitive_calls": 1,
+          "total_calls": 1,
+          "self_seconds": 8.000000000000001e-06,
+          "cumulative_seconds": 1.1096723000000002
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_domain.py",
+          "line": 112,
+          "function": "later_bundle",
+          "primitive_calls": 1,
+          "total_calls": 1,
+          "self_seconds": 0.0001989,
+          "cumulative_seconds": 1.1096643000000002
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_domain.py",
+          "line": 82,
+          "function": "identify",
+          "primitive_calls": 1,
+          "total_calls": 1,
+          "self_seconds": 0.0001751,
+          "cumulative_seconds": 1.1085967
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_domain.py",
+          "line": 41,
+          "function": "scene",
+          "primitive_calls": 10,
+          "total_calls": 10,
+          "self_seconds": 0.0001776,
+          "cumulative_seconds": 1.0848726
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_live_obligation_native_domain.py",
+          "line": 40,
+          "function": "native_scene",
+          "primitive_calls": 10,
+          "total_calls": 10,
+          "self_seconds": 0.0002963,
+          "cumulative_seconds": 1.0841367000000002
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_domain_guard.py",
+          "line": 26,
+          "function": "public_input",
+          "primitive_calls": 51,
+          "total_calls": 51,
+          "self_seconds": 0.0009705,
+          "cumulative_seconds": 1.0300972000000002
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_live_obligation_projection.py",
+          "line": 42,
+          "function": "inputs",
+          "primitive_calls": 51,
+          "total_calls": 51,
+          "self_seconds": 0.0008650000000000001,
+          "cumulative_seconds": 1.0291079
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_live_obligation_interval.py",
+          "line": 190,
+          "function": "fixed_contracts",
+          "primitive_calls": 51,
+          "total_calls": 51,
+          "self_seconds": 0.0084343,
+          "cumulative_seconds": 1.0279497
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_live_obligation_native_domain.py",
+          "line": 48,
+          "function": "validate_runtime_input",
+          "primitive_calls": 10,
+          "total_calls": 10,
+          "self_seconds": 0.00035830000000000004,
+          "cumulative_seconds": 0.8715174000000001
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_live_obligation_native_domain.py",
+          "line": 55,
+          "function": "<listcomp>",
+          "primitive_calls": 10,
+          "total_calls": 10,
+          "self_seconds": 0.00044540000000000004,
+          "cumulative_seconds": 0.6410964
+        },
+        {
+          "path": "C:\\PROGRAMING\\python3.11.9\\Lib\\copy.py",
+          "line": 128,
+          "function": "deepcopy",
+          "primitive_calls": 550,
+          "total_calls": 229742,
+          "self_seconds": 0.3278374,
+          "cumulative_seconds": 0.612468
+        },
+        {
+          "path": "C:\\PROGRAMING\\python3.11.9\\Lib\\copy.py",
+          "line": 227,
+          "function": "_deepcopy_dict",
+          "primitive_calls": 789,
+          "total_calls": 10946,
+          "self_seconds": 0.07149190000000001,
+          "cumulative_seconds": 0.5974
+        },
+        {
+          "path": "C:\\PROGRAMING\\python3.11.9\\Lib\\copy.py",
+          "line": 201,
+          "function": "_deepcopy_list",
+          "primitive_calls": 2694,
+          "total_calls": 12812,
+          "self_seconds": 0.0511782,
+          "cumulative_seconds": 0.5428866
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_live_obligation_interval.py",
+          "line": 46,
+          "function": "source_contract",
+          "primitive_calls": 102,
+          "total_calls": 102,
+          "self_seconds": 0.0013735000000000002,
+          "cumulative_seconds": 0.4101347
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_live_obligation_interval.py",
+          "line": 88,
+          "function": "derive",
+          "primitive_calls": 51,
+          "total_calls": 51,
+          "self_seconds": 0.0035059,
+          "cumulative_seconds": 0.3242937
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\live_obligation_domain_guard.py",
+          "line": 29,
+          "function": "supported_contract",
+          "primitive_calls": 11,
+          "total_calls": 11,
+          "self_seconds": 0.0001179,
+          "cumulative_seconds": 0.220508
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\native_host.py",
+          "line": 60,
+          "function": "prepare_input",
+          "primitive_calls": 1020,
+          "total_calls": 1020,
+          "self_seconds": 0.0041913,
+          "cumulative_seconds": 0.20877320000000002
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf28_service_potential.py",
+          "line": 59,
+          "function": "service_aware_potential",
+          "primitive_calls": 1023,
+          "total_calls": 1023,
+          "self_seconds": 0.1481897,
+          "cumulative_seconds": 0.2053104
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_preexisting_occupancy_domain.py",
+          "line": 75,
+          "function": "make_bundle",
+          "primitive_calls": 102,
+          "total_calls": 102,
+          "self_seconds": 0.0031959,
+          "cumulative_seconds": 0.1922064
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_synthetic_reuse_chain.py",
+          "line": 33,
+          "function": "scene",
+          "primitive_calls": 765,
+          "total_calls": 765,
+          "self_seconds": 0.0071723,
+          "cumulative_seconds": 0.18442550000000002
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_rolling_overlap_domain.py",
+          "line": 27,
+          "function": "public_domain",
+          "primitive_calls": 510,
+          "total_calls": 510,
+          "self_seconds": 0.007919500000000001,
+          "cumulative_seconds": 0.15452860000000002
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_preexisting_occupancy_domain.py",
+          "line": 29,
+          "function": "domain",
+          "primitive_calls": 153,
+          "total_calls": 153,
+          "self_seconds": 0.0046244,
+          "cumulative_seconds": 0.1442224
+        },
+        {
+          "path": "C:\\PROGRAMING\\python3.11.9\\Lib\\json\\__init__.py",
+          "line": 183,
+          "function": "dumps",
+          "primitive_calls": 452,
+          "total_calls": 452,
+          "self_seconds": 0.0019413000000000002,
+          "cumulative_seconds": 0.0945063
+        },
+        {
+          "path": "C:\\PROGRAMING\\python3.11.9\\Lib\\json\\encoder.py",
+          "line": 183,
+          "function": "encode",
+          "primitive_calls": 452,
+          "total_calls": 452,
+          "self_seconds": 0.0018413000000000001,
+          "cumulative_seconds": 0.09194250000000001
+        },
+        {
+          "path": "C:\\PROGRAMING\\python3.11.9\\Lib\\json\\encoder.py",
+          "line": 205,
+          "function": "iterencode",
+          "primitive_calls": 452,
+          "total_calls": 452,
+          "self_seconds": 0.0896422,
+          "cumulative_seconds": 0.0896422
+        }
+      ],
+      "top_self": [
+        {
+          "path": "C:\\PROGRAMING\\python3.11.9\\Lib\\copy.py",
+          "line": 128,
+          "function": "deepcopy",
+          "primitive_calls": 550,
+          "total_calls": 229742,
+          "self_seconds": 0.3278374,
+          "cumulative_seconds": 0.612468
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf28_service_potential.py",
+          "line": 59,
+          "function": "service_aware_potential",
+          "primitive_calls": 1023,
+          "total_calls": 1023,
+          "self_seconds": 0.1481897,
+          "cumulative_seconds": 0.2053104
+        },
+        {
+          "path": "C:\\PROGRAMING\\python3.11.9\\Lib\\json\\encoder.py",
+          "line": 205,
+          "function": "iterencode",
+          "primitive_calls": 452,
+          "total_calls": 452,
+          "self_seconds": 0.0896422,
+          "cumulative_seconds": 0.0896422
+        },
+        {
+          "path": "C:\\PROGRAMING\\python3.11.9\\Lib\\copy.py",
+          "line": 227,
+          "function": "_deepcopy_dict",
+          "primitive_calls": 789,
+          "total_calls": 10946,
+          "self_seconds": 0.07149190000000001,
+          "cumulative_seconds": 0.5974
+        },
+        {
+          "path": "~",
+          "line": 0,
+          "function": "<method 'get' of 'dict' objects>",
+          "primitive_calls": 463039,
+          "total_calls": 463039,
+          "self_seconds": 0.0581435,
+          "cumulative_seconds": 0.0581435
+        },
+        {
+          "path": "C:\\PROGRAMING\\python3.11.9\\Lib\\copy.py",
+          "line": 201,
+          "function": "_deepcopy_list",
+          "primitive_calls": 2694,
+          "total_calls": 12812,
+          "self_seconds": 0.0511782,
+          "cumulative_seconds": 0.5428866
+        },
+        {
+          "path": "~",
+          "line": 0,
+          "function": "<built-in method builtins.id>",
+          "primitive_calls": 280676,
+          "total_calls": 280676,
+          "self_seconds": 0.0339493,
+          "cumulative_seconds": 0.0339493
+        },
+        {
+          "path": "C:\\PROGRAMING\\python3.11.9\\Lib\\fractions.py",
+          "line": 62,
+          "function": "__new__",
+          "primitive_calls": 8772,
+          "total_calls": 8772,
+          "self_seconds": 0.027833,
+          "cumulative_seconds": 0.0447163
+        },
+        {
+          "path": "C:\\PROGRAMING\\python3.11.9\\Lib\\copy.py",
+          "line": 182,
+          "function": "_deepcopy_atomic",
+          "primitive_calls": 203179,
+          "total_calls": 203179,
+          "self_seconds": 0.0235806,
+          "cumulative_seconds": 0.0235806
+        },
+        {
+          "path": "C:\\PROGRAMING\\python3.11.9\\Lib\\copy.py",
+          "line": 243,
+          "function": "_keep_alive",
+          "primitive_calls": 23758,
+          "total_calls": 23758,
+          "self_seconds": 0.0180699,
+          "cumulative_seconds": 0.024574400000000003
+        },
+        {
+          "path": "~",
+          "line": 0,
+          "function": "<method 'append' of 'list' objects>",
+          "primitive_calls": 107609,
+          "total_calls": 107609,
+          "self_seconds": 0.0160812,
+          "cumulative_seconds": 0.0160812
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_synthetic_reuse_chain.py",
+          "line": 53,
+          "function": "<listcomp>",
+          "primitive_calls": 6885,
+          "total_calls": 6885,
+          "self_seconds": 0.012284100000000001,
+          "cumulative_seconds": 0.012284100000000001
+        },
+        {
+          "path": "~",
+          "line": 0,
+          "function": "<built-in method _heapq.heappop>",
+          "primitive_calls": 58329,
+          "total_calls": 58329,
+          "self_seconds": 0.0121959,
+          "cumulative_seconds": 0.0121959
+        },
+        {
+          "path": "~",
+          "line": 0,
+          "function": "<built-in method math.isfinite>",
+          "primitive_calls": 94639,
+          "total_calls": 94639,
+          "self_seconds": 0.011389900000000001,
+          "cumulative_seconds": 0.011389900000000001
+        },
+        {
+          "path": "C:\\PROGRAMING\\python3.11.9\\Lib\\fractions.py",
+          "line": 452,
+          "function": "_add",
+          "primitive_calls": 2805,
+          "total_calls": 2805,
+          "self_seconds": 0.010603000000000001,
+          "cumulative_seconds": 0.017335800000000002
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_live_obligation_interval.py",
+          "line": 24,
+          "function": "rational",
+          "primitive_calls": 4947,
+          "total_calls": 4947,
+          "self_seconds": 0.010379000000000001,
+          "cumulative_seconds": 0.0429855
+        },
+        {
+          "path": "~",
+          "line": 0,
+          "function": "<built-in method builtins.isinstance>",
+          "primitive_calls": 33865,
+          "total_calls": 33865,
+          "self_seconds": 0.009739300000000001,
+          "cumulative_seconds": 0.0157375
+        },
+        {
+          "path": "~",
+          "line": 0,
+          "function": "<built-in method _heapq.heappush>",
+          "primitive_calls": 48706,
+          "total_calls": 48706,
+          "self_seconds": 0.009383200000000001,
+          "cumulative_seconds": 0.009383200000000001
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\public_live_obligation_interval.py",
+          "line": 190,
+          "function": "fixed_contracts",
+          "primitive_calls": 51,
+          "total_calls": 51,
+          "self_seconds": 0.0084343,
+          "cumulative_seconds": 1.0279497
+        },
+        {
+          "path": "C:\\PROGRAMING\\python3.11.9\\Lib\\copy.py",
+          "line": 210,
+          "function": "_deepcopy_tuple",
+          "primitive_calls": 2805,
+          "total_calls": 2805,
+          "self_seconds": 0.0080871,
+          "cumulative_seconds": 0.0338452
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_rolling_overlap_domain.py",
+          "line": 27,
+          "function": "public_domain",
+          "primitive_calls": 510,
+          "total_calls": 510,
+          "self_seconds": 0.007919500000000001,
+          "cumulative_seconds": 0.15452860000000002
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_synthetic_reuse_chain.py",
+          "line": 33,
+          "function": "scene",
+          "primitive_calls": 765,
+          "total_calls": 765,
+          "self_seconds": 0.0071723,
+          "cumulative_seconds": 0.18442550000000002
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_rolling_overlap_domain.py",
+          "line": 38,
+          "function": "<listcomp>",
+          "primitive_calls": 510,
+          "total_calls": 510,
+          "self_seconds": 0.0063539,
+          "cumulative_seconds": 0.0063539
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf28_service_potential.py",
+          "line": 78,
+          "function": "<dictcomp>",
+          "primitive_calls": 1023,
+          "total_calls": 1023,
+          "self_seconds": 0.0061752000000000005,
+          "cumulative_seconds": 0.008592200000000001
+        },
+        {
+          "path": "C:\\PROGRAMING\\python3.11.9\\Lib\\fractions.py",
+          "line": 468,
+          "function": "_sub",
+          "primitive_calls": 1734,
+          "total_calls": 1734,
+          "self_seconds": 0.0060815,
+          "cumulative_seconds": 0.0105523
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_synthetic_reuse_chain.py",
+          "line": 55,
+          "function": "<listcomp>",
+          "primitive_calls": 765,
+          "total_calls": 765,
+          "self_seconds": 0.0059134,
+          "cumulative_seconds": 0.0059134
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_synthetic_reuse_chain.py",
+          "line": 52,
+          "function": "<listcomp>",
+          "primitive_calls": 765,
+          "total_calls": 765,
+          "self_seconds": 0.005632000000000001,
+          "cumulative_seconds": 0.0179161
+        },
+        {
+          "path": "C:\\PROGRAMING\\python3.11.9\\Lib\\fractions.py",
+          "line": 357,
+          "function": "forward",
+          "primitive_calls": 5304,
+          "total_calls": 5304,
+          "self_seconds": 0.0054097,
+          "cumulative_seconds": 0.0390848
+        },
+        {
+          "path": "C:\\PROGRAMING\\python3.11.9\\Lib\\copy.py",
+          "line": 211,
+          "function": "<listcomp>",
+          "primitive_calls": 2805,
+          "total_calls": 2805,
+          "self_seconds": 0.0049157,
+          "cumulative_seconds": 0.0254336
+        },
+        {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_preexisting_occupancy_domain.py",
+          "line": 29,
+          "function": "domain",
+          "primitive_calls": 153,
+          "total_calls": 153,
+          "self_seconds": 0.0046244,
+          "cumulative_seconds": 0.1442224
+        }
+      ]
+    }
+  ]
+}

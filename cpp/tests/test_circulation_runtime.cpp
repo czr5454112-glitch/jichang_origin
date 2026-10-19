@@ -115,6 +115,22 @@ void departure_lease_boundary() {
   state.transfers[0].status="departed";
   require(state.can_enter(0,3,0,50+5e-9)=="allowed","departure lease wrongly cancels in-flight continuation");
 }
+void receiver_admission_keeps_physical_capacity() {
+  CirculationState state;state.enabled=true;state.input=input();
+  state.input.nodes[0].capacity=4;state.input.nodes[0].empty_receive_transit_reserve=1;
+  state.next_entry.assign(state.input.edges.size(),0);
+  CirculationTrayState moving;moving.tray_id="return";moving.node=3;moving.active_leg=0;
+  moving.reception_node=0;moving.transfer=0;
+  state.trays.push_back(moving);
+  for(int i=0;i<3;++i) {CirculationTrayState parked;parked.tray_id="parked"+std::to_string(i);
+    parked.node=0;state.trays.push_back(parked);}
+  state.legs.push_back({0,"return-leg",0,-1,"empty_return"});
+  state.transfers.resize(1);state.transfers[0].status="departed";
+  require(state.occupancy(0)==4 && state.occupancy(0,0)==3,"own reservation counted twice");
+  require(state.can_enter(0,3,0,1)=="allowed","receiver policy changed physical continuation capacity");
+  state.trays[0].transfer=-1;state.trays[0].reception_node=-1;state.trays[0].job=0;
+  require(state.can_enter(0,3,0,1)=="allowed","receiver policy blocked loaded fourth physical slot");
+}
 void simultaneous_terminal_capacity_and_tail_headway() {
   Graph g; g.add_node(Node{0,0,0.001,0,0,{}}); g.add_node(Node{1,0,0.001,0,0,{}});
   g.add_edge(Edge{0,1,1,1}); g.set_heuristic({{0,1},{100,0}});
@@ -158,7 +174,8 @@ void explicit_goal_service_contract() {
 }
 int main() {
   try { cycle(false); cycle(true); default_horizon_and_checkpoint(); departure_lease_boundary();
-        simultaneous_terminal_capacity_and_tail_headway(); explicit_goal_service_contract(); }
+        simultaneous_terminal_capacity_and_tail_headway(); explicit_goal_service_contract();
+        receiver_admission_keeps_physical_capacity(); }
   catch(const std::exception& e) { std::cerr<<e.what()<<'\n'; return 1; }
   std::cout<<"native circulation cycle, rollback, horizon, clone and departure lease checks passed\n";
   return 0;

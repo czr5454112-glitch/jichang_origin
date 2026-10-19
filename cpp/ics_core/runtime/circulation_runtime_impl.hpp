@@ -57,6 +57,8 @@ inline void EventDrivenJunctionRuntime::initialize_circulation(
     if (!nodes.insert(n.node).second || n.capacity <= 0 ||
         n.export_min_stock < 0 || n.export_min_stock > n.capacity || n.zone.empty())
       throw std::invalid_argument("circulation:invalid_node_contract");
+    if(n.empty_receive_transit_reserve < 0 || n.empty_receive_transit_reserve >= n.capacity)
+      throw std::invalid_argument("circulation:invalid_receiver_transit_reserve");
   }
   if (nodes.size() != graph_.node_count())
     throw std::invalid_argument("circulation:node_contract_coverage");
@@ -467,6 +469,14 @@ inline void EventDrivenJunctionRuntime::circulation_progress(double time) {
         TimingMethod::none, 0, time);
     if (circulation_.occupancy(request.destination, state.tray) >= destination.capacity) {
       reject("receiving_full"); continue;
+    }
+    // This is receiver-local, atomic admission at the existing commit boundary.
+    // It is not a physical berth reduction or a sender snapshot authorization.
+    // Existing leases and every loaded/empty physical can_enter remain intact.
+    if (destination.empty_receive_transit_reserve > 0 &&
+        circulation_.occupancy(request.destination, state.tray) >=
+            destination.capacity - destination.empty_receive_transit_reserve) {
+      reject("receiver_transit_reserve"); continue;
     }
     timing_receiving_capacity.finish();
     auto timing_grant = request_timing_.scoped(TimingPhase::reservation_commit, timing_identity,

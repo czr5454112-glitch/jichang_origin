@@ -1,0 +1,37 @@
+{
+  "schema": "g31.foundation.repeated_supervised_protocol.v1",
+  "train_cases": [
+    "three_reuse_blocker_11_1"
+  ],
+  "development_cases": [
+    "four_reuse_blocker_12_5"
+  ],
+  "formal_test_cases_reserved_not_read": [
+    "three_reuse_blocker_12_1"
+  ],
+  "seeds": [
+    1701,
+    1702,
+    1703
+  ],
+  "epochs": 200,
+  "per_seed_wall_seconds": 45.0,
+  "total_wall_seconds": 180.0,
+  "cpu_threads": 1,
+  "architecture": [
+    64,
+    64
+  ],
+  "optimizer": {
+    "kind": "Adam",
+    "learning_rate": 0.01,
+    "weight_decay": 0.0001
+  },
+  "target": "negative_sum_max_zero_conditional_completion_minus_current_observation_time",
+  "label_kind": "frozen_full_job_conditional_model_prediction_on_actual_native_delivered_evidence",
+  "model_selection": "report_all_three_seeds_no_development_selection_no_formal_test_access",
+  "deployment_seed_if_needed": 1701,
+  "native_branches": 0,
+  "parent_group_unit": "registered_input_case_not_action_or_decision",
+  "scope": "supervised_conditional_model_distillation_not_actual_return_training_not_RL"
+}

@@ -1,0 +1,11 @@
+# Existing small-graph action mechanism limitation
+
+This is an analytic review of the existing business topology, not an impossibility proof for arbitrary additional business contracts. No native run or training was performed.
+
+The route 7→3→4 costs 2.1 seconds including intermediate service; 7→8→4 costs 3.4 seconds. The detour penalty is 1.3 seconds. After the original receiver completes at node 4, it occupies one of that node's two berths. The remaining E blocker can reserve node 3 for its 1-second incoming edge 9→3 and 0.1-second service, then leaves via its unblocked 3→10 edge. It never returns from sink 10. Thus bypassing that one reservation can save at most 1.1 seconds and still makes the currently selected L job at least 0.2 seconds later. The 7→3 and 3→4 entry clocks from an earlier L cycle have already expired by the next 6→7 return/reload.
+
+The first accepted nontrivial detour therefore cannot pass strict per-job protection against the original reference. Before it, native_default and prefer_3 have identical physical paths; there is no earlier gain to provide reference slack. Merely shifting existing arrival times, storage release at node 9 or initial loaded release at node 4, or adding more 7→6 reuse jobs, does not add another independent blockage or remove the 1.3-versus-1.1 bound.
+
+A separately declared real business job with mandatory prolonged storage at node 3 can break this bound. This must be registered as a new business-contract mechanism with its own full original baseline, actor information availability, exact all-job checks and model domain. Moving a job's storage node from 9 to 3 is not merely changing storage_release_at. No such input or source change was made by this audit.
+
+A further gate issue must be checked in that new mechanism: the current local mask treats native_default like a route request to node 3. During a long node-3 hold it may disable both default and prefer_3, leaving only prefer_8. One cannot claim two legal alternatives from the nominal action vocabulary. A no-command policy's real native waiting semantics may warrant a separately reviewed mask rule, but per-job protection and current authority must remain strict.

@@ -1,0 +1,89 @@
+{
+  "schema": "g31.independent.async_schedule_v2_design.v1",
+  "status": "implemented_pure_tests_passed_native_calibration_pending",
+  "native_source_frozen": true,
+  "native_started_by_this_summary": false,
+  "source_bindings": {
+    "foundation_repeated_native.py": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_native.py",
+      "sha256": "0d4795898b1255d42db9dd0ca6b7736393b00ced521c7035a06d6e12ca9fd978"
+    },
+    "foundation_repeated_campaign.py": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_campaign.py",
+      "sha256": "036819c1e15ba6f1585c410b981cf19a5cb31d713d6d57468154e2c703571986"
+    },
+    "foundation_repeated_domain.py": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_domain.py",
+      "sha256": "3bf1f2d520362eda81be1110b01a1698bacf677b7b5507222bac98d1e021afa2"
+    },
+    "foundation_repeated_worker.py": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_worker.py",
+      "sha256": "1df11c21d51d5a4386781f307a9190f134c188b6ff48e228601bd848e0a3e604"
+    }
+  },
+  "test_source": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\tests\\test_g31_foundation_repeated.py",
+    "sha256": "98b5918e497115990059ceb7149832795beb974273e2c39c341ae173b0c6d4c0"
+  },
+  "previous_failure_diagnosis": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\async_audit_tool_001\\A3_preview_failure_diagnosis_001.json",
+    "sha256": "6eabf80d2272775ca954c9f78dda6bbedc4a0e9b3c38b6ef3487639688a1e6de"
+  },
+  "previous_async_audit": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\async_audit_tool_001\\A3_train_async_audit_001.json",
+    "sha256": "8bb85292892f508f882074291f5b6c8068df4587f1312a278f9da6e4aa0641e0"
+  },
+  "old_failure": {
+    "actual_worker_requests": 0,
+    "actual_body_deliveries": 0,
+    "first_preview": "11.67: same activation as E recovery transfer; 11.71 fresh pair refuses unresolved source physical action.",
+    "second_preview": "15.011: waiting-only enumeration skips loading reuse2 and targets reuse3; 15.081 own capture has aged .06, violating the preserved .05 limit.",
+    "persistent_target_error": "A refused first preview had already permanently marked reuse2, preventing its later eligible attempt."
+  },
+  "new_schedule": {
+    "version": "g31.foundation.async_preview_schedule.v2",
+    "target_order": "Earliest actually known business not yet dispatched, including loading. A loading/previously-submitted next target cannot be skipped for a later waiting job.",
+    "source_gate": "All local physical requests must have actual delivered terminal acknowledgments. Received E 5->1 transfers also retain the pre-existing strict ACK delivered_at + .5 < now headway proof. No future peer/private state is read.",
+    "max_collection_opportunities_per_target": 2,
+    "retry_signature": [
+      "current target job record",
+      "actual locally observed trays",
+      "locally owned physical request terminal flags and delivered ACK bodies"
+    ],
+    "retry_rejected_when": "The same signature has already been tried, two opportunities have already been used, or only time has advanced.",
+    "target_finished_when": "ResidentWorker.submit returns an actual request id after a validated detached current collection. A refused collection leaves the target unconsumed.",
+    "no_local_L": "Preview is a non-executing proposal and may use trigger_tray=None. Its real fresh A/B collection must still reconstruct all carriers. No invented local L or generation is admitted.",
+    "default_behavior": "Worker polling remains nonblocking. An actual target load deadline cancels unfinished preview collection; default policy continues. Late results are rejected and each eligible body is consumed once.",
+    "scope": "Only async scheduling and its declared plan contract change. Current route guard, candidate mask, immutable paired reference, physical domain, guarded mode ranking and source TTL remain unchanged.",
+    "audit_log": "preview_schedule records deferral, bounded attempt, refusal and successful worker submission."
+  },
+  "pure_tests": {
+    "command": "python -m pytest tests/test_g31_foundation_repeated.py tests/test_g31_foundation_multirate.py -q --basetemp outputs/experiments/g31_ics_repeated_tests_20261019/session_010",
+    "exit_code": 0,
+    "passed_count": 52,
+    "evidence_kind": "Agent-observed terminal execution; no standalone JUnit was generated.",
+    "added_cases": [
+      "Reject unresolved/non-delivered terminal physical actions and wait until exact +.5 headway condition matures.",
+      "Allow non-executing preview without a local L; never construct a fictitious tray.",
+      "Reject repeat with identical physical/ACK signature; permit a changed loading observation once; cap at two.",
+      "Loading next target prevents jumping to later waiting target.",
+      "Only successful worker submission marks target complete.",
+      "Preserve real A3 failed raw and distinguish it from worker timing/consumption success."
+    ]
+  },
+  "native_validation_pending": {
+    "registered_run": "A4_train_async_001",
+    "owner": "root",
+    "single_native_process": true,
+    "do_not_claim_yet": [
+      "worker submitted a supported prediction",
+      "complete body was collected before the opportunity",
+      "body affected actual guarded ranking",
+      "selected action was submitted, ACKed and bound to an actual edge",
+      "any improvement or 100ms current latency"
+    ]
+  },
+  "remaining_control_cost": "Existing peer quiet intervals are preserved. A new preview can postpone a policy admission while native physical events and worker execution continue; the new raw must measure and disclose this cost.",
+  "no_caching_optimization_implemented": true,
+  "full_request_100ms_certified": false
+}

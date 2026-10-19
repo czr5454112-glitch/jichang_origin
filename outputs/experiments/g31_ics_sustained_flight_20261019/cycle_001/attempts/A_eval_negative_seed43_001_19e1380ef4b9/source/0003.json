@@ -1,0 +1,56 @@
+{
+  "schema": "g31.foundation.formal_reference_eligibility_clarification.v1",
+  "created_utc_epoch": 1792414338.197076,
+  "formal_contract": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A_formal_evaluation_001.json",
+    "sha256": "6ede398fcf64bd74fd2d79c30ad701bd056b787f6480e8d11eafa832f25b837b"
+  },
+  "completed_tasks_before_change": [
+    "A_eval_positive_baseline_001",
+    "A_eval_positive_rule_001",
+    "A_eval_positive_seed17_001",
+    "A_eval_positive_seed29_001",
+    "A_eval_positive_seed43_001",
+    "A_eval_negative_baseline_001"
+  ],
+  "first_attempt_tasks_after_change": [
+    "A_eval_negative_rule_001",
+    "A_eval_negative_seed17_001",
+    "A_eval_negative_seed29_001",
+    "A_eval_negative_seed43_001"
+  ],
+  "allowed_source_changes": {
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_campaign.py": {
+      "before_sha256": "036819c1e15ba6f1585c410b981cf19a5cb31d713d6d57468154e2c703571986",
+      "after_sha256": "b97c8f1b41d7709f96710021e2ae2f87f5f6eb7989e9877658a95d85ee77b5b1"
+    }
+  },
+  "all_other_native_campaign_sources_and_keys_must_match": true,
+  "baseline_audit": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A_formal_review_001\\negative_baseline_reference_audit_001.json",
+    "sha256": "bc144839fbab27c859e6d624a46fc245125f5b6a46412b726a3c5a9da6205b5b"
+  },
+  "implementation_audit": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\async_audit_tool_001\\baseline_reference_gate_clarification_001.json",
+    "sha256": "d55381b75d4a37cb389c34b9ac2dd9ca23c1ec028612233b9b98db318fed9861"
+  },
+  "interrupted_execution_log": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A_formal_execution_001.jsonl",
+    "sha256": "88dfbc19953039898f1837ad037a835f5810ad90cd3a7b32965338c19747b52e"
+  },
+  "preparation_failure": {
+    "task_id": "A_eval_negative_rule_001",
+    "native_started": false,
+    "ledger_registered": false,
+    "error": "complete_same_input_original_baseline",
+    "reason": "Historical summary requires every route update success, although actual six jobs and all physical requests closed after a capacity-refused route continued on the default path."
+  },
+  "scope": "Baseline eligibility only: complete original-policy actual outcomes with independently bound arrivals/completions, full physical audit, preserved recovery/returns, exact route refusal ACK and same loaded leg default continuation. Never classify refused command as executed.",
+  "historical_baseline_summary_modified": false,
+  "current_native_guard_modified": false,
+  "model_or_selection_modified": false,
+  "retraining_or_test_based_selection": false,
+  "new_native_branch_budget": 4,
+  "same_formal_input_and_clock_and_10_branch_denominator": true,
+  "no_reexecution_of_completed_six": true
+}

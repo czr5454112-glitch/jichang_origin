@@ -1,0 +1,1621 @@
+{
+  "schema": "g31.independent.airport_receiver_admission_audit.v1",
+  "run": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\C00_receiver_admission_001",
+  "method": "Standard-library closed raw/ACK/event/public-observation inspection; no controller/model/native imports or execution.",
+  "closure": {
+    "plan_sha256": "569689ae525b3d5d40ab0d08ff5e8599cfd6ca7d151bc74345c09d496d619789",
+    "archive_count": 105,
+    "archive_mismatches": [],
+    "evidence_count": 409,
+    "evidence_mismatches": [],
+    "acceptance": "closed_run_acceptance_passed",
+    "physical_stop": 31922.567000000006,
+    "last_complete_snapshot_time": 28800.0,
+    "warmup_reached": false,
+    "continuous_session_count": 1,
+    "reset_count": 0
+  },
+  "input_comparison": {
+    "full_business_jobs": 28506,
+    "same_jobs_trays_graph_capacity_services": true,
+    "only_delta": [
+      [
+        49,
+        {
+          "node": 49,
+          "zone": "international",
+          "control_partition": "partition:system_international",
+          "resource_owner": "owner:system_international",
+          "capacity": 4,
+          "export_min_stock": 0,
+          "allow_export": true,
+          "allow_receive": true
+        },
+        {
+          "node": 49,
+          "zone": "international",
+          "control_partition": "partition:system_international",
+          "resource_owner": "owner:system_international",
+          "capacity": 4,
+          "export_min_stock": 0,
+          "allow_export": true,
+          "allow_receive": true,
+          "empty_receive_transit_reserve": 1
+        }
+      ]
+    ],
+    "different_receiver_admission_control_and_native_version": true,
+    "unchanged_business_version": "g31.foundation.airport_cyclic_od.v1"
+  },
+  "last_closed_snapshot_business": {
+    "snapshot_time": 28800.0,
+    "population": {
+      "offered_by_horizon": 8740,
+      "observed": 8740,
+      "loaded": 92,
+      "completed": 89
+    },
+    "status_counts": {
+      "completed": 89,
+      "waiting_for_tray": 8648,
+      "in_transit": 3,
+      "unreleased": 19766
+    },
+    "unresolved_offered": 28417,
+    "completed_ids": [
+      "projected:1x:0",
+      "projected:1x:1",
+      "projected:1x:2",
+      "projected:1x:3",
+      "projected:1x:4",
+      "projected:1x:5",
+      "projected:1x:6",
+      "projected:1x:7",
+      "projected:1x:8",
+      "projected:1x:9",
+      "projected:1x:10",
+      "projected:1x:11",
+      "projected:1x:12",
+      "projected:1x:13",
+      "projected:1x:14",
+      "projected:1x:15",
+      "projected:1x:16",
+      "projected:1x:17",
+      "projected:1x:18",
+      "projected:1x:19",
+      "projected:1x:20",
+      "projected:1x:22",
+      "projected:1x:29",
+      "projected:1x:33",
+      "projected:1x:40",
+      "projected:1x:49",
+      "projected:1x:54",
+      "projected:1x:65",
+      "projected:1x:72",
+      "projected:1x:78",
+      "projected:1x:80",
+      "projected:1x:90",
+      "projected:1x:95",
+      "projected:1x:101",
+      "projected:1x:108",
+      "projected:1x:109",
+      "projected:1x:114",
+      "projected:1x:123",
+      "projected:1x:135",
+      "projected:1x:140",
+      "projected:1x:148",
+      "projected:1x:163",
+      "projected:1x:175",
+      "projected:1x:181",
+      "projected:1x:186",
+      "projected:1x:189",
+      "projected:1x:193",
+      "projected:1x:194",
+      "projected:1x:201",
+      "projected:1x:207",
+      "projected:1x:209",
+      "projected:1x:219",
+      "projected:1x:229",
+      "projected:1x:234",
+      "projected:1x:250",
+      "projected:1x:251",
+      "projected:1x:252",
+      "projected:1x:253",
+      "projected:1x:254",
+      "projected:1x:258",
+      "projected:1x:260",
+      "projected:1x:267",
+      "projected:1x:268",
+      "projected:1x:276",
+      "projected:1x:287",
+      "projected:1x:295",
+      "projected:1x:308",
+      "projected:1x:313",
+      "projected:1x:317",
+      "projected:1x:341",
+      "projected:1x:343",
+      "projected:1x:355",
+      "projected:1x:356",
+      "projected:1x:366",
+      "projected:1x:367",
+      "projected:1x:371",
+      "projected:1x:393",
+      "projected:1x:440",
+      "projected:1x:466",
+      "projected:1x:467",
+      "projected:1x:469",
+      "projected:1x:472",
+      "projected:1x:473",
+      "projected:1x:482",
+      "projected:1x:484",
+      "projected:1x:489",
+      "projected:1x:617",
+      "projected:1x:618",
+      "projected:1x:627"
+    ],
+    "native_leg_counts": {
+      "LEG_COMPLETE": 259,
+      "STORAGE_ENTER": 92,
+      "UNLOAD_COMPLETE": 89,
+      "EMPTY_RECEIVED": 78
+    }
+  },
+  "last_closed_snapshot_movement": {
+    "snapshot_time": 28800.0,
+    "event_counts": {
+      "PROTOCOL_COMMAND_ACK_DELIVERED": 2250,
+      "BAG_ARRIVAL": 8740,
+      "LOAD_START": 92,
+      "LOAD_COMPLETE": 92,
+      "LEG_START": 266,
+      "EDGE_ENTER": 4090,
+      "EDGE_EXIT": 4085,
+      "LEG_COMPLETE": 259,
+      "STORAGE_ENTER": 92,
+      "RESOURCE_WAIT": 708,
+      "MODULE_REQUEST_DELIVERED": 1382,
+      "EXPORT_GRANTED": 82,
+      "PROTOCOL_ACK_DELIVERED": 4421,
+      "EMPTY_RECEIVED": 78,
+      "RESOURCE_WAKE": 426,
+      "UNUSED_RECEIVING_RELEASED": 1,
+      "LEG_FAILED": 1,
+      "STORAGE_RELEASE": 92,
+      "native_merge_hold": 10,
+      "UNLOAD_START": 89,
+      "UNLOAD_COMPLETE": 89,
+      "HOLD_START": 89,
+      "HOLD_COMPLETE": 89,
+      "TRANSFER_REJECTED": 1297
+    },
+    "last_edge_enter": {
+      "time": 28799.956000000002,
+      "event": "EDGE_ENTER",
+      "business_bag_id": "projected:1x:322",
+      "transport_leg_id": "projected:1x:322:storage_out:263",
+      "tray_id": "initial:0:1",
+      "traversal_id": 4090,
+      "node": 61,
+      "from": 61,
+      "to": 63,
+      "reason": ""
+    },
+    "last_edge_exit": {
+      "time": 28798.831,
+      "event": "EDGE_EXIT",
+      "business_bag_id": "projected:1x:329",
+      "transport_leg_id": "projected:1x:329:storage_out:264",
+      "tray_id": "initial:138:0",
+      "traversal_id": 4088,
+      "node": 80,
+      "from": 78,
+      "to": 80,
+      "reason": ""
+    },
+    "within_snapshot_tail_seconds": 1.169000000001688,
+    "motion_after_snapshot_unknown_from_receipts": true,
+    "last_business_completion": {
+      "time": 28598.433999999994,
+      "event": "UNLOAD_COMPLETE",
+      "business_bag_id": "projected:1x:627",
+      "transport_leg_id": "",
+      "tray_id": "initial:49:1",
+      "traversal_id": 4039,
+      "node": 83,
+      "from": -1,
+      "to": -1,
+      "reason": ""
+    }
+  },
+  "receiver49_through_closed_snapshot": {
+    "snapshot_time": 28800.0,
+    "max_remote_leases": 3,
+    "max_counted": 4,
+    "grants": [
+      {
+        "time": 11342.0,
+        "event": "EXPORT_GRANTED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "initial:138:0",
+        "traversal_id": 0,
+        "node": 138,
+        "from": 138,
+        "to": 49,
+        "reason": "live:21:owner:system_domestic:transfer:116"
+      },
+      {
+        "time": 11342.0,
+        "event": "EXPORT_GRANTED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "initial:138:1",
+        "traversal_id": 0,
+        "node": 138,
+        "from": 138,
+        "to": 49,
+        "reason": "live:21:owner:system_domestic:transfer:117"
+      },
+      {
+        "time": 20942.0,
+        "event": "EXPORT_GRANTED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "initial:0:0",
+        "traversal_id": 404,
+        "node": 114,
+        "from": 114,
+        "to": 49,
+        "reason": "live:21:owner:system_domestic:transfer:1052"
+      },
+      {
+        "time": 21542.0,
+        "event": "EXPORT_GRANTED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "initial:0:1",
+        "traversal_id": 519,
+        "node": 114,
+        "from": 114,
+        "to": 49,
+        "reason": "live:21:owner:system_domestic:transfer:1104"
+      },
+      {
+        "time": 21542.0,
+        "event": "EXPORT_GRANTED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "initial:134:0",
+        "traversal_id": 595,
+        "node": 114,
+        "from": 114,
+        "to": 49,
+        "reason": "live:21:owner:system_domestic:transfer:1105"
+      },
+      {
+        "time": 21842.0,
+        "event": "EXPORT_GRANTED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "initial:134:1",
+        "traversal_id": 614,
+        "node": 114,
+        "from": 114,
+        "to": 49,
+        "reason": "live:21:owner:system_domestic:transfer:1147"
+      },
+      {
+        "time": 22322.0,
+        "event": "EXPORT_GRANTED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "initial:49:1",
+        "traversal_id": 691,
+        "node": 85,
+        "from": 85,
+        "to": 49,
+        "reason": "live:21:owner:system_domestic:transfer:1231"
+      },
+      {
+        "time": 22322.0,
+        "event": "EXPORT_GRANTED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "initial:24:0",
+        "traversal_id": 424,
+        "node": 114,
+        "from": 114,
+        "to": 49,
+        "reason": "live:21:owner:system_domestic:transfer:1233"
+      },
+      {
+        "time": 22409.195999999993,
+        "event": "EXPORT_GRANTED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "initial:95:0",
+        "traversal_id": 1223,
+        "node": 114,
+        "from": 114,
+        "to": 49,
+        "reason": "live:21:owner:system_domestic:transfer:1126"
+      },
+      {
+        "time": 22922.0,
+        "event": "EXPORT_GRANTED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "initial:0:1",
+        "traversal_id": 1343,
+        "node": 85,
+        "from": 85,
+        "to": 49,
+        "reason": "live:21:owner:system_domestic:transfer:1343"
+      },
+      {
+        "time": 22982.0,
+        "event": "EXPORT_GRANTED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "initial:136:0",
+        "traversal_id": 902,
+        "node": 118,
+        "from": 118,
+        "to": 49,
+        "reason": "live:21:owner:system_domestic:transfer:1354"
+      },
+      {
+        "time": 23042.0,
+        "event": "EXPORT_GRANTED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "initial:24:1",
+        "traversal_id": 559,
+        "node": 118,
+        "from": 118,
+        "to": 49,
+        "reason": "live:21:owner:system_domestic:transfer:1365"
+      },
+      {
+        "time": 23642.0,
+        "event": "EXPORT_GRANTED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "initial:149:0",
+        "traversal_id": 1003,
+        "node": 116,
+        "from": 116,
+        "to": 49,
+        "reason": "live:21:owner:system_domestic:transfer:1473"
+      },
+      {
+        "time": 23642.0,
+        "event": "EXPORT_GRANTED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "initial:26:0",
+        "traversal_id": 426,
+        "node": 116,
+        "from": 116,
+        "to": 49,
+        "reason": "live:21:owner:system_domestic:transfer:1474"
+      },
+      {
+        "time": 23642.0,
+        "event": "EXPORT_GRANTED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "initial:26:1",
+        "traversal_id": 555,
+        "node": 116,
+        "from": 116,
+        "to": 49,
+        "reason": "live:21:owner:system_domestic:transfer:1475"
+      },
+      {
+        "time": 24242.0,
+        "event": "EXPORT_GRANTED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "initial:0:0",
+        "traversal_id": 1999,
+        "node": 73,
+        "from": 73,
+        "to": 49,
+        "reason": "live:21:owner:system_domestic:transfer:1579"
+      },
+      {
+        "time": 24362.0,
+        "event": "EXPORT_GRANTED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "initial:0:1",
+        "traversal_id": 2083,
+        "node": 81,
+        "from": 81,
+        "to": 49,
+        "reason": "live:21:owner:system_domestic:transfer:1604"
+      },
+      {
+        "time": 24362.0,
+        "event": "EXPORT_GRANTED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "initial:24:1",
+        "traversal_id": 2159,
+        "node": 64,
+        "from": 64,
+        "to": 49,
+        "reason": "live:21:owner:system_domestic:transfer:1605"
+      },
+      {
+        "time": 24722.0,
+        "event": "EXPORT_GRANTED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "initial:49:0",
+        "traversal_id": 1674,
+        "node": 73,
+        "from": 73,
+        "to": 49,
+        "reason": "live:21:owner:system_domestic:transfer:1678"
+      },
+      {
+        "time": 24769.184999999994,
+        "event": "EXPORT_GRANTED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "initial:26:0",
+        "traversal_id": 2397,
+        "node": 118,
+        "from": 118,
+        "to": 49,
+        "reason": "live:21:owner:system_domestic:transfer:1618"
+      },
+      {
+        "time": 24962.0,
+        "event": "EXPORT_GRANTED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "initial:134:1",
+        "traversal_id": 2306,
+        "node": 114,
+        "from": 114,
+        "to": 49,
+        "reason": "live:21:owner:system_domestic:transfer:1731"
+      },
+      {
+        "time": 25142.0,
+        "event": "EXPORT_GRANTED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "initial:138:1",
+        "traversal_id": 1848,
+        "node": 120,
+        "from": 120,
+        "to": 49,
+        "reason": "live:21:owner:system_domestic:transfer:1771"
+      },
+      {
+        "time": 25442.0,
+        "event": "EXPORT_GRANTED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "initial:0:0",
+        "traversal_id": 2644,
+        "node": 114,
+        "from": 114,
+        "to": 49,
+        "reason": "live:21:owner:system_domestic:transfer:1836"
+      },
+      {
+        "time": 25622.0,
+        "event": "EXPORT_GRANTED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "initial:24:0",
+        "traversal_id": 2556,
+        "node": 120,
+        "from": 120,
+        "to": 49,
+        "reason": "live:21:owner:system_domestic:transfer:1873"
+      },
+      {
+        "time": 25622.0,
+        "event": "EXPORT_GRANTED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "initial:49:1",
+        "traversal_id": 2113,
+        "node": 116,
+        "from": 116,
+        "to": 49,
+        "reason": "live:21:owner:system_domestic:transfer:1874"
+      },
+      {
+        "time": 25982.0,
+        "event": "EXPORT_GRANTED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "initial:26:1",
+        "traversal_id": 2789,
+        "node": 120,
+        "from": 120,
+        "to": 49,
+        "reason": "live:21:owner:system_domestic:transfer:1953"
+      },
+      {
+        "time": 26102.0,
+        "event": "EXPORT_GRANTED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "initial:49:0",
+        "traversal_id": 2788,
+        "node": 85,
+        "from": 85,
+        "to": 49,
+        "reason": "live:21:owner:system_domestic:transfer:1981"
+      },
+      {
+        "time": 26118.692,
+        "event": "EXPORT_GRANTED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "initial:0:1",
+        "traversal_id": 3030,
+        "node": 73,
+        "from": 73,
+        "to": 49,
+        "reason": "live:21:owner:system_domestic:transfer:1747"
+      },
+      {
+        "time": 26642.0,
+        "event": "EXPORT_GRANTED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "initial:0:0",
+        "traversal_id": 3172,
+        "node": 73,
+        "from": 73,
+        "to": 49,
+        "reason": "live:21:owner:system_domestic:transfer:2098"
+      },
+      {
+        "time": 26702.0,
+        "event": "EXPORT_GRANTED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "initial:26:0",
+        "traversal_id": 3181,
+        "node": 116,
+        "from": 116,
+        "to": 49,
+        "reason": "live:21:owner:system_domestic:transfer:2114"
+      },
+      {
+        "time": 26712.951,
+        "event": "EXPORT_GRANTED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "initial:134:0",
+        "traversal_id": 3236,
+        "node": 116,
+        "from": 116,
+        "to": 49,
+        "reason": "live:21:owner:system_domestic:transfer:1988"
+      },
+      {
+        "time": 27242.0,
+        "event": "EXPORT_GRANTED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "initial:24:0",
+        "traversal_id": 3249,
+        "node": 120,
+        "from": 120,
+        "to": 49,
+        "reason": "live:21:owner:system_domestic:transfer:2242"
+      },
+      {
+        "time": 27242.0,
+        "event": "EXPORT_GRANTED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "initial:24:1",
+        "traversal_id": 3366,
+        "node": 116,
+        "from": 116,
+        "to": 49,
+        "reason": "live:21:owner:system_domestic:transfer:2243"
+      },
+      {
+        "time": 27242.0,
+        "event": "EXPORT_GRANTED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "initial:57:0",
+        "traversal_id": 1828,
+        "node": 116,
+        "from": 116,
+        "to": 49,
+        "reason": "live:21:owner:system_domestic:transfer:2244"
+      },
+      {
+        "time": 27722.0,
+        "event": "EXPORT_GRANTED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "initial:0:1",
+        "traversal_id": 3486,
+        "node": 87,
+        "from": 87,
+        "to": 49,
+        "reason": "live:21:owner:system_domestic:transfer:2355"
+      },
+      {
+        "time": 27782.0,
+        "event": "EXPORT_GRANTED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "initial:138:0",
+        "traversal_id": 1867,
+        "node": 124,
+        "from": 124,
+        "to": 49,
+        "reason": "live:21:owner:system_domestic:transfer:2369"
+      },
+      {
+        "time": 27782.0,
+        "event": "EXPORT_GRANTED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "initial:138:1",
+        "traversal_id": 3353,
+        "node": 124,
+        "from": 124,
+        "to": 49,
+        "reason": "live:21:owner:system_domestic:transfer:2370"
+      },
+      {
+        "time": 28382.0,
+        "event": "EXPORT_GRANTED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "initial:24:0",
+        "traversal_id": 3899,
+        "node": 124,
+        "from": 124,
+        "to": 49,
+        "reason": "live:21:owner:system_domestic:transfer:2504"
+      },
+      {
+        "time": 28382.0,
+        "event": "EXPORT_GRANTED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "initial:24:1",
+        "traversal_id": 3897,
+        "node": 83,
+        "from": 83,
+        "to": 49,
+        "reason": "live:21:owner:system_domestic:transfer:2505"
+      },
+      {
+        "time": 28488.188000000002,
+        "event": "EXPORT_GRANTED",
+        "business_bag_id": "",
+        "transport_leg_id": "",
+        "tray_id": "initial:134:0",
+        "traversal_id": 4002,
+        "node": 83,
+        "from": 83,
+        "to": 49,
+        "reason": "live:21:owner:system_domestic:transfer:2430"
+      }
+    ],
+    "policy_rejection_count": 520,
+    "grant_time_occupancy_policy_verified_from_receipts": true
+  },
+  "nodes_at_closed_snapshot": {
+    "25": {
+      "capacity": 4,
+      "counted": [],
+      "physical": [],
+      "receiving_leases": [],
+      "outgoing_edges": [
+        [
+          25,
+          9,
+          70.02,
+          2.0
+        ],
+        [
+          25,
+          34,
+          68.62,
+          2.0
+        ],
+        [
+          25,
+          94,
+          125.2,
+          2.0
+        ]
+      ]
+    },
+    "49": {
+      "capacity": 4,
+      "counted": [
+        "initial:24:0",
+        "initial:24:1",
+        "initial:134:0"
+      ],
+      "physical": [],
+      "receiving_leases": [
+        "initial:24:0",
+        "initial:24:1",
+        "initial:134:0"
+      ],
+      "outgoing_edges": [
+        [
+          49,
+          50,
+          40.93,
+          2.0
+        ]
+      ]
+    },
+    "53": {
+      "capacity": 4,
+      "counted": [
+        "initial:134:0"
+      ],
+      "physical": [],
+      "receiving_leases": [],
+      "outgoing_edges": [
+        [
+          53,
+          49,
+          150.25,
+          2.0
+        ]
+      ]
+    },
+    "61": {
+      "capacity": 4,
+      "counted": [],
+      "physical": [],
+      "receiving_leases": [],
+      "outgoing_edges": [
+        [
+          61,
+          62,
+          5.3,
+          2.0
+        ],
+        [
+          61,
+          63,
+          4.5,
+          2.0
+        ]
+      ]
+    },
+    "67": {
+      "capacity": 4,
+      "counted": [
+        "initial:26:0"
+      ],
+      "physical": [
+        "initial:26:0"
+      ],
+      "receiving_leases": [],
+      "outgoing_edges": [
+        [
+          67,
+          70,
+          18.3,
+          2.0
+        ]
+      ]
+    },
+    "69": {
+      "capacity": 4,
+      "counted": [
+        "initial:57:0"
+      ],
+      "physical": [
+        "initial:57:0"
+      ],
+      "receiving_leases": [],
+      "outgoing_edges": [
+        [
+          69,
+          70,
+          11.2,
+          2.0
+        ]
+      ]
+    },
+    "73": {
+      "capacity": 4,
+      "counted": [
+        "initial:57:1",
+        "initial:92:1"
+      ],
+      "physical": [
+        "initial:57:1",
+        "initial:92:1"
+      ],
+      "receiving_leases": [],
+      "outgoing_edges": [
+        [
+          73,
+          74,
+          11.4,
+          2.0
+        ]
+      ]
+    },
+    "80": {
+      "capacity": 4,
+      "counted": [
+        "initial:138:0"
+      ],
+      "physical": [
+        "initial:138:0"
+      ],
+      "receiving_leases": [],
+      "outgoing_edges": [
+        [
+          80,
+          81,
+          7.7,
+          2.0
+        ],
+        [
+          80,
+          82,
+          21.2,
+          2.0
+        ]
+      ]
+    },
+    "81": {
+      "capacity": 4,
+      "counted": [
+        "initial:134:1"
+      ],
+      "physical": [
+        "initial:134:1"
+      ],
+      "receiving_leases": [],
+      "outgoing_edges": [
+        [
+          81,
+          82,
+          12.5,
+          2.0
+        ]
+      ]
+    },
+    "83": {
+      "capacity": 4,
+      "counted": [
+        "initial:0:0",
+        "initial:49:1"
+      ],
+      "physical": [
+        "initial:0:0",
+        "initial:49:1"
+      ],
+      "receiving_leases": [],
+      "outgoing_edges": [
+        [
+          83,
+          86,
+          14.9,
+          2.0
+        ]
+      ]
+    },
+    "112": {
+      "capacity": 4,
+      "counted": [],
+      "physical": [],
+      "receiving_leases": [],
+      "outgoing_edges": [
+        [
+          112,
+          53,
+          139.5,
+          2.0
+        ],
+        [
+          112,
+          113,
+          3.0,
+          2.0
+        ]
+      ]
+    },
+    "114": {
+      "capacity": 4,
+      "counted": [
+        "initial:149:0",
+        "initial:149:1"
+      ],
+      "physical": [
+        "initial:149:0",
+        "initial:149:1"
+      ],
+      "receiving_leases": [],
+      "outgoing_edges": [
+        [
+          114,
+          117,
+          10.9,
+          2.0
+        ]
+      ]
+    },
+    "116": {
+      "capacity": 4,
+      "counted": [
+        "initial:26:1",
+        "initial:92:0",
+        "initial:95:1"
+      ],
+      "physical": [
+        "initial:26:1",
+        "initial:92:0",
+        "initial:95:1"
+      ],
+      "receiving_leases": [],
+      "outgoing_edges": [
+        [
+          116,
+          119,
+          14.7,
+          2.0
+        ]
+      ]
+    },
+    "118": {
+      "capacity": 4,
+      "counted": [
+        "initial:136:0"
+      ],
+      "physical": [
+        "initial:136:0"
+      ],
+      "receiving_leases": [],
+      "outgoing_edges": [
+        [
+          118,
+          121,
+          27.8,
+          2.0
+        ]
+      ]
+    },
+    "120": {
+      "capacity": 4,
+      "counted": [
+        "initial:95:0"
+      ],
+      "physical": [
+        "initial:95:0"
+      ],
+      "receiving_leases": [],
+      "outgoing_edges": [
+        [
+          120,
+          121,
+          12.7,
+          2.0
+        ]
+      ]
+    },
+    "124": {
+      "capacity": 4,
+      "counted": [
+        "initial:49:0"
+      ],
+      "physical": [
+        "initial:49:0"
+      ],
+      "receiving_leases": [],
+      "outgoing_edges": [
+        [
+          124,
+          127,
+          38.8,
+          2.0
+        ]
+      ]
+    },
+    "136": {
+      "capacity": 4,
+      "counted": [
+        "initial:136:1"
+      ],
+      "physical": [
+        "initial:136:1"
+      ],
+      "receiving_leases": [],
+      "outgoing_edges": [
+        [
+          136,
+          137,
+          63.3,
+          2.0
+        ]
+      ]
+    }
+  },
+  "snapshot_tray_mode_counts": {
+    "empty": 15,
+    "loaded": 3,
+    "empty_transit": 3,
+    "quarantined": 1
+  },
+  "failed_requests": 1,
+  "transfer_status_counts": {
+    "received": 78,
+    "rejected": 1297,
+    "failed": 1,
+    "departed": 3,
+    "pending": 3,
+    "undelivered": 15
+  },
+  "transfer_rejection_reasons": {
+    "departure_lease_expired": 13,
+    "receiving_full": 764,
+    "receiver_transit_reserve": 520
+  },
+  "observations": {
+    "count": 0,
+    "first": null,
+    "last": null,
+    "owners": [],
+    "owner_scope_integrity_passed": true,
+    "conditional_labels_available": false,
+    "counts": []
+  },
+  "C10_guard_branch_audit": {
+    "activate_at": 57660.0,
+    "counts": {},
+    "forecast_branch_reachable_on_recorded_observations": null,
+    "scope": "Unavailable: stop precedes 43200 observation start, 57600 warmup and 57660 activation. Zero records is not zero supply."
+  },
+  "same_business_prior_policy_comparison_at_28800": {
+    "counts": {
+      "equal": 7,
+      "unknown_incomplete": 28499
+    },
+    "strict_all_job_nonharm_established": false,
+    "unfinished_jobs_excluded": 0
+  },
+  "segments": [
+    {
+      "target": 0.0,
+      "actual_clock": 0.0,
+      "result_available": true,
+      "snapshot_time": 0.0,
+      "population": {
+        "offered_by_horizon": 0,
+        "observed": 0,
+        "loaded": 0,
+        "completed": 0
+      },
+      "native_summary": {
+        "event_count": 0,
+        "completed_count": 0,
+        "failed_count": 0,
+        "runtime_seconds": 0.0,
+        "edge_enter_event_count": 0,
+        "edge_exit_event_count": 0,
+        "reservation_conflicts": 0,
+        "physical_fault_edge_entry_violation_count": 0,
+        "merge_grant_timing_mode": "jit_fair_aging_deadline",
+        "g4irsf20_event_hotpath_policy": "E2",
+        "local_queue_capacity": 0
+      },
+      "wall_seconds": 0.05639159999554977,
+      "raw": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\C00_receiver_admission_001\\C00\\segment_00.json.gz",
+        "sha256": "44e5a7876af3c2dfc1a0a701a01172bd7f9db63df62876b4140f6137a96e5c5a"
+      },
+      "last_native_batch": {
+        "target": 0.0,
+        "status": "reached",
+        "start_at": 0.0,
+        "end_at": 0.0,
+        "trace_sequence": 3,
+        "wall_ms": 0.01780001912266016,
+        "cpu_ms": 0.0
+      }
+    },
+    {
+      "target": 3600.0,
+      "actual_clock": 3600.0,
+      "result_available": true,
+      "snapshot_time": 3600.0,
+      "population": {
+        "offered_by_horizon": 0,
+        "observed": 0,
+        "loaded": 0,
+        "completed": 0
+      },
+      "native_summary": {
+        "event_count": 8,
+        "completed_count": 0,
+        "failed_count": 0,
+        "runtime_seconds": 0.0,
+        "edge_enter_event_count": 0,
+        "edge_exit_event_count": 0,
+        "reservation_conflicts": 0,
+        "physical_fault_edge_entry_violation_count": 0,
+        "merge_grant_timing_mode": "jit_fair_aging_deadline",
+        "g4irsf20_event_hotpath_policy": "E2",
+        "local_queue_capacity": 0
+      },
+      "wall_seconds": 0.38957540004048496,
+      "raw": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\C00_receiver_admission_001\\C00\\segment_01.json.gz",
+        "sha256": "f2b9c7c2fa8f4592597bb3353972951eb6d80ca7968e8d5655b4b36726c1a8c0"
+      },
+      "last_native_batch": {
+        "target": 3600.0,
+        "status": "reached",
+        "start_at": 3600.0,
+        "end_at": 3600.0,
+        "trace_sequence": 180,
+        "wall_ms": 0.018700025975704193,
+        "cpu_ms": 0.0
+      }
+    },
+    {
+      "target": 7200.0,
+      "actual_clock": 7200.0,
+      "result_available": true,
+      "snapshot_time": 7200.0,
+      "population": {
+        "offered_by_horizon": 0,
+        "observed": 0,
+        "loaded": 0,
+        "completed": 0
+      },
+      "native_summary": {
+        "event_count": 8,
+        "completed_count": 0,
+        "failed_count": 0,
+        "runtime_seconds": 0.0,
+        "edge_enter_event_count": 0,
+        "edge_exit_event_count": 0,
+        "reservation_conflicts": 0,
+        "physical_fault_edge_entry_violation_count": 0,
+        "merge_grant_timing_mode": "jit_fair_aging_deadline",
+        "g4irsf20_event_hotpath_policy": "E2",
+        "local_queue_capacity": 0
+      },
+      "wall_seconds": 0.37595080002211034,
+      "raw": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\C00_receiver_admission_001\\C00\\segment_02.json.gz",
+        "sha256": "0eeee04e6797019f65e87e21b689bf6823254c99d2ea8ce54df399ec8a1149cf"
+      },
+      "last_native_batch": {
+        "target": 7200.0,
+        "status": "reached",
+        "start_at": 7200.0,
+        "end_at": 7200.0,
+        "trace_sequence": 180,
+        "wall_ms": 0.013700046110898256,
+        "cpu_ms": 0.0
+      }
+    },
+    {
+      "target": 10800.0,
+      "actual_clock": 10800.0,
+      "result_available": true,
+      "snapshot_time": 10800.0,
+      "population": {
+        "offered_by_horizon": 22,
+        "observed": 22,
+        "loaded": 15,
+        "completed": 0
+      },
+      "native_summary": {
+        "event_count": 2244,
+        "completed_count": 5,
+        "failed_count": 0,
+        "runtime_seconds": 0.0,
+        "edge_enter_event_count": 162,
+        "edge_exit_event_count": 157,
+        "reservation_conflicts": 0,
+        "physical_fault_edge_entry_violation_count": 0,
+        "merge_grant_timing_mode": "jit_fair_aging_deadline",
+        "g4irsf20_event_hotpath_policy": "E2",
+        "local_queue_capacity": 0
+      },
+      "wall_seconds": 0.4996594000258483,
+      "raw": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\C00_receiver_admission_001\\C00\\segment_03.json.gz",
+        "sha256": "b287a5ab80afb9d8336272a5b4926e6ffa8afc5c90a64207fb6c95352ce33be3"
+      },
+      "last_native_batch": {
+        "target": 10800.0,
+        "status": "reached",
+        "start_at": 10800.0,
+        "end_at": 10800.0,
+        "trace_sequence": 180,
+        "wall_ms": 0.017499958630651236,
+        "cpu_ms": 0.0
+      }
+    },
+    {
+      "target": 14400.0,
+      "actual_clock": 14400.0,
+      "result_available": true,
+      "snapshot_time": 14400.0,
+      "population": {
+        "offered_by_horizon": 191,
+        "observed": 191,
+        "loaded": 17,
+        "completed": 0
+      },
+      "native_summary": {
+        "event_count": 7056,
+        "completed_count": 7,
+        "failed_count": 1,
+        "runtime_seconds": 0.0,
+        "edge_enter_event_count": 221,
+        "edge_exit_event_count": 221,
+        "reservation_conflicts": 0,
+        "physical_fault_edge_entry_violation_count": 0,
+        "merge_grant_timing_mode": "jit_fair_aging_deadline",
+        "g4irsf20_event_hotpath_policy": "E2",
+        "local_queue_capacity": 0
+      },
+      "wall_seconds": 0.9599297999520786,
+      "raw": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\C00_receiver_admission_001\\C00\\segment_04.json.gz",
+        "sha256": "29589ef27e17223335e2e283077110758934585ed6b087582e259ac6267e4f44"
+      },
+      "last_native_batch": {
+        "target": 14400.0,
+        "status": "reached",
+        "start_at": 14400.0,
+        "end_at": 14400.0,
+        "trace_sequence": 180,
+        "wall_ms": 0.012499978765845299,
+        "cpu_ms": 0.0
+      }
+    },
+    {
+      "target": 18000.0,
+      "actual_clock": 18000.0,
+      "result_available": true,
+      "snapshot_time": 18000.0,
+      "population": {
+        "offered_by_horizon": 986,
+        "observed": 986,
+        "loaded": 17,
+        "completed": 0
+      },
+      "native_summary": {
+        "event_count": 12075,
+        "completed_count": 7,
+        "failed_count": 1,
+        "runtime_seconds": 0.0,
+        "edge_enter_event_count": 221,
+        "edge_exit_event_count": 221,
+        "reservation_conflicts": 0,
+        "physical_fault_edge_entry_violation_count": 0,
+        "merge_grant_timing_mode": "jit_fair_aging_deadline",
+        "g4irsf20_event_hotpath_policy": "E2",
+        "local_queue_capacity": 0
+      },
+      "wall_seconds": 1.4115642000106163,
+      "raw": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\C00_receiver_admission_001\\C00\\segment_05.json.gz",
+        "sha256": "55c7beebf3a6a64b778645036a7d0f79517972d2b2d0b4f39f9237303b913634"
+      },
+      "last_native_batch": {
+        "target": 18000.0,
+        "status": "reached",
+        "start_at": 18000.0,
+        "end_at": 18000.0,
+        "trace_sequence": 180,
+        "wall_ms": 0.020200037397444248,
+        "cpu_ms": 0.0
+      }
+    },
+    {
+      "target": 21600.0,
+      "actual_clock": 21600.0,
+      "result_available": true,
+      "snapshot_time": 21600.0,
+      "population": {
+        "offered_by_horizon": 3485,
+        "observed": 3485,
+        "loaded": 24,
+        "completed": 14
+      },
+      "native_summary": {
+        "event_count": 25220,
+        "completed_count": 43,
+        "failed_count": 1,
+        "runtime_seconds": 0.0,
+        "edge_enter_event_count": 695,
+        "edge_exit_event_count": 684,
+        "reservation_conflicts": 0,
+        "physical_fault_edge_entry_violation_count": 0,
+        "merge_grant_timing_mode": "jit_fair_aging_deadline",
+        "g4irsf20_event_hotpath_policy": "E2",
+        "local_queue_capacity": 0
+      },
+      "wall_seconds": 2.5122722000232898,
+      "raw": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\C00_receiver_admission_001\\C00\\segment_06.json.gz",
+        "sha256": "c05139d5444bff780635ed96e7895183db5ce5a1947eb024da7f6a0b08cf51ef"
+      },
+      "last_native_batch": {
+        "target": 21600.0,
+        "status": "reached",
+        "start_at": 21600.0,
+        "end_at": 21600.0,
+        "trace_sequence": 180,
+        "wall_ms": 0.015500001609325409,
+        "cpu_ms": 0.0
+      }
+    },
+    {
+      "target": 25200.0,
+      "actual_clock": 25200.0,
+      "result_available": true,
+      "snapshot_time": 25200.0,
+      "population": {
+        "offered_by_horizon": 6592,
+        "observed": 6592,
+        "loaded": 63,
+        "completed": 57
+      },
+      "native_summary": {
+        "event_count": 55399,
+        "completed_count": 166,
+        "failed_count": 1,
+        "runtime_seconds": 0.0,
+        "edge_enter_event_count": 2623,
+        "edge_exit_event_count": 2616,
+        "reservation_conflicts": 0,
+        "physical_fault_edge_entry_violation_count": 0,
+        "merge_grant_timing_mode": "jit_fair_aging_deadline",
+        "g4irsf20_event_hotpath_policy": "E2",
+        "local_queue_capacity": 0
+      },
+      "wall_seconds": 11.969186000002082,
+      "raw": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\C00_receiver_admission_001\\C00\\segment_07.json.gz",
+        "sha256": "4e92d47df6ca3682e664a71d0a3a9caf7947d7e01463867be0c4e19f4f4db75c"
+      },
+      "last_native_batch": {
+        "target": 25200.0,
+        "status": "reached",
+        "start_at": 25200.0,
+        "end_at": 25200.0,
+        "trace_sequence": 180,
+        "wall_ms": 0.017900019884109497,
+        "cpu_ms": 0.0
+      }
+    },
+    {
+      "target": 28800.0,
+      "actual_clock": 28800.0,
+      "result_available": true,
+      "snapshot_time": 28800.0,
+      "population": {
+        "offered_by_horizon": 8740,
+        "observed": 8740,
+        "loaded": 92,
+        "completed": 89
+      },
+      "native_summary": {
+        "event_count": 79289,
+        "completed_count": 259,
+        "failed_count": 1,
+        "runtime_seconds": 0.0,
+        "edge_enter_event_count": 4090,
+        "edge_exit_event_count": 4085,
+        "reservation_conflicts": 0,
+        "physical_fault_edge_entry_violation_count": 0,
+        "merge_grant_timing_mode": "jit_fair_aging_deadline",
+        "g4irsf20_event_hotpath_policy": "E2",
+        "local_queue_capacity": 0
+      },
+      "wall_seconds": 21.65713239996694,
+      "raw": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\C00_receiver_admission_001\\C00\\segment_08.json.gz",
+        "sha256": "ce57be765604a307e88d858be5d290a6dabd3b918621147a5088bfa4cd6b5e80"
+      },
+      "last_native_batch": {
+        "target": 28800.0,
+        "status": "reached",
+        "start_at": 28800.0,
+        "end_at": 28800.0,
+        "trace_sequence": 180,
+        "wall_ms": 0.016199948731809855,
+        "cpu_ms": 0.0
+      }
+    },
+    {
+      "target": 32400.0,
+      "actual_clock": 31922.567000000006,
+      "result_available": false,
+      "snapshot_time": null,
+      "population": null,
+      "native_summary": null,
+      "wall_seconds": 24.2210924999672,
+      "raw": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\C00_receiver_admission_001\\C00\\segment_09.json.gz",
+        "sha256": "1bb081871fa3fdec97185d3ce3500ada40e7fc6c63eb44fd544a75d3125f32f4"
+      },
+      "last_native_batch": {
+        "target": 31980.0,
+        "status": "budget_exhausted",
+        "start_at": 31920.0,
+        "end_at": 31922.567000000006,
+        "trace_sequence": 156,
+        "wall_ms": 10.752499976661056,
+        "cpu_ms": 15.625
+      }
+    }
+  ],
+  "budget_diagnosis": {
+    "input_global_max_events": 100000,
+    "last_snapshot_event_count": 79289,
+    "remaining_events_after_snapshot": 20711,
+    "last_native_batch": {
+      "target": 31980.0,
+      "status": "budget_exhausted",
+      "start_at": 31920.0,
+      "end_at": 31922.567000000006,
+      "trace_sequence": 156,
+      "wall_ms": 10.752499976661056,
+      "cpu_ms": 15.625
+    },
+    "source_explanation": "process_one_event first stops at cumulative result.summary.event_count >= config.max_events. advance_circulation_to also has a per-call budget=100000; with 79289 already used, the global remaining20711 must stop first. No per-tick100000 exhaustion is possible here.",
+    "same_timestamp_event_storm_established": false,
+    "final_event_counter_exported": false,
+    "last_5_control_ticks": [
+      {
+        "at": 31680.0,
+        "owners": [
+          {
+            "owner": "owner:system_domestic",
+            "supply_count": 14,
+            "intent_count": 14,
+            "submit_count": 14
+          },
+          {
+            "owner": "owner:system_international",
+            "supply_count": 0,
+            "intent_count": 0,
+            "submit_count": 0
+          }
+        ]
+      },
+      {
+        "at": 31740.0,
+        "owners": [
+          {
+            "owner": "owner:system_domestic",
+            "supply_count": 12,
+            "intent_count": 12,
+            "submit_count": 12
+          },
+          {
+            "owner": "owner:system_international",
+            "supply_count": 0,
+            "intent_count": 0,
+            "submit_count": 0
+          }
+        ]
+      },
+      {
+        "at": 31800.0,
+        "owners": [
+          {
+            "owner": "owner:system_domestic",
+            "supply_count": 12,
+            "intent_count": 12,
+            "submit_count": 12
+          },
+          {
+            "owner": "owner:system_international",
+            "supply_count": 2,
+            "intent_count": 2,
+            "submit_count": 2
+          }
+        ]
+      },
+      {
+        "at": 31860.0,
+        "owners": [
+          {
+            "owner": "owner:system_domestic",
+            "supply_count": 10,
+            "intent_count": 10,
+            "submit_count": 10
+          },
+          {
+            "owner": "owner:system_international",
+            "supply_count": 0,
+            "intent_count": 0,
+            "submit_count": 0
+          }
+        ]
+      },
+      {
+        "at": 31920.0,
+        "owners": [
+          {
+            "owner": "owner:system_domestic",
+            "supply_count": 11,
+            "intent_count": 11,
+            "submit_count": 11
+          },
+          {
+            "owner": "owner:system_international",
+            "supply_count": 0,
+            "intent_count": 0,
+            "submit_count": 0
+          }
+        ]
+      }
+    ]
+  },
+  "post_censor_public_evidence": {
+    "at": 31922.567000000006,
+    "timestamp_complete": false,
+    "scope": "Diagnostic owner-public endpoint reads after failed advance, not a complete native result or actor training snapshot.",
+    "unique_tray_count": 22,
+    "tray_modes": {
+      "empty": 12,
+      "empty_transit": 3,
+      "loaded": 6,
+      "quarantined": 1
+    },
+    "active_edges": 9,
+    "node49_receiving_leases": [
+      "initial:26:0",
+      "initial:49:1",
+      "initial:92:0"
+    ],
+    "node49_stationary_trays": [],
+    "node53_stationary_trays": [],
+    "latest_received_ack": {
+      "request_id": "live:21:owner:system_domestic:transfer:3218",
+      "sequence": 9,
+      "attempt": 9,
+      "observed_at": 31802.0,
+      "delivered_at": 31802.2,
+      "status": "received",
+      "reason": "",
+      "received_at": 31778.57900000001,
+      "delivered_copies": 1,
+      "public_owner": "owner:system_domestic"
+    },
+    "motion_after_28800_proven_by_delivered_ack": true,
+    "full_business_completion_at_stop": null,
+    "new_global_wait_for_cycle_established": false
+  },
+  "excluded_claims": [
+    "full-flow completion",
+    "global deadlock freedom",
+    "forecast improvement",
+    "strict all-job nonharm",
+    "multi-step RL"
+  ]
+}

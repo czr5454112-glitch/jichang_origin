@@ -1,0 +1,92 @@
+{
+  "schema": "g31.airport_recorded_calibration_preparation_audit.v1",
+  "status": "prepared_not_executed",
+  "native_sessions": 0,
+  "source_files_and_archives_verified": 106,
+  "plan_sha256": "c089ede73233d223661f82f7dbca8fc05fac231c666a69b4cad847fbfc35926e",
+  "task_spec": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\C00_receiver_recorded_v2_001_task.json",
+  "task_spec_sha256": "da50510f77d9d730dccb3a659f2bf57d33e489b290f2e76534a0396e87dbe315",
+  "task_source_count": 114,
+  "native_branch_budget": 1,
+  "automatic_retries": 0,
+  "budgets_seconds": {
+    "soft": 420,
+    "inner_hard": 480,
+    "outer_hard": 540
+  },
+  "same_input_bytes_as_prior500k": true,
+  "input_sha256": "a9611267471a269cc34f5646a4ebb409c61a08fa77dcef4c02266b346c86890c",
+  "protocol_input_semantic_sha256": "43988c9a00a791f7dfdecf1ac1285cdc4a8c0a495a004c3abe1db3329d684afa",
+  "same_fields_as_prior500k": [
+    "business_semantic_sha256",
+    "non_business_semantic_sha256",
+    "protocol_input_semantic_sha256",
+    "physical_start",
+    "warmup_end",
+    "window_boundaries",
+    "warmup_segment_seconds",
+    "physical_input_horizon",
+    "controller",
+    "receiver_admission_policy",
+    "resource_contract",
+    "offered_business_count",
+    "inventory",
+    "node_count",
+    "edge_count",
+    "binary",
+    "planner_activate_at",
+    "same_live_session_across_boundaries",
+    "reset_at_window_boundary",
+    "all_unfinished_preserved"
+  ],
+  "policy_observation_contract": {
+    "schema": "g31.foundation.airport_policy_observation.v2",
+    "start_at": 43200.0,
+    "end_at": 59400.0,
+    "scope": "actual owner policy callback arguments and returned decision, including residual calls",
+    "readonly": true,
+    "extra_native_queries": 0,
+    "future_truth_join": false,
+    "candidate_labels_created": false,
+    "storage": "lossless content-addressed64-item chunks and complete gzip reference records",
+    "chunk_items": 64,
+    "same_actor_fields_and_values": true,
+    "reconstructed_record_schema_change": {
+      "from": "g31.foundation.airport_policy_observation.v1",
+      "to": "g31.foundation.airport_policy_observation.v2"
+    },
+    "all_other_reconstructed_fields_exact": true,
+    "unknown_values_and_group_counts_preserved": true,
+    "partial_rule": "only complete gzip members and reference rows with all blobs present are reconstructable"
+  },
+  "soft_checkpoint_contract": {
+    "schema": "g31.airport_soft_checkpoint.v1",
+    "check": "before each control tick after bounded native timestamp completion",
+    "per_advance_event_budget": 100000,
+    "partial_result_horizon": "actual complete native timestamp only, never unfinished requested horizon",
+    "control_trace_changed_when_deadline_never_fires": false,
+    "last_complete_snapshot_explicit": true,
+    "soft_seconds": 420,
+    "hard_seconds": 480,
+    "recommended_outer_hard_seconds": 540,
+    "previous_soft_seconds": 240,
+    "previous_hard_seconds": 300,
+    "wall_budget_basis": "43200 required162.64s; last3600 interval34.70s implies remaining16200 about156s before recording; bounded420/480 with lossless recording optimization"
+  },
+  "pure_tests": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\tests\\test_g31_airport_recording_v2.py",
+    "sha256": "c6a130d7c0239c262c1468087e9716de7eb1ab40336ee14a3c20cfef7819ad2b",
+    "passed": 9,
+    "command": "python -m pytest tests/test_g31_airport_recording_v2.py --basetemp outputs/airport_recording_v2_tests_005 -q -x"
+  },
+  "decoder_freeze_validation": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\C_observation_v2_benchmark_001\\decoder_freeze_validation.json",
+    "sha256": "5caa9ab3843295864195fb58908f8c7688de3a2e1fb4bbf41e268326bd8d3a05"
+  },
+  "recording_cost_benchmark": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\C_observation_v2_benchmark_001\\report.json",
+    "sha256": "803637653e752ae67e84c14c69dd2ef6e5e1902009c29a5a0603dc3e9c86ddeb",
+    "scope": "24 actual records; exact parity, not native throughput or worst-case guarantee"
+  },
+  "C10_prepared": false
+}

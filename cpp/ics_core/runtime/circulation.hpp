@@ -22,6 +22,9 @@ struct CirculationNodeContract {
   bool allow_receive = true;
   std::string control_partition;
   std::string resource_owner;
+  // Receiver admission policy for NEW empty-transfer reservations only.
+  // Physical capacity and can_enter are unchanged; zero preserves old policy.
+  int empty_receive_transit_reserve = 0;
 };
 struct CirculationEdgeContract {
   int from = -1;

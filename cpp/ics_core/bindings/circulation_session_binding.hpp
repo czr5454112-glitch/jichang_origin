@@ -182,6 +182,8 @@ class NativeSession {
       d["control_partition"]=s.partition(n.node);d["resource_owner"]=observation_owner(n.node);
       d["capacity"]=n.capacity;d["export_min_stock"]=n.export_min_stock;
       d["allow_export"]=n.allow_export;d["allow_receive"]=n.allow_receive;
+      if(n.empty_receive_transit_reserve > 0)
+        d["empty_receive_transit_reserve"]=n.empty_receive_transit_reserve;
       if(observation_owner(n.node)==owner) {d["occupancy"]=s.occupancy(n.node);d["actual_available"]=s.empty_stock(n.node,physical_time());}
       contracts.append(d);
     }

@@ -1,0 +1,40 @@
+{
+  "status": "optimization_proposal_not_implemented",
+  "native_source_frozen": true,
+  "evidence": [
+    {
+      "target_job": "reuse2",
+      "diagnostic_evaluate_cumulative_s": 1.1607051000000002,
+      "diagnostic_identify_cumulative_s": 1.0910882000000002,
+      "identify_fraction_of_instrumented_evaluate": 0.9400218884193755,
+      "registered_scene_builds_per_evaluate": 765,
+      "fixed_contract_builds_per_evaluate": 51,
+      "completion_exact_parity": true
+    },
+    {
+      "target_job": "reuse3",
+      "diagnostic_evaluate_cumulative_s": 1.1763619,
+      "diagnostic_identify_cumulative_s": 1.1085967,
+      "identify_fraction_of_instrumented_evaluate": 0.942394258093534,
+      "registered_scene_builds_per_evaluate": 765,
+      "fixed_contract_builds_per_evaluate": 51,
+      "completion_exact_parity": true
+    }
+  ],
+  "proposal": {
+    "scope": "Static registered-domain signatures only",
+    "initialize": "After bounded process starts and before native episode, construct every registered scene once using existing validation, then retain immutable CONTRACT_FIELDS tuples and the physical canonical signature.",
+    "current_guard": "Still check exact complete current business ids/fields, physical signature, native handle, all current source records/.05 causal ages, full candidate predictions and per-job immutable reference. Do not cache current endpoints, source ages, pending requests, or guard outcomes.",
+    "mutation_defense": "Pin registry descriptors/source bytes; cached objects must not be returned mutable or exposed to actors. Preserve field comparison semantics and uniqueness.",
+    "verification_after_unfreeze": [
+      "Replay all recorded positive and refused current evidence with exact status/completion/per-job masks parity.",
+      "Test registry/signature tampering, missing future contract, stale .05, source ACK/pending and physical-field changes remain refused.",
+      "Measure unprofiled full current path and submit boundaries in a separately registered future instrumentation version; do not infer 100ms from this profile."
+    ]
+  },
+  "limitations": [
+    "cProfile overhead is large; function counts identify work duplication but percentages are instrumented, not production latency.",
+    "evaluate excludes the native.collect phase; collect itself also calls validate_endpoints, so existing full current path performs the static identification again.",
+    "No optimization, case or input changes have been performed."
+  ]
+}

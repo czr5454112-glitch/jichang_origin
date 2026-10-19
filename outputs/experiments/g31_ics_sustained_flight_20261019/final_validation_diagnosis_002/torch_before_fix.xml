@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="1" time="3.960" timestamp="2026-10-19T23:00:42.565820+08:00" hostname="LAPTOP-M3GASC4G"><testcase classname="tests.test_g31_foundation_repeated" name="test_preparation_pins_independent_reference_eligibility" time="2.050"><failure message="FileNotFoundError: [Errno 2] No such file or directory: 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\_classes.py'">tmp_path = WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/pytest_torch_pre_002/test_preparation_pins_independ0')
+
+    def test_preparation_pins_independent_reference_eligibility(tmp_path):
+&gt;       plan = campaign.prepare(tmp_path/'reference_clarification', 'hold3_11_69_release27_7', 'guarded', negative_baseline_artifact())
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+tests\test_g31_foundation_repeated.py:527: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+output = WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/pytest_torch_pre_002/test_preparation_pins_independ0/reference_clarification')
+case = 'hold3_11_69_release27_7', mode = 'guarded'
+reference_path = WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_ics_sustained_flight_20261019/cycle_001/A_eval_negative_baseline_001/raw.json.gz')
+selection = 'score', model_path = None
+
+    def prepare(output, case, mode, reference_path=None, selection='score', model_path=None):
+        output = Path(output).resolve()
+        require(not output.exists(), 'fresh_repeated_output')
+        reference, binding, provenance, eligibility = None, None, None, None
+        if mode != 'baseline':
+            require(reference_path is not None, 'same_input_original_reference_required')
+            reference_path = Path(reference_path).resolve()
+            raw, provenance = validate_original_reference(reference_path, case)
+            eligibility = original_reference_eligibility(raw)
+            require(raw['input'] == domain.scene(case) and raw['specification']['mode'] == 'baseline'
+                and eligibility['status'] == 'eligible_complete_actual_original_baseline'
+                and set(raw['summary']['completion']) == set(domain.manifest(case)['business_ids'])
+                and all(domain.finite(value) and value &gt;= 0 for value in raw['summary']['completion'].values()),
+                'complete_same_input_fixed_original_reference')
+            reference = {'completion': raw['summary']['completion'], 'input_sha256': domain.digest(raw['input']),
+                'reference_refresh_allowed': False, 'kind': 'frozen_paired_actual_baseline', 'actor_access': False}
+            binding = campaign.reference(reference_path)
+        require(selection in implementation.SELECTIONS, 'fixed_current_selection')
+        row = {'case': case, 'mode': mode, 'domain': domain.manifest(case), 'reference': reference, 'selection': selection,
+            'performance_contract': domain.plain(implementation.PERFORMANCE_CONTRACT)}
+        if mode == 'async':
+            row['async_preview_contract'] = domain.plain(implementation.ASYNC_PREVIEW_CONTRACT)
+        if model_path is not None:
+            require(mode != 'baseline' and selection == 'score', 'model_ranking_requires_protected_score_mode')
+            model_path = Path(model_path).resolve()
+            checkpoint = campaign.read(model_path)
+            implementation.learned_value.predict(checkpoint, [], [])
+            row.update(model_reference=campaign.reference(model_path), model_content_sha256=checkpoint['model_sha256'],
+                model_used_as_authority=False)
+        old = environment.online.old
+        contract_path = old.OUT / 'native027_accepted_contract_001.json'
+        semantic_path = old.OUT / 'native027_semantic_native_002/receipt.json'
+        contract = old.read(contract_path)
+        key = case + '/' + mode
+        output.mkdir(parents=True)
+&gt;       hashes, archives = environment.archive_sources(output, old.bound.imported_sources())
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+scripts\experiments\g31_ics_circulation\foundation_repeated_campaign.py:189: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+output = WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/pytest_torch_pre_002/test_preparation_pins_independ0/reference_clarification')
+sources = [WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/_classes.py'), WindowsPath('C:/PROGRAMING/czr005/.g31...ed_map.py'), WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/scripts/eval/g4irsf11_workloads.py'), ...]
+
+    def archive_sources(output, sources):
+        output = Path(output)
+        hashes, archives = {}, {}
+        for index, source in enumerate(sorted(sources)):
+            require(source.is_relative_to(ROOT), 'source_inside_research_workspace')
+            archive = output / 'source' / f'{index:04d}.py'
+            archive.parent.mkdir(parents=True, exist_ok=True)
+&gt;           archive.write_bytes(source.read_bytes())
+                                ^^^^^^^^^^^^^^^^^^^
+
+scripts\experiments\g31_ics_circulation\foundation_native_environment.py:403: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/_classes.py')
+
+    def read_bytes(self):
+        """
+        Open the file in bytes mode, read it, and close the file.
+        """
+&gt;       with self.open(mode='rb') as f:
+             ^^^^^^^^^^^^^^^^^^^^
+
+..\..\python3.11.9\Lib\pathlib.py:1050: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/_classes.py')
+mode = 'rb', buffering = -1, encoding = None, errors = None, newline = None
+
+    def open(self, mode='r', buffering=-1, encoding=None,
+             errors=None, newline=None):
+        """
+        Open the file pointed by this path and return a file object, as
+        the built-in open() function does.
+        """
+        if "b" not in mode:
+            encoding = io.text_encoding(encoding)
+&gt;       return io.open(self, mode, buffering, encoding, errors, newline)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       FileNotFoundError: [Errno 2] No such file or directory: 'C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\_classes.py'
+
+..\..\python3.11.9\Lib\pathlib.py:1044: FileNotFoundError</failure></testcase></testsuite></testsuites>

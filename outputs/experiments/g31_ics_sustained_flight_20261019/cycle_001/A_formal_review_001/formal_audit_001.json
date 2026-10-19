@@ -1,0 +1,2083 @@
+{
+  "schema": "g31.independent.formal_fqi_evaluation_audit.v1",
+  "status": "completed_independent_audit",
+  "frozen_plan": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A_formal_evaluation_001.json",
+    "sha256": "6ede398fcf64bd74fd2d79c30ad701bd056b787f6480e8d11eafa832f25b837b"
+  },
+  "audit_script": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A_formal_review_001\\audit_formal_v2.py",
+    "sha256": "6a2438708619dde840b131cec7b4f191605ec23fa1e2af374c33893f7764947e"
+  },
+  "planned_denominator": 10,
+  "results": [
+    {
+      "task_id": "A_eval_positive_baseline_001",
+      "case": "hold3_11_66_release27_7",
+      "mode": "baseline",
+      "model": null,
+      "status": "closed_audited",
+      "complete": true,
+      "completion": {
+        "loaded": 7.250999999999998,
+        "receiver": 5.449999999999999,
+        "reuse1": 12.700999999999993,
+        "reuse2": 30.700000000000006,
+        "blocker": 29.000000000000004,
+        "reuse3": 36.11000000000002
+      },
+      "censored_jobs": [],
+      "physical_clock": 40.0,
+      "completion_sum": 121.21200000000002,
+      "decisions": [],
+      "scored_decisions": 0,
+      "multiple_enabled_model_decisions": 0,
+      "model_changed_same_state_rule_choices": 0,
+      "guard_singleton_decisions": 0,
+      "source_archive_verified": true,
+      "outer_wall_seconds": 34.625
+    },
+    {
+      "task_id": "A_eval_positive_rule_001",
+      "case": "hold3_11_66_release27_7",
+      "mode": "guarded",
+      "model": null,
+      "status": "closed_audited",
+      "complete": true,
+      "completion": {
+        "loaded": 7.250999999999998,
+        "receiver": 5.449999999999999,
+        "reuse1": 12.700999999999993,
+        "reuse2": 19.410999999999998,
+        "blocker": 29.000000000000004,
+        "reuse3": 26.121000000000013
+      },
+      "censored_jobs": [],
+      "physical_clock": 40.0,
+      "completion_sum": 99.934,
+      "decisions": [
+        {
+          "decision_id": "28d44d8e0754030b9de5030a00490f0648b705efeb5d7ec248a77289e9939b8f",
+          "job": "reuse2",
+          "command_id": "live:1:B:later-route-1",
+          "ack": {
+            "sequence": 1,
+            "attempt": 1,
+            "observed_at": 15.16099999999999,
+            "delivered_at": 15.18099999999999,
+            "executed_at": 15.16099999999999,
+            "completed_at": 15.16099999999999,
+            "status": "updated",
+            "reason": "allowed",
+            "result_id": "live:1:B:later-route-1"
+          },
+          "edge": {
+            "time": 15.210999999999991,
+            "event": "EDGE_ENTER",
+            "business_bag_id": "reuse2",
+            "transport_leg_id": "reuse2:direct:8",
+            "tray_id": "L",
+            "traversal_id": 14,
+            "node": 7,
+            "from": 7,
+            "to": 8,
+            "reason": ""
+          },
+          "current_full_guard_verified": true,
+          "status": "verified_actual_ranking",
+          "candidate_count": 3,
+          "enabled_count": 3,
+          "chosen": "prefer_8",
+          "same_state_rule_choice": "prefer_8",
+          "model_changes_same_state_rule_choice": false,
+          "model_scored": false,
+          "scores": {},
+          "selection_basis": "strong_rule_score",
+          "guard_singleton_determined_choice": false,
+          "model_unique_top_score": false,
+          "chosen_model_score": null,
+          "chosen_rule_completion_sum": 104.513,
+          "rule_completion_sum_by_action": {
+            "native_default": 121.21200000000002,
+            "prefer_3": 121.21200000000002,
+            "prefer_8": 104.513
+          },
+          "candidate_admission_and_scores": [
+            {
+              "action_id": "native_default",
+              "enabled": true,
+              "guard_status": "passed",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "blocker": 0.0,
+                "reuse2": 0.0,
+                "reuse3": 0.0
+              },
+              "rule_completion_sum": 121.21200000000002,
+              "model_score": null
+            },
+            {
+              "action_id": "prefer_3",
+              "enabled": true,
+              "guard_status": "passed",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "blocker": 0.0,
+                "reuse2": 0.0,
+                "reuse3": 0.0
+              },
+              "rule_completion_sum": 121.21200000000002,
+              "model_score": null
+            },
+            {
+              "action_id": "prefer_8",
+              "enabled": true,
+              "guard_status": "passed",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "reuse2": -11.289000000000009,
+                "blocker": 0.0,
+                "reuse3": -5.410000000000014
+              },
+              "rule_completion_sum": 104.513,
+              "model_score": null
+            }
+          ],
+          "observation_sha256": "8034f36435e2131c21eb6f87dceecb41f216a76915eef9f3d4cd017189f63b09",
+          "semantic_sha256": {
+            "native_default": "5d419e5430355293a4e64463fa83ff386bcbc32dad7b667d94851de41620ecb1",
+            "prefer_3": "e3ebf42982dbf2536435b9d636c443fa6340c1fd1416a584ac99994014b93132",
+            "prefer_8": "321e23195547711235bd0a93ae17862f07f04e267d76a378ddddde8ba381aac6"
+          }
+        },
+        {
+          "decision_id": "9d4dcc6cc49623821dfc688bf14b079f96eb0dadd1544d54606692a12911f83c",
+          "job": "reuse3",
+          "command_id": "live:1:B:later-route-2",
+          "ack": {
+            "sequence": 1,
+            "attempt": 1,
+            "observed_at": 21.871000000000013,
+            "delivered_at": 21.891000000000012,
+            "executed_at": 21.871000000000013,
+            "completed_at": 21.871000000000013,
+            "status": "updated",
+            "reason": "allowed",
+            "result_id": "live:1:B:later-route-2"
+          },
+          "edge": {
+            "time": 21.921000000000006,
+            "event": "EDGE_ENTER",
+            "business_bag_id": "reuse3",
+            "transport_leg_id": "reuse3:direct:10",
+            "tray_id": "L",
+            "traversal_id": 18,
+            "node": 7,
+            "from": 7,
+            "to": 8,
+            "reason": ""
+          },
+          "current_full_guard_verified": true,
+          "status": "verified_actual_ranking",
+          "candidate_count": 3,
+          "enabled_count": 2,
+          "chosen": "prefer_8",
+          "same_state_rule_choice": "prefer_8",
+          "model_changes_same_state_rule_choice": false,
+          "model_scored": false,
+          "scores": {},
+          "selection_basis": "strong_rule_score",
+          "guard_singleton_determined_choice": false,
+          "model_unique_top_score": false,
+          "chosen_model_score": null,
+          "chosen_rule_completion_sum": 99.934,
+          "rule_completion_sum_by_action": {
+            "native_default": 104.513,
+            "prefer_3": 104.513,
+            "prefer_8": 99.934
+          },
+          "candidate_admission_and_scores": [
+            {
+              "action_id": "native_default",
+              "enabled": true,
+              "guard_status": "passed",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "reuse2": -11.289000000000009,
+                "blocker": 0.0,
+                "reuse3": -5.410000000000014
+              },
+              "rule_completion_sum": 104.513,
+              "model_score": null
+            },
+            {
+              "action_id": "prefer_3",
+              "enabled": false,
+              "guard_status": "passed",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "reuse2": -11.289000000000009,
+                "blocker": 0.0,
+                "reuse3": -5.410000000000014
+              },
+              "rule_completion_sum": 104.513,
+              "model_score": null
+            },
+            {
+              "action_id": "prefer_8",
+              "enabled": true,
+              "guard_status": "passed",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "reuse2": -11.289000000000009,
+                "reuse3": -9.989000000000008,
+                "blocker": 0.0
+              },
+              "rule_completion_sum": 99.934,
+              "model_score": null
+            }
+          ],
+          "observation_sha256": "821489cd43827b1b9c8f6784197bc546d69fb2808fca2d1d7630bb119c9c09cd",
+          "semantic_sha256": {
+            "native_default": "5d419e5430355293a4e64463fa83ff386bcbc32dad7b667d94851de41620ecb1",
+            "prefer_8": "6417bb303b25f0a57c3401ae5bb726c7b03b353f083d059e5e789b840442854a"
+          }
+        }
+      ],
+      "scored_decisions": 0,
+      "multiple_enabled_model_decisions": 0,
+      "model_changed_same_state_rule_choices": 0,
+      "guard_singleton_decisions": 0,
+      "source_archive_verified": true,
+      "outer_wall_seconds": 35.68699999997625,
+      "delta_vs_original_by_job": {
+        "loaded": 0.0,
+        "receiver": 0.0,
+        "reuse1": 0.0,
+        "reuse2": -11.289000000000009,
+        "blocker": 0.0,
+        "reuse3": -9.989000000000008
+      },
+      "zero_tolerance_native_nonharm": true
+    },
+    {
+      "task_id": "A_eval_positive_seed17_001",
+      "case": "hold3_11_66_release27_7",
+      "mode": "guarded",
+      "model": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_selection_002\\checkpoint_seed_17.json",
+        "sha256": "ce481ed2abd041f82f23cd3bcebf7e0ca51361b537f5b677a755426d3d7ab96e"
+      },
+      "status": "closed_audited",
+      "complete": true,
+      "completion": {
+        "loaded": 7.250999999999998,
+        "receiver": 5.449999999999999,
+        "reuse1": 12.700999999999993,
+        "reuse2": 19.410999999999998,
+        "blocker": 29.000000000000004,
+        "reuse3": 26.121000000000013
+      },
+      "censored_jobs": [],
+      "physical_clock": 40.0,
+      "completion_sum": 99.934,
+      "decisions": [
+        {
+          "decision_id": "28d44d8e0754030b9de5030a00490f0648b705efeb5d7ec248a77289e9939b8f",
+          "job": "reuse2",
+          "command_id": "live:1:B:later-route-1",
+          "ack": {
+            "sequence": 1,
+            "attempt": 1,
+            "observed_at": 15.16099999999999,
+            "delivered_at": 15.18099999999999,
+            "executed_at": 15.16099999999999,
+            "completed_at": 15.16099999999999,
+            "status": "updated",
+            "reason": "allowed",
+            "result_id": "live:1:B:later-route-1"
+          },
+          "edge": {
+            "time": 15.210999999999991,
+            "event": "EDGE_ENTER",
+            "business_bag_id": "reuse2",
+            "transport_leg_id": "reuse2:direct:8",
+            "tray_id": "L",
+            "traversal_id": 14,
+            "node": 7,
+            "from": 7,
+            "to": 8,
+            "reason": ""
+          },
+          "current_full_guard_verified": true,
+          "status": "verified_actual_ranking",
+          "candidate_count": 3,
+          "enabled_count": 3,
+          "chosen": "prefer_8",
+          "same_state_rule_choice": "prefer_8",
+          "model_changes_same_state_rule_choice": false,
+          "model_scored": true,
+          "scores": {
+            "native_default": -49.740672123766515,
+            "prefer_3": -30.932804284979454,
+            "prefer_8": -28.823856017907502
+          },
+          "selection_basis": "model_unique_top_score",
+          "guard_singleton_determined_choice": false,
+          "model_unique_top_score": true,
+          "chosen_model_score": -28.823856017907502,
+          "chosen_rule_completion_sum": 104.513,
+          "rule_completion_sum_by_action": {
+            "native_default": 121.21200000000002,
+            "prefer_3": 121.21200000000002,
+            "prefer_8": 104.513
+          },
+          "candidate_admission_and_scores": [
+            {
+              "action_id": "native_default",
+              "enabled": true,
+              "guard_status": "passed",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "blocker": 0.0,
+                "reuse2": 0.0,
+                "reuse3": 0.0
+              },
+              "rule_completion_sum": 121.21200000000002,
+              "model_score": -49.740672123766515
+            },
+            {
+              "action_id": "prefer_3",
+              "enabled": true,
+              "guard_status": "passed",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "blocker": 0.0,
+                "reuse2": 0.0,
+                "reuse3": 0.0
+              },
+              "rule_completion_sum": 121.21200000000002,
+              "model_score": -30.932804284979454
+            },
+            {
+              "action_id": "prefer_8",
+              "enabled": true,
+              "guard_status": "passed",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "reuse2": -11.289000000000009,
+                "blocker": 0.0,
+                "reuse3": -5.410000000000014
+              },
+              "rule_completion_sum": 104.513,
+              "model_score": -28.823856017907502
+            }
+          ],
+          "observation_sha256": "8034f36435e2131c21eb6f87dceecb41f216a76915eef9f3d4cd017189f63b09",
+          "semantic_sha256": {
+            "native_default": "5d419e5430355293a4e64463fa83ff386bcbc32dad7b667d94851de41620ecb1",
+            "prefer_3": "e3ebf42982dbf2536435b9d636c443fa6340c1fd1416a584ac99994014b93132",
+            "prefer_8": "321e23195547711235bd0a93ae17862f07f04e267d76a378ddddde8ba381aac6"
+          }
+        },
+        {
+          "decision_id": "9d4dcc6cc49623821dfc688bf14b079f96eb0dadd1544d54606692a12911f83c",
+          "job": "reuse3",
+          "command_id": "live:1:B:later-route-2",
+          "ack": {
+            "sequence": 1,
+            "attempt": 1,
+            "observed_at": 21.871000000000013,
+            "delivered_at": 21.891000000000012,
+            "executed_at": 21.871000000000013,
+            "completed_at": 21.871000000000013,
+            "status": "updated",
+            "reason": "allowed",
+            "result_id": "live:1:B:later-route-2"
+          },
+          "edge": {
+            "time": 21.921000000000006,
+            "event": "EDGE_ENTER",
+            "business_bag_id": "reuse3",
+            "transport_leg_id": "reuse3:direct:10",
+            "tray_id": "L",
+            "traversal_id": 18,
+            "node": 7,
+            "from": 7,
+            "to": 8,
+            "reason": ""
+          },
+          "current_full_guard_verified": true,
+          "status": "verified_actual_ranking",
+          "candidate_count": 3,
+          "enabled_count": 2,
+          "chosen": "prefer_8",
+          "same_state_rule_choice": "prefer_8",
+          "model_changes_same_state_rule_choice": false,
+          "model_scored": true,
+          "scores": {
+            "native_default": -15.585095556750286,
+            "prefer_8": -11.187029153238164
+          },
+          "selection_basis": "model_unique_top_score",
+          "guard_singleton_determined_choice": false,
+          "model_unique_top_score": true,
+          "chosen_model_score": -11.187029153238164,
+          "chosen_rule_completion_sum": 99.934,
+          "rule_completion_sum_by_action": {
+            "native_default": 104.513,
+            "prefer_3": 104.513,
+            "prefer_8": 99.934
+          },
+          "candidate_admission_and_scores": [
+            {
+              "action_id": "native_default",
+              "enabled": true,
+              "guard_status": "passed",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "reuse2": -11.289000000000009,
+                "blocker": 0.0,
+                "reuse3": -5.410000000000014
+              },
+              "rule_completion_sum": 104.513,
+              "model_score": -15.585095556750286
+            },
+            {
+              "action_id": "prefer_3",
+              "enabled": false,
+              "guard_status": "passed",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "reuse2": -11.289000000000009,
+                "blocker": 0.0,
+                "reuse3": -5.410000000000014
+              },
+              "rule_completion_sum": 104.513,
+              "model_score": null
+            },
+            {
+              "action_id": "prefer_8",
+              "enabled": true,
+              "guard_status": "passed",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "reuse2": -11.289000000000009,
+                "reuse3": -9.989000000000008,
+                "blocker": 0.0
+              },
+              "rule_completion_sum": 99.934,
+              "model_score": -11.187029153238164
+            }
+          ],
+          "observation_sha256": "821489cd43827b1b9c8f6784197bc546d69fb2808fca2d1d7630bb119c9c09cd",
+          "semantic_sha256": {
+            "native_default": "5d419e5430355293a4e64463fa83ff386bcbc32dad7b667d94851de41620ecb1",
+            "prefer_8": "6417bb303b25f0a57c3401ae5bb726c7b03b353f083d059e5e789b840442854a"
+          }
+        }
+      ],
+      "scored_decisions": 2,
+      "multiple_enabled_model_decisions": 2,
+      "model_changed_same_state_rule_choices": 0,
+      "guard_singleton_decisions": 0,
+      "source_archive_verified": true,
+      "outer_wall_seconds": 36.51500000001397,
+      "delta_vs_original_by_job": {
+        "loaded": 0.0,
+        "receiver": 0.0,
+        "reuse1": 0.0,
+        "reuse2": -11.289000000000009,
+        "blocker": 0.0,
+        "reuse3": -9.989000000000008
+      },
+      "zero_tolerance_native_nonharm": true,
+      "delta_vs_strong_rule_by_job": {
+        "loaded": 0.0,
+        "receiver": 0.0,
+        "reuse1": 0.0,
+        "reuse2": 0.0,
+        "blocker": 0.0,
+        "reuse3": 0.0
+      },
+      "completion_sum_delta_vs_strong_rule": 0.0
+    },
+    {
+      "task_id": "A_eval_positive_seed29_001",
+      "case": "hold3_11_66_release27_7",
+      "mode": "guarded",
+      "model": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_selection_002\\checkpoint_seed_29.json",
+        "sha256": "540afd60d1e13274a2ea6d081bf21dc3114d4584d1329a6fec651574606db80c"
+      },
+      "status": "closed_audited",
+      "complete": true,
+      "completion": {
+        "loaded": 7.250999999999998,
+        "receiver": 5.449999999999999,
+        "reuse1": 12.700999999999993,
+        "reuse2": 19.410999999999998,
+        "blocker": 29.000000000000004,
+        "reuse3": 26.121000000000013
+      },
+      "censored_jobs": [],
+      "physical_clock": 40.0,
+      "completion_sum": 99.934,
+      "decisions": [
+        {
+          "decision_id": "28d44d8e0754030b9de5030a00490f0648b705efeb5d7ec248a77289e9939b8f",
+          "job": "reuse2",
+          "command_id": "live:1:B:later-route-1",
+          "ack": {
+            "sequence": 1,
+            "attempt": 1,
+            "observed_at": 15.16099999999999,
+            "delivered_at": 15.18099999999999,
+            "executed_at": 15.16099999999999,
+            "completed_at": 15.16099999999999,
+            "status": "updated",
+            "reason": "allowed",
+            "result_id": "live:1:B:later-route-1"
+          },
+          "edge": {
+            "time": 15.210999999999991,
+            "event": "EDGE_ENTER",
+            "business_bag_id": "reuse2",
+            "transport_leg_id": "reuse2:direct:8",
+            "tray_id": "L",
+            "traversal_id": 14,
+            "node": 7,
+            "from": 7,
+            "to": 8,
+            "reason": ""
+          },
+          "current_full_guard_verified": true,
+          "status": "verified_actual_ranking",
+          "candidate_count": 3,
+          "enabled_count": 3,
+          "chosen": "prefer_8",
+          "same_state_rule_choice": "prefer_8",
+          "model_changes_same_state_rule_choice": false,
+          "model_scored": true,
+          "scores": {
+            "native_default": -49.81483290281427,
+            "prefer_3": -31.341782167971925,
+            "prefer_8": -28.920319287101687
+          },
+          "selection_basis": "model_unique_top_score",
+          "guard_singleton_determined_choice": false,
+          "model_unique_top_score": true,
+          "chosen_model_score": -28.920319287101687,
+          "chosen_rule_completion_sum": 104.513,
+          "rule_completion_sum_by_action": {
+            "native_default": 121.21200000000002,
+            "prefer_3": 121.21200000000002,
+            "prefer_8": 104.513
+          },
+          "candidate_admission_and_scores": [
+            {
+              "action_id": "native_default",
+              "enabled": true,
+              "guard_status": "passed",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "blocker": 0.0,
+                "reuse2": 0.0,
+                "reuse3": 0.0
+              },
+              "rule_completion_sum": 121.21200000000002,
+              "model_score": -49.81483290281427
+            },
+            {
+              "action_id": "prefer_3",
+              "enabled": true,
+              "guard_status": "passed",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "blocker": 0.0,
+                "reuse2": 0.0,
+                "reuse3": 0.0
+              },
+              "rule_completion_sum": 121.21200000000002,
+              "model_score": -31.341782167971925
+            },
+            {
+              "action_id": "prefer_8",
+              "enabled": true,
+              "guard_status": "passed",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "reuse2": -11.289000000000009,
+                "blocker": 0.0,
+                "reuse3": -5.410000000000014
+              },
+              "rule_completion_sum": 104.513,
+              "model_score": -28.920319287101687
+            }
+          ],
+          "observation_sha256": "8034f36435e2131c21eb6f87dceecb41f216a76915eef9f3d4cd017189f63b09",
+          "semantic_sha256": {
+            "native_default": "5d419e5430355293a4e64463fa83ff386bcbc32dad7b667d94851de41620ecb1",
+            "prefer_3": "e3ebf42982dbf2536435b9d636c443fa6340c1fd1416a584ac99994014b93132",
+            "prefer_8": "321e23195547711235bd0a93ae17862f07f04e267d76a378ddddde8ba381aac6"
+          }
+        },
+        {
+          "decision_id": "9d4dcc6cc49623821dfc688bf14b079f96eb0dadd1544d54606692a12911f83c",
+          "job": "reuse3",
+          "command_id": "live:1:B:later-route-2",
+          "ack": {
+            "sequence": 1,
+            "attempt": 1,
+            "observed_at": 21.871000000000013,
+            "delivered_at": 21.891000000000012,
+            "executed_at": 21.871000000000013,
+            "completed_at": 21.871000000000013,
+            "status": "updated",
+            "reason": "allowed",
+            "result_id": "live:1:B:later-route-2"
+          },
+          "edge": {
+            "time": 21.921000000000006,
+            "event": "EDGE_ENTER",
+            "business_bag_id": "reuse3",
+            "transport_leg_id": "reuse3:direct:10",
+            "tray_id": "L",
+            "traversal_id": 18,
+            "node": 7,
+            "from": 7,
+            "to": 8,
+            "reason": ""
+          },
+          "current_full_guard_verified": true,
+          "status": "verified_actual_ranking",
+          "candidate_count": 3,
+          "enabled_count": 2,
+          "chosen": "prefer_8",
+          "same_state_rule_choice": "prefer_8",
+          "model_changes_same_state_rule_choice": false,
+          "model_scored": true,
+          "scores": {
+            "native_default": -15.4932171696183,
+            "prefer_8": -11.164184433754574
+          },
+          "selection_basis": "model_unique_top_score",
+          "guard_singleton_determined_choice": false,
+          "model_unique_top_score": true,
+          "chosen_model_score": -11.164184433754574,
+          "chosen_rule_completion_sum": 99.934,
+          "rule_completion_sum_by_action": {
+            "native_default": 104.513,
+            "prefer_3": 104.513,
+            "prefer_8": 99.934
+          },
+          "candidate_admission_and_scores": [
+            {
+              "action_id": "native_default",
+              "enabled": true,
+              "guard_status": "passed",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "reuse2": -11.289000000000009,
+                "blocker": 0.0,
+                "reuse3": -5.410000000000014
+              },
+              "rule_completion_sum": 104.513,
+              "model_score": -15.4932171696183
+            },
+            {
+              "action_id": "prefer_3",
+              "enabled": false,
+              "guard_status": "passed",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "reuse2": -11.289000000000009,
+                "blocker": 0.0,
+                "reuse3": -5.410000000000014
+              },
+              "rule_completion_sum": 104.513,
+              "model_score": null
+            },
+            {
+              "action_id": "prefer_8",
+              "enabled": true,
+              "guard_status": "passed",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "reuse2": -11.289000000000009,
+                "reuse3": -9.989000000000008,
+                "blocker": 0.0
+              },
+              "rule_completion_sum": 99.934,
+              "model_score": -11.164184433754574
+            }
+          ],
+          "observation_sha256": "821489cd43827b1b9c8f6784197bc546d69fb2808fca2d1d7630bb119c9c09cd",
+          "semantic_sha256": {
+            "native_default": "5d419e5430355293a4e64463fa83ff386bcbc32dad7b667d94851de41620ecb1",
+            "prefer_8": "6417bb303b25f0a57c3401ae5bb726c7b03b353f083d059e5e789b840442854a"
+          }
+        }
+      ],
+      "scored_decisions": 2,
+      "multiple_enabled_model_decisions": 2,
+      "model_changed_same_state_rule_choices": 0,
+      "guard_singleton_decisions": 0,
+      "source_archive_verified": true,
+      "outer_wall_seconds": 36.14000000001397,
+      "delta_vs_original_by_job": {
+        "loaded": 0.0,
+        "receiver": 0.0,
+        "reuse1": 0.0,
+        "reuse2": -11.289000000000009,
+        "blocker": 0.0,
+        "reuse3": -9.989000000000008
+      },
+      "zero_tolerance_native_nonharm": true,
+      "delta_vs_strong_rule_by_job": {
+        "loaded": 0.0,
+        "receiver": 0.0,
+        "reuse1": 0.0,
+        "reuse2": 0.0,
+        "blocker": 0.0,
+        "reuse3": 0.0
+      },
+      "completion_sum_delta_vs_strong_rule": 0.0
+    },
+    {
+      "task_id": "A_eval_positive_seed43_001",
+      "case": "hold3_11_66_release27_7",
+      "mode": "guarded",
+      "model": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_selection_002\\checkpoint_seed_43.json",
+        "sha256": "2ed6a79ceddc8cd552f67e4534d31050835af23fe4dcb609468ed7ba8134fd7d"
+      },
+      "status": "closed_audited",
+      "complete": true,
+      "completion": {
+        "loaded": 7.250999999999998,
+        "receiver": 5.449999999999999,
+        "reuse1": 12.700999999999993,
+        "reuse2": 19.410999999999998,
+        "blocker": 29.000000000000004,
+        "reuse3": 26.121000000000013
+      },
+      "censored_jobs": [],
+      "physical_clock": 40.0,
+      "completion_sum": 99.934,
+      "decisions": [
+        {
+          "decision_id": "28d44d8e0754030b9de5030a00490f0648b705efeb5d7ec248a77289e9939b8f",
+          "job": "reuse2",
+          "command_id": "live:1:B:later-route-1",
+          "ack": {
+            "sequence": 1,
+            "attempt": 1,
+            "observed_at": 15.16099999999999,
+            "delivered_at": 15.18099999999999,
+            "executed_at": 15.16099999999999,
+            "completed_at": 15.16099999999999,
+            "status": "updated",
+            "reason": "allowed",
+            "result_id": "live:1:B:later-route-1"
+          },
+          "edge": {
+            "time": 15.210999999999991,
+            "event": "EDGE_ENTER",
+            "business_bag_id": "reuse2",
+            "transport_leg_id": "reuse2:direct:8",
+            "tray_id": "L",
+            "traversal_id": 14,
+            "node": 7,
+            "from": 7,
+            "to": 8,
+            "reason": ""
+          },
+          "current_full_guard_verified": true,
+          "status": "verified_actual_ranking",
+          "candidate_count": 3,
+          "enabled_count": 3,
+          "chosen": "prefer_8",
+          "same_state_rule_choice": "prefer_8",
+          "model_changes_same_state_rule_choice": false,
+          "model_scored": true,
+          "scores": {
+            "native_default": -49.83412416558093,
+            "prefer_3": -30.969703176853642,
+            "prefer_8": -28.911316396552763
+          },
+          "selection_basis": "model_unique_top_score",
+          "guard_singleton_determined_choice": false,
+          "model_unique_top_score": true,
+          "chosen_model_score": -28.911316396552763,
+          "chosen_rule_completion_sum": 104.513,
+          "rule_completion_sum_by_action": {
+            "native_default": 121.21200000000002,
+            "prefer_3": 121.21200000000002,
+            "prefer_8": 104.513
+          },
+          "candidate_admission_and_scores": [
+            {
+              "action_id": "native_default",
+              "enabled": true,
+              "guard_status": "passed",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "blocker": 0.0,
+                "reuse2": 0.0,
+                "reuse3": 0.0
+              },
+              "rule_completion_sum": 121.21200000000002,
+              "model_score": -49.83412416558093
+            },
+            {
+              "action_id": "prefer_3",
+              "enabled": true,
+              "guard_status": "passed",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "blocker": 0.0,
+                "reuse2": 0.0,
+                "reuse3": 0.0
+              },
+              "rule_completion_sum": 121.21200000000002,
+              "model_score": -30.969703176853642
+            },
+            {
+              "action_id": "prefer_8",
+              "enabled": true,
+              "guard_status": "passed",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "reuse2": -11.289000000000009,
+                "blocker": 0.0,
+                "reuse3": -5.410000000000014
+              },
+              "rule_completion_sum": 104.513,
+              "model_score": -28.911316396552763
+            }
+          ],
+          "observation_sha256": "8034f36435e2131c21eb6f87dceecb41f216a76915eef9f3d4cd017189f63b09",
+          "semantic_sha256": {
+            "native_default": "5d419e5430355293a4e64463fa83ff386bcbc32dad7b667d94851de41620ecb1",
+            "prefer_3": "e3ebf42982dbf2536435b9d636c443fa6340c1fd1416a584ac99994014b93132",
+            "prefer_8": "321e23195547711235bd0a93ae17862f07f04e267d76a378ddddde8ba381aac6"
+          }
+        },
+        {
+          "decision_id": "9d4dcc6cc49623821dfc688bf14b079f96eb0dadd1544d54606692a12911f83c",
+          "job": "reuse3",
+          "command_id": "live:1:B:later-route-2",
+          "ack": {
+            "sequence": 1,
+            "attempt": 1,
+            "observed_at": 21.871000000000013,
+            "delivered_at": 21.891000000000012,
+            "executed_at": 21.871000000000013,
+            "completed_at": 21.871000000000013,
+            "status": "updated",
+            "reason": "allowed",
+            "result_id": "live:1:B:later-route-2"
+          },
+          "edge": {
+            "time": 21.921000000000006,
+            "event": "EDGE_ENTER",
+            "business_bag_id": "reuse3",
+            "transport_leg_id": "reuse3:direct:10",
+            "tray_id": "L",
+            "traversal_id": 18,
+            "node": 7,
+            "from": 7,
+            "to": 8,
+            "reason": ""
+          },
+          "current_full_guard_verified": true,
+          "status": "verified_actual_ranking",
+          "candidate_count": 3,
+          "enabled_count": 2,
+          "chosen": "prefer_8",
+          "same_state_rule_choice": "prefer_8",
+          "model_changes_same_state_rule_choice": false,
+          "model_scored": true,
+          "scores": {
+            "native_default": -15.521456964379732,
+            "prefer_8": -11.183844630394201
+          },
+          "selection_basis": "model_unique_top_score",
+          "guard_singleton_determined_choice": false,
+          "model_unique_top_score": true,
+          "chosen_model_score": -11.183844630394201,
+          "chosen_rule_completion_sum": 99.934,
+          "rule_completion_sum_by_action": {
+            "native_default": 104.513,
+            "prefer_3": 104.513,
+            "prefer_8": 99.934
+          },
+          "candidate_admission_and_scores": [
+            {
+              "action_id": "native_default",
+              "enabled": true,
+              "guard_status": "passed",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "reuse2": -11.289000000000009,
+                "blocker": 0.0,
+                "reuse3": -5.410000000000014
+              },
+              "rule_completion_sum": 104.513,
+              "model_score": -15.521456964379732
+            },
+            {
+              "action_id": "prefer_3",
+              "enabled": false,
+              "guard_status": "passed",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "reuse2": -11.289000000000009,
+                "blocker": 0.0,
+                "reuse3": -5.410000000000014
+              },
+              "rule_completion_sum": 104.513,
+              "model_score": null
+            },
+            {
+              "action_id": "prefer_8",
+              "enabled": true,
+              "guard_status": "passed",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "reuse2": -11.289000000000009,
+                "reuse3": -9.989000000000008,
+                "blocker": 0.0
+              },
+              "rule_completion_sum": 99.934,
+              "model_score": -11.183844630394201
+            }
+          ],
+          "observation_sha256": "821489cd43827b1b9c8f6784197bc546d69fb2808fca2d1d7630bb119c9c09cd",
+          "semantic_sha256": {
+            "native_default": "5d419e5430355293a4e64463fa83ff386bcbc32dad7b667d94851de41620ecb1",
+            "prefer_8": "6417bb303b25f0a57c3401ae5bb726c7b03b353f083d059e5e789b840442854a"
+          }
+        }
+      ],
+      "scored_decisions": 2,
+      "multiple_enabled_model_decisions": 2,
+      "model_changed_same_state_rule_choices": 0,
+      "guard_singleton_decisions": 0,
+      "source_archive_verified": true,
+      "outer_wall_seconds": 37.71899999998277,
+      "delta_vs_original_by_job": {
+        "loaded": 0.0,
+        "receiver": 0.0,
+        "reuse1": 0.0,
+        "reuse2": -11.289000000000009,
+        "blocker": 0.0,
+        "reuse3": -9.989000000000008
+      },
+      "zero_tolerance_native_nonharm": true,
+      "delta_vs_strong_rule_by_job": {
+        "loaded": 0.0,
+        "receiver": 0.0,
+        "reuse1": 0.0,
+        "reuse2": 0.0,
+        "blocker": 0.0,
+        "reuse3": 0.0
+      },
+      "completion_sum_delta_vs_strong_rule": 0.0
+    },
+    {
+      "task_id": "A_eval_negative_baseline_001",
+      "case": "hold3_11_69_release27_7",
+      "mode": "baseline",
+      "model": null,
+      "status": "closed_audited",
+      "complete": true,
+      "completion": {
+        "loaded": 7.250999999999998,
+        "receiver": 5.449999999999999,
+        "reuse1": 12.700999999999993,
+        "reuse2": 18.110999999999997,
+        "blocker": 29.000000000000004,
+        "reuse3": 30.700000000000006
+      },
+      "censored_jobs": [],
+      "physical_clock": 40.0,
+      "completion_sum": 103.213,
+      "decisions": [],
+      "scored_decisions": 0,
+      "multiple_enabled_model_decisions": 0,
+      "model_changed_same_state_rule_choices": 0,
+      "guard_singleton_decisions": 0,
+      "source_archive_verified": true,
+      "outer_wall_seconds": 34.46899999998277
+    },
+    {
+      "task_id": "A_eval_negative_rule_001",
+      "case": "hold3_11_69_release27_7",
+      "mode": "guarded",
+      "model": null,
+      "status": "closed_audited",
+      "complete": true,
+      "completion": {
+        "loaded": 7.250999999999998,
+        "receiver": 5.449999999999999,
+        "reuse1": 12.700999999999993,
+        "reuse2": 18.110999999999997,
+        "blocker": 29.000000000000004,
+        "reuse3": 24.821000000000012
+      },
+      "censored_jobs": [],
+      "physical_clock": 40.0,
+      "completion_sum": 97.334,
+      "decisions": [
+        {
+          "decision_id": "8ea7e90ef5afbc068ae63c5757c78458e40d7b49aec0adfac8a298f6203c0a60",
+          "job": "reuse2",
+          "command_id": "live:1:B:later-route-1",
+          "ack": {
+            "sequence": 1,
+            "attempt": 1,
+            "observed_at": 15.16099999999999,
+            "delivered_at": 15.18099999999999,
+            "executed_at": 15.16099999999999,
+            "completed_at": 15.16099999999999,
+            "status": "updated",
+            "reason": "allowed",
+            "result_id": "live:1:B:later-route-1"
+          },
+          "edge": {
+            "time": 15.210999999999991,
+            "event": "EDGE_ENTER",
+            "business_bag_id": "reuse2",
+            "transport_leg_id": "reuse2:direct:7",
+            "tray_id": "L",
+            "traversal_id": 13,
+            "node": 7,
+            "from": 7,
+            "to": 3,
+            "reason": ""
+          },
+          "current_full_guard_verified": true,
+          "status": "verified_actual_ranking",
+          "candidate_count": 3,
+          "enabled_count": 2,
+          "chosen": "prefer_3",
+          "same_state_rule_choice": "prefer_3",
+          "model_changes_same_state_rule_choice": false,
+          "model_scored": false,
+          "scores": {},
+          "selection_basis": "strong_rule_score",
+          "guard_singleton_determined_choice": false,
+          "model_unique_top_score": false,
+          "chosen_model_score": null,
+          "chosen_rule_completion_sum": 103.213,
+          "rule_completion_sum_by_action": {
+            "native_default": 103.213,
+            "prefer_3": 103.213,
+            "prefer_8": 104.513
+          },
+          "candidate_admission_and_scores": [
+            {
+              "action_id": "native_default",
+              "enabled": true,
+              "guard_status": "passed",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "reuse2": 0.0,
+                "blocker": 0.0,
+                "reuse3": 0.0
+              },
+              "rule_completion_sum": 103.213,
+              "model_score": null
+            },
+            {
+              "action_id": "prefer_3",
+              "enabled": true,
+              "guard_status": "passed",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "reuse2": 0.0,
+                "blocker": 0.0,
+                "reuse3": 0.0
+              },
+              "rule_completion_sum": 103.213,
+              "model_score": null
+            },
+            {
+              "action_id": "prefer_8",
+              "enabled": false,
+              "guard_status": "rejected",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "reuse2": 1.3000000000000007,
+                "blocker": 0.0,
+                "reuse3": 0.0
+              },
+              "rule_completion_sum": 104.513,
+              "model_score": null
+            }
+          ],
+          "observation_sha256": "b8cca80ddc8de46bdc6160c3b2104df5475c4ab7d78750bb143cd130054b02a4",
+          "semantic_sha256": {
+            "native_default": "5d419e5430355293a4e64463fa83ff386bcbc32dad7b667d94851de41620ecb1",
+            "prefer_3": "e3ebf42982dbf2536435b9d636c443fa6340c1fd1416a584ac99994014b93132"
+          }
+        },
+        {
+          "decision_id": "133668356d132fa6406e3debc4fc083213a35df4bcf3528dcea450b89d4130c6",
+          "job": "reuse3",
+          "command_id": "live:1:B:later-route-2",
+          "ack": {
+            "sequence": 1,
+            "attempt": 1,
+            "observed_at": 20.571000000000012,
+            "delivered_at": 20.59100000000001,
+            "executed_at": 20.571000000000012,
+            "completed_at": 20.571000000000012,
+            "status": "updated",
+            "reason": "allowed",
+            "result_id": "live:1:B:later-route-2"
+          },
+          "edge": {
+            "time": 20.621000000000006,
+            "event": "EDGE_ENTER",
+            "business_bag_id": "reuse3",
+            "transport_leg_id": "reuse3:direct:10",
+            "tray_id": "L",
+            "traversal_id": 18,
+            "node": 7,
+            "from": 7,
+            "to": 8,
+            "reason": ""
+          },
+          "current_full_guard_verified": true,
+          "status": "verified_actual_ranking",
+          "candidate_count": 3,
+          "enabled_count": 2,
+          "chosen": "prefer_8",
+          "same_state_rule_choice": "prefer_8",
+          "model_changes_same_state_rule_choice": false,
+          "model_scored": false,
+          "scores": {},
+          "selection_basis": "strong_rule_score",
+          "guard_singleton_determined_choice": false,
+          "model_unique_top_score": false,
+          "chosen_model_score": null,
+          "chosen_rule_completion_sum": 97.334,
+          "rule_completion_sum_by_action": {
+            "native_default": 103.213,
+            "prefer_3": 103.213,
+            "prefer_8": 97.334
+          },
+          "candidate_admission_and_scores": [
+            {
+              "action_id": "native_default",
+              "enabled": true,
+              "guard_status": "passed",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "reuse2": 0.0,
+                "blocker": 0.0,
+                "reuse3": 0.0
+              },
+              "rule_completion_sum": 103.213,
+              "model_score": null
+            },
+            {
+              "action_id": "prefer_3",
+              "enabled": false,
+              "guard_status": "passed",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "reuse2": 0.0,
+                "blocker": 0.0,
+                "reuse3": 0.0
+              },
+              "rule_completion_sum": 103.213,
+              "model_score": null
+            },
+            {
+              "action_id": "prefer_8",
+              "enabled": true,
+              "guard_status": "passed",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "reuse2": 0.0,
+                "reuse3": -5.878999999999994,
+                "blocker": 0.0
+              },
+              "rule_completion_sum": 97.334,
+              "model_score": null
+            }
+          ],
+          "observation_sha256": "232006a7a96f9d1326fa79896808ba723eee74a2fa8a0d43efbf0fe713f1ace0",
+          "semantic_sha256": {
+            "native_default": "5d419e5430355293a4e64463fa83ff386bcbc32dad7b667d94851de41620ecb1",
+            "prefer_8": "1f2426973bed4a54f767bd8505f751d8132ab944ef2f7b8fdc679c34dd2efa0b"
+          }
+        }
+      ],
+      "scored_decisions": 0,
+      "multiple_enabled_model_decisions": 0,
+      "model_changed_same_state_rule_choices": 0,
+      "guard_singleton_decisions": 0,
+      "source_archive_verified": true,
+      "outer_wall_seconds": 36.23399999999674,
+      "delta_vs_original_by_job": {
+        "loaded": 0.0,
+        "receiver": 0.0,
+        "reuse1": 0.0,
+        "reuse2": 0.0,
+        "blocker": 0.0,
+        "reuse3": -5.878999999999994
+      },
+      "zero_tolerance_native_nonharm": true
+    },
+    {
+      "task_id": "A_eval_negative_seed17_001",
+      "case": "hold3_11_69_release27_7",
+      "mode": "guarded",
+      "model": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_selection_002\\checkpoint_seed_17.json",
+        "sha256": "ce481ed2abd041f82f23cd3bcebf7e0ca51361b537f5b677a755426d3d7ab96e"
+      },
+      "status": "closed_audited",
+      "complete": true,
+      "completion": {
+        "loaded": 7.250999999999998,
+        "receiver": 5.449999999999999,
+        "reuse1": 12.700999999999993,
+        "reuse2": 18.110999999999997,
+        "blocker": 29.000000000000004,
+        "reuse3": 24.821000000000012
+      },
+      "censored_jobs": [],
+      "physical_clock": 40.0,
+      "completion_sum": 97.334,
+      "decisions": [
+        {
+          "decision_id": "8ea7e90ef5afbc068ae63c5757c78458e40d7b49aec0adfac8a298f6203c0a60",
+          "job": "reuse2",
+          "command_id": "live:1:B:later-route-1",
+          "ack": {
+            "sequence": 1,
+            "attempt": 1,
+            "observed_at": 15.16099999999999,
+            "delivered_at": 15.18099999999999,
+            "executed_at": 15.16099999999999,
+            "completed_at": 15.16099999999999,
+            "status": "updated",
+            "reason": "allowed",
+            "result_id": "live:1:B:later-route-1"
+          },
+          "edge": {
+            "time": 15.210999999999991,
+            "event": "EDGE_ENTER",
+            "business_bag_id": "reuse2",
+            "transport_leg_id": "reuse2:direct:7",
+            "tray_id": "L",
+            "traversal_id": 13,
+            "node": 7,
+            "from": 7,
+            "to": 3,
+            "reason": ""
+          },
+          "current_full_guard_verified": true,
+          "status": "verified_actual_ranking",
+          "candidate_count": 3,
+          "enabled_count": 2,
+          "chosen": "prefer_3",
+          "same_state_rule_choice": "prefer_3",
+          "model_changes_same_state_rule_choice": false,
+          "model_scored": true,
+          "scores": {
+            "native_default": -49.7456482859294,
+            "prefer_3": -30.943831886524027
+          },
+          "selection_basis": "model_unique_top_score",
+          "guard_singleton_determined_choice": false,
+          "model_unique_top_score": true,
+          "chosen_model_score": -30.943831886524027,
+          "chosen_rule_completion_sum": 103.213,
+          "rule_completion_sum_by_action": {
+            "native_default": 103.213,
+            "prefer_3": 103.213,
+            "prefer_8": 104.513
+          },
+          "candidate_admission_and_scores": [
+            {
+              "action_id": "native_default",
+              "enabled": true,
+              "guard_status": "passed",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "reuse2": 0.0,
+                "blocker": 0.0,
+                "reuse3": 0.0
+              },
+              "rule_completion_sum": 103.213,
+              "model_score": -49.7456482859294
+            },
+            {
+              "action_id": "prefer_3",
+              "enabled": true,
+              "guard_status": "passed",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "reuse2": 0.0,
+                "blocker": 0.0,
+                "reuse3": 0.0
+              },
+              "rule_completion_sum": 103.213,
+              "model_score": -30.943831886524027
+            },
+            {
+              "action_id": "prefer_8",
+              "enabled": false,
+              "guard_status": "rejected",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "reuse2": 1.3000000000000007,
+                "blocker": 0.0,
+                "reuse3": 0.0
+              },
+              "rule_completion_sum": 104.513,
+              "model_score": null
+            }
+          ],
+          "observation_sha256": "b8cca80ddc8de46bdc6160c3b2104df5475c4ab7d78750bb143cd130054b02a4",
+          "semantic_sha256": {
+            "native_default": "5d419e5430355293a4e64463fa83ff386bcbc32dad7b667d94851de41620ecb1",
+            "prefer_3": "e3ebf42982dbf2536435b9d636c443fa6340c1fd1416a584ac99994014b93132"
+          }
+        },
+        {
+          "decision_id": "133668356d132fa6406e3debc4fc083213a35df4bcf3528dcea450b89d4130c6",
+          "job": "reuse3",
+          "command_id": "live:1:B:later-route-2",
+          "ack": {
+            "sequence": 1,
+            "attempt": 1,
+            "observed_at": 20.571000000000012,
+            "delivered_at": 20.59100000000001,
+            "executed_at": 20.571000000000012,
+            "completed_at": 20.571000000000012,
+            "status": "updated",
+            "reason": "allowed",
+            "result_id": "live:1:B:later-route-2"
+          },
+          "edge": {
+            "time": 20.621000000000006,
+            "event": "EDGE_ENTER",
+            "business_bag_id": "reuse3",
+            "transport_leg_id": "reuse3:direct:10",
+            "tray_id": "L",
+            "traversal_id": 18,
+            "node": 7,
+            "from": 7,
+            "to": 8,
+            "reason": ""
+          },
+          "current_full_guard_verified": true,
+          "status": "verified_actual_ranking",
+          "candidate_count": 3,
+          "enabled_count": 2,
+          "chosen": "prefer_8",
+          "same_state_rule_choice": "prefer_8",
+          "model_changes_same_state_rule_choice": false,
+          "model_scored": true,
+          "scores": {
+            "native_default": -16.893721488957304,
+            "prefer_8": -11.47171021666907
+          },
+          "selection_basis": "model_unique_top_score",
+          "guard_singleton_determined_choice": false,
+          "model_unique_top_score": true,
+          "chosen_model_score": -11.47171021666907,
+          "chosen_rule_completion_sum": 97.334,
+          "rule_completion_sum_by_action": {
+            "native_default": 103.213,
+            "prefer_3": 103.213,
+            "prefer_8": 97.334
+          },
+          "candidate_admission_and_scores": [
+            {
+              "action_id": "native_default",
+              "enabled": true,
+              "guard_status": "passed",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "reuse2": 0.0,
+                "blocker": 0.0,
+                "reuse3": 0.0
+              },
+              "rule_completion_sum": 103.213,
+              "model_score": -16.893721488957304
+            },
+            {
+              "action_id": "prefer_3",
+              "enabled": false,
+              "guard_status": "passed",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "reuse2": 0.0,
+                "blocker": 0.0,
+                "reuse3": 0.0
+              },
+              "rule_completion_sum": 103.213,
+              "model_score": null
+            },
+            {
+              "action_id": "prefer_8",
+              "enabled": true,
+              "guard_status": "passed",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "reuse2": 0.0,
+                "reuse3": -5.878999999999994,
+                "blocker": 0.0
+              },
+              "rule_completion_sum": 97.334,
+              "model_score": -11.47171021666907
+            }
+          ],
+          "observation_sha256": "232006a7a96f9d1326fa79896808ba723eee74a2fa8a0d43efbf0fe713f1ace0",
+          "semantic_sha256": {
+            "native_default": "5d419e5430355293a4e64463fa83ff386bcbc32dad7b667d94851de41620ecb1",
+            "prefer_8": "1f2426973bed4a54f767bd8505f751d8132ab944ef2f7b8fdc679c34dd2efa0b"
+          }
+        }
+      ],
+      "scored_decisions": 2,
+      "multiple_enabled_model_decisions": 2,
+      "model_changed_same_state_rule_choices": 0,
+      "guard_singleton_decisions": 0,
+      "source_archive_verified": true,
+      "outer_wall_seconds": 36.59299999999348,
+      "delta_vs_original_by_job": {
+        "loaded": 0.0,
+        "receiver": 0.0,
+        "reuse1": 0.0,
+        "reuse2": 0.0,
+        "blocker": 0.0,
+        "reuse3": -5.878999999999994
+      },
+      "zero_tolerance_native_nonharm": true,
+      "delta_vs_strong_rule_by_job": {
+        "loaded": 0.0,
+        "receiver": 0.0,
+        "reuse1": 0.0,
+        "reuse2": 0.0,
+        "blocker": 0.0,
+        "reuse3": 0.0
+      },
+      "completion_sum_delta_vs_strong_rule": 0.0
+    },
+    {
+      "task_id": "A_eval_negative_seed29_001",
+      "case": "hold3_11_69_release27_7",
+      "mode": "guarded",
+      "model": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_selection_002\\checkpoint_seed_29.json",
+        "sha256": "540afd60d1e13274a2ea6d081bf21dc3114d4584d1329a6fec651574606db80c"
+      },
+      "status": "closed_audited",
+      "complete": true,
+      "completion": {
+        "loaded": 7.250999999999998,
+        "receiver": 5.449999999999999,
+        "reuse1": 12.700999999999993,
+        "reuse2": 18.110999999999997,
+        "blocker": 29.000000000000004,
+        "reuse3": 24.821000000000012
+      },
+      "censored_jobs": [],
+      "physical_clock": 40.0,
+      "completion_sum": 97.334,
+      "decisions": [
+        {
+          "decision_id": "8ea7e90ef5afbc068ae63c5757c78458e40d7b49aec0adfac8a298f6203c0a60",
+          "job": "reuse2",
+          "command_id": "live:1:B:later-route-1",
+          "ack": {
+            "sequence": 1,
+            "attempt": 1,
+            "observed_at": 15.16099999999999,
+            "delivered_at": 15.18099999999999,
+            "executed_at": 15.16099999999999,
+            "completed_at": 15.16099999999999,
+            "status": "updated",
+            "reason": "allowed",
+            "result_id": "live:1:B:later-route-1"
+          },
+          "edge": {
+            "time": 15.210999999999991,
+            "event": "EDGE_ENTER",
+            "business_bag_id": "reuse2",
+            "transport_leg_id": "reuse2:direct:7",
+            "tray_id": "L",
+            "traversal_id": 13,
+            "node": 7,
+            "from": 7,
+            "to": 3,
+            "reason": ""
+          },
+          "current_full_guard_verified": true,
+          "status": "verified_actual_ranking",
+          "candidate_count": 3,
+          "enabled_count": 2,
+          "chosen": "prefer_3",
+          "same_state_rule_choice": "prefer_3",
+          "model_changes_same_state_rule_choice": false,
+          "model_scored": true,
+          "scores": {
+            "native_default": -49.8180772667411,
+            "prefer_3": -31.34992868997399
+          },
+          "selection_basis": "model_unique_top_score",
+          "guard_singleton_determined_choice": false,
+          "model_unique_top_score": true,
+          "chosen_model_score": -31.34992868997399,
+          "chosen_rule_completion_sum": 103.213,
+          "rule_completion_sum_by_action": {
+            "native_default": 103.213,
+            "prefer_3": 103.213,
+            "prefer_8": 104.513
+          },
+          "candidate_admission_and_scores": [
+            {
+              "action_id": "native_default",
+              "enabled": true,
+              "guard_status": "passed",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "reuse2": 0.0,
+                "blocker": 0.0,
+                "reuse3": 0.0
+              },
+              "rule_completion_sum": 103.213,
+              "model_score": -49.8180772667411
+            },
+            {
+              "action_id": "prefer_3",
+              "enabled": true,
+              "guard_status": "passed",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "reuse2": 0.0,
+                "blocker": 0.0,
+                "reuse3": 0.0
+              },
+              "rule_completion_sum": 103.213,
+              "model_score": -31.34992868997399
+            },
+            {
+              "action_id": "prefer_8",
+              "enabled": false,
+              "guard_status": "rejected",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "reuse2": 1.3000000000000007,
+                "blocker": 0.0,
+                "reuse3": 0.0
+              },
+              "rule_completion_sum": 104.513,
+              "model_score": null
+            }
+          ],
+          "observation_sha256": "b8cca80ddc8de46bdc6160c3b2104df5475c4ab7d78750bb143cd130054b02a4",
+          "semantic_sha256": {
+            "native_default": "5d419e5430355293a4e64463fa83ff386bcbc32dad7b667d94851de41620ecb1",
+            "prefer_3": "e3ebf42982dbf2536435b9d636c443fa6340c1fd1416a584ac99994014b93132"
+          }
+        },
+        {
+          "decision_id": "133668356d132fa6406e3debc4fc083213a35df4bcf3528dcea450b89d4130c6",
+          "job": "reuse3",
+          "command_id": "live:1:B:later-route-2",
+          "ack": {
+            "sequence": 1,
+            "attempt": 1,
+            "observed_at": 20.571000000000012,
+            "delivered_at": 20.59100000000001,
+            "executed_at": 20.571000000000012,
+            "completed_at": 20.571000000000012,
+            "status": "updated",
+            "reason": "allowed",
+            "result_id": "live:1:B:later-route-2"
+          },
+          "edge": {
+            "time": 20.621000000000006,
+            "event": "EDGE_ENTER",
+            "business_bag_id": "reuse3",
+            "transport_leg_id": "reuse3:direct:10",
+            "tray_id": "L",
+            "traversal_id": 18,
+            "node": 7,
+            "from": 7,
+            "to": 8,
+            "reason": ""
+          },
+          "current_full_guard_verified": true,
+          "status": "verified_actual_ranking",
+          "candidate_count": 3,
+          "enabled_count": 2,
+          "chosen": "prefer_8",
+          "same_state_rule_choice": "prefer_8",
+          "model_changes_same_state_rule_choice": false,
+          "model_scored": true,
+          "scores": {
+            "native_default": -16.931127635549046,
+            "prefer_8": -11.330344425910894
+          },
+          "selection_basis": "model_unique_top_score",
+          "guard_singleton_determined_choice": false,
+          "model_unique_top_score": true,
+          "chosen_model_score": -11.330344425910894,
+          "chosen_rule_completion_sum": 97.334,
+          "rule_completion_sum_by_action": {
+            "native_default": 103.213,
+            "prefer_3": 103.213,
+            "prefer_8": 97.334
+          },
+          "candidate_admission_and_scores": [
+            {
+              "action_id": "native_default",
+              "enabled": true,
+              "guard_status": "passed",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "reuse2": 0.0,
+                "blocker": 0.0,
+                "reuse3": 0.0
+              },
+              "rule_completion_sum": 103.213,
+              "model_score": -16.931127635549046
+            },
+            {
+              "action_id": "prefer_3",
+              "enabled": false,
+              "guard_status": "passed",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "reuse2": 0.0,
+                "blocker": 0.0,
+                "reuse3": 0.0
+              },
+              "rule_completion_sum": 103.213,
+              "model_score": null
+            },
+            {
+              "action_id": "prefer_8",
+              "enabled": true,
+              "guard_status": "passed",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "reuse2": 0.0,
+                "reuse3": -5.878999999999994,
+                "blocker": 0.0
+              },
+              "rule_completion_sum": 97.334,
+              "model_score": -11.330344425910894
+            }
+          ],
+          "observation_sha256": "232006a7a96f9d1326fa79896808ba723eee74a2fa8a0d43efbf0fe713f1ace0",
+          "semantic_sha256": {
+            "native_default": "5d419e5430355293a4e64463fa83ff386bcbc32dad7b667d94851de41620ecb1",
+            "prefer_8": "1f2426973bed4a54f767bd8505f751d8132ab944ef2f7b8fdc679c34dd2efa0b"
+          }
+        }
+      ],
+      "scored_decisions": 2,
+      "multiple_enabled_model_decisions": 2,
+      "model_changed_same_state_rule_choices": 0,
+      "guard_singleton_decisions": 0,
+      "source_archive_verified": true,
+      "outer_wall_seconds": 36.73399999999674,
+      "delta_vs_original_by_job": {
+        "loaded": 0.0,
+        "receiver": 0.0,
+        "reuse1": 0.0,
+        "reuse2": 0.0,
+        "blocker": 0.0,
+        "reuse3": -5.878999999999994
+      },
+      "zero_tolerance_native_nonharm": true,
+      "delta_vs_strong_rule_by_job": {
+        "loaded": 0.0,
+        "receiver": 0.0,
+        "reuse1": 0.0,
+        "reuse2": 0.0,
+        "blocker": 0.0,
+        "reuse3": 0.0
+      },
+      "completion_sum_delta_vs_strong_rule": 0.0
+    },
+    {
+      "task_id": "A_eval_negative_seed43_001",
+      "case": "hold3_11_69_release27_7",
+      "mode": "guarded",
+      "model": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A3_fqi_selection_002\\checkpoint_seed_43.json",
+        "sha256": "2ed6a79ceddc8cd552f67e4534d31050835af23fe4dcb609468ed7ba8134fd7d"
+      },
+      "status": "closed_audited",
+      "complete": true,
+      "completion": {
+        "loaded": 7.250999999999998,
+        "receiver": 5.449999999999999,
+        "reuse1": 12.700999999999993,
+        "reuse2": 18.110999999999997,
+        "blocker": 29.000000000000004,
+        "reuse3": 24.821000000000012
+      },
+      "censored_jobs": [],
+      "physical_clock": 40.0,
+      "completion_sum": 97.334,
+      "decisions": [
+        {
+          "decision_id": "8ea7e90ef5afbc068ae63c5757c78458e40d7b49aec0adfac8a298f6203c0a60",
+          "job": "reuse2",
+          "command_id": "live:1:B:later-route-1",
+          "ack": {
+            "sequence": 1,
+            "attempt": 1,
+            "observed_at": 15.16099999999999,
+            "delivered_at": 15.18099999999999,
+            "executed_at": 15.16099999999999,
+            "completed_at": 15.16099999999999,
+            "status": "updated",
+            "reason": "allowed",
+            "result_id": "live:1:B:later-route-1"
+          },
+          "edge": {
+            "time": 15.210999999999991,
+            "event": "EDGE_ENTER",
+            "business_bag_id": "reuse2",
+            "transport_leg_id": "reuse2:direct:7",
+            "tray_id": "L",
+            "traversal_id": 13,
+            "node": 7,
+            "from": 7,
+            "to": 3,
+            "reason": ""
+          },
+          "current_full_guard_verified": true,
+          "status": "verified_actual_ranking",
+          "candidate_count": 3,
+          "enabled_count": 2,
+          "chosen": "prefer_3",
+          "same_state_rule_choice": "prefer_3",
+          "model_changes_same_state_rule_choice": false,
+          "model_scored": true,
+          "scores": {
+            "native_default": -49.83787627037265,
+            "prefer_3": -30.97866962807717
+          },
+          "selection_basis": "model_unique_top_score",
+          "guard_singleton_determined_choice": false,
+          "model_unique_top_score": true,
+          "chosen_model_score": -30.97866962807717,
+          "chosen_rule_completion_sum": 103.213,
+          "rule_completion_sum_by_action": {
+            "native_default": 103.213,
+            "prefer_3": 103.213,
+            "prefer_8": 104.513
+          },
+          "candidate_admission_and_scores": [
+            {
+              "action_id": "native_default",
+              "enabled": true,
+              "guard_status": "passed",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "reuse2": 0.0,
+                "blocker": 0.0,
+                "reuse3": 0.0
+              },
+              "rule_completion_sum": 103.213,
+              "model_score": -49.83787627037265
+            },
+            {
+              "action_id": "prefer_3",
+              "enabled": true,
+              "guard_status": "passed",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "reuse2": 0.0,
+                "blocker": 0.0,
+                "reuse3": 0.0
+              },
+              "rule_completion_sum": 103.213,
+              "model_score": -30.97866962807717
+            },
+            {
+              "action_id": "prefer_8",
+              "enabled": false,
+              "guard_status": "rejected",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "reuse2": 1.3000000000000007,
+                "blocker": 0.0,
+                "reuse3": 0.0
+              },
+              "rule_completion_sum": 104.513,
+              "model_score": null
+            }
+          ],
+          "observation_sha256": "b8cca80ddc8de46bdc6160c3b2104df5475c4ab7d78750bb143cd130054b02a4",
+          "semantic_sha256": {
+            "native_default": "5d419e5430355293a4e64463fa83ff386bcbc32dad7b667d94851de41620ecb1",
+            "prefer_3": "e3ebf42982dbf2536435b9d636c443fa6340c1fd1416a584ac99994014b93132"
+          }
+        },
+        {
+          "decision_id": "133668356d132fa6406e3debc4fc083213a35df4bcf3528dcea450b89d4130c6",
+          "job": "reuse3",
+          "command_id": "live:1:B:later-route-2",
+          "ack": {
+            "sequence": 1,
+            "attempt": 1,
+            "observed_at": 20.571000000000012,
+            "delivered_at": 20.59100000000001,
+            "executed_at": 20.571000000000012,
+            "completed_at": 20.571000000000012,
+            "status": "updated",
+            "reason": "allowed",
+            "result_id": "live:1:B:later-route-2"
+          },
+          "edge": {
+            "time": 20.621000000000006,
+            "event": "EDGE_ENTER",
+            "business_bag_id": "reuse3",
+            "transport_leg_id": "reuse3:direct:10",
+            "tray_id": "L",
+            "traversal_id": 18,
+            "node": 7,
+            "from": 7,
+            "to": 8,
+            "reason": ""
+          },
+          "current_full_guard_verified": true,
+          "status": "verified_actual_ranking",
+          "candidate_count": 3,
+          "enabled_count": 2,
+          "chosen": "prefer_8",
+          "same_state_rule_choice": "prefer_8",
+          "model_changes_same_state_rule_choice": false,
+          "model_scored": true,
+          "scores": {
+            "native_default": -16.77027638169531,
+            "prefer_8": -11.326121174369629
+          },
+          "selection_basis": "model_unique_top_score",
+          "guard_singleton_determined_choice": false,
+          "model_unique_top_score": true,
+          "chosen_model_score": -11.326121174369629,
+          "chosen_rule_completion_sum": 97.334,
+          "rule_completion_sum_by_action": {
+            "native_default": 103.213,
+            "prefer_3": 103.213,
+            "prefer_8": 97.334
+          },
+          "candidate_admission_and_scores": [
+            {
+              "action_id": "native_default",
+              "enabled": true,
+              "guard_status": "passed",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "reuse2": 0.0,
+                "blocker": 0.0,
+                "reuse3": 0.0
+              },
+              "rule_completion_sum": 103.213,
+              "model_score": -16.77027638169531
+            },
+            {
+              "action_id": "prefer_3",
+              "enabled": false,
+              "guard_status": "passed",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "reuse2": 0.0,
+                "blocker": 0.0,
+                "reuse3": 0.0
+              },
+              "rule_completion_sum": 103.213,
+              "model_score": null
+            },
+            {
+              "action_id": "prefer_8",
+              "enabled": true,
+              "guard_status": "passed",
+              "per_job_delta": {
+                "receiver": 0.0,
+                "loaded": 0.0,
+                "reuse1": 0.0,
+                "reuse2": 0.0,
+                "reuse3": -5.878999999999994,
+                "blocker": 0.0
+              },
+              "rule_completion_sum": 97.334,
+              "model_score": -11.326121174369629
+            }
+          ],
+          "observation_sha256": "232006a7a96f9d1326fa79896808ba723eee74a2fa8a0d43efbf0fe713f1ace0",
+          "semantic_sha256": {
+            "native_default": "5d419e5430355293a4e64463fa83ff386bcbc32dad7b667d94851de41620ecb1",
+            "prefer_8": "1f2426973bed4a54f767bd8505f751d8132ab944ef2f7b8fdc679c34dd2efa0b"
+          }
+        }
+      ],
+      "scored_decisions": 2,
+      "multiple_enabled_model_decisions": 2,
+      "model_changed_same_state_rule_choices": 0,
+      "guard_singleton_decisions": 0,
+      "source_archive_verified": true,
+      "outer_wall_seconds": 39.32900000002701,
+      "delta_vs_original_by_job": {
+        "loaded": 0.0,
+        "receiver": 0.0,
+        "reuse1": 0.0,
+        "reuse2": 0.0,
+        "blocker": 0.0,
+        "reuse3": -5.878999999999994
+      },
+      "zero_tolerance_native_nonharm": true,
+      "delta_vs_strong_rule_by_job": {
+        "loaded": 0.0,
+        "receiver": 0.0,
+        "reuse1": 0.0,
+        "reuse2": 0.0,
+        "blocker": 0.0,
+        "reuse3": 0.0
+      },
+      "completion_sum_delta_vs_strong_rule": 0.0
+    }
+  ],
+  "source_inventory_count": 126,
+  "unchanged_source_count": 125,
+  "source_addendum": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A_formal_reference_eligibility_addendum_001.json",
+    "sha256": "f7c862a828f2fbb0ac354ba5a997de40ed657289b6cb5b1271b964f8e06ff3bd"
+  },
+  "exact_harness_source_exception": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_campaign.py",
+    "before_sha256": "036819c1e15ba6f1585c410b981cf19a5cb31d713d6d57468154e2c703571986",
+    "after_sha256": "b97c8f1b41d7709f96710021e2ae2f87f5f6eb7989e9877658a95d85ee77b5b1",
+    "tasks_after": [
+      "A_eval_negative_rule_001",
+      "A_eval_negative_seed17_001",
+      "A_eval_negative_seed29_001",
+      "A_eval_negative_seed43_001"
+    ]
+  },
+  "preparation_failure_not_a_native_attempt": {
+    "task_id": "A_eval_negative_rule_001",
+    "native_started": false,
+    "ledger_registered": false,
+    "error": "complete_same_input_original_baseline",
+    "reason": "Historical summary requires every route update success, although actual six jobs and all physical requests closed after a capacity-refused route continued on the default path."
+  },
+  "closed_complete_count": 10,
+  "all_seeds_reported": true,
+  "test_based_selection_performed": false,
+  "training_or_native_executed_by_audit": false,
+  "scope": "two synthetic heldout parent groups; not independent airport days or systemwide RL validation"
+}

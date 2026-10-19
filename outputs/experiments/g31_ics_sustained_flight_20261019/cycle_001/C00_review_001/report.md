@@ -1,0 +1,11 @@
+# C00 independent airport blockage audit
+
+The original 28,506 jobs, 151 nodes, 227 edges and 22 trays were preserved. C00 reached 59,400 with closed native acceptance, but completed **zero business jobs**. The native summary's six completions are transport legs (four Storage entries and two empty returns), not business completions.
+
+Physical edge motion stopped at 11395.634000000004. At 19,500 the Storage53 head job `projected:1x:0` attempted goal99 and native reported `no_static_legal_suffix`. The original profile and actual input agree exactly on edge geometry/direction/capacity, including closed edge97->98. Independent positive-capacity directed reachability finds **4001 unreachable business paths across 48 parent groups**; no task was removed for this analysis.
+
+The four Storage trays hold jobs0,2,1,3. Jobs0/1 cannot reach99. Jobs2/3 have paths to116/47 but fixed FIFO places the no-route head ahead of them. Four trays occupy112 waiting toward53; four occupy29; four occupy137, including two departed empties. Two more departed empties wait139. Actual receiving leases remain at0/24/26/49. Full per-tray contracts, outgoing alternatives, last resource receipts and immutable delivered ACKs are in `tray_blockage_and_ack.json`. Trace-limit zero means this audit does not claim an exact native dependency queue dump or invent a selected edge.
+
+Changing empty reserve or learned priority cannot supply a missing legal path. Loaded reroute permission is false in this input, and the native route gate also rejects any suffix that cannot reach the active goal. No C01/C11 gain claim is supported. Suppressing pointless forecast retries could reduce overhead, but would not establish physical recovery.
+
+Contract decisions requiring separate review: verify the meaning of the zero-capacity edge against source evidence; review whether the retrospective projection assigned unreachable unloaders; or explicitly define treatment/staging of infeasible offered jobs. Any repaired capacity, destination projection, FIFO/exception handling or service semantics is a new common physical contract and must retain this run as a negative result. It is not same-scenario algorithmic improvement.

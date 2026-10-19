@@ -62,10 +62,15 @@ CirculationInput read_input(const py::dict& data) {
   }
   for (auto h : data["node_contracts"]) {
     auto d=py::cast<py::dict>(h);
+    if(d.contains("empty_receive_transit_reserve") &&
+       (!py::isinstance<py::int_>(d["empty_receive_transit_reserve"]) ||
+        py::isinstance<py::bool_>(d["empty_receive_transit_reserve"])))
+      throw py::value_error("circulation:invalid_receiver_transit_reserve");
     in.nodes.push_back({required<int>(d,"node"),required<std::string>(d,"zone"),
       required<int>(d,"capacity"),field<int>(d,"export_min_stock",0),
       field<bool>(d,"allow_export",true),field<bool>(d,"allow_receive",true),
-      field<std::string>(d,"control_partition",""),field<std::string>(d,"resource_owner","")});
+      field<std::string>(d,"control_partition",""),field<std::string>(d,"resource_owner",""),
+      field<int>(d,"empty_receive_transit_reserve",0)});
   }
   for (auto h : data["edge_contracts"]) {
     auto d=py::cast<py::dict>(h);

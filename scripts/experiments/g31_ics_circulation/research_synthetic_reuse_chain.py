@@ -113,13 +113,23 @@ class Transport:
     def send(self, identity: str, *, retry: bool):
         row = self.rows[identity]
         payload = copy.deepcopy(row["request"])
+        # Optional audit data only. Default callers keep their original exact
+        # transport type/methods; no callback or policy authority is installed.
+        timing_rows = getattr(self, "native_submit_timings", None)
+        timing_enabled = type(timing_rows) is list
+        timing_start = time.perf_counter_ns() if timing_enabled else None
         reply = (self.session.submit_protocol_transfer(payload) if row["kind"] == "transfer"
                  else self.session.submit_protocol_command(payload))
+        timing_end = time.perf_counter_ns() if timing_enabled else None
         row["next_retry"] = self.session.physical_time + .5
         row["reply"] = copy.deepcopy(reply)
         row["terminal"] = reply.get("status") == "rejected"
         self.calls.append({"at": self.session.physical_time, "kind": row["kind"],
                            "retry": retry, "request": payload, "reply": reply})
+        if timing_enabled:
+            timing_rows.append({"request_id": identity, "kind": row["kind"], "owner": payload["owner_id"],
+                "retry": retry, "start_wall_ns": timing_start, "end_wall_ns": timing_end,
+                "sim_s": self.calls[-1]["at"], "status": reply.get("status"), "scope": "actual_native_submit_call_only"})
 
     def refresh(self, *, retry=True):
         for identity, row in self.rows.items():

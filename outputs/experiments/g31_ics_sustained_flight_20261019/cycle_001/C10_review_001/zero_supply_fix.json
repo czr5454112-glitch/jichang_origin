@@ -1,0 +1,35 @@
+{
+  "schema": "g31.airport_zero_supply_computation_fix.v1",
+  "status": "implemented_pure_tests_passed",
+  "saved_run_evidence_changed": false,
+  "native_replayed": false,
+  "training_run": false,
+  "physical_gridlock_fixed": false,
+  "throughput_gain_established": false,
+  "purpose": "Skip a forecast that cannot produce a physical action when no actual_available supply exists. Preserve unknown demand rather than fabricate zero.",
+  "changed_files": {
+    "scripts/experiments/g31_ics_circulation/foundation_airport_flight.py": "c1fb8b2d26c6e047614872b3b0fd03d9519a1ad6a171c259a1dc88234cabb670",
+    "tests/test_g31_foundation_airport_flight.py": "a5db4cdeceac03119a6639e13e5de63b1ad03c59a41cf634d6530c6e48f8dfa8"
+  },
+  "test_command": "python -m pytest tests/test_g31_foundation_airport_flight.py tests/test_g31_foundation_airport_campaign.py --basetemp outputs/airport_tests_20261019_005 -q",
+  "passed_tests": 26,
+  "negative_cases": [
+    "empty supplies",
+    "firm_release only",
+    "conditional_release only",
+    "obligated_arrival only"
+  ],
+  "assertions": [
+    "provider never invoked",
+    "intents remain empty so no new transfer can be submitted by protocol loop",
+    "observations and baseline inputs unchanged",
+    "forecast=None, demand_inference=not_evaluated, skip_reason=no_actual_available_supply",
+    "existing business intents and pre-activation behavior unchanged"
+  ],
+  "past_C10_measurement": {
+    "saved_forecast_records": 34,
+    "no_actual_supply_records": 34,
+    "planner_compute_seconds_sum": 40.81484960013768,
+    "measurement_scope": "recorded planner compute includes preparation; no claimed measured after-fix speedup"
+  }
+}

@@ -1,0 +1,107 @@
+{
+  "schema": "g31.foundation.R1_independent_review.v1",
+  "status": "source_semantics_pass_with_timing_scope_limitations",
+  "auditor": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\R1_independent_review_001\\audit.py",
+    "sha256": "de8974c2adb77e254a65000be08105caed54a018f830112aa828b746a8d9092e"
+  },
+  "freeze": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\async_audit_tool_001\\R1_implementation_freeze_001.json",
+    "sha256": "bdf1d3251f05acd8ec337f7d80c4a56a676a30b71e40dd2e4d14a4e67b39bcde"
+  },
+  "source_bindings": {
+    "foundation_repeated_domain.py": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_domain.py",
+      "sha256": "9bf38e3251423c8344d57f1e26bdb73c6ef1e32708411c25baadfe7b2a3ff488"
+    },
+    "foundation_repeated_native.py": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_native.py",
+      "sha256": "d3fc54addc8e7cebf8da0f1b2160f6316792817b1cf5b8c7cbd39cb86637f315"
+    },
+    "foundation_repeated_worker.py": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_worker.py",
+      "sha256": "e87b20fcbb0e2ccbc09d6a51451fc7b2415e89d09a33ab0af3b632cc68362b35"
+    },
+    "foundation_repeated_campaign.py": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_campaign.py",
+      "sha256": "d98acb69e824ab0e9e5207082ee2a54f8e07716da0bf38507007ef9ae3b43fa3"
+    },
+    "foundation_repeated_registry.py": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_registry.py",
+      "sha256": "3398bec2ccda5cf9c5919cc4bbc4fe681860eee1e6b54c53bfc96c5926c86022"
+    },
+    "foundation_repeated_timing.py": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_timing.py",
+      "sha256": "0336d5c84c01e917f96f9a2f070e895fa9b88f8fa2a2f7a3e6be5eed253e1613"
+    },
+    "research_synthetic_reuse_chain.py": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\research_synthetic_reuse_chain.py",
+      "sha256": "341314a4a542a6caeb5359b58e045296b56b053ea010443e90f4fd808e1a9e27"
+    }
+  },
+  "checks": 76,
+  "historical_source_plan": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A_eval_negative_rule_001\\plan.json",
+    "sha256": "c5c5ef7a29c4cc5f274ce4230b6a99eb9e54c8aecb9c1abf67230cb6ea1dee3b"
+  },
+  "unchanged_domain_functions_except_identify": [
+    "scene",
+    "manifest",
+    "validate_scene",
+    "opportunity",
+    "later_bundle",
+    "validate_endpoints",
+    "build_seed",
+    "evaluate"
+  ],
+  "transport_original_send_ast_preserved": true,
+  "static_only_cache": true,
+  "dynamic_guard_or_TTL_cached": false,
+  "saved_parity_evidence": {
+    "report": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\async_audit_tool_001\\R1_saved_evidence_parity_001.json",
+      "sha256": "3bec00898e37cdf13485cf2e38c6378f06be589a23dc77407d34e025d8aa1645"
+    },
+    "raw_files_hash_verified": 29,
+    "distinct_evidence": 27,
+    "supported": 19,
+    "unknown": 8,
+    "independently_reran_prediction_engine": false
+  },
+  "saved_tests_verified": {
+    "junit": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_repeated_tests_20261019\\session_015_junit.xml",
+      "sha256": "bb794334e6d8a2ebf44d99beff673126e6b79f537aa0ad3667ee6d5b53d6265a"
+    },
+    "passed": 92
+  },
+  "independent_pure_checks": [
+    "static ownership and six mutation negatives",
+    "logical wait/native submit/ACK envelope arithmetic"
+  ],
+  "findings": [
+    {
+      "id": "R1-T1",
+      "severity": "measurement_scope",
+      "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_native.py",
+      "line": 759,
+      "finding": "Initial client activation roots and final_outbox_collection/refresh bypass OwnerPolicy.activate timing; a first ACK read there has no recorded read envelope.",
+      "impact": "All owner activations and all ACK reads are broader than the measured continuation-policy scope; not a guard semantics defect."
+    },
+    {
+      "id": "R1-T2",
+      "severity": "measurement_denominator",
+      "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_campaign.py",
+      "line": 263,
+      "finding": "Exception partial capture does not serialize client.path_timing.audit; successful run_branch return is the only path_timing output.",
+      "impact": "Exception runs must be kept as timing-censored failures; pure Recorder tests do not establish persistent failure timing coverage."
+    }
+  ],
+  "finite_calibration_semantic_blocker_found": false,
+  "native_executed_by_audit": false,
+  "training_or_selection_executed": false,
+  "full_request_100ms_certified": false,
+  "all_failure_timings_persisted": false,
+  "physical_effect_exact_wall_time_measured": false,
+  "followup_boundary": "Do not mutate freeze001; a repair needs its own new freeze before a separately registered run."
+}

@@ -1,0 +1,156 @@
+{
+  "schema": "g31.airport_live_shadow_independent_audit.v1",
+  "status": "passed_closed_two_callback_shadow_mechanism",
+  "scope": "posthoc-selected train-trajectory mechanism only; no native/model execution in this audit",
+  "budget": {
+    "soft_seconds": 100,
+    "requested_outer_hard_seconds": 120,
+    "native_branches": 0,
+    "fit_calls": 0,
+    "automatic_retries": 0
+  },
+  "process_status": "requested_calibration_end_reached",
+  "source_archive_pairs": 116,
+  "actual_clock": 59400.0,
+  "snapshot": 59400.0,
+  "full_native_result_parity": {
+    "equal": true,
+    "excluded": [
+      "native_event_ms",
+      "advance.wall_seconds"
+    ],
+    "includes": "all jobs/trays/transfers/receipts/leg identities/native counts/population/advance and continuation semantics",
+    "completed_business": 430
+  },
+  "all_command_payload_reply_retry_and_ACK_parity": true,
+  "recording": {
+    "all_blob_CRC_SHA_verified": true,
+    "blob_count": 38758,
+    "all_ref_graphs_verified": 3978,
+    "full_callback_materializations": 2,
+    "scope": "All new storage hashes/graphs plus exactly2 full public rows; baseline all3978 audit remains separately closed."
+  },
+  "joins": [
+    {
+      "identity": {
+        "owner_id": "owner:system_international",
+        "now": 57840.0,
+        "sequence": 3582,
+        "residual_index": 0,
+        "request_prefix": "protocol:964"
+      },
+      "request": {
+        "request_id": "live:26:owner:system_international:transfer:1942",
+        "tray_id": "initial:0:0",
+        "source": 41,
+        "destination": 138,
+        "issued_at": 57840.0,
+        "message_delay": 2.0,
+        "earliest_departure": 57840.0,
+        "expiry": 58336.418,
+        "forecast_dependency": "initial:0:0:projected:1x:2110:loaded",
+        "forecast_ledger": "conditional_release",
+        "control_reason": "observed_source_queue",
+        "service_window": {
+          "earliest_departure": 57840.0,
+          "conditional_dependencies": [],
+          "hard_guarantee": false
+        },
+        "owner_id": "owner:system_international"
+      },
+      "first_edge": {
+        "time": 57972.850000000006,
+        "event": "EDGE_ENTER",
+        "business_bag_id": "",
+        "transport_leg_id": "live:26:owner:system_international:transfer:1942:empty_return:1206",
+        "tray_id": "initial:0:0",
+        "traversal_id": 17493,
+        "node": 41,
+        "from": 41,
+        "to": 30,
+        "reason": ""
+      },
+      "positive_source_delivered_ACK": {
+        "request_id": "live:26:owner:system_international:transfer:1942",
+        "sequence": 4,
+        "attempt": 4,
+        "observed_at": 58022.0,
+        "delivered_at": 58022.2,
+        "status": "departed",
+        "reason": "",
+        "received_at": -1.0,
+        "delivered_copies": 1
+      },
+      "scorer_wall_seconds": 0.4286821,
+      "entire_recorded_callback_wall_seconds": 0.46592170000076294,
+      "all3_actual_models_scored": true,
+      "public_row_canonical_sha256": "4e9eb731c6638ecd537a73a73a253284426df4d544f15edd840901a3d88cb93c"
+    },
+    {
+      "identity": {
+        "owner_id": "owner:system_domestic",
+        "now": 57900.0,
+        "sequence": 3585,
+        "residual_index": 0,
+        "request_prefix": "protocol:965"
+      },
+      "request": {
+        "request_id": "live:21:owner:system_domestic:transfer:9017",
+        "tray_id": "initial:24:1",
+        "source": 81,
+        "destination": 49,
+        "issued_at": 57900.0,
+        "message_delay": 2.0,
+        "earliest_departure": 57900.0,
+        "expiry": 58429.729,
+        "forecast_dependency": "initial:24:1:empty",
+        "forecast_ledger": "actual_available",
+        "control_reason": "observed_source_queue",
+        "service_window": {
+          "earliest_departure": 57900.0,
+          "conditional_dependencies": [],
+          "hard_guarantee": false
+        },
+        "owner_id": "owner:system_domestic"
+      },
+      "first_edge": {
+        "time": 57905.0,
+        "event": "EDGE_ENTER",
+        "business_bag_id": "",
+        "transport_leg_id": "live:21:owner:system_domestic:transfer:9017:empty_return:1203",
+        "tray_id": "initial:24:1",
+        "traversal_id": 17455,
+        "node": 81,
+        "from": 81,
+        "to": 82,
+        "reason": ""
+      },
+      "positive_source_delivered_ACK": {
+        "request_id": "live:21:owner:system_domestic:transfer:9017",
+        "sequence": 2,
+        "attempt": 2,
+        "observed_at": 57962.0,
+        "delivered_at": 57962.2,
+        "status": "departed",
+        "reason": "",
+        "received_at": -1.0,
+        "delivered_copies": 1
+      },
+      "scorer_wall_seconds": 8.5605733,
+      "entire_recorded_callback_wall_seconds": 8.973571000038646,
+      "all3_actual_models_scored": true,
+      "public_row_canonical_sha256": "c76c3732926a6e002bc588cb5330007e04d684d0fbf4a1e55a1fc4f5b3fda484"
+    }
+  ],
+  "physical_window_completed": true,
+  "model_consumptions": 6,
+  "fit_calls": 0,
+  "native_calls_in_this_audit": 0,
+  "native_consumption_proven_by_this_separate_audit": true,
+  "scores_selected_or_modified_actions": false,
+  "policy_gain_established": false,
+  "unseen_validation_established": false,
+  "request_100ms_certified": false,
+  "full28506_business_completed": false,
+  "wall_seconds": 48.96900000004098
+}

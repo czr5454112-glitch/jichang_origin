@@ -1,0 +1,293 @@
+{
+  "schema": "g31.R1.offline_public_data_profile.v1",
+  "raw": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\R1_guarded_v2_001\\raw.json.gz",
+    "sha256": "d830c4c1e57a58e6b29d9dbbfb71603dfa7d2e416f78513e1d20e192d0fa8160"
+  },
+  "script": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\async_audit_tool_001\\profile_R1_public_data.py",
+    "sha256": "ae493d8c6f16e3b2a932be980b932c2118b16c578d9045f3f87452ad597dc1c3"
+  },
+  "source": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_native.py",
+    "sha256": "f0af221e118997114e94328f5d879c6545a13ed9e01e665dc7d60459e133787d"
+  },
+  "condition": "After registered R1 calibration closed; native not started by profiler. CPU contention is not experimentally controlled.",
+  "scope": "Actual observation function over saved endpoint dictionaries; original native getter cost is deliberately absent.",
+  "not_a_native_latency_benchmark": true,
+  "source_edited": false,
+  "grant_current_authority": false,
+  "decisions": [
+    {
+      "decision_id": "82b2b418d10db7b516691ca7c09ccd5be40323a88ca82745cd35bc29807f11e9",
+      "target_job": "reuse2",
+      "exact_public_parity": true,
+      "repetitions": 5,
+      "delivered_messages": 1,
+      "own_outbox_rows": 14
+    },
+    {
+      "decision_id": "7a027cf2f248de9547f949b251a48de90ae3e7e74902d05d81d74f61c61cac7b",
+      "target_job": "reuse3",
+      "exact_public_parity": true,
+      "repetitions": 5,
+      "delivered_messages": 1,
+      "own_outbox_rows": 18
+    }
+  ],
+  "profile": [
+    {
+      "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_native.py",
+      "line": 205,
+      "function": "observation",
+      "primitive_calls": 10,
+      "total_calls": 10,
+      "self_cpu_seconds": 0.0008057,
+      "cumulative_seconds": 0.08158470000000001
+    },
+    {
+      "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_later_control.py",
+      "line": 27,
+      "function": "plain",
+      "primitive_calls": 70,
+      "total_calls": 70,
+      "self_cpu_seconds": 0.00021700000000000002,
+      "cumulative_seconds": 0.0803677
+    },
+    {
+      "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_native.py",
+      "line": 129,
+      "function": "visible_view",
+      "primitive_calls": 20,
+      "total_calls": 20,
+      "self_cpu_seconds": 7.71e-05,
+      "cumulative_seconds": 0.060248
+    },
+    {
+      "file": "C:\\PROGRAMING\\python3.11.9\\Lib\\json\\__init__.py",
+      "line": 183,
+      "function": "dumps",
+      "primitive_calls": 70,
+      "total_calls": 70,
+      "self_cpu_seconds": 0.0002414,
+      "cumulative_seconds": 0.0464252
+    },
+    {
+      "file": "C:\\PROGRAMING\\python3.11.9\\Lib\\json\\encoder.py",
+      "line": 183,
+      "function": "encode",
+      "primitive_calls": 70,
+      "total_calls": 70,
+      "self_cpu_seconds": 0.0002494,
+      "cumulative_seconds": 0.046138000000000005
+    },
+    {
+      "file": "C:\\PROGRAMING\\python3.11.9\\Lib\\json\\encoder.py",
+      "line": 205,
+      "function": "iterencode",
+      "primitive_calls": 70,
+      "total_calls": 70,
+      "self_cpu_seconds": 0.045826900000000004,
+      "cumulative_seconds": 0.045826900000000004
+    },
+    {
+      "file": "C:\\PROGRAMING\\python3.11.9\\Lib\\json\\__init__.py",
+      "line": 299,
+      "function": "loads",
+      "primitive_calls": 70,
+      "total_calls": 70,
+      "self_cpu_seconds": 0.0001542,
+      "cumulative_seconds": 0.033725500000000005
+    },
+    {
+      "file": "C:\\PROGRAMING\\python3.11.9\\Lib\\json\\decoder.py",
+      "line": 332,
+      "function": "decode",
+      "primitive_calls": 70,
+      "total_calls": 70,
+      "self_cpu_seconds": 0.0002618,
+      "cumulative_seconds": 0.0335279
+    },
+    {
+      "file": "C:\\PROGRAMING\\python3.11.9\\Lib\\json\\decoder.py",
+      "line": 343,
+      "function": "raw_decode",
+      "primitive_calls": 70,
+      "total_calls": 70,
+      "self_cpu_seconds": 0.033032200000000005,
+      "cumulative_seconds": 0.033032200000000005
+    },
+    {
+      "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_later_control.py",
+      "line": 57,
+      "function": "v3_messages",
+      "primitive_calls": 10,
+      "total_calls": 10,
+      "self_cpu_seconds": 7.010000000000001e-05,
+      "cumulative_seconds": 0.0022327000000000002
+    },
+    {
+      "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_native.py",
+      "line": 159,
+      "function": "audit_copy",
+      "primitive_calls": 10,
+      "total_calls": 10,
+      "self_cpu_seconds": 2.2800000000000002e-05,
+      "cumulative_seconds": 0.0011298
+    },
+    {
+      "file": "~",
+      "line": 0,
+      "function": "<built-in method builtins.sum>",
+      "primitive_calls": 20,
+      "total_calls": 20,
+      "self_cpu_seconds": 6.27e-05,
+      "cumulative_seconds": 0.00016700000000000002
+    },
+    {
+      "file": "~",
+      "line": 0,
+      "function": "<method 'match' of 're.Pattern' objects>",
+      "primitive_calls": 140,
+      "total_calls": 140,
+      "self_cpu_seconds": 0.000124,
+      "cumulative_seconds": 0.000124
+    },
+    {
+      "file": "~",
+      "line": 0,
+      "function": "<method 'end' of 're.Match' objects>",
+      "primitive_calls": 140,
+      "total_calls": 140,
+      "self_cpu_seconds": 9.240000000000001e-05,
+      "cumulative_seconds": 9.240000000000001e-05
+    },
+    {
+      "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_native.py",
+      "line": 213,
+      "function": "<genexpr>",
+      "primitive_calls": 60,
+      "total_calls": 60,
+      "self_cpu_seconds": 7.03e-05,
+      "cumulative_seconds": 8.120000000000001e-05
+    },
+    {
+      "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_native.py",
+      "line": 131,
+      "function": "<listcomp>",
+      "primitive_calls": 20,
+      "total_calls": 20,
+      "self_cpu_seconds": 5.520000000000001e-05,
+      "cumulative_seconds": 5.520000000000001e-05
+    },
+    {
+      "file": "~",
+      "line": 0,
+      "function": "<built-in method builtins.isinstance>",
+      "primitive_calls": 210,
+      "total_calls": 210,
+      "self_cpu_seconds": 5.3e-05,
+      "cumulative_seconds": 5.3e-05
+    },
+    {
+      "file": "C:\\PROGRAMING\\python3.11.9\\Lib\\json\\encoder.py",
+      "line": 105,
+      "function": "__init__",
+      "primitive_calls": 70,
+      "total_calls": 70,
+      "self_cpu_seconds": 4.58e-05,
+      "cumulative_seconds": 4.58e-05
+    },
+    {
+      "file": "~",
+      "line": 0,
+      "function": "<method 'startswith' of 'str' objects>",
+      "primitive_calls": 70,
+      "total_calls": 70,
+      "self_cpu_seconds": 3.51e-05,
+      "cumulative_seconds": 3.51e-05
+    },
+    {
+      "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_native.py",
+      "line": 215,
+      "function": "<genexpr>",
+      "primitive_calls": 45,
+      "total_calls": 45,
+      "self_cpu_seconds": 2.3100000000000002e-05,
+      "cumulative_seconds": 2.3100000000000002e-05
+    },
+    {
+      "file": "~",
+      "line": 0,
+      "function": "<built-in method builtins.len>",
+      "primitive_calls": 70,
+      "total_calls": 70,
+      "self_cpu_seconds": 1.7500000000000002e-05,
+      "cumulative_seconds": 1.7500000000000002e-05
+    },
+    {
+      "file": "~",
+      "line": 0,
+      "function": "<method 'join' of 'str' objects>",
+      "primitive_calls": 70,
+      "total_calls": 70,
+      "self_cpu_seconds": 1.7e-05,
+      "cumulative_seconds": 1.7e-05
+    },
+    {
+      "file": "~",
+      "line": 0,
+      "function": "<method 'get' of 'dict' objects>",
+      "primitive_calls": 50,
+      "total_calls": 50,
+      "self_cpu_seconds": 1.09e-05,
+      "cumulative_seconds": 1.09e-05
+    },
+    {
+      "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\async_audit_tool_001\\profile_R1_public_data.py",
+      "line": 45,
+      "function": "<lambda>",
+      "primitive_calls": 10,
+      "total_calls": 10,
+      "self_cpu_seconds": 6.6e-06,
+      "cumulative_seconds": 6.6e-06
+    },
+    {
+      "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\async_audit_tool_001\\profile_R1_public_data.py",
+      "line": 41,
+      "function": "<lambda>",
+      "primitive_calls": 10,
+      "total_calls": 10,
+      "self_cpu_seconds": 5.8e-06,
+      "cumulative_seconds": 5.8e-06
+    },
+    {
+      "file": "~",
+      "line": 0,
+      "function": "<method 'append' of 'list' objects>",
+      "primitive_calls": 10,
+      "total_calls": 10,
+      "self_cpu_seconds": 3.5000000000000004e-06,
+      "cumulative_seconds": 3.5000000000000004e-06
+    },
+    {
+      "file": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_later_control.py",
+      "line": 22,
+      "function": "require",
+      "primitive_calls": 10,
+      "total_calls": 10,
+      "self_cpu_seconds": 3.2000000000000003e-06,
+      "cumulative_seconds": 3.2000000000000003e-06
+    },
+    {
+      "file": "~",
+      "line": 0,
+      "function": "<method 'disable' of '_lsprof.Profiler' objects>",
+      "primitive_calls": 2,
+      "total_calls": 2,
+      "self_cpu_seconds": 2.9e-06,
+      "cumulative_seconds": 2.9e-06
+    }
+  ],
+  "human_profile": "         1547 function calls in 0.082 seconds\n\n   Ordered by: cumulative time\n   List reduced from 28 to 25 due to restriction <25>\n\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\n       10    0.001    0.000    0.082    0.008 C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_native.py:205(observation)\n       70    0.000    0.000    0.080    0.001 C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_later_control.py:27(plain)\n       20    0.000    0.000    0.060    0.003 C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_native.py:129(visible_view)\n       70    0.000    0.000    0.046    0.001 C:\\PROGRAMING\\python3.11.9\\Lib\\json\\__init__.py:183(dumps)\n       70    0.000    0.000    0.046    0.001 C:\\PROGRAMING\\python3.11.9\\Lib\\json\\encoder.py:183(encode)\n       70    0.046    0.001    0.046    0.001 C:\\PROGRAMING\\python3.11.9\\Lib\\json\\encoder.py:205(iterencode)\n       70    0.000    0.000    0.034    0.000 C:\\PROGRAMING\\python3.11.9\\Lib\\json\\__init__.py:299(loads)\n       70    0.000    0.000    0.034    0.000 C:\\PROGRAMING\\python3.11.9\\Lib\\json\\decoder.py:332(decode)\n       70    0.033    0.000    0.033    0.000 C:\\PROGRAMING\\python3.11.9\\Lib\\json\\decoder.py:343(raw_decode)\n       10    0.000    0.000    0.002    0.000 C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_later_control.py:57(v3_messages)\n       10    0.000    0.000    0.001    0.000 C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_native.py:159(audit_copy)\n       20    0.000    0.000    0.000    0.000 {built-in method builtins.sum}\n      140    0.000    0.000    0.000    0.000 {method 'match' of 're.Pattern' objects}\n      140    0.000    0.000    0.000    0.000 {method 'end' of 're.Match' objects}\n       60    0.000    0.000    0.000    0.000 C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_native.py:213(<genexpr>)\n       20    0.000    0.000    0.000    0.000 C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_native.py:131(<listcomp>)\n      210    0.000    0.000    0.000    0.000 {built-in method builtins.isinstance}\n       70    0.000    0.000    0.000    0.000 C:\\PROGRAMING\\python3.11.9\\Lib\\json\\encoder.py:105(__init__)\n       70    0.000    0.000    0.000    0.000 {method 'startswith' of 'str' objects}\n       45    0.000    0.000    0.000    0.000 C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_native.py:215(<genexpr>)\n       70    0.000    0.000    0.000    0.000 {built-in method builtins.len}\n       70    0.000    0.000    0.000    0.000 {method 'join' of 'str' objects}\n       50    0.000    0.000    0.000    0.000 {method 'get' of 'dict' objects}\n       10    0.000    0.000    0.000    0.000 C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\async_audit_tool_001\\profile_R1_public_data.py:45(<lambda>)\n       10    0.000    0.000    0.000    0.000 C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\async_audit_tool_001\\profile_R1_public_data.py:41(<lambda>)\n\n\n"
+}

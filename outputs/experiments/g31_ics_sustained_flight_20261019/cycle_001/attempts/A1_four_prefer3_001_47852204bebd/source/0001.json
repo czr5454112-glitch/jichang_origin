@@ -1,0 +1,48 @@
+{
+  "owner": "B",
+  "peer_policy_id": "fixed_original_A_repeated_returns_v1",
+  "reward_schema": "g31.foundation.exact_arrived_unfinished_integral.v1",
+  "gamma": 1.0,
+  "training_seeds": [
+    17,
+    29,
+    43
+  ],
+  "iterations": 5,
+  "epochs": 100,
+  "checkpoint_selection": "minimum_development_behavior_return_mse_then_earliest_iteration",
+  "train_parent_groups": [
+    "three_reuse_blocker_11_1"
+  ],
+  "development_parent_groups": [
+    "four_reuse_blocker_12_5"
+  ],
+  "evaluation_plan": {
+    "held_out_parent_group": "three_reuse_blocker_12_1",
+    "registration_before_first_training": true,
+    "native_pairs": [
+      "original_fixed",
+      "guarded_score",
+      "learned_seed17",
+      "learned_seed29",
+      "learned_seed43"
+    ],
+    "no_test_based_parameter_selection": true
+  },
+  "decision_contract_sha256": "f46edd1f0cc4128b6f6988c0f11188e5d774ef3929cf088aed21eb2efa8d3771",
+  "behavior_policy": {
+    "protected_preferences": [
+      "score",
+      "prefer_3",
+      "prefer_8"
+    ],
+    "fallback": "original_fixed",
+    "probability": "deterministic per preregistered branch; no unrecorded stochastic exploration"
+  },
+  "candidate_budget": 3,
+  "frozen_before_collection": true,
+  "created_utc_epoch": 1792409233.69834,
+  "scope": "Finite small-domain mechanism pilot; no airport or population generalization",
+  "native_budget_initial": 12,
+  "repairs": "A failed mechanism may receive one explicit new registered revision; old raw retained; revised inputs get new parent groups"
+}

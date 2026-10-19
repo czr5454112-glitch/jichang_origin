@@ -1,0 +1,138 @@
+{
+  "schema": "g31.foundation.repeated_supervised_plan.v1",
+  "protocol": {
+    "schema": "g31.foundation.repeated_supervised_protocol.v1",
+    "train_cases": [
+      "three_reuse_blocker_11_1"
+    ],
+    "development_cases": [
+      "four_reuse_blocker_12_5"
+    ],
+    "formal_test_cases_reserved_not_read": [
+      "three_reuse_blocker_12_1"
+    ],
+    "seeds": [
+      1701,
+      1702,
+      1703
+    ],
+    "epochs": 200,
+    "per_seed_wall_seconds": 45.0,
+    "total_wall_seconds": 180.0,
+    "cpu_threads": 1,
+    "architecture": [
+      64,
+      64
+    ],
+    "optimizer": {
+      "kind": "Adam",
+      "learning_rate": 0.01,
+      "weight_decay": 0.0001
+    },
+    "target": "negative_sum_max_zero_conditional_completion_minus_current_observation_time",
+    "label_kind": "frozen_full_job_conditional_model_prediction_on_actual_native_delivered_evidence",
+    "model_selection": "report_all_three_seeds_no_development_selection_no_formal_test_access",
+    "deployment_seed_if_needed": 1701,
+    "native_branches": 0,
+    "parent_group_unit": "registered_input_case_not_action_or_decision",
+    "scope": "supervised_conditional_model_distillation_not_actual_return_training_not_RL"
+  },
+  "protocol_reference": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\repeated_supervised_protocol_001.json",
+    "sha256": "b0ffe36fb324a0933780525523165a49ef36bcaf21abb257885e7d93fe89e99d"
+  },
+  "source_sha256_pins": {
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_supervised.py": "82766ef9e396431ea8de2405c57bad85d76eee9e98e0127fb2210667737a189f",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_repeated_value.py": "4b4ff7a0aa74c47302c0da9e0a67770af99c0239bb44a3120c09193c757abc9d"
+  },
+  "sources": [
+    {
+      "split": "train",
+      "case": "three_reuse_blocker_11_1",
+      "directory": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A1_three_prefer3_002",
+      "bindings": {
+        "receipt.json": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A1_three_prefer3_002\\receipt.json",
+          "sha256": "0f0e82a16a43e57329748cba590b324cc510e9b5b559992a99fb868368c39f0d"
+        },
+        "worker_report.json": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A1_three_prefer3_002\\worker_report.json",
+          "sha256": "b6cf4b866aa2999c6afba0d879f16f7c58e3e53e32d0f656327bb663de7c04e8"
+        },
+        "acceptance.json": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A1_three_prefer3_002\\acceptance.json",
+          "sha256": "486040342e32e57bc1050f471208888c4cc82c813d2914feb14cff702c9d3461"
+        },
+        "plan.json": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A1_three_prefer3_002\\plan.json",
+          "sha256": "a0f8b1fc580adf1ebfb71aa71392a5383f4938ab4e015f7e6a61f66d6bceddbe"
+        },
+        "raw.json.gz": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A1_three_prefer3_002\\raw.json.gz",
+          "sha256": "ad52a13c0bbb45753b26e7c229e33fb7a2af0e3a2bee67a7c4f15ce20a843585"
+        }
+      },
+      "input_sha256": "5d6d1157f284476d44cace83d1bd4e7312cb06b5efd572cc04f8781b04eaaea1"
+    },
+    {
+      "split": "development",
+      "case": "four_reuse_blocker_12_5",
+      "directory": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A1_four_prefer3_001",
+      "bindings": {
+        "receipt.json": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A1_four_prefer3_001\\receipt.json",
+          "sha256": "5256a006a2cdcb84dcde6e0fb2cd5270af4b7a9484cd257844655787bad654fb"
+        },
+        "worker_report.json": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A1_four_prefer3_001\\worker_report.json",
+          "sha256": "8d8f161fa340bba65c288ba4cb76e5f9d8373dab943dd53c1586fc75f0b8c76c"
+        },
+        "acceptance.json": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A1_four_prefer3_001\\acceptance.json",
+          "sha256": "aad0a6c32309f5aa78d9700c2519eb691322709ebc4563aa27b90403d61539ac"
+        },
+        "plan.json": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A1_four_prefer3_001\\plan.json",
+          "sha256": "1e8ffc530bcabdd182a18fbe65cee7d745d79587fe1d8e415e7f70432f8f2405"
+        },
+        "raw.json.gz": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A1_four_prefer3_001\\raw.json.gz",
+          "sha256": "016d151f6dd928ced5881d5246df39b2de97fac49f1d7e48011461211b1d176e"
+        }
+      },
+      "input_sha256": "bd91ac5d3f353a80d774236e4b20cb7fbdb68ebce5e0887824aa35e7419e2d61"
+    }
+  ],
+  "native_branches": 0,
+  "historical_exclusions": {
+    "audit_reference": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\repeated_supervised_conversion_001\\report.json",
+      "sha256": "2bb79ec1d55b17eab73187c3a9140177334b29dd090872d1d0b34d4ca9780c50"
+    },
+    "source_directory": "A1_three_prefer3_001",
+    "bindings": {
+      "receipt.json": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A1_three_prefer3_001\\receipt.json",
+        "sha256": "295e241525b146e84a25d4ba43aa892e009cab2f081dc0f232e8e20031e483ac"
+      },
+      "worker_report.json": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A1_three_prefer3_001\\worker_report.json",
+        "sha256": "8d4f72a97668c5879182b5f9a89214277a43dd9b6dbf1e077164f57c7fbeb9df"
+      },
+      "acceptance.json": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A1_three_prefer3_001\\acceptance.json",
+        "sha256": "8d74ceb8c214b4bd03a70bb9d05f058dcc3e2dcc81d004a526ce0fb01852f7f8"
+      },
+      "plan.json": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A1_three_prefer3_001\\plan.json",
+        "sha256": "8c08c3bdfb790394faae13fad16857be9c0a561375d1cba9f0380f7c77971b97"
+      },
+      "raw.json.gz": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A1_three_prefer3_001\\raw.json.gz",
+        "sha256": "212db865c906151e7db3a5a7e750edd707cda43de43dac02ffa32460781fa97a"
+      }
+    },
+    "training_rows": 0,
+    "reason": "unknown conditional reports retained as exclusions; never zero-labelled"
+  }
+}

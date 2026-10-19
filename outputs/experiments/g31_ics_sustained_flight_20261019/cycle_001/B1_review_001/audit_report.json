@@ -1,0 +1,110 @@
+{
+  "status": "passed",
+  "checks": 104599,
+  "auditor_imports": "Python standard library only",
+  "run": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\B1_training_001",
+  "receipt_sha256": "5d2e943d5cc50a36dcb75b9ce7c57a99b7c58ed25e627ec6494f6c0b23d6feb8",
+  "training_wall_seconds": 127.18879450001987,
+  "split_parent_counts": {
+    "train": 153,
+    "development": 75,
+    "test": 132
+  },
+  "forecast_record_counts": {
+    "development:flight_prior_only": 43,
+    "development:flight_synthetic_observed_counts": 43,
+    "development:no_plan_recent_rate": 43,
+    "test:flight_prior_only": 91,
+    "test:flight_synthetic_observed_counts": 91,
+    "test:no_plan_recent_rate": 91
+  },
+  "formal_test_performance_not_extracted_by_this_audit": true,
+  "development_macro_region_summary": {
+    "flight_prior_only": {
+      "60": {
+        "MAE": 1.7376283846872076,
+        "bias_predicted_minus_actual": 0.5239398084815304,
+        "interval_90_empirical_coverage": 0.9534883720930232,
+        "interval_mean_width": 4.744186046511628
+      },
+      "300": {
+        "MAE": 4.4272685818513455,
+        "bias_predicted_minus_actual": 1.25379454107224,
+        "interval_90_empirical_coverage": 0.8704318936877077,
+        "interval_mean_width": 14.74418604651163
+      },
+      "900": {
+        "MAE": 7.227411894990558,
+        "bias_predicted_minus_actual": 3.525720365665656,
+        "interval_90_empirical_coverage": 0.9069767441860465,
+        "interval_mean_width": 32.880398671096344
+      },
+      "1800": {
+        "MAE": 11.44561700649252,
+        "bias_predicted_minus_actual": 6.690356762860192,
+        "interval_90_empirical_coverage": 0.9667774086378736,
+        "interval_mean_width": 55.634551495016616
+      }
+    },
+    "flight_synthetic_observed_counts": {
+      "60": {
+        "MAE": 1.6473309147905286,
+        "bias_predicted_minus_actual": 0.5088422046229238,
+        "interval_90_empirical_coverage": 0.9136212624584718,
+        "interval_mean_width": 4.4485049833887045
+      },
+      "300": {
+        "MAE": 4.642413540522621,
+        "bias_predicted_minus_actual": 1.1783968991924307,
+        "interval_90_empirical_coverage": 0.7873754152823921,
+        "interval_mean_width": 11.926910299003321
+      },
+      "900": {
+        "MAE": 5.84947959469068,
+        "bias_predicted_minus_actual": 3.3498529111186253,
+        "interval_90_empirical_coverage": 0.8538205980066446,
+        "interval_mean_width": 22.11295681063123
+      },
+      "1800": {
+        "MAE": 7.581512962013489,
+        "bias_predicted_minus_actual": 6.233639252872684,
+        "interval_90_empirical_coverage": 0.9003322259136212,
+        "interval_mean_width": 33.98671096345515
+      }
+    },
+    "no_plan_recent_rate": {
+      "60": {
+        "MAE": 1.9486826464747138,
+        "bias_predicted_minus_actual": 0.9301010853820595,
+        "interval_90_empirical_coverage": 0.9169435215946844,
+        "interval_mean_width": 5.21594684385382
+      },
+      "300": {
+        "MAE": 6.498350425433737,
+        "bias_predicted_minus_actual": 0.404658250830564,
+        "interval_90_empirical_coverage": 0.49169435215946844,
+        "interval_mean_width": 12.521594684385382
+      },
+      "900": {
+        "MAE": 12.799107171096344,
+        "bias_predicted_minus_actual": 2.2239415299003293,
+        "interval_90_empirical_coverage": 0.5481727574750831,
+        "interval_mean_width": 24.68770764119601
+      },
+      "1800": {
+        "MAE": 22.88738938095238,
+        "bias_predicted_minus_actual": 7.952866448504978,
+        "interval_90_empirical_coverage": 0.5647840531561462,
+        "interval_mean_width": 40.35548172757475
+      }
+    }
+  },
+  "limits": [
+    "single simulated source day",
+    "static retrospective group roster may omit zero-bag flights",
+    "legacy source regions are not yet airport owners",
+    "main counts unavailable; synthetic observed-count variant auxiliary only",
+    "intervals uncalibrated",
+    "no actor/native/RL success inferred from forecast fit"
+  ]
+}

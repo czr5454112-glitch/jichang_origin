@@ -1,0 +1,358 @@
+{
+  "schema": "g31.independent.original_baseline_reference_eligibility.v1",
+  "status": "complete_original_baseline_reference_eligible_despite_terminal_route_rejection",
+  "original_summary_preserved": {
+    "status": "unknown_incomplete_or_unexecuted",
+    "completion": {
+      "loaded": 7.250999999999998,
+      "receiver": 5.449999999999999,
+      "reuse1": 12.700999999999993,
+      "reuse2": 18.110999999999997,
+      "blocker": 29.000000000000004,
+      "reuse3": 30.700000000000006
+    },
+    "business_complete": true,
+    "common_horizon_complete": true,
+    "completion_sum": 103.213,
+    "supply_recovery_valid": true,
+    "all_original_and_new_returns_received": true,
+    "same_L_all_reuse_loads": true,
+    "all_routes_updated_and_match_edges": false,
+    "stock_preserved": true,
+    "audit": {
+      "status": "passed",
+      "completed_traversals": 21,
+      "open_traversals": 0,
+      "tray_count": 3,
+      "optimality": "unknown",
+      "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+    },
+    "all_input_business_in_evaluator": true,
+    "native_model_protection_certified": false
+  },
+  "completion": {
+    "complete": true,
+    "completion": {
+      "loaded": 7.250999999999998,
+      "receiver": 5.449999999999999,
+      "reuse1": 12.700999999999993,
+      "reuse2": 18.110999999999997,
+      "blocker": 29.000000000000004,
+      "reuse3": 30.700000000000006
+    },
+    "censored_jobs": [],
+    "physical_clock": 40.0,
+    "completion_sum": 103.213
+  },
+  "physical_transfers": [
+    {
+      "request_id": "live:1:B:initial-supply",
+      "status": "rejected",
+      "ack": {
+        "sequence": 6,
+        "attempt": 6,
+        "observed_at": 2.67,
+        "delivered_at": 2.69,
+        "status": "rejected",
+        "reason": "receiving_full",
+        "received_at": -1.0
+      }
+    },
+    {
+      "request_id": "live:1:A:return-0",
+      "status": "received",
+      "received_event": {
+        "time": 9.600999999999996,
+        "event": "EMPTY_RECEIVED",
+        "business_bag_id": "",
+        "transport_leg_id": "live:1:A:return-0:empty_return:3",
+        "tray_id": "L",
+        "traversal_id": 7,
+        "node": 7,
+        "from": -1,
+        "to": 7,
+        "reason": "live:1:A:return-0"
+      }
+    },
+    {
+      "request_id": "live:1:B:supply-recovery-1",
+      "status": "received",
+      "received_event": {
+        "time": 12.119999999999997,
+        "event": "EMPTY_RECEIVED",
+        "business_bag_id": "",
+        "transport_leg_id": "live:1:B:supply-recovery-1:empty_return:5",
+        "tray_id": "E",
+        "traversal_id": 10,
+        "node": 1,
+        "from": -1,
+        "to": 1,
+        "reason": "live:1:B:supply-recovery-1"
+      }
+    },
+    {
+      "request_id": "live:1:A:return-1",
+      "status": "received",
+      "received_event": {
+        "time": 15.010999999999992,
+        "event": "EMPTY_RECEIVED",
+        "business_bag_id": "",
+        "transport_leg_id": "live:1:A:return-1:empty_return:6",
+        "tray_id": "L",
+        "traversal_id": 12,
+        "node": 7,
+        "from": -1,
+        "to": 7,
+        "reason": "live:1:A:return-1"
+      }
+    },
+    {
+      "request_id": "live:1:A:return-2",
+      "status": "received",
+      "received_event": {
+        "time": 20.421000000000003,
+        "event": "EMPTY_RECEIVED",
+        "business_bag_id": "",
+        "transport_leg_id": "live:1:A:return-2:empty_return:9",
+        "tray_id": "L",
+        "traversal_id": 17,
+        "node": 7,
+        "from": -1,
+        "to": 7,
+        "reason": "live:1:A:return-2"
+      }
+    }
+  ],
+  "route_chains": [
+    {
+      "job": "reuse1",
+      "request_id": null,
+      "status": "default_no_command",
+      "ack": null,
+      "load": {
+        "time": 9.700999999999995,
+        "event": "LOAD_COMPLETE",
+        "business_bag_id": "reuse1",
+        "transport_leg_id": "",
+        "tray_id": "L",
+        "traversal_id": 7,
+        "node": 7,
+        "from": -1,
+        "to": -1,
+        "reason": ""
+      },
+      "leg": {
+        "time": 9.700999999999995,
+        "event": "LEG_START",
+        "business_bag_id": "reuse1",
+        "transport_leg_id": "reuse1:direct:4",
+        "tray_id": "L",
+        "traversal_id": 7,
+        "node": 7,
+        "from": 7,
+        "to": 6,
+        "reason": "direct"
+      },
+      "first_edge": {
+        "time": 9.800999999999995,
+        "event": "EDGE_ENTER",
+        "business_bag_id": "reuse1",
+        "transport_leg_id": "reuse1:direct:4",
+        "tray_id": "L",
+        "traversal_id": 8,
+        "node": 7,
+        "from": 7,
+        "to": 3,
+        "reason": ""
+      },
+      "recovery_events": [],
+      "rejected_command_claimed_executed": false
+    },
+    {
+      "job": "reuse2",
+      "request_id": "live:1:B:later-route-1",
+      "status": "updated_command_and_actual_edge",
+      "ack": {
+        "sequence": 1,
+        "attempt": 1,
+        "observed_at": 15.120999999999992,
+        "delivered_at": 15.140999999999991,
+        "executed_at": 15.120999999999992,
+        "completed_at": 15.120999999999992,
+        "status": "updated",
+        "reason": "allowed",
+        "result_id": "live:1:B:later-route-1"
+      },
+      "load": {
+        "time": 15.110999999999992,
+        "event": "LOAD_COMPLETE",
+        "business_bag_id": "reuse2",
+        "transport_leg_id": "",
+        "tray_id": "L",
+        "traversal_id": 12,
+        "node": 7,
+        "from": -1,
+        "to": -1,
+        "reason": ""
+      },
+      "leg": {
+        "time": 15.110999999999992,
+        "event": "LEG_START",
+        "business_bag_id": "reuse2",
+        "transport_leg_id": "reuse2:direct:7",
+        "tray_id": "L",
+        "traversal_id": 12,
+        "node": 7,
+        "from": 7,
+        "to": 6,
+        "reason": "direct"
+      },
+      "first_edge": {
+        "time": 15.210999999999991,
+        "event": "EDGE_ENTER",
+        "business_bag_id": "reuse2",
+        "transport_leg_id": "reuse2:direct:7",
+        "tray_id": "L",
+        "traversal_id": 13,
+        "node": 7,
+        "from": 7,
+        "to": 3,
+        "reason": ""
+      },
+      "recovery_events": [],
+      "rejected_command_claimed_executed": false
+    },
+    {
+      "job": "reuse3",
+      "request_id": "live:1:B:later-route-2",
+      "status": "terminal_rejection_then_unchanged_native_continuation",
+      "ack": {
+        "sequence": 1,
+        "attempt": 1,
+        "observed_at": 20.531000000000006,
+        "delivered_at": 20.551000000000005,
+        "executed_at": 20.531000000000006,
+        "completed_at": 20.531000000000006,
+        "status": "rejected",
+        "reason": "circulation:receiving_full",
+        "result_id": "live:1:B:later-route-2"
+      },
+      "load": {
+        "time": 20.521000000000004,
+        "event": "LOAD_COMPLETE",
+        "business_bag_id": "reuse3",
+        "transport_leg_id": "",
+        "tray_id": "L",
+        "traversal_id": 17,
+        "node": 7,
+        "from": -1,
+        "to": -1,
+        "reason": ""
+      },
+      "leg": {
+        "time": 20.521000000000004,
+        "event": "LEG_START",
+        "business_bag_id": "reuse3",
+        "transport_leg_id": "reuse3:direct:10",
+        "tray_id": "L",
+        "traversal_id": 17,
+        "node": 7,
+        "from": 7,
+        "to": 6,
+        "reason": "direct"
+      },
+      "first_edge": {
+        "time": 27.8,
+        "event": "EDGE_ENTER",
+        "business_bag_id": "reuse3",
+        "transport_leg_id": "reuse3:direct:10",
+        "tray_id": "L",
+        "traversal_id": 19,
+        "node": 7,
+        "from": 7,
+        "to": 3,
+        "reason": ""
+      },
+      "recovery_events": [
+        {
+          "time": 20.621000000000006,
+          "event": "RESOURCE_WAIT",
+          "business_bag_id": "reuse3",
+          "transport_leg_id": "reuse3:direct:10",
+          "tray_id": "L",
+          "traversal_id": 17,
+          "node": 7,
+          "from": 7,
+          "to": -1,
+          "reason": "committed_resource_change_required"
+        },
+        {
+          "time": 27.7,
+          "event": "RESOURCE_WAKE",
+          "business_bag_id": "reuse3",
+          "transport_leg_id": "reuse3:direct:10",
+          "tray_id": "L",
+          "traversal_id": 17,
+          "node": 7,
+          "from": 7,
+          "to": -1,
+          "reason": "candidate_score_state_changed"
+        },
+        {
+          "time": 27.7,
+          "event": "RESOURCE_WAIT",
+          "business_bag_id": "reuse3",
+          "transport_leg_id": "reuse3:direct:10",
+          "tray_id": "L",
+          "traversal_id": 17,
+          "node": 7,
+          "from": 7,
+          "to": -1,
+          "reason": "committed_resource_change_required"
+        },
+        {
+          "time": 27.8,
+          "event": "RESOURCE_WAKE",
+          "business_bag_id": "reuse3",
+          "transport_leg_id": "reuse3:direct:10",
+          "tray_id": "L",
+          "traversal_id": 17,
+          "node": 7,
+          "from": 7,
+          "to": -1,
+          "reason": "candidate_score_state_changed"
+        }
+      ],
+      "rejected_command_claimed_executed": false
+    }
+  ],
+  "original_supply_recovery": [
+    {
+      "request_id": "live:1:B:supply-recovery-1",
+      "predecessor": "live:1:B:initial-supply",
+      "received_at": 12.119999999999997
+    }
+  ],
+  "raw": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A_eval_negative_baseline_001\\raw.json.gz",
+    "sha256": "af8aeb702528b40c568ffd364a65ec46c1abe5137ac69f292cf7e639ba6548ce"
+  },
+  "audit_script": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A_formal_review_001\\audit_negative_baseline.py",
+    "sha256": "6742bf4ccbe89765ebb66597c275944d5ae8deaf9c9a1c6d38ec557d432e84b5"
+  },
+  "formal_audit_helper": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A_formal_review_001\\audit_formal.py",
+    "sha256": "537829ba360eea776db8380c732c97b0fe7cfb2e1dc197242247d45b045b1664"
+  },
+  "guard_snapshot": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\A_formal_review_001\\guard_audit_snapshot.py",
+    "sha256": "67cae1b1597cc9254a2cba0c9f7e670033aa4849dbb91e653ff9c6f39ca078b6"
+  },
+  "raw_mutated": false,
+  "native_executed_by_audit": false,
+  "fit_or_selection_performed": false,
+  "rejected_command_claimed_executed": false,
+  "eligibility_scope": "actual original-policy completion vector only; current candidate guard and model authority unchanged",
+  "remaining_four_formal_branches": "not yet run at diagnosis; not counted as failures"
+}
