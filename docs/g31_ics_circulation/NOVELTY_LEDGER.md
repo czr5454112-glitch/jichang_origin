@@ -12,7 +12,7 @@
 
 下一可证伪门槛是充分的合法可行动机会与已执行标签支持、同信息强基线、完整服务/成本与尾时延；不以延长预算或仅保留成功子集降低门槛。
 
-实际CAS构建和仓库外五卷重组已完成；冻结隔离审计实际为blocked_invalid_evidence，整体失败保留。它通过全包字节、36正式单格及72配对臂/36标签核验，但泛化split=test guard拒绝9个完成旧诊断；包外精确9项补充审计已实际9/9全人口保存成本重算通过（16.086秒），仅补齐该限定范围，不重写冻结整体失败、不重放物理/控制历史，也不扩大方法结论。权重/依赖hash验证不等于重训或重做dev选择。[外部delivery凭证](../../outputs/experiments/g31_ics_inventory_spi_20261020/cycle_001/report_support/partial_delivery_receipt_001.json)记录真实包/审计及材料发布状态，当前未提交/推送。这些是交付可审计性，不增加算法新颖性、RL收益或正式排名证据；001/002组装失败及guard排除的5份纯测试XML原件均保留。
+实际CAS构建和仓库外五卷重组已完成；冻结隔离审计实际为blocked_invalid_evidence，整体失败保留。它通过全包字节、36正式单格及72配对臂/36标签核验，但泛化split=test guard拒绝9个完成旧诊断；包外精确9项补充审计已实际9/9全人口保存成本重算通过（16.086秒），仅补齐该限定范围，不重写冻结整体失败、不重放物理/控制历史，也不扩大方法结论。权重/依赖hash验证不等于重训或重做dev选择。[外部delivery凭证](../../outputs/experiments/g31_ics_inventory_spi_20261020/cycle_001/report_support/partial_delivery_receipt_001.json)记录真实包/审计及材料发布状态：材料提交`54e30d927a34ba48a33d4b6f978e934dc271949d`已推送且远端同SHA核验通过（[实际凭证](../../outputs/experiments/g31_ics_inventory_spi_20261020/cycle_001/report_support/partial_material_publication_001.json)），本次元数据记录既成发布，最终仓库tip由Git可查。这些是交付可审计性，不增加算法新颖性、RL收益或正式排名证据；001/002组装失败及guard排除的5份纯测试XML原件均保留。
 
 ## 以下为2026-10-13起的历史证据记录
 
