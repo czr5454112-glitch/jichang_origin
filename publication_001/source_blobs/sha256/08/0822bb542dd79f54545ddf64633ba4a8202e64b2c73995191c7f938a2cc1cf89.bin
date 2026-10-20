@@ -1,0 +1,273 @@
+"""Offline labels from two actual continuations, including failures/censoring."""
+from __future__ import annotations
+
+import copy
+import math
+
+from .foundation_airport_batch_patch import digest, require
+from .foundation_airport_behavior_evidence import snapshot_index
+from .foundation_airport_paired_continuation import validate_parent
+
+
+SCHEMA = "g31.foundation.airport_pair_dataset.v1"
+HORIZON_SECONDS = 1800.
+
+
+def window_cost(data, result, *, start, end):
+    """Full offered population bag-seconds, requiring a closed native endpoint."""
+    require(all(type(x) in (float, int) and math.isfinite(x) for x in (start, end))
+        and 0 <= start < end, "finite_nonempty_cost_window")
+    index = snapshot_index(result, expected_population=len(data["jobs"]))
+    require(end <= index["clock"], "cost_window_not_closed")
+    jobs = {row["business_bag_id"]: row for row in data["jobs"]}
+    require(len(jobs) == len(data["jobs"]) and set(jobs) == set(index["jobs"]),
+        "complete_input_business_identity")
+    contributions, completed, arrived = [], {}, {}
+    for identity, specification in jobs.items():
+        arrival = float(specification["arrival"])
+        require(math.isfinite(arrival) and arrival >= 0, "finite_input_arrival")
+        require((identity in index["arrivals"]) == (arrival <= index["clock"]),
+            "closed_timestamp_complete_arrival_population")
+        if identity in index["arrivals"]:
+            require(index["arrivals"][identity] == arrival, "input_actual_arrival_binding")
+        completion = index["completions"].get(identity, math.inf)
+        contributions.append(max(0., min(completion, end) - max(arrival, start)))
+        if arrival <= end:
+            arrived[identity] = arrival
+        if completion <= end:
+            completed[identity] = completion
+    unknown = len(arrived) - len(completed)
+    load_starts = {}
+    for receipt in result.get("receipts", []):
+        if receipt["event"] == "LOAD_START":
+            identity = receipt["business_bag_id"]
+            require(identity not in load_starts, "unique_actual_first_load")
+            load_starts[identity] = receipt["time"]
+    load_evidence_complete = all(row["status"] in ("unreleased", "waiting_for_tray")
+        or identity in load_starts for identity, row in index["jobs"].items())
+    waiting_integral = (math.fsum(max(0., min(load_starts.get(identity, math.inf), end)
+        - max(specification["arrival"], start)) for identity, specification in jobs.items())
+        if load_evidence_complete else None)
+    return {"label_start": start, "label_end": end, "horizon_seconds": end-start,
+        "backlog_integral_bag_seconds": math.fsum(contributions),
+        "target_return": -math.fsum(contributions), "physical_population": len(jobs),
+        "arrived_by_end": len(arrived), "not_yet_arrived_by_end": len(jobs)-len(arrived),
+        "completed_by_end": len(completed), "arrived_unfinished_by_end": unknown,
+        "on_time_by_end": sum(completion <= jobs[identity]["deadline"]
+            for identity, completion in completed.items()),
+        "arrived_unfinished_past_deadline": sum(identity not in completed
+            and specification["deadline"] < end and identity in arrived
+            for identity, specification in jobs.items()),
+        "completion_times_unknown_for_arrived": unknown,
+        "completion_times_imputed": False, "right_censored_for_integral_only": True,
+        "waiting_for_tray_integral_bag_seconds": waiting_integral,
+        "loaded_or_processing_integral_bag_seconds": (math.fsum(contributions)-waiting_integral
+            if waiting_integral is not None else None),
+        "wait_load_decomposition_status": "actual_LOAD_START_receipts" if load_evidence_complete
+            else "unknown_missing_actual_load_start",
+        "per_job_nonharm_certified": False, "uncompleted_jobs_excluded": 0}
+
+
+def execution_timeline(selected, result, client_calls, delivered_ack_views, *, end):
+    """Retain attempts without requiring positive ACK or eventual receipt."""
+    action = selected["opportunity"]["candidates"][selected["patch_rank"]]
+    tray_id, at = action["tray_id"], selected["observed_at"]
+    calls = [row for row in client_calls if row.get("kind") == "transfer" and not row.get("retry")
+        and row["at"] == at and row["request"]["tray_id"] == tray_id]
+    require(len(calls) <= 1, "one_intervention_tray_submission_per_timestamp")
+    owner_view = (delivered_ack_views.get(selected["owner_id"], {})
+        if isinstance(delivered_ack_views, dict) else next(
+            (row for row in delivered_ack_views if row["owner_id"] == selected["owner_id"]), {}))
+    receipts = result.get("receipts", []) if result is not None else []
+    attempts = []
+    for call in calls:
+        request = call["request"]
+        identity = request["request_id"]
+        legs = [leg for leg in (result or {}).get("leg_identities", [])
+            if leg["kind"] == "empty_return"
+            and leg["transport_leg_id"] == identity + ":empty_return:" + str(leg["runtime_id"])]
+        require(len(legs) <= 1, "unique_native_empty_leg")
+        leg_ids = {row["transport_leg_id"] for row in legs}
+        events = [row for row in receipts if at <= row["time"] <= end
+            and (row.get("transport_leg_id") in leg_ids
+                 or row.get("reason") == identity)]
+        first_edges = [row for row in events if row["event"] == "EDGE_ENTER"]
+        received = [row for row in events if row["event"] == "EMPTY_RECEIVED"]
+        acks = [row for row in owner_view.get("delivered_transfer_acks", [])
+            if row["request_id"] == identity and row["delivered_at"] <= end]
+        receive_at = min((row["time"] for row in received), default=None)
+        loads = [row for row in receipts if row["event"] == "LOAD_START"
+            and row.get("tray_id") == tray_id and receive_at is not None
+            and receive_at <= row["time"] <= end]
+        attempts.append({"actual_request": copy.deepcopy(request), "submitted_at": call["at"],
+            "submission_reply": copy.deepcopy(call["reply"]), "delivered_acks": copy.deepcopy(acks),
+            "positive_delivered_ack": any(row["status"] in
+                ("granted", "dispatching", "departed", "in_transit", "received") for row in acks),
+            "native_leg": copy.deepcopy(legs[0]) if legs else None,
+            "first_edge_at": min((row["time"] for row in first_edges), default=None),
+            "received_at": receive_at, "next_load_at": min((row["time"] for row in loads), default=None),
+            "native_rejection_events": [copy.deepcopy(row) for row in events
+                if "REJECT" in row["event"] or "FAIL" in row["event"]],
+            "strict_nonharm_certified": False})
+    return {"tray_id": tray_id, "attempts": attempts,
+        "intervention_semantics": "submitted_attempt" if attempts else "no_submission_for_this_tray_at_anchor",
+        "attempt_included_in_evaluation": True,
+        "actual_semantic_actions": [{key: row["actual_request"].get(key) for key in
+            ("tray_id", "source", "destination", "earliest_departure", "transfer_scope")} for row in attempts]}
+
+
+def branch_evidence(*, data, planner_report, result, client_calls, delivered_ack_views=None,
+                    stop_reason="reached", input_sha256=None):
+    """Export only observed branch and its real next owner opportunity."""
+    parent = validate_parent(planner_report["parent"])
+    selected = planner_report["selected"]
+    output = {"schema": SCHEMA, "branch": planner_report["branch"], "parent": parent,
+        "input_sha256": input_sha256 or digest(data),
+        "continuation_version": planner_report["continuation_version"],
+        "selected": copy.deepcopy(selected), "successor": copy.deepcopy(planner_report.get("successor")),
+        "stop_reason": stop_reason, "status": "no_eligible_anchor" if selected is None else "censored",
+        "cost": None, "execution": None, "transition": None,
+        "final_physical_time": None if result is None else result["physical_clock"],
+        "strict_nonharm_certified": False}
+    if selected is None:
+        return output
+    require("prefix" in selected, "exact_precommit_prefix_required")
+    start, end = selected["observed_at"], selected["observed_at"] + HORIZON_SECONDS
+    closed = result is not None and result.get("advance", {}).get("status") == "reached" \
+        and result["advance"].get("horizon_complete") is True
+    actual_end = min(end, result["physical_clock"]) if closed else start
+    output["execution"] = execution_timeline(selected, result, client_calls,
+        delivered_ack_views or {}, end=actual_end)
+    if closed and result["physical_clock"] >= end:
+        output["cost"] = window_cost(data, result, start=start, end=end)
+        output["status"] = "closed_full_window"
+        completed = {row["business_bag_id"]: row["completed_at"] for row in result["jobs"]
+            if row["completed_at"] >= 0 and row["completed_at"] <= end}
+        output["job_outcomes"] = {row["business_bag_id"]: {
+            "arrival": row["arrival"], "completed_at": completed.get(row["business_bag_id"]),
+            "status": "completed" if row["business_bag_id"] in completed else
+                "arrived_unfinished" if row["arrival"] <= end else "not_yet_arrived"}
+            for row in data["jobs"]}
+    elif closed and actual_end > start:
+        output["observed_partial_cost"] = window_cost(data, result, start=start, end=actual_end)
+    successor = output["successor"]
+    if successor is not None:
+        at = successor["observed_at"]
+        require(successor["owner_id"] == selected["owner_id"] and at > start,
+            "natural_same_owner_successor_requires_positive_elapsed_time")
+        if closed and at <= actual_end:
+            next_calls = [row for row in client_calls if row.get("kind") == "transfer"
+                and not row.get("retry") and row["at"] == at
+                and row["request"]["owner_id"] == selected["owner_id"]]
+            initial = successor["baseline_decision"]["intents"]
+            supported = not initial
+            if initial and next_calls:
+                proposed = copy.deepcopy(initial[0])
+                proposed.pop("expected_version", None)
+                proposed["request_id"] = next_calls[0]["request"]["request_id"]
+                proposed["owner_id"] = selected["owner_id"]
+                supported = proposed == next_calls[0]["request"]
+            reward = window_cost(data, result, start=start, end=at)
+            output["transition"] = {"elapsed_seconds": at-start, "reward": reward["target_return"],
+                "reward_unit": "negative_bag_seconds", "next_opportunity_id": successor["opportunity"]["opportunity_id"],
+                "next_state": copy.deepcopy(successor["observation"]),
+                "supported_next_action_ids": ["a_ref"] if supported else [],
+                "support_scope": "actual_reference_batch_or_observed_wait_only",
+                "unexecuted_candidates_have_labels": False, "terminated": False,
+                "truncated": False, "candidate_labels": None}
+    if output["transition"] is None:
+        output["transition"] = {"elapsed_seconds": None, "reward": None, "next_state": None,
+            "supported_next_action_ids": [], "terminated": False, "truncated": True,
+            "reason": "natural_successor_not_observed_or_interval_not_closed"}
+    return output
+
+
+def compare_pair(reference, patched):
+    """Pair only exact full prefixes, retaining unknown outcomes and failures."""
+    require(reference["branch"] == "a_ref" and patched["branch"] == "a_patch", "ordered_pair_branches")
+    require(reference["parent"] == patched["parent"], "same_physical_parent_and_split")
+    require(reference["input_sha256"] == patched["input_sha256"], "same_frozen_exogenous_input")
+    require(reference["continuation_version"] == patched["continuation_version"], "same_continuation_policy")
+    output = {"schema": SCHEMA, "parent": copy.deepcopy(reference["parent"]),
+        "reference_status": reference["status"], "patched_status": patched["status"],
+        "advantage_bag_seconds": None, "status": "not_comparable",
+        "strict_nonharm_certified": False, "rl_benefit_demonstrated": False,
+        "attempts_or_failures_excluded": 0}
+    a, b = reference["selected"], patched["selected"]
+    if a is None or b is None:
+        output["reason"] = "one_or_both_registered_cells_have_no_eligible_anchor"
+        return output
+    require(a["prefix"]["complete_prefix_sha256"] == b["prefix"]["complete_prefix_sha256"],
+        "different_complete_physical_controller_protocol_prefix")
+    require(a["opportunity"] == b["opportunity"] and a["patch_rank"] == b["patch_rank"],
+        "different_public_opportunity_or_candidate_catalog")
+    require(a["chosen_action"]["kind"] == "a_ref" and b["chosen_action"]["kind"] != "a_ref",
+        "actual_distinct_registered_interventions")
+    output.update(pair_id=digest({"parent": output["parent"], "prefix": a["prefix"],
+        "patch": b["chosen_action"]}), opportunity_id=a["opportunity"]["opportunity_id"],
+        complete_prefix_sha256=a["prefix"]["complete_prefix_sha256"],
+        action_difference=reference["execution"]["actual_semantic_actions"]
+            != patched["execution"]["actual_semantic_actions"],
+        reference_execution=copy.deepcopy(reference["execution"]),
+        patched_execution=copy.deepcopy(patched["execution"]))
+    if reference["cost"] is None or patched["cost"] is None:
+        output["reason"] = "one_or_both_branches_did_not_close_common_1800s_window"
+        return output
+    require(reference["cost"]["label_start"] == patched["cost"]["label_start"]
+        and reference["cost"]["label_end"] == patched["cost"]["label_end"],
+        "identical_cost_boundaries")
+    advantage = reference["cost"]["backlog_integral_bag_seconds"] - patched["cost"]["backlog_integral_bag_seconds"]
+    old_jobs, new_jobs = reference["job_outcomes"], patched["job_outcomes"]
+    require(set(old_jobs) == set(new_jobs), "same_complete_job_outcome_population")
+    comparison_counts, job_rows = {}, []
+    for identity in old_jobs:
+        left, right = old_jobs[identity]["completed_at"], new_jobs[identity]["completed_at"]
+        category = ("unknown_incomplete" if left is None or right is None
+            else "harmed" if right > left else "improved" if right < left else "equal")
+        comparison_counts[category] = comparison_counts.get(category, 0) + 1
+        job_rows.append({"business_bag_id": identity, "comparison": category,
+            "reference_completed_at": left, "patched_completed_at": right,
+            "delta_seconds": right-left if left is not None and right is not None else None})
+    output.update(status="closed_actual_pair", advantage_bag_seconds=advantage,
+        reference_cost=copy.deepcopy(reference["cost"]), patched_cost=copy.deepcopy(patched["cost"]),
+        positive_means="patch_reduces_complete_population_unfinished_integral",
+        mechanism_direction="patch_better" if advantage > 0 else "reference_better" if advantage < 0 else "equal",
+        per_job_comparison_counts=comparison_counts, per_job_comparisons=job_rows,
+        learning_claim="isolated_action_contrast_only_not_trained_RL_control")
+    return output
+
+
+def dataset_rows(reference, patched):
+    """Two real branch rows; no labels for the unused third candidate."""
+    pair = compare_pair(reference, patched)
+    if pair["status"] != "closed_actual_pair":
+        return {"schema": SCHEMA, "pair": pair, "rows": [],
+            "omission_reason": "no_closed_paired_target", "failed_pair_retained": True}
+    rows = []
+    for branch in (reference, patched):
+        selection = branch["selected"]
+        compared_tray = selection["opportunity"]["candidates"][selection["patch_rank"]]["tray_id"]
+        actual_allocation = next((row for row in selection["chosen_decision"]["intents"]
+            if row.get("tray_id") == compared_tray), None)
+        supply = next(row for row in selection["opportunity"]["actual_uncommitted_trays"]
+            if row["tray_id"] == compared_tray)
+        semantic = {"tray_id": compared_tray, "kind": "transfer" if actual_allocation else "hold_optional",
+            "source": supply["node"], "destination": actual_allocation["destination"] if actual_allocation else None,
+            "earliest_departure": actual_allocation["earliest_departure"] if actual_allocation else None,
+            "transfer_scope": actual_allocation.get("transfer_scope", "cross_zone_transfer") if actual_allocation else None}
+        rows.append({"schema": SCHEMA, "pair_id": pair["pair_id"],
+            "parent": copy.deepcopy(branch["parent"]), "branch": branch["branch"],
+            "opportunity": copy.deepcopy(selection["opportunity"]),
+            "observation": copy.deepcopy(selection["observation"]),
+            "baseline_decision": copy.deepcopy(selection["baseline_decision"]),
+            "action": copy.deepcopy(selection["chosen_action"]),
+            "semantic_action": semantic,
+            "actual_execution": copy.deepcopy(branch["execution"]),
+            "target_return": branch["cost"]["target_return"],
+            "paired_advantage_bag_seconds": pair["advantage_bag_seconds"],
+            "transition": copy.deepcopy(branch["transition"]),
+            "training_use": "train" if branch["parent"]["split"] == "train" else "evaluation_only",
+            "unexecuted_candidate_label": False, "strict_nonharm_certified": False})
+    return {"schema": SCHEMA, "pair": pair, "rows": rows,
+        "unused_candidate_count": reference["selected"]["opportunity"]["K"] - 2,
+        "unused_candidates_have_labels": False}

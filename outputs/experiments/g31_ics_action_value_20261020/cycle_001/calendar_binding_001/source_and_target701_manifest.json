@@ -1,0 +1,62 @@
+{
+  "schema": "g31.foundation.airport_absolute_forecast_binding.v1",
+  "version": "g31.foundation.airport_calendar_parameter_reuse.v1",
+  "time_basis": "absolute_epoch_seconds",
+  "model_id": "221e01808f76b416778518276ad8794b07674adca11e62bf44aaff49e40f0e86",
+  "source_model_id": "fd2e73b9bef85724154823af91167803ce3e0ceb5d29c214a28302cab30f288b",
+  "source_calendar_start": "2026-09-01T00:00:00+08:00",
+  "source_calendar_start_epoch_seconds": 1788192000.0,
+  "original_training_labels_closed_at_sim_time": 43200.0,
+  "original_model_available_at_sim_time": 43200.0,
+  "training_labels_closed_at_epoch_seconds": 1788235200.0,
+  "model_available_at_epoch_seconds": 1788235200.0,
+  "original_checkpoint_sha256": "43787d4753966a63f97cf291bd6cd04aee49fc38b5ced9a3e5bf13cb75786bc8",
+  "original_training_receipt_sha256": "5d2e943d5cc50a36dcb75b9ce7c57a99b7c58ed25e627ec6494f6c0b23d6feb8",
+  "original_public_plan_sha256": "c85693b61757e54bff51fbc014e32e16b902ed225607b250fe43da67681a2508",
+  "original_model_time_basis": {
+    "unit": "seconds",
+    "origin": "legacy_simulated_source_day_start",
+    "timezone": "Asia/Shanghai",
+    "conversion_version": "legacy_seconds_identity_experiment_v1"
+  },
+  "original_model_static_plan_sha256": "737151690bae3f85247f49f744b90e4023b32c3b401917e478160cd1008516da",
+  "source_references": {
+    "flight_forecaster_checkpoint.json": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\B1_training_001\\flight_forecaster_checkpoint.json",
+      "sha256": "43787d4753966a63f97cf291bd6cd04aee49fc38b5ced9a3e5bf13cb75786bc8"
+    },
+    "public/static_flight_plan.json": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\B1_training_001\\public\\static_flight_plan.json",
+      "sha256": "c85693b61757e54bff51fbc014e32e16b902ed225607b250fe43da67681a2508"
+    },
+    "receipt.json": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\B1_training_001\\receipt.json",
+      "sha256": "5d2e943d5cc50a36dcb75b9ce7c57a99b7c58ed25e627ec6494f6c0b23d6feb8"
+    }
+  },
+  "parameter_sha256": "eb84947f750d633957528270e4e4a784d3778fe34b53f3fef4fbd5b87f4486a9",
+  "target_parent": {
+    "parent_seed": 701,
+    "split": "train",
+    "parent_group": "conditional_timing_parent_701",
+    "synthetic": true,
+    "calendar_start": "2026-09-02T00:00:00+08:00",
+    "common_historical_template_sha256": "a9611267471a269cc34f5646a4ebb409c61a08fa77dcef4c02266b346c86890c",
+    "sampling": "sha256(seed:business_identity), uniform[-120,120], clip_zero",
+    "calendar_start_epoch_seconds": 1788278400.0
+  },
+  "target_plan_template_sha256": "e8da0e2c6245cc4bded41f6b7b16549690370b6fe178608016b79636898f9007",
+  "airport_mapping_sha256": "9ef6298aad0546ca6a54cd323359b0783ab248e393d325d1bf89200ab0759b67",
+  "new_fit_performed": false,
+  "observed_count_update": false,
+  "source_training_parent_split": "historical_train_STD_at_or_before_43200",
+  "synthetic_common_template_limits": {
+    "independent_real_airport_days": false,
+    "template_groups_retrospectively_identified": true,
+    "static_plan_predeclared_assumption": "Retrospectively identified historical groups and STD are pre-supplied at experiment time 0; receipt time is experimental, publication remains missing; zero-bag flights may be absent.",
+    "calendar_dates_are_declared_experiment_coordinates": true,
+    "source_and_target_share_historical_template": true,
+    "target_actual_arrivals_or_future_counts_used": false,
+    "no_cross_day_or_field_generalization_claim": true
+  }
+}

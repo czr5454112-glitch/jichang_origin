@@ -1,0 +1,153 @@
+{
+  "schema": "g31.foundation.final_stage_report_independent_review.v1",
+  "created_at_utc": "2026-10-20T05:28:36.743057+00:00",
+  "status": "passed_with_explicit_scientific_limitations",
+  "reviewed_document": {
+    "path": "docs/g31_ics_circulation/ACTION_VALUE_STAGE_20261020.md",
+    "sha256": "d12aff9174281fb563713d7014ed513cc780ec8b59e46790ac3c55015bfb4f2b"
+  },
+  "evidence": [
+    {
+      "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/prospective_offline_review.json",
+      "sha256": "b81e996e4f9319f3b401b6bb2ac318577f78557480ac06b95338430861d582c8"
+    },
+    {
+      "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/report_support/final_operational_summary_001/operational_summary.json",
+      "sha256": "607eaefb433c81ce36714b3a7f3bb56bfd8dc9d8cbd5447180b5611a47e59c29"
+    },
+    {
+      "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/report_support/final_resource_table_001.json",
+      "sha256": "ccdf8799428ae0319a25628c12797c3a7c1f28e1fd4fd6e52db2bd01b9e5b9e7"
+    },
+    {
+      "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/report_support/learned_execution_audit_summary_001.json",
+      "sha256": "36910a0ab48322c0bc6984eb3faed3c7f899f9c7a245bf2ccfab1055ddad7cb2"
+    },
+    {
+      "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/report_support/final_protection_closed_runs_001.json",
+      "sha256": "d30cbc5799995ca45039e61b47fca3dfcd93a429d8133d2fc4182ffa6fa2b7b6"
+    },
+    {
+      "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/report_support/protection_execution_audit_001.json",
+      "sha256": "4257ae2098b207ddeb2751f79f6c160e3966a2305b30d7934410a77fb7a42369"
+    },
+    {
+      "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/report_support/final_budget_audit_001.json",
+      "sha256": "112f76a8946f399a41356570b9e7cfdae655247c82abeff755c5019635906daa"
+    },
+    {
+      "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/report_support/G_N26_P902_closed_stall_diagnosis_001.json",
+      "sha256": "71a552f58b86d13ca04911108870858fb73dc5ace8f43aadf4ab0e05aa9d626c"
+    },
+    {
+      "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/report_support/D_primary_closed_main_test_001.json",
+      "sha256": "97702e25c13ab76f9539bb0e295b09d1c16c19f563fd0d2a5090aa8fd74e7d26"
+    },
+    {
+      "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/report_support/D_P901_first_closed_operational_decomposition_001.json",
+      "sha256": "bb3b04fa7e064f0c3b6981db50ec1f70574b8a2a16cc7b536862910159208081"
+    },
+    {
+      "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/report_support/training_independent_audit_001.json",
+      "sha256": "9aea34f33dc6c3a12c64ea5a2318c1f46a445ffbe46599393a0f5bf475a10063"
+    },
+    {
+      "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/report_support/final_report_render_validation_001.json",
+      "sha256": "0e940173e0b86b564a5f438738bba86fc6849c396144f5595d9839940e05cd02"
+    }
+  ],
+  "review_scope": "Read-only scientific wording and numeric consistency review of the final stage report against closed experiment and independent audit artifacts. No runtime, model, policy, or source-data modifications; no new native run or fit. This receipt does not replace raw native or full callback semantic replay.",
+  "numeric_table_checks": {
+    "status": "passed",
+    "automatically_compared_rows": 46,
+    "primary_raw_rows": 16,
+    "resource_raw_rows": 18,
+    "primary_contrast_rows": 6,
+    "resource_same_N_contrast_rows": 6,
+    "raw_J_rounding_tolerance_bag_seconds": 5.1e-07,
+    "displayed_gain_rounding_tolerance_bag_seconds": 0.000501,
+    "relative_percent_rounding_tolerance_percentage_points": 5.1e-10,
+    "all_integer_counts_exact": true
+  },
+  "checks": [
+    {
+      "id": "primary_all_seeds_and_both_parents",
+      "status": "passed",
+      "finding": "All 16 primary raw rows, six same-information C11/C10 contrasts, six C11/C00 contrasts, six C01/C00 contrasts and interactions agree. Overall 0.089645688% and negative parent902 mean are reported; seed29 is not post-hoc substituted and its numeric threshold is separated from failures."
+    },
+    {
+      "id": "resource_grid_and_stall",
+      "status": "passed",
+      "finding": "All 18 fixed resource points and six contrasts agree. G26/P902 C00/C10/C11 completions23/27/1003 and C11/C10 J gain17780947.891 are not pooled away. Finite-window physical stall is distinguished from permanent deadlock; raw-index evidence is insufficient to establish exact SCC."
+    },
+    {
+      "id": "N_star_layers",
+      "status": "passed",
+      "finding": "Aggregate-only minimum measured N is22 against the preregistered22C10 service vector. Known completion harm296/396 blocks the no-known-harm candidate; certified N remains null. N18 replacement is not established. Unknown completions and additional quarantine remain explicit."
+    },
+    {
+      "id": "causal_attribution",
+      "status": "passed",
+      "finding": "Single-step paired continuation and repeated whole-policy comparisons are distinguished. The G26 first divergence and strict prearrival examples are descriptive mechanism evidence, not identified single-action causal estimates. C01 examples are not attributed to forecast information; one has worse final completion."
+    },
+    {
+      "id": "execution_chain_denominators",
+      "status": "passed_after_author_correction",
+      "finding": "2828 different submitted choices;2473 basic entity/positiveACK/first-edge chains;2452 received;2393 next-load-node matches. The report now explicitly says2393 does not ensure absence of intermediate reposition. G1 existence is supported by separate continuous receipt/load witnesses, without upgrading2473 to full-terminal chains."
+    },
+    {
+      "id": "rejection_failure_denominators",
+      "status": "passed",
+      "finding": "353 final selected-action rejects versus18812 all-run native rejection events are separated. Seven failed transfers/quarantines across six learned runs are whole-policy failures, not falsely all selected learned patches. Nine failures/quarantines across eight total runs are retained."
+    },
+    {
+      "id": "timing_scope",
+      "status": "passed",
+      "finding": "Selector branch p95 range38.84-63.22ms and initial planner range251.16-552.04ms are not pooled quantiles or end-to-end promises. Planner2718.21s and audit494.39s are separately reported; residual/native submission/audit exclusions, concurrency and synchronous simulated clock limitations are explicit."
+    },
+    {
+      "id": "actual_native_feature_gate",
+      "status": "passed_as_explicitly_incomplete",
+      "finding": "Native actual batch proposal counts3/4 and diagnostic hook76.74/88.77ms are distinct from K<=3 and offline13 candidates. Native13-proposal acceptance remains unmet; diagnostic hook excluded from controller timing but included in branch wall."
+    },
+    {
+      "id": "protection_audit_coverage",
+      "status": "passed",
+      "finding": "34 raw-result counter checks are distinguished from seven-run independent physical semantic replay. Recomputed seven-run initial callback denominator13874 and changed-batch denominator817 match. No general future shared-resource nonharm is claimed."
+    },
+    {
+      "id": "G2_and_protected_takeover",
+      "status": "passed",
+      "finding": "G2 incremental learning value, the0.1% engineering expansion condition, and full per-job protected takeover are explicitly distinct. Some positive cells do not establish fullG2; protected takeover remains uncertified."
+    },
+    {
+      "id": "training_and_information_contract",
+      "status": "passed",
+      "finding": "24 policy fits/12 frozen model chains and two diagnostic fits are separate. Thin paired data, single-patch continuation versus repeated policy distribution shift, retrospective static startup calendar assumptions, no unsupported bootstrap, and zero independent real airport days are explicit."
+    },
+    {
+      "id": "budget_and_publication",
+      "status": "passed_for_experiment_artifacts",
+      "finding": "72 long constructions=71 endpoints+one censoredA1;10 short constructions=8 valid+2 expected invalid;34E/D/G closed. D/G identical source and pretest model freeze are reflected. Packaging/ZIP/Git publication facts are intentionally delegated to later external publication receipts."
+    }
+  ],
+  "resolved_findings": [
+    {
+      "id": "next_load_node_match_is_not_uninterrupted_direct_chain",
+      "resolution": "Author changed2393 wording before this final review; current document SHA binds the correction. No unconfirmed2391 strict total was inserted."
+    }
+  ],
+  "unresolved_scientific_wording_findings": [],
+  "scope_limits": [
+    "Not a fresh re-execution of all raw native semantic checks or all7418 score forwards.",
+    "No additional model selection, fitting or policy changes.",
+    "Only two conditional synthetic test timings from one historical template; no independent real airport day.",
+    "Review is not an operational deployment or protection certificate.",
+    "Final archive byte verification and publication commit remain outside this document review."
+  ],
+  "ready_for_document_freeze_and_artifact_packaging": true,
+  "native_runs_started": 0,
+  "fit_calls": 0,
+  "runtime_sources_modified": false,
+  "reviewed_document_modified_by_reviewer": false
+}

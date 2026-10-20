@@ -1,0 +1,218 @@
+"""Read-only finite-population and carrier-time diagnosis of saved native runs."""
+from __future__ import annotations
+
+from collections import Counter, defaultdict
+import argparse
+import gzip
+import hashlib
+import json
+import math
+from pathlib import Path
+
+from .analytic_control import PublicTravel
+from .foundation_airport_pair_dataset import window_cost
+
+
+def load_gz(path):
+    return json.loads(gzip.decompress(Path(path).read_bytes()))
+
+
+def distribution(values):
+    values = sorted(values)
+    if not values:
+        return {"n": 0}
+    def quantile(fraction):
+        index = (len(values)-1)*fraction
+        lo, hi = math.floor(index), math.ceil(index)
+        return values[lo] + (values[hi]-values[lo])*(index-lo)
+    return {"n": len(values), "mean": math.fsum(values)/len(values),
+        "min": values[0], "median": quantile(.5), "p90": quantile(.9),
+        "p95": quantile(.95), "max": values[-1]}
+
+
+def tray_time(result, *, start, end):
+    """Integrate actual lifecycle transitions; validate every final carrier."""
+    transitions = {"LOAD_START": "loading", "LOAD_COMPLETE": "loaded",
+        "STORAGE_ENTER": "storage", "STORAGE_RELEASE": "loaded",
+        "UNLOAD_START": "unloading", "UNLOAD_COMPLETE": "hold", "HOLD_START": "hold",
+        "HOLD_COMPLETE": "empty", "EXPORT_GRANTED": "empty_transit",
+        "EMPTY_RECEIVED": "empty", "LEG_FAILED": "quarantined"}
+    state = {row["tray_id"]: {"mode": "empty", "at": 0., "edge_at": None} for row in result["trays"]}
+    times, edge_times = Counter(), Counter()
+    for row in result["receipts"]:
+        tray = state.get(row.get("tray_id"))
+        if tray is None:
+            continue
+        at = row["time"]
+        if at > end:
+            continue
+        event = row["event"]
+        if event in transitions:
+            times[tray["mode"]] += max(0., min(at, end)-max(tray["at"], start))
+            tray.update(mode=transitions[event], at=at)
+        if event == "EDGE_ENTER":
+            if tray["edge_at"] is not None:
+                raise ValueError("diagnosis:overlapping_physical_edges")
+            tray["edge_at"] = at, tray["mode"]
+        elif event == "EDGE_EXIT":
+            if tray["edge_at"] is None:
+                raise ValueError("diagnosis:edge_exit_without_entry")
+            began, mode = tray["edge_at"]
+            edge_times[mode] += max(0., min(at, end)-max(began, start))
+            tray["edge_at"] = None
+    for tray in state.values():
+        times[tray["mode"]] += max(0., end-max(tray["at"], start))
+        if tray["edge_at"] is not None:
+            began, mode = tray["edge_at"]
+            edge_times[mode] += max(0., end-max(began, start))
+    expected = len(state)*(end-start)
+    if abs(math.fsum(times.values())-expected) > 1e-6*max(1., expected):
+        raise ValueError("diagnosis:carrier_seconds_not_conserved")
+    if end == result["physical_clock"]:
+        if any(state[row["tray_id"]]["mode"] != row["mode"] for row in result["trays"]):
+            raise ValueError("diagnosis:lifecycle_reconstruction_disagrees_with_native")
+    return {"start": start, "end": end, "carrier_seconds": dict(times),
+        "fraction_of_fleet_time": {mode: value/expected for mode, value in times.items()},
+        "physical_edge_seconds_by_mode": dict(edge_times),
+        "nonedge_seconds_by_mode": {mode: seconds-edge_times[mode] for mode, seconds in times.items()},
+        "physical_edge_fraction": math.fsum(edge_times.values())/expected,
+        "fleet_seconds_conserved": True}
+
+
+def diagnose(directory):
+    directory = Path(directory)
+    data = json.loads((directory/"input.json").read_text(encoding="utf8"))
+    result = load_gz(directory/"final_result.json.gz")
+    calls = load_gz(directory/"client_calls.json.gz")
+    diagnostics = load_gz(directory/"offline_diagnostics.json.gz")
+    graph = load_gz(directory/"wait_graph_report.json.gz")
+    now = result["physical_clock"]
+    if now != diagnostics["now"] or now != graph["at"]:
+        raise ValueError("diagnosis:complete_common_timestamp_required")
+    requests = {row["request"]["request_id"]: row["request"] for row in calls
+        if row.get("kind") == "transfer" and not row.get("retry")}
+    by_leg, by_job, grants = defaultdict(list), defaultdict(list), {}
+    for row in result["receipts"]:
+        by_leg[row.get("transport_leg_id", "")].append(row)
+        by_job[row.get("business_bag_id", "")].append(row)
+        if row["event"] == "EXPORT_GRANTED":
+            if row["reason"] in grants:
+                raise ValueError("diagnosis:multiple_grants_for_one_request")
+            grants[row["reason"]] = row["time"]
+    travel = PublicTravel(dict(data, now=now, known_faults=[]))
+    transfers, groups = [], defaultdict(list)
+    for row in result["transfers"]:
+        request = requests.get(row["request_id"])
+        if request is None:
+            continue
+        received = row["received_at"]
+        duration = received-row["delivered_at"] if received >= 0 else None
+        grant = grants.get(row["request_id"])
+        actual_duration = received-grant if received >= 0 and grant is not None else None
+        static = travel.complete(request["source"], request["destination"])
+        item = {"request_id": row["request_id"], "tray_id": request["tray_id"],
+            "scope": request.get("transfer_scope", "cross_zone_transfer"),
+            "source": request["source"], "destination": request["destination"], "status": row["status"],
+            "delivered_at": row["delivered_at"], "received_at": received,
+            "actual_export_granted_at": grant,
+            "forecast_ledger_at_submit": request.get("forecast_ledger"),
+            "pregrant_wait_after_delivery_seconds": grant-row["delivered_at"] if grant is not None else None,
+            "delivered_to_received_seconds": duration, "public_static_duration_estimate": static,
+            "actual_empty_occupation_seconds": actual_duration,
+            "extra_seconds_vs_static_estimate": actual_duration-static if actual_duration is not None else None,
+            "causal_congestion_attribution": "unknown; descriptive difference only"}
+        transfers.append(item)
+        groups[item["scope"]].append(item)
+    transfer_summary = {scope: {"requests": len(rows), "statuses": dict(Counter(r["status"] for r in rows)),
+        "completed_delivery_seconds": distribution([r["delivered_to_received_seconds"] for r in rows
+            if r["delivered_to_received_seconds"] is not None]),
+        "completed_actual_empty_occupation_seconds": distribution([r["actual_empty_occupation_seconds"] for r in rows
+            if r["actual_empty_occupation_seconds"] is not None]),
+        "pregrant_wait_after_delivery_seconds": distribution([r["pregrant_wait_after_delivery_seconds"] for r in rows
+            if r["pregrant_wait_after_delivery_seconds"] is not None]),
+        "completed_extra_seconds_vs_static": distribution([r["extra_seconds_vs_static_estimate"] for r in rows
+            if r["extra_seconds_vs_static_estimate"] is not None])} for scope, rows in groups.items()}
+    ranges = [(0., now), (7200., 14400.), (28800., 36000.), (54000., now), (now-1800., now)]
+    windows = []
+    for start, end in ranges:
+        cost = window_cost(data, result, start=start, end=end)
+        arrived = sum(start < row["arrival"] <= end for row in data["jobs"])
+        completed = sum(start < row["completed_at"] <= end for row in result["jobs"])
+        cost.update(new_arrivals=arrived, new_completions=completed,
+            arrivals_per_hour=arrived*3600/(end-start), completions_per_hour=completed*3600/(end-start),
+            arrived_minus_completed_growth=arrived-completed,
+            tray_time=tray_time(result, start=start, end=end))
+        windows.append(cost)
+    cycles = []
+    for component in graph["witnessed_hold_wait_cycles"]:
+        waits = []
+        for edge in component["edges"]:
+            if edge["kind"] == "actual_hold":
+                continue
+            runtime_id = edge["evidence"]["runtime_id"]
+            leg = next(row for row in diagnostics["legs"] if row["runtime_id"] == runtime_id)
+            events = [row for row in by_leg[leg["transport_leg_id"]] if row["event"] == "RESOURCE_WAIT"]
+            last = max((row["time"] for row in events), default=None)
+            waits.append({"tray": edge["from"], "resource": edge["to"],
+                "latest_wait_at": last, "latest_wait_age_seconds": now-last if last is not None else None})
+        cycles.append({"vertices": component["vertices"], "waits": waits,
+            "all_current_resource_holders": [row for row in graph["edges"]
+                if row["kind"] == "actual_hold" and row["from"] in component["vertices"]],
+            "meaning": "current hold/wait SCC; noncycle holders, alternative routing and later releases may break it",
+            "permanent_deadlock": False})
+    loaded_duration, interload_duration = [], []
+    for identity, events in by_job.items():
+        if not identity:
+            continue
+        loads = [r["time"] for r in events if r["event"] == "LOAD_START"]
+        complete = [r["time"] for r in events if r["event"] == "UNLOAD_COMPLETE"]
+        if loads and complete:
+            loaded_duration.append(complete[0]-loads[0])
+    load_by_tray = defaultdict(list)
+    for row in result["receipts"]:
+        if row["event"] == "LOAD_START":
+            load_by_tray[row["tray_id"]].append(row["time"])
+    for values in load_by_tray.values():
+        interload_duration.extend(b-a for a,b in zip(values,values[1:]))
+    idle_now = [row for row in result["trays"] if row["mode"] == "empty"
+        and row["edge_to"] < 0 and row["active_leg"] < 0 and row["available_at"] <= now]
+    return {"schema": "g31.airport.saved_operational_diagnosis.v1",
+        "source_directory": str(directory.resolve()), "at": now,
+        "source_sha256": {name: hashlib.sha256((directory/name).read_bytes()).hexdigest()
+            for name in ("input.json","final_result.json.gz","client_calls.json.gz","offline_diagnostics.json.gz","wait_graph_report.json.gz")},
+        "scope": "read-only description of common repaired baseline, not RL gain",
+        "offered": len(data["jobs"]), "jobs_by_final_status": dict(Counter(row["status"] for row in result["jobs"])),
+        "trays_by_final_mode": dict(Counter(row["mode"] for row in result["trays"])),
+        "actual_uncommitted_empty_at_endpoint": len(idle_now), "windows": windows,
+        "empty_transfer_summary": transfer_summary,
+        "longest_completed_empty_returns": sorted([r for r in transfers if r["actual_empty_occupation_seconds"] is not None],
+            key=lambda r:r["actual_empty_occupation_seconds"], reverse=True)[:20],
+        "latency_semantics": "delivered-to-received includes waiting for a forecast release or departure; only grant-to-received measures empty allocation occupation",
+        "loaded_job_elapsed_seconds_completed_only": distribution(loaded_duration),
+        "interload_cycle_seconds_observed_intervals_only": distribution(interload_duration),
+        "cycle_diagnosis": cycles, "request_denominators": {k:v for k,v in graph["request_denominators"].items() if k!="request_rows"},
+        "operational_hypotheses_not_results": [
+            "Earlier allocation can help when an actual spare reaches a loader before a future shortage; the earliest collected pair did not reduce waiting.",
+            "Choose destinations by total future service and empty-return exposure rather than only the next receipt; requires actual paired outcomes.",
+            "Delay or redirect optional empty commitments when reception leases compete with loaded traffic; current guard lacks shared-resource nonharm proof.",
+            "Late endpoint has no actual idle carrier, so immediate prepositioning headroom is zero there; gains must originate before commitment or shorten later cycles.",
+            "Observed arrival/completion imbalance is a fixed-domain bottleneck diagnostic, not a proof that any particular fleet size is required."],
+        "rl_gain_established": False}
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--input-directory", type=Path, required=True)
+    parser.add_argument("--output", type=Path, required=True)
+    args = parser.parse_args()
+    result = diagnose(args.input_directory)
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    with args.output.open("x", encoding="utf8") as stream:
+        json.dump(result, stream, ensure_ascii=False, indent=2, allow_nan=False)
+    print(json.dumps({"output":str(args.output),"at":result["at"],"windows":[{
+        k:w[k] for k in ("label_start","label_end","new_arrivals","new_completions",
+            "backlog_integral_bag_seconds","waiting_for_tray_integral_bag_seconds")} for w in result["windows"]]}))
+
+
+if __name__ == "__main__":
+    main()

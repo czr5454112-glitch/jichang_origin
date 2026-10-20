@@ -26,7 +26,8 @@ def digest(value):
     return hashlib.sha256(json.dumps(value,sort_keys=True,separators=(',',':'),allow_nan=False).encode()).hexdigest()
 
 
-def score_record(record,*,model_descriptors,flight_context,forecast_checkpoint,mapping,episode_id,episode_end=59400.):
+def score_record(record,*,model_descriptors,flight_context,forecast_checkpoint,mapping,episode_id,episode_end=59400.,
+                 prepared_checkpoints=None):
     """Score every actual baseline proposal with all three frozen final models.
 
     Records are detached JSON data. Return a diagnostic report even on error;
@@ -52,6 +53,8 @@ def score_record(record,*,model_descriptors,flight_context,forecast_checkpoint,m
         require(type(now)in(int,float) and math.isfinite(now) and 57660.<=now<=59400. and episode_end==59400.,
             'registered_late_callback_and_59400_episode_semantics')
         require([item['seed']for item in model_descriptors]==list(SEEDS),'all_fixed_three_final_seeds_in_order')
+        require(prepared_checkpoints is None or len(prepared_checkpoints)==len(model_descriptors),
+            'all_prepared_checkpoints_in_fixed_order')
         require(record['readonly'] is True and record['native_execution_authority'] is False
             and record['candidate_conditional_labels'] is None and record['decision']['intents'],
             'actual_public_baseline_intents_without_outcome_labels')
@@ -76,26 +79,31 @@ def score_record(record,*,model_descriptors,flight_context,forecast_checkpoint,m
         regional=phase('B1_current_public_prior_forecast',lambda:arrays.predict(context,forecast_checkpoint,
             now=now,owner=record['owner_id'],observed_counts=None))
         mapped=phase('public_region_mapping',lambda:projection.project(regional,mapping))
-        wrapped,account_audit=phase('public_six_account_and_forecast_adapter',lambda:public.wrap_record(adapted,mapped,
+        current,account_audit,candidates=phase('public_six_account_and_forecast_adapter',lambda:public.prepare_record(adapted,mapped,
             episode_id=episode_id,episode_end=episode_end))
-        candidates=phase('original_baseline_proposal_semantics',lambda:public.proposal_actions(adapted))
         require(len(candidates)==len(record['decision']['intents']) and all(candidate['enabled']is None
             and candidate['outcome_label']is None and candidate['source_proposal_sha256']==digest(proposal)
             for candidate,proposal in zip(candidates,record['decision']['intents'],strict=True)),
             'exact_original_proposal_list_no_invented_candidates_or_guard')
         actions=[candidate['semantic']for candidate in candidates]
-        features=phase('public_action_features',lambda:[value.features(wrapped,action)for action in actions])
+        matrix=phase('public_action_features',lambda:value.prepare_feature_matrix(current,actions))
+        features=matrix.feature_rows()
+        wrapped=current.to_observation()
         report.update(normalization=normalization,regional_forecast_sha256=digest(regional),
             mapped_forecast_sha256=digest(mapped),forecast=wrapped['demand_forecast'],
             model_observation_sha256=digest(wrapped),mapping_version=wrapped['mapping_version'],
             information_variant=wrapped['information_variant'],flight_context_sha256=wrapped['flight_context_sha256'],
             account_adapter=account_audit,candidates=candidates,features=features,features_sha256=digest(features),
-            actual_baseline_first_proposal_index=0,baseline_selection_changed=False)
-        for descriptor in model_descriptors:
+            actual_baseline_first_proposal_index=0,baseline_selection_changed=False,
+            current_context_build_count=1,feature_matrix_build_count=1,
+            feature_matrix_actions_sha256=matrix.actions_sha256,
+            prepared_static_checkpoints_used=prepared_checkpoints is not None)
+        for index,descriptor in enumerate(model_descriptors):
             def forward():
-                model=consumer.validate_behavior_checkpoint(wrapped,descriptor)
-                require(model['seed']==descriptor['seed'],'descriptor_seed_matches_actual_registered_weights')
-                return value.predict(model,[wrapped]*len(actions),actions),digest(model)
+                checkpoint=(consumer.prepare_behavior_checkpoint(wrapped,descriptor) if prepared_checkpoints is None
+                    else prepared_checkpoints[index])
+                require(checkpoint.seed==descriptor['seed'],'descriptor_seed_matches_actual_registered_weights')
+                return consumer.predict_prepared_behavior_checkpoint(current,matrix,checkpoint,descriptor=descriptor),checkpoint.model_content_sha256
             scores,content_sha=phase('seed_'+str(descriptor['seed'])+'_gated_model_forward',forward)
             require(len(scores)==len(actions) and all(type(score)in(int,float) and math.isfinite(score)for score in scores),
                 'all_original_proposals_have_finite_scores')

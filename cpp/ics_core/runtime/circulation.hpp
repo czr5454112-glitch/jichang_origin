@@ -60,6 +60,12 @@ struct CirculationTransfer {
   double message_delay = 0;
   double earliest_departure = 0;
   double expiry = 1.0e9;  // departure lease, reception berth stays held in transit
+  std::string transfer_scope = "cross_zone_transfer";
+};
+// Public, immutable role declaration; never inferred from future jobs.
+struct CirculationStaticRoleContract {
+  std::string schema;
+  std::vector<int> loader_nodes;
 };
 struct CirculationOwnerOutage {
   std::string owner;
@@ -80,6 +86,7 @@ struct CirculationInput {
   std::vector<CirculationTransfer> transfers;
   CirculationOwnerProtocol owner_protocol;
   bool owner_notifications_enabled = false;
+  CirculationStaticRoleContract static_role_contract;
 };
 // Owner-local revision, never a global heap/event/traversal counter. Bits:
 // arrival=1, physical=2, demand=4, forecast=8, ACK=16, timeout=32, known fault=64,

@@ -1,0 +1,27 @@
+{
+  "schema": "g31.airport.protection_scope.v1",
+  "mode": "isolated_simulation_only",
+  "checks_retained": [
+    "actual current empty entity and source owner",
+    "no outstanding tray pledge/reception commitment at optional selection",
+    "source FIFO and export_min_stock",
+    "static loader role and explicit local/cross-zone scope",
+    "native receiver lease/reserve/capacity admission",
+    "ordinary ACK/retry/recovery and unique entity leg"
+  ],
+  "patch_limit": "at most one optional actual tray; preserve all other initial batch allocations; refresh current for residual",
+  "certified": false,
+  "unknown": [
+    "per-job effects through shared loaded/empty channels",
+    "future route interference and downstream FIFO interactions",
+    "completion times for unfinished jobs",
+    "wall-clock freshness under asynchronous physical execution"
+  ],
+  "known_negative_evidence": "paired datasets preserve known delayed jobs even when aggregate backlog cost improves",
+  "unsupported_claims": [
+    "protected model takeover",
+    "per-job nonharm from native legality",
+    "global deadlock from a short local wait cycle",
+    "optimal multistep Q from a finite conditional continuation label"
+  ]
+}

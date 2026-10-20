@@ -1,0 +1,2180 @@
+{
+  "schema": "g31.airport.closed_D16_interim_main_test.v1",
+  "created_at_utc": "2026-10-20T04:49:21.581329+00:00",
+  "status": "all_16_primary_runs_closed_recomputed_interim_only",
+  "not_final_34_run_review": true,
+  "E_or_G_outcomes_opened_by_this_script": false,
+  "scope": "All preregistered D16 rows, every parent and every model seed. No post-test seed/model/resource selection.",
+  "inputs": {
+    "grid": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\prospective_evaluation_grid_001.json",
+      "sha256": "e79207293a42bdad9758d73b2ab7449af33a399dd2f2a59e106b7b622c65936a"
+    },
+    "script": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\report_support\\summarize_closed_D_main_test_001.py",
+      "sha256": "7a55cf2bc11bbdef1fec3e9bdebf3490c6a96b785eeebaa986ab1b24ff3f61ec"
+    },
+    "review_module": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_airport_action_review.py",
+      "sha256": "89bdc18d16feea632d5d5c2a8b7d3b9825a530ffd43fff9219014fb086374cbb"
+    }
+  },
+  "engineering_threshold_contract": {
+    "relative_mean_J_reduction": 0.001,
+    "interpretation": "pretest research continuation criterion, not statistical significance or airport SLA",
+    "additional_requirements": [
+      "both held-out parents improve at same information",
+      "no additional run failures",
+      "report every known harmed and unknown job",
+      "protected G2 remains unavailable while shared-resource nonharm is not certified"
+    ]
+  },
+  "relative_mean_ambiguity_handling": "Both mean of the two parent-relative gains and ratio of the two mean costs are reported. Numeric decision requires both >= frozen0.001; no threshold redefinition or tuning.",
+  "rows": [
+    {
+      "batch": "D",
+      "name": "D_N22_C00_P901_001",
+      "fleet": 22,
+      "parent_seed": 901,
+      "variant": "C00",
+      "model_seed": null,
+      "training_domain": null,
+      "status": "complete",
+      "plan_sha256": "93bd495b2fd2681d1e139738a95fd835fc7a58a821076787e1029f49bf472603",
+      "receipt_sha256": "df6c9d30c7241fa8e4769dd78895a38dc9bd0a73f22ba925e31dede57bdd4a0b",
+      "input_semantic_sha256": "3585308e8cd1bdb9e5ad9cdf581229c004dbecfd4f99a2f05e30d89aa5a6239e",
+      "binary_sha256": "3483458a6a8342685406b83e296b3f072409a73c63e24092f19d88136e89c985",
+      "wall_seconds": 192.61000000004424,
+      "summary": {
+        "offered": 28506,
+        "arrived": 20921,
+        "completed": 969,
+        "jobs_by_status": {
+          "completed": 969,
+          "waiting_for_tray": 19933,
+          "in_transit": 19,
+          "unreleased": 7585
+        },
+        "trays_by_mode": {
+          "loaded": 19,
+          "empty_transit": 2,
+          "empty": 1
+        },
+        "at": 59400.0
+      },
+      "strict_nonharm_certified": false,
+      "full_window_cost": {
+        "label_start": 7200.0,
+        "label_end": 59400.0,
+        "horizon_seconds": 52200.0,
+        "backlog_integral_bag_seconds": 489185556.28164,
+        "target_return": -489185556.28164,
+        "physical_population": 28506,
+        "arrived_by_end": 20921,
+        "not_yet_arrived_by_end": 7585,
+        "completed_by_end": 969,
+        "arrived_unfinished_by_end": 19952,
+        "on_time_by_end": 91,
+        "arrived_unfinished_past_deadline": 17569,
+        "completion_times_unknown_for_arrived": 19952,
+        "completion_times_imputed": false,
+        "right_censored_for_integral_only": true,
+        "waiting_for_tray_integral_bag_seconds": 488432740.323471,
+        "loaded_or_processing_integral_bag_seconds": 752815.9581689835,
+        "wait_load_decomposition_status": "actual_LOAD_START_receipts",
+        "per_job_nonharm_certified": false,
+        "uncompleted_jobs_excluded": 0
+      },
+      "independent_cost_recalculation": 489185556.28164,
+      "jobs_digest": "e29aa52f5fa0d3025343ef7c9bd9482d30f34d709719952a9c3d10c009b6982d",
+      "initial_trays_digest": "95b10471bfb4cf6567f83a5f6dbac7f41d5f74c4a65037f45cfbb1269244b109",
+      "action_execution_counts": {
+        "evaluated_decisions": 399
+      },
+      "prearrival_examples": [],
+      "prearrival_inference_scope": "Actual transfer receipt precedes arrival of its next served bag at that loader; this timing alone does not prove aggregate policy benefit."
+    },
+    {
+      "batch": "D",
+      "name": "D_N22_C10_P901_001",
+      "fleet": 22,
+      "parent_seed": 901,
+      "variant": "C10",
+      "model_seed": null,
+      "training_domain": null,
+      "status": "complete",
+      "plan_sha256": "78815e9706bdb12f26d95fa6ddd2c979f566649d56a2abec6dd83b61c149b143",
+      "receipt_sha256": "09cbf659cf3a7edfc9d71273681f01af8e5e9f76e27c77ea2724435d0a03eccc",
+      "input_semantic_sha256": "3585308e8cd1bdb9e5ad9cdf581229c004dbecfd4f99a2f05e30d89aa5a6239e",
+      "binary_sha256": "3483458a6a8342685406b83e296b3f072409a73c63e24092f19d88136e89c985",
+      "wall_seconds": 311.5,
+      "summary": {
+        "offered": 28506,
+        "arrived": 20921,
+        "completed": 957,
+        "jobs_by_status": {
+          "completed": 957,
+          "waiting_for_tray": 19952,
+          "in_transit": 12,
+          "unreleased": 7585
+        },
+        "trays_by_mode": {
+          "empty": 4,
+          "loaded": 12,
+          "empty_transit": 6
+        },
+        "at": 59400.0
+      },
+      "strict_nonharm_certified": false,
+      "full_window_cost": {
+        "label_start": 7200.0,
+        "label_end": 59400.0,
+        "horizon_seconds": 52200.0,
+        "backlog_integral_bag_seconds": 489417802.81163996,
+        "target_return": -489417802.81163996,
+        "physical_population": 28506,
+        "arrived_by_end": 20921,
+        "not_yet_arrived_by_end": 7585,
+        "completed_by_end": 957,
+        "arrived_unfinished_by_end": 19964,
+        "on_time_by_end": 90,
+        "arrived_unfinished_past_deadline": 17581,
+        "completion_times_unknown_for_arrived": 19964,
+        "completion_times_imputed": false,
+        "right_censored_for_integral_only": true,
+        "waiting_for_tray_integral_bag_seconds": 488680317.626202,
+        "loaded_or_processing_integral_bag_seconds": 737485.1854379773,
+        "wait_load_decomposition_status": "actual_LOAD_START_receipts",
+        "per_job_nonharm_certified": false,
+        "uncompleted_jobs_excluded": 0
+      },
+      "independent_cost_recalculation": 489417802.81163996,
+      "jobs_digest": "e29aa52f5fa0d3025343ef7c9bd9482d30f34d709719952a9c3d10c009b6982d",
+      "initial_trays_digest": "95b10471bfb4cf6567f83a5f6dbac7f41d5f74c4a65037f45cfbb1269244b109",
+      "action_execution_counts": {
+        "evaluated_decisions": 400,
+        "different_proposals": 5,
+        "different_actual_submissions": 5,
+        "different_verified_execution_links": 5,
+        "different_with_positive_ack": 5,
+        "different_with_unique_leg": 5,
+        "different_with_first_edge": 5,
+        "different_with_receipt": 5,
+        "different_with_next_load": 5,
+        "ready_before_arrival_of_next_served_job": 1
+      },
+      "prearrival_examples": [
+        {
+          "request_id": "live:21:owner:system_domestic:transfer:18",
+          "business_bag_id": "projected:1x:16",
+          "destination": 95,
+          "received_at": 10445.453000000003,
+          "bag_arrival": 10603.892557,
+          "next_load_at": 10603.892557
+        }
+      ],
+      "prearrival_inference_scope": "Actual transfer receipt precedes arrival of its next served bag at that loader; this timing alone does not prove aggregate policy benefit."
+    },
+    {
+      "batch": "D",
+      "name": "D_N22_C01_S17_P901_001",
+      "fleet": 22,
+      "parent_seed": 901,
+      "variant": "C01",
+      "model_seed": 17,
+      "training_domain": "primary_22",
+      "status": "complete",
+      "plan_sha256": "4da6820511ac9600e8590950d23eb67a7afebd47741d50756828444add101348",
+      "receipt_sha256": "0b985cfcd4f0a63b220adbf4ce981ae5cffa3226187873654efd1623a67a82dd",
+      "input_semantic_sha256": "3585308e8cd1bdb9e5ad9cdf581229c004dbecfd4f99a2f05e30d89aa5a6239e",
+      "binary_sha256": "3483458a6a8342685406b83e296b3f072409a73c63e24092f19d88136e89c985",
+      "wall_seconds": 255.23399999999674,
+      "summary": {
+        "offered": 28506,
+        "arrived": 20921,
+        "completed": 948,
+        "jobs_by_status": {
+          "completed": 948,
+          "waiting_for_tray": 19958,
+          "in_transit": 15,
+          "unreleased": 7585
+        },
+        "trays_by_mode": {
+          "empty_transit": 6,
+          "loaded": 15,
+          "quarantined": 1
+        },
+        "at": 59400.0
+      },
+      "strict_nonharm_certified": false,
+      "full_window_cost": {
+        "label_start": 7200.0,
+        "label_end": 59400.0,
+        "horizon_seconds": 52200.0,
+        "backlog_integral_bag_seconds": 489473999.69264,
+        "target_return": -489473999.69264,
+        "physical_population": 28506,
+        "arrived_by_end": 20921,
+        "not_yet_arrived_by_end": 7585,
+        "completed_by_end": 948,
+        "arrived_unfinished_by_end": 19973,
+        "on_time_by_end": 90,
+        "arrived_unfinished_past_deadline": 17590,
+        "completion_times_unknown_for_arrived": 19973,
+        "completion_times_imputed": false,
+        "right_censored_for_integral_only": true,
+        "waiting_for_tray_integral_bag_seconds": 488765320.57464397,
+        "loaded_or_processing_integral_bag_seconds": 708679.117996037,
+        "wait_load_decomposition_status": "actual_LOAD_START_receipts",
+        "per_job_nonharm_certified": false,
+        "uncompleted_jobs_excluded": 0
+      },
+      "independent_cost_recalculation": 489473999.69264,
+      "jobs_digest": "e29aa52f5fa0d3025343ef7c9bd9482d30f34d709719952a9c3d10c009b6982d",
+      "initial_trays_digest": "95b10471bfb4cf6567f83a5f6dbac7f41d5f74c4a65037f45cfbb1269244b109",
+      "action_execution_counts": {
+        "evaluated_decisions": 417,
+        "different_proposals": 121,
+        "different_actual_submissions": 121,
+        "different_verified_execution_links": 117,
+        "different_with_positive_ack": 117,
+        "different_with_unique_leg": 117,
+        "different_with_first_edge": 117,
+        "different_with_receipt": 115,
+        "different_with_next_load": 115,
+        "ready_before_arrival_of_next_served_job": 0,
+        "different_unverified_execution_links": 4
+      },
+      "prearrival_examples": [],
+      "prearrival_inference_scope": "Actual transfer receipt precedes arrival of its next served bag at that loader; this timing alone does not prove aggregate policy benefit."
+    },
+    {
+      "batch": "D",
+      "name": "D_N22_C01_S29_P901_001",
+      "fleet": 22,
+      "parent_seed": 901,
+      "variant": "C01",
+      "model_seed": 29,
+      "training_domain": "primary_22",
+      "status": "complete",
+      "plan_sha256": "b17f800e947acf8022a97dde20891471a47f9b3c53024ed5a929f707c2fd70e4",
+      "receipt_sha256": "4a580b9c62f91f1da924d5aedcef9500fd3fe5df73a528624737cb22099927ea",
+      "input_semantic_sha256": "3585308e8cd1bdb9e5ad9cdf581229c004dbecfd4f99a2f05e30d89aa5a6239e",
+      "binary_sha256": "3483458a6a8342685406b83e296b3f072409a73c63e24092f19d88136e89c985",
+      "wall_seconds": 239.65599999995902,
+      "summary": {
+        "offered": 28506,
+        "arrived": 20921,
+        "completed": 968,
+        "jobs_by_status": {
+          "completed": 968,
+          "waiting_for_tray": 19939,
+          "in_transit": 14,
+          "unreleased": 7585
+        },
+        "trays_by_mode": {
+          "loaded": 14,
+          "empty_transit": 7,
+          "quarantined": 1
+        },
+        "at": 59400.0
+      },
+      "strict_nonharm_certified": false,
+      "full_window_cost": {
+        "label_start": 7200.0,
+        "label_end": 59400.0,
+        "horizon_seconds": 52200.0,
+        "backlog_integral_bag_seconds": 488966066.57563996,
+        "target_return": -488966066.57563996,
+        "physical_population": 28506,
+        "arrived_by_end": 20921,
+        "not_yet_arrived_by_end": 7585,
+        "completed_by_end": 968,
+        "arrived_unfinished_by_end": 19953,
+        "on_time_by_end": 100,
+        "arrived_unfinished_past_deadline": 17570,
+        "completion_times_unknown_for_arrived": 19953,
+        "completion_times_imputed": false,
+        "right_censored_for_integral_only": true,
+        "waiting_for_tray_integral_bag_seconds": 488309752.602018,
+        "loaded_or_processing_integral_bag_seconds": 656313.9736219645,
+        "wait_load_decomposition_status": "actual_LOAD_START_receipts",
+        "per_job_nonharm_certified": false,
+        "uncompleted_jobs_excluded": 0
+      },
+      "independent_cost_recalculation": 488966066.57563996,
+      "jobs_digest": "e29aa52f5fa0d3025343ef7c9bd9482d30f34d709719952a9c3d10c009b6982d",
+      "initial_trays_digest": "95b10471bfb4cf6567f83a5f6dbac7f41d5f74c4a65037f45cfbb1269244b109",
+      "action_execution_counts": {
+        "evaluated_decisions": 417,
+        "different_proposals": 159,
+        "different_actual_submissions": 159,
+        "different_verified_execution_links": 149,
+        "different_with_positive_ack": 149,
+        "different_with_unique_leg": 149,
+        "different_with_first_edge": 149,
+        "different_with_receipt": 149,
+        "different_with_next_load": 148,
+        "ready_before_arrival_of_next_served_job": 1,
+        "different_unverified_execution_links": 10
+      },
+      "prearrival_examples": [
+        {
+          "request_id": "live:21:owner:system_domestic:transfer:18",
+          "business_bag_id": "projected:1x:16",
+          "destination": 95,
+          "received_at": 10445.453000000003,
+          "bag_arrival": 10603.892557,
+          "next_load_at": 10603.892557
+        }
+      ],
+      "prearrival_inference_scope": "Actual transfer receipt precedes arrival of its next served bag at that loader; this timing alone does not prove aggregate policy benefit."
+    },
+    {
+      "batch": "D",
+      "name": "D_N22_C01_S43_P901_001",
+      "fleet": 22,
+      "parent_seed": 901,
+      "variant": "C01",
+      "model_seed": 43,
+      "training_domain": "primary_22",
+      "status": "complete",
+      "plan_sha256": "a54256d59b4b722a56907e95d0eadddd3b61fdbaa0c6985f1cc055d65ba36cff",
+      "receipt_sha256": "ba520b0ecaedb351424be7dfc95385d21bc8d7c38163ca56f97dc63b240e1dd5",
+      "input_semantic_sha256": "3585308e8cd1bdb9e5ad9cdf581229c004dbecfd4f99a2f05e30d89aa5a6239e",
+      "binary_sha256": "3483458a6a8342685406b83e296b3f072409a73c63e24092f19d88136e89c985",
+      "wall_seconds": 265.9679999999935,
+      "summary": {
+        "offered": 28506,
+        "arrived": 20921,
+        "completed": 1039,
+        "jobs_by_status": {
+          "completed": 1039,
+          "waiting_for_tray": 19865,
+          "in_transit": 17,
+          "unreleased": 7585
+        },
+        "trays_by_mode": {
+          "loaded": 17,
+          "empty_transit": 4,
+          "empty": 1
+        },
+        "at": 59400.0
+      },
+      "strict_nonharm_certified": false,
+      "full_window_cost": {
+        "label_start": 7200.0,
+        "label_end": 59400.0,
+        "horizon_seconds": 52200.0,
+        "backlog_integral_bag_seconds": 487903183.74964,
+        "target_return": -487903183.74964,
+        "physical_population": 28506,
+        "arrived_by_end": 20921,
+        "not_yet_arrived_by_end": 7585,
+        "completed_by_end": 1039,
+        "arrived_unfinished_by_end": 19882,
+        "on_time_by_end": 97,
+        "arrived_unfinished_past_deadline": 17499,
+        "completion_times_unknown_for_arrived": 19882,
+        "completion_times_imputed": false,
+        "right_censored_for_integral_only": true,
+        "waiting_for_tray_integral_bag_seconds": 487237228.758852,
+        "loaded_or_processing_integral_bag_seconds": 665954.9907879829,
+        "wait_load_decomposition_status": "actual_LOAD_START_receipts",
+        "per_job_nonharm_certified": false,
+        "uncompleted_jobs_excluded": 0
+      },
+      "independent_cost_recalculation": 487903183.74964,
+      "jobs_digest": "e29aa52f5fa0d3025343ef7c9bd9482d30f34d709719952a9c3d10c009b6982d",
+      "initial_trays_digest": "95b10471bfb4cf6567f83a5f6dbac7f41d5f74c4a65037f45cfbb1269244b109",
+      "action_execution_counts": {
+        "evaluated_decisions": 408,
+        "different_proposals": 214,
+        "different_actual_submissions": 214,
+        "different_verified_execution_links": 159,
+        "different_with_positive_ack": 159,
+        "different_with_unique_leg": 159,
+        "different_with_first_edge": 159,
+        "different_with_receipt": 158,
+        "different_with_next_load": 158,
+        "ready_before_arrival_of_next_served_job": 4,
+        "different_unverified_execution_links": 55
+      },
+      "prearrival_examples": [
+        {
+          "request_id": "live:21:owner:system_domestic:transfer:1",
+          "business_bag_id": "projected:1x:9",
+          "destination": 149,
+          "received_at": 7470.703000000002,
+          "bag_arrival": 10118.692092,
+          "next_load_at": 10118.692092
+        },
+        {
+          "request_id": "live:21:owner:system_domestic:transfer:2",
+          "business_bag_id": "projected:1x:12",
+          "destination": 149,
+          "received_at": 7530.703000000002,
+          "bag_arrival": 10611.045184,
+          "next_load_at": 10611.045184
+        },
+        {
+          "request_id": "live:26:owner:system_international:transfer:2",
+          "business_bag_id": "projected:1x:2",
+          "destination": 26,
+          "received_at": 8622.161999999998,
+          "bag_arrival": 8850.515339,
+          "next_load_at": 8850.515339
+        },
+        {
+          "request_id": "live:26:owner:system_international:transfer:14",
+          "business_bag_id": "projected:1x:6",
+          "destination": 26,
+          "received_at": 9586.112,
+          "bag_arrival": 10072.594022,
+          "next_load_at": 10072.594022
+        }
+      ],
+      "prearrival_inference_scope": "Actual transfer receipt precedes arrival of its next served bag at that loader; this timing alone does not prove aggregate policy benefit."
+    },
+    {
+      "batch": "D",
+      "name": "D_N22_C11_S17_P901_001",
+      "fleet": 22,
+      "parent_seed": 901,
+      "variant": "C11",
+      "model_seed": 17,
+      "training_domain": "primary_22",
+      "status": "complete",
+      "plan_sha256": "5a9df25ecb615f22dbb0e1c1c878206d1de013a4892378e190756f376815fe7c",
+      "receipt_sha256": "4056cd76a25b5e953985aef765ce4f6c6de9306afbd838966987345a26e89040",
+      "input_semantic_sha256": "3585308e8cd1bdb9e5ad9cdf581229c004dbecfd4f99a2f05e30d89aa5a6239e",
+      "binary_sha256": "3483458a6a8342685406b83e296b3f072409a73c63e24092f19d88136e89c985",
+      "wall_seconds": 324.56299999996554,
+      "summary": {
+        "offered": 28506,
+        "arrived": 20921,
+        "completed": 1039,
+        "jobs_by_status": {
+          "completed": 1039,
+          "waiting_for_tray": 19867,
+          "in_transit": 15,
+          "unreleased": 7585
+        },
+        "trays_by_mode": {
+          "empty_transit": 7,
+          "loaded": 15
+        },
+        "at": 59400.0
+      },
+      "strict_nonharm_certified": false,
+      "full_window_cost": {
+        "label_start": 7200.0,
+        "label_end": 59400.0,
+        "horizon_seconds": 52200.0,
+        "backlog_integral_bag_seconds": 488263319.95764,
+        "target_return": -488263319.95764,
+        "physical_population": 28506,
+        "arrived_by_end": 20921,
+        "not_yet_arrived_by_end": 7585,
+        "completed_by_end": 1039,
+        "arrived_unfinished_by_end": 19882,
+        "on_time_by_end": 89,
+        "arrived_unfinished_past_deadline": 17499,
+        "completion_times_unknown_for_arrived": 19882,
+        "completion_times_imputed": false,
+        "right_censored_for_integral_only": true,
+        "waiting_for_tray_integral_bag_seconds": 487563399.741153,
+        "loaded_or_processing_integral_bag_seconds": 699920.2164869905,
+        "wait_load_decomposition_status": "actual_LOAD_START_receipts",
+        "per_job_nonharm_certified": false,
+        "uncompleted_jobs_excluded": 0
+      },
+      "independent_cost_recalculation": 488263319.95764,
+      "jobs_digest": "e29aa52f5fa0d3025343ef7c9bd9482d30f34d709719952a9c3d10c009b6982d",
+      "initial_trays_digest": "95b10471bfb4cf6567f83a5f6dbac7f41d5f74c4a65037f45cfbb1269244b109",
+      "action_execution_counts": {
+        "evaluated_decisions": 416,
+        "different_proposals": 159,
+        "different_actual_submissions": 159,
+        "different_verified_execution_links": 158,
+        "different_with_positive_ack": 158,
+        "different_with_unique_leg": 158,
+        "different_with_first_edge": 158,
+        "different_with_receipt": 156,
+        "different_with_next_load": 156,
+        "ready_before_arrival_of_next_served_job": 0,
+        "different_unverified_execution_links": 1
+      },
+      "prearrival_examples": [],
+      "prearrival_inference_scope": "Actual transfer receipt precedes arrival of its next served bag at that loader; this timing alone does not prove aggregate policy benefit."
+    },
+    {
+      "batch": "D",
+      "name": "D_N22_C11_S29_P901_001",
+      "fleet": 22,
+      "parent_seed": 901,
+      "variant": "C11",
+      "model_seed": 29,
+      "training_domain": "primary_22",
+      "status": "complete",
+      "plan_sha256": "819099ed87a09f03cf20ef244989c2cda044aaf6e6cdc63203b77b6bfcf02d4e",
+      "receipt_sha256": "051b6b02f2f3a0901219525352d7b310487aa47b840c9da3b52934e8a678a382",
+      "input_semantic_sha256": "3585308e8cd1bdb9e5ad9cdf581229c004dbecfd4f99a2f05e30d89aa5a6239e",
+      "binary_sha256": "3483458a6a8342685406b83e296b3f072409a73c63e24092f19d88136e89c985",
+      "wall_seconds": 337.98500000004424,
+      "summary": {
+        "offered": 28506,
+        "arrived": 20921,
+        "completed": 1032,
+        "jobs_by_status": {
+          "completed": 1032,
+          "waiting_for_tray": 19877,
+          "in_transit": 12,
+          "unreleased": 7585
+        },
+        "trays_by_mode": {
+          "empty_transit": 9,
+          "loaded": 12,
+          "empty": 1
+        },
+        "at": 59400.0
+      },
+      "strict_nonharm_certified": false,
+      "full_window_cost": {
+        "label_start": 7200.0,
+        "label_end": 59400.0,
+        "horizon_seconds": 52200.0,
+        "backlog_integral_bag_seconds": 487974953.33463997,
+        "target_return": -487974953.33463997,
+        "physical_population": 28506,
+        "arrived_by_end": 20921,
+        "not_yet_arrived_by_end": 7585,
+        "completed_by_end": 1032,
+        "arrived_unfinished_by_end": 19889,
+        "on_time_by_end": 95,
+        "arrived_unfinished_past_deadline": 17506,
+        "completion_times_unknown_for_arrived": 19889,
+        "completion_times_imputed": false,
+        "right_censored_for_integral_only": true,
+        "waiting_for_tray_integral_bag_seconds": 487298163.394978,
+        "loaded_or_processing_integral_bag_seconds": 676789.9396619797,
+        "wait_load_decomposition_status": "actual_LOAD_START_receipts",
+        "per_job_nonharm_certified": false,
+        "uncompleted_jobs_excluded": 0
+      },
+      "independent_cost_recalculation": 487974953.33463997,
+      "jobs_digest": "e29aa52f5fa0d3025343ef7c9bd9482d30f34d709719952a9c3d10c009b6982d",
+      "initial_trays_digest": "95b10471bfb4cf6567f83a5f6dbac7f41d5f74c4a65037f45cfbb1269244b109",
+      "action_execution_counts": {
+        "evaluated_decisions": 420,
+        "different_proposals": 159,
+        "different_actual_submissions": 159,
+        "different_verified_execution_links": 150,
+        "different_with_positive_ack": 150,
+        "different_with_unique_leg": 150,
+        "different_with_first_edge": 150,
+        "different_with_receipt": 148,
+        "different_with_next_load": 148,
+        "ready_before_arrival_of_next_served_job": 3,
+        "different_unverified_execution_links": 9
+      },
+      "prearrival_examples": [
+        {
+          "request_id": "live:21:owner:system_domestic:transfer:1",
+          "business_bag_id": "projected:1x:9",
+          "destination": 149,
+          "received_at": 7470.703000000002,
+          "bag_arrival": 10118.692092,
+          "next_load_at": 10118.692092
+        },
+        {
+          "request_id": "live:21:owner:system_domestic:transfer:2",
+          "business_bag_id": "projected:1x:12",
+          "destination": 149,
+          "received_at": 7530.703000000002,
+          "bag_arrival": 10611.045184,
+          "next_load_at": 10611.045184
+        },
+        {
+          "request_id": "live:26:owner:system_international:transfer:2",
+          "business_bag_id": "projected:1x:2",
+          "destination": 26,
+          "received_at": 8562.161999999998,
+          "bag_arrival": 8850.515339,
+          "next_load_at": 8850.515339
+        }
+      ],
+      "prearrival_inference_scope": "Actual transfer receipt precedes arrival of its next served bag at that loader; this timing alone does not prove aggregate policy benefit."
+    },
+    {
+      "batch": "D",
+      "name": "D_N22_C11_S43_P901_001",
+      "fleet": 22,
+      "parent_seed": 901,
+      "variant": "C11",
+      "model_seed": 43,
+      "training_domain": "primary_22",
+      "status": "complete",
+      "plan_sha256": "54417aa9b715932e820c246bebecf1419f7a716006e079c8a4616e6c175d738e",
+      "receipt_sha256": "fd747dd6e8c4d9b92298a6b09791b86775c758da24268ceb8a47224038ed78ce",
+      "input_semantic_sha256": "3585308e8cd1bdb9e5ad9cdf581229c004dbecfd4f99a2f05e30d89aa5a6239e",
+      "binary_sha256": "3483458a6a8342685406b83e296b3f072409a73c63e24092f19d88136e89c985",
+      "wall_seconds": 332.64100000000326,
+      "summary": {
+        "offered": 28506,
+        "arrived": 20921,
+        "completed": 993,
+        "jobs_by_status": {
+          "completed": 993,
+          "waiting_for_tray": 19916,
+          "in_transit": 12,
+          "unreleased": 7585
+        },
+        "trays_by_mode": {
+          "loaded": 12,
+          "empty_transit": 8,
+          "empty": 2
+        },
+        "at": 59400.0
+      },
+      "strict_nonharm_certified": false,
+      "full_window_cost": {
+        "label_start": 7200.0,
+        "label_end": 59400.0,
+        "horizon_seconds": 52200.0,
+        "backlog_integral_bag_seconds": 489367797.37764,
+        "target_return": -489367797.37764,
+        "physical_population": 28506,
+        "arrived_by_end": 20921,
+        "not_yet_arrived_by_end": 7585,
+        "completed_by_end": 993,
+        "arrived_unfinished_by_end": 19928,
+        "on_time_by_end": 70,
+        "arrived_unfinished_past_deadline": 17545,
+        "completion_times_unknown_for_arrived": 19928,
+        "completion_times_imputed": false,
+        "right_censored_for_integral_only": true,
+        "waiting_for_tray_integral_bag_seconds": 488631517.564471,
+        "loaded_or_processing_integral_bag_seconds": 736279.8131690025,
+        "wait_load_decomposition_status": "actual_LOAD_START_receipts",
+        "per_job_nonharm_certified": false,
+        "uncompleted_jobs_excluded": 0
+      },
+      "independent_cost_recalculation": 489367797.37764,
+      "jobs_digest": "e29aa52f5fa0d3025343ef7c9bd9482d30f34d709719952a9c3d10c009b6982d",
+      "initial_trays_digest": "95b10471bfb4cf6567f83a5f6dbac7f41d5f74c4a65037f45cfbb1269244b109",
+      "action_execution_counts": {
+        "evaluated_decisions": 427,
+        "different_proposals": 144,
+        "different_actual_submissions": 144,
+        "different_verified_execution_links": 139,
+        "different_with_positive_ack": 139,
+        "different_with_unique_leg": 139,
+        "different_with_first_edge": 139,
+        "different_with_receipt": 138,
+        "different_with_next_load": 138,
+        "ready_before_arrival_of_next_served_job": 0,
+        "different_unverified_execution_links": 5
+      },
+      "prearrival_examples": [],
+      "prearrival_inference_scope": "Actual transfer receipt precedes arrival of its next served bag at that loader; this timing alone does not prove aggregate policy benefit."
+    },
+    {
+      "batch": "D",
+      "name": "D_N22_C00_P902_001",
+      "fleet": 22,
+      "parent_seed": 902,
+      "variant": "C00",
+      "model_seed": null,
+      "training_domain": null,
+      "status": "complete",
+      "plan_sha256": "50d27d78815de3fbe1cafef02e050c1b54ffbd2e84a0a4133a90d3a1714eb757",
+      "receipt_sha256": "507a8551cfbaa43a7a1685901666e9c7acdedfe9857e6d556cda23586cee904e",
+      "input_semantic_sha256": "fb054d2e74550cea175d9c801f3c7d896f3854ca895b8d61541fc1ffec8d8aa7",
+      "binary_sha256": "3483458a6a8342685406b83e296b3f072409a73c63e24092f19d88136e89c985",
+      "wall_seconds": 210.56199999997625,
+      "summary": {
+        "offered": 28506,
+        "arrived": 20919,
+        "completed": 991,
+        "jobs_by_status": {
+          "completed": 991,
+          "waiting_for_tray": 19912,
+          "in_transit": 16,
+          "unreleased": 7587
+        },
+        "trays_by_mode": {
+          "loaded": 16,
+          "empty_transit": 5,
+          "empty": 1
+        },
+        "at": 59400.0
+      },
+      "strict_nonharm_certified": false,
+      "full_window_cost": {
+        "label_start": 7200.0,
+        "label_end": 59400.0,
+        "horizon_seconds": 52200.0,
+        "backlog_integral_bag_seconds": 488613207.456495,
+        "target_return": -488613207.456495,
+        "physical_population": 28506,
+        "arrived_by_end": 20919,
+        "not_yet_arrived_by_end": 7587,
+        "completed_by_end": 991,
+        "arrived_unfinished_by_end": 19928,
+        "on_time_by_end": 97,
+        "arrived_unfinished_past_deadline": 17547,
+        "completion_times_unknown_for_arrived": 19928,
+        "completion_times_imputed": false,
+        "right_censored_for_integral_only": true,
+        "waiting_for_tray_integral_bag_seconds": 487864285.760895,
+        "loaded_or_processing_integral_bag_seconds": 748921.6955999732,
+        "wait_load_decomposition_status": "actual_LOAD_START_receipts",
+        "per_job_nonharm_certified": false,
+        "uncompleted_jobs_excluded": 0
+      },
+      "independent_cost_recalculation": 488613207.456495,
+      "jobs_digest": "4a588fc9553d956f0f19236591f9123b5e19d7a0dde98418b05a2f3808dda602",
+      "initial_trays_digest": "95b10471bfb4cf6567f83a5f6dbac7f41d5f74c4a65037f45cfbb1269244b109",
+      "action_execution_counts": {
+        "evaluated_decisions": 413
+      },
+      "prearrival_examples": [],
+      "prearrival_inference_scope": "Actual transfer receipt precedes arrival of its next served bag at that loader; this timing alone does not prove aggregate policy benefit."
+    },
+    {
+      "batch": "D",
+      "name": "D_N22_C10_P902_001",
+      "fleet": 22,
+      "parent_seed": 902,
+      "variant": "C10",
+      "model_seed": null,
+      "training_domain": null,
+      "status": "complete",
+      "plan_sha256": "200fbc346e7e8450fda40b755a146bac15700146c8588fedffe1b20b76991596",
+      "receipt_sha256": "ab64d40db74127a667ee5e7022391c738b0010c240af5fc4f0b0cd427f1b888b",
+      "input_semantic_sha256": "fb054d2e74550cea175d9c801f3c7d896f3854ca895b8d61541fc1ffec8d8aa7",
+      "binary_sha256": "3483458a6a8342685406b83e296b3f072409a73c63e24092f19d88136e89c985",
+      "wall_seconds": 281.60999999998603,
+      "summary": {
+        "offered": 28506,
+        "arrived": 20919,
+        "completed": 995,
+        "jobs_by_status": {
+          "completed": 995,
+          "waiting_for_tray": 19907,
+          "in_transit": 17,
+          "unreleased": 7587
+        },
+        "trays_by_mode": {
+          "loaded": 17,
+          "empty_transit": 4,
+          "empty": 1
+        },
+        "at": 59400.0
+      },
+      "strict_nonharm_certified": false,
+      "full_window_cost": {
+        "label_start": 7200.0,
+        "label_end": 59400.0,
+        "horizon_seconds": 52200.0,
+        "backlog_integral_bag_seconds": 488986329.618495,
+        "target_return": -488986329.618495,
+        "physical_population": 28506,
+        "arrived_by_end": 20919,
+        "not_yet_arrived_by_end": 7587,
+        "completed_by_end": 995,
+        "arrived_unfinished_by_end": 19924,
+        "on_time_by_end": 86,
+        "arrived_unfinished_past_deadline": 17543,
+        "completion_times_unknown_for_arrived": 19924,
+        "completion_times_imputed": false,
+        "right_censored_for_integral_only": true,
+        "waiting_for_tray_integral_bag_seconds": 488248923.7827,
+        "loaded_or_processing_integral_bag_seconds": 737405.8357949853,
+        "wait_load_decomposition_status": "actual_LOAD_START_receipts",
+        "per_job_nonharm_certified": false,
+        "uncompleted_jobs_excluded": 0
+      },
+      "independent_cost_recalculation": 488986329.618495,
+      "jobs_digest": "4a588fc9553d956f0f19236591f9123b5e19d7a0dde98418b05a2f3808dda602",
+      "initial_trays_digest": "95b10471bfb4cf6567f83a5f6dbac7f41d5f74c4a65037f45cfbb1269244b109",
+      "action_execution_counts": {
+        "evaluated_decisions": 394,
+        "different_proposals": 4,
+        "different_actual_submissions": 4,
+        "different_verified_execution_links": 4,
+        "different_with_positive_ack": 4,
+        "different_with_unique_leg": 4,
+        "different_with_first_edge": 4,
+        "different_with_receipt": 4,
+        "different_with_next_load": 4,
+        "ready_before_arrival_of_next_served_job": 1
+      },
+      "prearrival_examples": [
+        {
+          "request_id": "live:21:owner:system_domestic:transfer:22",
+          "business_bag_id": "projected:1x:17",
+          "destination": 95,
+          "received_at": 10445.453000000003,
+          "bag_arrival": 10579.129165,
+          "next_load_at": 10579.129165
+        }
+      ],
+      "prearrival_inference_scope": "Actual transfer receipt precedes arrival of its next served bag at that loader; this timing alone does not prove aggregate policy benefit."
+    },
+    {
+      "batch": "D",
+      "name": "D_N22_C01_S17_P902_001",
+      "fleet": 22,
+      "parent_seed": 902,
+      "variant": "C01",
+      "model_seed": 17,
+      "training_domain": "primary_22",
+      "status": "complete",
+      "plan_sha256": "d97b08dc371e746df7a29f768478c475a9798f4b51f8cd7d1220a30a53d1049e",
+      "receipt_sha256": "fcd3ab29c6cd2a3dde9a8c1ff3a8ef8e0a2757b790d4b38fe02d7ca1884be922",
+      "input_semantic_sha256": "fb054d2e74550cea175d9c801f3c7d896f3854ca895b8d61541fc1ffec8d8aa7",
+      "binary_sha256": "3483458a6a8342685406b83e296b3f072409a73c63e24092f19d88136e89c985",
+      "wall_seconds": 241.67199999996228,
+      "summary": {
+        "offered": 28506,
+        "arrived": 20919,
+        "completed": 995,
+        "jobs_by_status": {
+          "completed": 995,
+          "waiting_for_tray": 19907,
+          "in_transit": 17,
+          "unreleased": 7587
+        },
+        "trays_by_mode": {
+          "loaded": 17,
+          "empty_transit": 3,
+          "empty": 2
+        },
+        "at": 59400.0
+      },
+      "strict_nonharm_certified": false,
+      "full_window_cost": {
+        "label_start": 7200.0,
+        "label_end": 59400.0,
+        "horizon_seconds": 52200.0,
+        "backlog_integral_bag_seconds": 488801995.698495,
+        "target_return": -488801995.698495,
+        "physical_population": 28506,
+        "arrived_by_end": 20919,
+        "not_yet_arrived_by_end": 7587,
+        "completed_by_end": 995,
+        "arrived_unfinished_by_end": 19924,
+        "on_time_by_end": 92,
+        "arrived_unfinished_past_deadline": 17543,
+        "completion_times_unknown_for_arrived": 19924,
+        "completion_times_imputed": false,
+        "right_censored_for_integral_only": true,
+        "waiting_for_tray_integral_bag_seconds": 488071530.605661,
+        "loaded_or_processing_integral_bag_seconds": 730465.0928339958,
+        "wait_load_decomposition_status": "actual_LOAD_START_receipts",
+        "per_job_nonharm_certified": false,
+        "uncompleted_jobs_excluded": 0
+      },
+      "independent_cost_recalculation": 488801995.698495,
+      "jobs_digest": "4a588fc9553d956f0f19236591f9123b5e19d7a0dde98418b05a2f3808dda602",
+      "initial_trays_digest": "95b10471bfb4cf6567f83a5f6dbac7f41d5f74c4a65037f45cfbb1269244b109",
+      "action_execution_counts": {
+        "evaluated_decisions": 422,
+        "different_proposals": 126,
+        "different_actual_submissions": 126,
+        "different_verified_execution_links": 121,
+        "different_with_positive_ack": 121,
+        "different_with_unique_leg": 121,
+        "different_with_first_edge": 121,
+        "different_with_receipt": 121,
+        "different_with_next_load": 121,
+        "ready_before_arrival_of_next_served_job": 0,
+        "different_unverified_execution_links": 5
+      },
+      "prearrival_examples": [],
+      "prearrival_inference_scope": "Actual transfer receipt precedes arrival of its next served bag at that loader; this timing alone does not prove aggregate policy benefit."
+    },
+    {
+      "batch": "D",
+      "name": "D_N22_C01_S29_P902_001",
+      "fleet": 22,
+      "parent_seed": 902,
+      "variant": "C01",
+      "model_seed": 29,
+      "training_domain": "primary_22",
+      "status": "complete",
+      "plan_sha256": "133d976b1ea0ff7d25ae4f00127cabd1c7f5bd6d41ea2805b34c6440334dc205",
+      "receipt_sha256": "1382766f994ef8060fa972f4f75692e5374a5e6491d052896378fe60e4c3493e",
+      "input_semantic_sha256": "fb054d2e74550cea175d9c801f3c7d896f3854ca895b8d61541fc1ffec8d8aa7",
+      "binary_sha256": "3483458a6a8342685406b83e296b3f072409a73c63e24092f19d88136e89c985",
+      "wall_seconds": 239.85999999998603,
+      "summary": {
+        "offered": 28506,
+        "arrived": 20919,
+        "completed": 1007,
+        "jobs_by_status": {
+          "completed": 1007,
+          "waiting_for_tray": 19900,
+          "in_transit": 12,
+          "unreleased": 7587
+        },
+        "trays_by_mode": {
+          "loaded": 12,
+          "empty_transit": 8,
+          "empty": 2
+        },
+        "at": 59400.0
+      },
+      "strict_nonharm_certified": false,
+      "full_window_cost": {
+        "label_start": 7200.0,
+        "label_end": 59400.0,
+        "horizon_seconds": 52200.0,
+        "backlog_integral_bag_seconds": 488275639.627495,
+        "target_return": -488275639.627495,
+        "physical_population": 28506,
+        "arrived_by_end": 20919,
+        "not_yet_arrived_by_end": 7587,
+        "completed_by_end": 1007,
+        "arrived_unfinished_by_end": 19912,
+        "on_time_by_end": 102,
+        "arrived_unfinished_past_deadline": 17531,
+        "completion_times_unknown_for_arrived": 19912,
+        "completion_times_imputed": false,
+        "right_censored_for_integral_only": true,
+        "waiting_for_tray_integral_bag_seconds": 487579454.470576,
+        "loaded_or_processing_integral_bag_seconds": 696185.1569190025,
+        "wait_load_decomposition_status": "actual_LOAD_START_receipts",
+        "per_job_nonharm_certified": false,
+        "uncompleted_jobs_excluded": 0
+      },
+      "independent_cost_recalculation": 488275639.627495,
+      "jobs_digest": "4a588fc9553d956f0f19236591f9123b5e19d7a0dde98418b05a2f3808dda602",
+      "initial_trays_digest": "95b10471bfb4cf6567f83a5f6dbac7f41d5f74c4a65037f45cfbb1269244b109",
+      "action_execution_counts": {
+        "evaluated_decisions": 392,
+        "different_proposals": 138,
+        "different_actual_submissions": 138,
+        "different_verified_execution_links": 135,
+        "different_with_positive_ack": 135,
+        "different_with_unique_leg": 135,
+        "different_with_first_edge": 135,
+        "different_with_receipt": 135,
+        "different_with_next_load": 135,
+        "ready_before_arrival_of_next_served_job": 1,
+        "different_unverified_execution_links": 3
+      },
+      "prearrival_examples": [
+        {
+          "request_id": "live:21:owner:system_domestic:transfer:22",
+          "business_bag_id": "projected:1x:17",
+          "destination": 95,
+          "received_at": 10445.453000000003,
+          "bag_arrival": 10579.129165,
+          "next_load_at": 10579.129165
+        }
+      ],
+      "prearrival_inference_scope": "Actual transfer receipt precedes arrival of its next served bag at that loader; this timing alone does not prove aggregate policy benefit."
+    },
+    {
+      "batch": "D",
+      "name": "D_N22_C01_S43_P902_001",
+      "fleet": 22,
+      "parent_seed": 902,
+      "variant": "C01",
+      "model_seed": 43,
+      "training_domain": "primary_22",
+      "status": "complete",
+      "plan_sha256": "6d1efc276bc08077c8ffec1f52db868666c77f3eb0d904847e3653cc4fcc78e8",
+      "receipt_sha256": "430fc0bb256c437577c032089968b400bd95fcca9ec64f1432880999bff2bac2",
+      "input_semantic_sha256": "fb054d2e74550cea175d9c801f3c7d896f3854ca895b8d61541fc1ffec8d8aa7",
+      "binary_sha256": "3483458a6a8342685406b83e296b3f072409a73c63e24092f19d88136e89c985",
+      "wall_seconds": 243.5,
+      "summary": {
+        "offered": 28506,
+        "arrived": 20919,
+        "completed": 1014,
+        "jobs_by_status": {
+          "completed": 1014,
+          "waiting_for_tray": 19893,
+          "in_transit": 12,
+          "unreleased": 7587
+        },
+        "trays_by_mode": {
+          "loaded": 12,
+          "empty": 5,
+          "empty_transit": 5
+        },
+        "at": 59400.0
+      },
+      "strict_nonharm_certified": false,
+      "full_window_cost": {
+        "label_start": 7200.0,
+        "label_end": 59400.0,
+        "horizon_seconds": 52200.0,
+        "backlog_integral_bag_seconds": 488722550.677495,
+        "target_return": -488722550.677495,
+        "physical_population": 28506,
+        "arrived_by_end": 20919,
+        "not_yet_arrived_by_end": 7587,
+        "completed_by_end": 1014,
+        "arrived_unfinished_by_end": 19905,
+        "on_time_by_end": 69,
+        "arrived_unfinished_past_deadline": 17524,
+        "completion_times_unknown_for_arrived": 19905,
+        "completion_times_imputed": false,
+        "right_censored_for_integral_only": true,
+        "waiting_for_tray_integral_bag_seconds": 488051635.143647,
+        "loaded_or_processing_integral_bag_seconds": 670915.5338479877,
+        "wait_load_decomposition_status": "actual_LOAD_START_receipts",
+        "per_job_nonharm_certified": false,
+        "uncompleted_jobs_excluded": 0
+      },
+      "independent_cost_recalculation": 488722550.677495,
+      "jobs_digest": "4a588fc9553d956f0f19236591f9123b5e19d7a0dde98418b05a2f3808dda602",
+      "initial_trays_digest": "95b10471bfb4cf6567f83a5f6dbac7f41d5f74c4a65037f45cfbb1269244b109",
+      "action_execution_counts": {
+        "evaluated_decisions": 386,
+        "different_proposals": 193,
+        "different_actual_submissions": 193,
+        "different_verified_execution_links": 138,
+        "different_with_positive_ack": 138,
+        "different_with_unique_leg": 138,
+        "different_with_first_edge": 138,
+        "different_with_receipt": 137,
+        "different_with_next_load": 137,
+        "ready_before_arrival_of_next_served_job": 4,
+        "different_unverified_execution_links": 55
+      },
+      "prearrival_examples": [
+        {
+          "request_id": "live:21:owner:system_domestic:transfer:1",
+          "business_bag_id": "projected:1x:9",
+          "destination": 149,
+          "received_at": 7470.703000000002,
+          "bag_arrival": 10044.365891,
+          "next_load_at": 10044.365891
+        },
+        {
+          "request_id": "live:21:owner:system_domestic:transfer:2",
+          "business_bag_id": "projected:1x:12",
+          "destination": 149,
+          "received_at": 7530.703000000002,
+          "bag_arrival": 10617.394124,
+          "next_load_at": 10617.394124
+        },
+        {
+          "request_id": "live:26:owner:system_international:transfer:2",
+          "business_bag_id": "projected:1x:2",
+          "destination": 26,
+          "received_at": 8502.161999999998,
+          "bag_arrival": 8893.220173,
+          "next_load_at": 8893.220173
+        },
+        {
+          "request_id": "live:26:owner:system_international:transfer:21",
+          "business_bag_id": "projected:1x:6",
+          "destination": 26,
+          "received_at": 9767.011999999999,
+          "bag_arrival": 10052.651422,
+          "next_load_at": 10052.651422
+        }
+      ],
+      "prearrival_inference_scope": "Actual transfer receipt precedes arrival of its next served bag at that loader; this timing alone does not prove aggregate policy benefit."
+    },
+    {
+      "batch": "D",
+      "name": "D_N22_C11_S17_P902_001",
+      "fleet": 22,
+      "parent_seed": 902,
+      "variant": "C11",
+      "model_seed": 17,
+      "training_domain": "primary_22",
+      "status": "complete",
+      "plan_sha256": "94218f775557f405963d2121b6b39d774b556699a903e3a17d6cd72aff919c68",
+      "receipt_sha256": "61d9b3fe4c0170f01ad46d8db47ee6926f2bdcb0e65cd914309319b396a788a7",
+      "input_semantic_sha256": "fb054d2e74550cea175d9c801f3c7d896f3854ca895b8d61541fc1ffec8d8aa7",
+      "binary_sha256": "3483458a6a8342685406b83e296b3f072409a73c63e24092f19d88136e89c985",
+      "wall_seconds": 323.780999999959,
+      "summary": {
+        "offered": 28506,
+        "arrived": 20919,
+        "completed": 997,
+        "jobs_by_status": {
+          "completed": 997,
+          "waiting_for_tray": 19910,
+          "in_transit": 12,
+          "unreleased": 7587
+        },
+        "trays_by_mode": {
+          "loaded": 12,
+          "empty_transit": 7,
+          "empty": 3
+        },
+        "at": 59400.0
+      },
+      "strict_nonharm_certified": false,
+      "full_window_cost": {
+        "label_start": 7200.0,
+        "label_end": 59400.0,
+        "horizon_seconds": 52200.0,
+        "backlog_integral_bag_seconds": 489043401.923495,
+        "target_return": -489043401.923495,
+        "physical_population": 28506,
+        "arrived_by_end": 20919,
+        "not_yet_arrived_by_end": 7587,
+        "completed_by_end": 997,
+        "arrived_unfinished_by_end": 19922,
+        "on_time_by_end": 80,
+        "arrived_unfinished_past_deadline": 17541,
+        "completion_times_unknown_for_arrived": 19922,
+        "completion_times_imputed": false,
+        "right_censored_for_integral_only": true,
+        "waiting_for_tray_integral_bag_seconds": 488316014.682661,
+        "loaded_or_processing_integral_bag_seconds": 727387.2408339977,
+        "wait_load_decomposition_status": "actual_LOAD_START_receipts",
+        "per_job_nonharm_certified": false,
+        "uncompleted_jobs_excluded": 0
+      },
+      "independent_cost_recalculation": 489043401.923495,
+      "jobs_digest": "4a588fc9553d956f0f19236591f9123b5e19d7a0dde98418b05a2f3808dda602",
+      "initial_trays_digest": "95b10471bfb4cf6567f83a5f6dbac7f41d5f74c4a65037f45cfbb1269244b109",
+      "action_execution_counts": {
+        "evaluated_decisions": 421,
+        "different_proposals": 156,
+        "different_actual_submissions": 156,
+        "different_verified_execution_links": 155,
+        "different_with_positive_ack": 155,
+        "different_with_unique_leg": 155,
+        "different_with_first_edge": 155,
+        "different_with_receipt": 153,
+        "different_with_next_load": 153,
+        "ready_before_arrival_of_next_served_job": 0,
+        "different_unverified_execution_links": 1
+      },
+      "prearrival_examples": [],
+      "prearrival_inference_scope": "Actual transfer receipt precedes arrival of its next served bag at that loader; this timing alone does not prove aggregate policy benefit."
+    },
+    {
+      "batch": "D",
+      "name": "D_N22_C11_S29_P902_001",
+      "fleet": 22,
+      "parent_seed": 902,
+      "variant": "C11",
+      "model_seed": 29,
+      "training_domain": "primary_22",
+      "status": "complete",
+      "plan_sha256": "2040d1962afe7e708df42fe7a3a667087541da0cbda0f685266eb28d7044f492",
+      "receipt_sha256": "ac86bbea4bca569b8ec4499fec67f1cd867c3a4286cbe104430141200944b3cf",
+      "input_semantic_sha256": "fb054d2e74550cea175d9c801f3c7d896f3854ca895b8d61541fc1ffec8d8aa7",
+      "binary_sha256": "3483458a6a8342685406b83e296b3f072409a73c63e24092f19d88136e89c985",
+      "wall_seconds": 314.469000000041,
+      "summary": {
+        "offered": 28506,
+        "arrived": 20919,
+        "completed": 977,
+        "jobs_by_status": {
+          "completed": 977,
+          "waiting_for_tray": 19931,
+          "in_transit": 11,
+          "unreleased": 7587
+        },
+        "trays_by_mode": {
+          "loaded": 11,
+          "empty_transit": 9,
+          "quarantined": 1,
+          "empty": 1
+        },
+        "at": 59400.0
+      },
+      "strict_nonharm_certified": false,
+      "full_window_cost": {
+        "label_start": 7200.0,
+        "label_end": 59400.0,
+        "horizon_seconds": 52200.0,
+        "backlog_integral_bag_seconds": 488915414.363495,
+        "target_return": -488915414.363495,
+        "physical_population": 28506,
+        "arrived_by_end": 20919,
+        "not_yet_arrived_by_end": 7587,
+        "completed_by_end": 977,
+        "arrived_unfinished_by_end": 19942,
+        "on_time_by_end": 81,
+        "arrived_unfinished_past_deadline": 17561,
+        "completion_times_unknown_for_arrived": 19942,
+        "completion_times_imputed": false,
+        "right_censored_for_integral_only": true,
+        "waiting_for_tray_integral_bag_seconds": 488259752.22047,
+        "loaded_or_processing_integral_bag_seconds": 655662.143024981,
+        "wait_load_decomposition_status": "actual_LOAD_START_receipts",
+        "per_job_nonharm_certified": false,
+        "uncompleted_jobs_excluded": 0
+      },
+      "independent_cost_recalculation": 488915414.363495,
+      "jobs_digest": "4a588fc9553d956f0f19236591f9123b5e19d7a0dde98418b05a2f3808dda602",
+      "initial_trays_digest": "95b10471bfb4cf6567f83a5f6dbac7f41d5f74c4a65037f45cfbb1269244b109",
+      "action_execution_counts": {
+        "evaluated_decisions": 405,
+        "different_proposals": 138,
+        "different_actual_submissions": 138,
+        "different_verified_execution_links": 122,
+        "different_with_positive_ack": 122,
+        "different_with_unique_leg": 122,
+        "different_with_first_edge": 122,
+        "different_with_receipt": 121,
+        "different_with_next_load": 121,
+        "ready_before_arrival_of_next_served_job": 4,
+        "different_unverified_execution_links": 16
+      },
+      "prearrival_examples": [
+        {
+          "request_id": "live:21:owner:system_domestic:transfer:1",
+          "business_bag_id": "projected:1x:9",
+          "destination": 149,
+          "received_at": 7470.703000000002,
+          "bag_arrival": 10044.365891,
+          "next_load_at": 10044.365891
+        },
+        {
+          "request_id": "live:21:owner:system_domestic:transfer:2",
+          "business_bag_id": "projected:1x:12",
+          "destination": 149,
+          "received_at": 7530.703000000002,
+          "bag_arrival": 10617.394124,
+          "next_load_at": 10617.394124
+        },
+        {
+          "request_id": "live:26:owner:system_international:transfer:2",
+          "business_bag_id": "projected:1x:2",
+          "destination": 26,
+          "received_at": 8442.161999999998,
+          "bag_arrival": 8893.220173,
+          "next_load_at": 8893.220173
+        },
+        {
+          "request_id": "live:21:owner:system_domestic:transfer:6",
+          "business_bag_id": "projected:1x:10",
+          "destination": 95,
+          "received_at": 9785.453000000003,
+          "bag_arrival": 10063.529158,
+          "next_load_at": 10063.529158
+        }
+      ],
+      "prearrival_inference_scope": "Actual transfer receipt precedes arrival of its next served bag at that loader; this timing alone does not prove aggregate policy benefit."
+    },
+    {
+      "batch": "D",
+      "name": "D_N22_C11_S43_P902_001",
+      "fleet": 22,
+      "parent_seed": 902,
+      "variant": "C11",
+      "model_seed": 43,
+      "training_domain": "primary_22",
+      "status": "complete",
+      "plan_sha256": "7058f345e8b000096ef789f2332ce330c8c5a59748524c328453ad383fdf5054",
+      "receipt_sha256": "19fb29fe566d510e37b676e1f5f311634659f1b5cd3eab2a7b30308248faf99d",
+      "input_semantic_sha256": "fb054d2e74550cea175d9c801f3c7d896f3854ca895b8d61541fc1ffec8d8aa7",
+      "binary_sha256": "3483458a6a8342685406b83e296b3f072409a73c63e24092f19d88136e89c985",
+      "wall_seconds": 311.6720000000205,
+      "summary": {
+        "offered": 28506,
+        "arrived": 20919,
+        "completed": 1007,
+        "jobs_by_status": {
+          "completed": 1007,
+          "waiting_for_tray": 19898,
+          "in_transit": 14,
+          "unreleased": 7587
+        },
+        "trays_by_mode": {
+          "loaded": 14,
+          "empty": 1,
+          "empty_transit": 7
+        },
+        "at": 59400.0
+      },
+      "strict_nonharm_certified": false,
+      "full_window_cost": {
+        "label_start": 7200.0,
+        "label_end": 59400.0,
+        "horizon_seconds": 52200.0,
+        "backlog_integral_bag_seconds": 489015045.480495,
+        "target_return": -489015045.480495,
+        "physical_population": 28506,
+        "arrived_by_end": 20919,
+        "not_yet_arrived_by_end": 7587,
+        "completed_by_end": 1007,
+        "arrived_unfinished_by_end": 19912,
+        "on_time_by_end": 78,
+        "arrived_unfinished_past_deadline": 17531,
+        "completion_times_unknown_for_arrived": 19912,
+        "completion_times_imputed": false,
+        "right_censored_for_integral_only": true,
+        "waiting_for_tray_integral_bag_seconds": 488288465.394661,
+        "loaded_or_processing_integral_bag_seconds": 726580.0858339667,
+        "wait_load_decomposition_status": "actual_LOAD_START_receipts",
+        "per_job_nonharm_certified": false,
+        "uncompleted_jobs_excluded": 0
+      },
+      "independent_cost_recalculation": 489015045.480495,
+      "jobs_digest": "4a588fc9553d956f0f19236591f9123b5e19d7a0dde98418b05a2f3808dda602",
+      "initial_trays_digest": "95b10471bfb4cf6567f83a5f6dbac7f41d5f74c4a65037f45cfbb1269244b109",
+      "action_execution_counts": {
+        "evaluated_decisions": 408,
+        "different_proposals": 128,
+        "different_actual_submissions": 128,
+        "different_verified_execution_links": 128,
+        "different_with_positive_ack": 128,
+        "different_with_unique_leg": 128,
+        "different_with_first_edge": 128,
+        "different_with_receipt": 127,
+        "different_with_next_load": 127,
+        "ready_before_arrival_of_next_served_job": 0
+      },
+      "prearrival_examples": [],
+      "prearrival_inference_scope": "Actual transfer receipt precedes arrival of its next served bag at that loader; this timing alone does not prove aggregate policy benefit."
+    }
+  ],
+  "comparisons": [
+    {
+      "reference": "D_N22_C00_P901_001",
+      "candidate": "D_N22_C10_P901_001",
+      "status": "complete_same_resource_comparison",
+      "advantage_bag_seconds": -232246.5299999714,
+      "strict_nonharm_certified": false,
+      "common_sources_and_full_warmup_verified": true,
+      "relative_advantage": -0.0004747616257628415,
+      "completed_delta": -12,
+      "on_time_delta": -1,
+      "arrived_unfinished_past_deadline_delta": 12,
+      "per_job_comparison": {
+        "improved": 388,
+        "harmed": 537,
+        "equal": 7,
+        "unknown_incomplete": 27574
+      },
+      "incomplete_comparison_breakdown": {
+        "reference_only_finished": 37,
+        "neither_finished": 27512,
+        "candidate_only_finished": 25
+      },
+      "maximum_known_delay_seconds": 5261.561000000009,
+      "comparison_kind": "C10_vs_C00"
+    },
+    {
+      "reference": "D_N22_C00_P901_001",
+      "candidate": "D_N22_C01_S17_P901_001",
+      "status": "complete_same_resource_comparison",
+      "advantage_bag_seconds": -288443.41100001335,
+      "strict_nonharm_certified": false,
+      "common_sources_and_full_warmup_verified": true,
+      "relative_advantage": -0.0005896400809388312,
+      "completed_delta": -21,
+      "on_time_delta": -1,
+      "arrived_unfinished_past_deadline_delta": 21,
+      "per_job_comparison": {
+        "improved": 313,
+        "equal": 4,
+        "harmed": 548,
+        "unknown_incomplete": 27641
+      },
+      "incomplete_comparison_breakdown": {
+        "neither_finished": 27454,
+        "candidate_only_finished": 83,
+        "reference_only_finished": 104
+      },
+      "maximum_known_delay_seconds": 13316.74499999998,
+      "comparison_kind": "C01_vs_C00",
+      "parent_seed": 901,
+      "model_seed": 17
+    },
+    {
+      "reference": "D_N22_C10_P901_001",
+      "candidate": "D_N22_C11_S17_P901_001",
+      "status": "complete_same_resource_comparison",
+      "advantage_bag_seconds": 1154482.8539999723,
+      "strict_nonharm_certified": false,
+      "common_sources_and_full_warmup_verified": true,
+      "relative_advantage": 0.0023588901902783723,
+      "completed_delta": 82,
+      "on_time_delta": -1,
+      "arrived_unfinished_past_deadline_delta": -82,
+      "per_job_comparison": {
+        "improved": 554,
+        "harmed": 295,
+        "equal": 5,
+        "unknown_incomplete": 27652
+      },
+      "incomplete_comparison_breakdown": {
+        "candidate_only_finished": 185,
+        "neither_finished": 27364,
+        "reference_only_finished": 103
+      },
+      "maximum_known_delay_seconds": 17394.698999999993,
+      "comparison_kind": "C11_vs_C10",
+      "parent_seed": 901,
+      "model_seed": 17
+    },
+    {
+      "reference": "D_N22_C00_P901_001",
+      "candidate": "D_N22_C11_S17_P901_001",
+      "status": "complete_same_resource_comparison",
+      "advantage_bag_seconds": 922236.324000001,
+      "strict_nonharm_certified": false,
+      "common_sources_and_full_warmup_verified": true,
+      "relative_advantage": 0.0018852484750572635,
+      "completed_delta": 70,
+      "on_time_delta": -2,
+      "arrived_unfinished_past_deadline_delta": -70,
+      "per_job_comparison": {
+        "improved": 517,
+        "harmed": 367,
+        "equal": 1,
+        "unknown_incomplete": 27621
+      },
+      "incomplete_comparison_breakdown": {
+        "candidate_only_finished": 154,
+        "neither_finished": 27383,
+        "reference_only_finished": 84
+      },
+      "maximum_known_delay_seconds": 17749.788999999982,
+      "comparison_kind": "C11_vs_C00",
+      "parent_seed": 901,
+      "model_seed": 17
+    },
+    {
+      "reference": "D_N22_C00_P901_001",
+      "candidate": "D_N22_C01_S29_P901_001",
+      "status": "complete_same_resource_comparison",
+      "advantage_bag_seconds": 219489.70600003004,
+      "strict_nonharm_certified": false,
+      "common_sources_and_full_warmup_verified": true,
+      "relative_advantage": 0.00044868394657519834,
+      "completed_delta": -1,
+      "on_time_delta": 9,
+      "arrived_unfinished_past_deadline_delta": 1,
+      "per_job_comparison": {
+        "improved": 527,
+        "harmed": 326,
+        "equal": 2,
+        "unknown_incomplete": 27651
+      },
+      "incomplete_comparison_breakdown": {
+        "neither_finished": 27424,
+        "candidate_only_finished": 113,
+        "reference_only_finished": 114
+      },
+      "maximum_known_delay_seconds": 21038.036000000015,
+      "comparison_kind": "C01_vs_C00",
+      "parent_seed": 901,
+      "model_seed": 29
+    },
+    {
+      "reference": "D_N22_C10_P901_001",
+      "candidate": "D_N22_C11_S29_P901_001",
+      "status": "complete_same_resource_comparison",
+      "advantage_bag_seconds": 1442849.476999998,
+      "strict_nonharm_certified": false,
+      "common_sources_and_full_warmup_verified": true,
+      "relative_advantage": 0.002948093568952785,
+      "completed_delta": 75,
+      "on_time_delta": 5,
+      "arrived_unfinished_past_deadline_delta": -75,
+      "per_job_comparison": {
+        "improved": 591,
+        "equal": 4,
+        "harmed": 274,
+        "unknown_incomplete": 27637
+      },
+      "incomplete_comparison_breakdown": {
+        "candidate_only_finished": 163,
+        "neither_finished": 27386,
+        "reference_only_finished": 88
+      },
+      "maximum_known_delay_seconds": 15655.694999999956,
+      "comparison_kind": "C11_vs_C10",
+      "parent_seed": 901,
+      "model_seed": 29
+    },
+    {
+      "reference": "D_N22_C00_P901_001",
+      "candidate": "D_N22_C11_S29_P901_001",
+      "status": "complete_same_resource_comparison",
+      "advantage_bag_seconds": 1210602.9470000267,
+      "strict_nonharm_certified": false,
+      "common_sources_and_full_warmup_verified": true,
+      "relative_advantage": 0.0024747315848856408,
+      "completed_delta": 63,
+      "on_time_delta": 4,
+      "arrived_unfinished_past_deadline_delta": -63,
+      "per_job_comparison": {
+        "improved": 656,
+        "harmed": 240,
+        "equal": 3,
+        "unknown_incomplete": 27607
+      },
+      "incomplete_comparison_breakdown": {
+        "neither_finished": 27404,
+        "candidate_only_finished": 133,
+        "reference_only_finished": 70
+      },
+      "maximum_known_delay_seconds": 15332.988000000005,
+      "comparison_kind": "C11_vs_C00",
+      "parent_seed": 901,
+      "model_seed": 29
+    },
+    {
+      "reference": "D_N22_C00_P901_001",
+      "candidate": "D_N22_C01_S43_P901_001",
+      "status": "complete_same_resource_comparison",
+      "advantage_bag_seconds": 1282372.5320000052,
+      "strict_nonharm_certified": false,
+      "common_sources_and_full_warmup_verified": true,
+      "relative_advantage": 0.002621443980782012,
+      "completed_delta": 70,
+      "on_time_delta": 6,
+      "arrived_unfinished_past_deadline_delta": -70,
+      "per_job_comparison": {
+        "improved": 658,
+        "harmed": 232,
+        "equal": 2,
+        "unknown_incomplete": 27614
+      },
+      "incomplete_comparison_breakdown": {
+        "neither_finished": 27390,
+        "candidate_only_finished": 147,
+        "reference_only_finished": 77
+      },
+      "maximum_known_delay_seconds": 17536.52600000002,
+      "comparison_kind": "C01_vs_C00",
+      "parent_seed": 901,
+      "model_seed": 43
+    },
+    {
+      "reference": "D_N22_C10_P901_001",
+      "candidate": "D_N22_C11_S43_P901_001",
+      "status": "complete_same_resource_comparison",
+      "advantage_bag_seconds": 50005.433999955654,
+      "strict_nonharm_certified": false,
+      "common_sources_and_full_warmup_verified": true,
+      "relative_advantage": 0.00010217330410271369,
+      "completed_delta": 36,
+      "on_time_delta": -20,
+      "arrived_unfinished_past_deadline_delta": -36,
+      "per_job_comparison": {
+        "harmed": 574,
+        "improved": 281,
+        "equal": 3,
+        "unknown_incomplete": 27648
+      },
+      "incomplete_comparison_breakdown": {
+        "candidate_only_finished": 135,
+        "neither_finished": 27414,
+        "reference_only_finished": 99
+      },
+      "maximum_known_delay_seconds": 18809.347999999998,
+      "comparison_kind": "C11_vs_C10",
+      "parent_seed": 901,
+      "model_seed": 43
+    },
+    {
+      "reference": "D_N22_C00_P901_001",
+      "candidate": "D_N22_C11_S43_P901_001",
+      "status": "complete_same_resource_comparison",
+      "advantage_bag_seconds": -182241.09600001574,
+      "strict_nonharm_certified": false,
+      "common_sources_and_full_warmup_verified": true,
+      "relative_advantage": -0.0003725398136961624,
+      "completed_delta": 24,
+      "on_time_delta": -21,
+      "arrived_unfinished_past_deadline_delta": -24,
+      "per_job_comparison": {
+        "harmed": 585,
+        "improved": 284,
+        "equal": 5,
+        "unknown_incomplete": 27632
+      },
+      "incomplete_comparison_breakdown": {
+        "neither_finished": 27418,
+        "candidate_only_finished": 119,
+        "reference_only_finished": 95
+      },
+      "maximum_known_delay_seconds": 18880.706999999988,
+      "comparison_kind": "C11_vs_C00",
+      "parent_seed": 901,
+      "model_seed": 43
+    },
+    {
+      "reference": "D_N22_C00_P902_001",
+      "candidate": "D_N22_C10_P902_001",
+      "status": "complete_same_resource_comparison",
+      "advantage_bag_seconds": -373122.1620000005,
+      "strict_nonharm_certified": false,
+      "common_sources_and_full_warmup_verified": true,
+      "relative_advantage": -0.0007636350313621484,
+      "completed_delta": 4,
+      "on_time_delta": -11,
+      "arrived_unfinished_past_deadline_delta": -4,
+      "per_job_comparison": {
+        "harmed": 750,
+        "equal": 5,
+        "improved": 225,
+        "unknown_incomplete": 27526
+      },
+      "incomplete_comparison_breakdown": {
+        "reference_only_finished": 11,
+        "neither_finished": 27500,
+        "candidate_only_finished": 15
+      },
+      "maximum_known_delay_seconds": 7095.169999999991,
+      "comparison_kind": "C10_vs_C00"
+    },
+    {
+      "reference": "D_N22_C00_P902_001",
+      "candidate": "D_N22_C01_S17_P902_001",
+      "status": "complete_same_resource_comparison",
+      "advantage_bag_seconds": -188788.2419999838,
+      "strict_nonharm_certified": false,
+      "common_sources_and_full_warmup_verified": true,
+      "relative_advantage": -0.00038637564257162053,
+      "completed_delta": 4,
+      "on_time_delta": -5,
+      "arrived_unfinished_past_deadline_delta": -4,
+      "per_job_comparison": {
+        "improved": 329,
+        "harmed": 546,
+        "equal": 3,
+        "unknown_incomplete": 27628
+      },
+      "incomplete_comparison_breakdown": {
+        "reference_only_finished": 113,
+        "neither_finished": 27398,
+        "candidate_only_finished": 117
+      },
+      "maximum_known_delay_seconds": 16157.920999999988,
+      "comparison_kind": "C01_vs_C00",
+      "parent_seed": 902,
+      "model_seed": 17
+    },
+    {
+      "reference": "D_N22_C10_P902_001",
+      "candidate": "D_N22_C11_S17_P902_001",
+      "status": "complete_same_resource_comparison",
+      "advantage_bag_seconds": -57072.30500000715,
+      "strict_nonharm_certified": false,
+      "common_sources_and_full_warmup_verified": true,
+      "relative_advantage": -0.00011671554303887129,
+      "completed_delta": 2,
+      "on_time_delta": -6,
+      "arrived_unfinished_past_deadline_delta": -2,
+      "per_job_comparison": {
+        "improved": 315,
+        "equal": 2,
+        "harmed": 533,
+        "unknown_incomplete": 27656
+      },
+      "incomplete_comparison_breakdown": {
+        "reference_only_finished": 145,
+        "neither_finished": 27364,
+        "candidate_only_finished": 147
+      },
+      "maximum_known_delay_seconds": 19191.53900000002,
+      "comparison_kind": "C11_vs_C10",
+      "parent_seed": 902,
+      "model_seed": 17
+    },
+    {
+      "reference": "D_N22_C00_P902_001",
+      "candidate": "D_N22_C11_S17_P902_001",
+      "status": "complete_same_resource_comparison",
+      "advantage_bag_seconds": -430194.46700000763,
+      "strict_nonharm_certified": false,
+      "common_sources_and_full_warmup_verified": true,
+      "relative_advantage": -0.0008804397024783886,
+      "completed_delta": 6,
+      "on_time_delta": -17,
+      "arrived_unfinished_past_deadline_delta": -6,
+      "per_job_comparison": {
+        "improved": 247,
+        "harmed": 595,
+        "equal": 4,
+        "unknown_incomplete": 27660
+      },
+      "incomplete_comparison_breakdown": {
+        "reference_only_finished": 145,
+        "neither_finished": 27364,
+        "candidate_only_finished": 151
+      },
+      "maximum_known_delay_seconds": 20728.582000000002,
+      "comparison_kind": "C11_vs_C00",
+      "parent_seed": 902,
+      "model_seed": 17
+    },
+    {
+      "reference": "D_N22_C00_P902_001",
+      "candidate": "D_N22_C01_S29_P902_001",
+      "status": "complete_same_resource_comparison",
+      "advantage_bag_seconds": 337567.8289999962,
+      "strict_nonharm_certified": false,
+      "common_sources_and_full_warmup_verified": true,
+      "relative_advantage": 0.0006908692271279885,
+      "completed_delta": 16,
+      "on_time_delta": 5,
+      "arrived_unfinished_past_deadline_delta": -16,
+      "per_job_comparison": {
+        "improved": 605,
+        "harmed": 276,
+        "equal": 2,
+        "unknown_incomplete": 27623
+      },
+      "incomplete_comparison_breakdown": {
+        "neither_finished": 27391,
+        "candidate_only_finished": 124,
+        "reference_only_finished": 108
+      },
+      "maximum_known_delay_seconds": 16278.175000000017,
+      "comparison_kind": "C01_vs_C00",
+      "parent_seed": 902,
+      "model_seed": 29
+    },
+    {
+      "reference": "D_N22_C10_P902_001",
+      "candidate": "D_N22_C11_S29_P902_001",
+      "status": "complete_same_resource_comparison",
+      "advantage_bag_seconds": 70915.25499999523,
+      "strict_nonharm_certified": false,
+      "common_sources_and_full_warmup_verified": true,
+      "relative_advantage": 0.00014502502565935332,
+      "completed_delta": -18,
+      "on_time_delta": -5,
+      "arrived_unfinished_past_deadline_delta": 18,
+      "per_job_comparison": {
+        "improved": 427,
+        "equal": 2,
+        "harmed": 459,
+        "unknown_incomplete": 27618
+      },
+      "incomplete_comparison_breakdown": {
+        "neither_finished": 27422,
+        "candidate_only_finished": 89,
+        "reference_only_finished": 107
+      },
+      "maximum_known_delay_seconds": 16063.275000000038,
+      "comparison_kind": "C11_vs_C10",
+      "parent_seed": 902,
+      "model_seed": 29
+    },
+    {
+      "reference": "D_N22_C00_P902_001",
+      "candidate": "D_N22_C11_S29_P902_001",
+      "status": "complete_same_resource_comparison",
+      "advantage_bag_seconds": -302206.90700000525,
+      "strict_nonharm_certified": false,
+      "common_sources_and_full_warmup_verified": true,
+      "relative_advantage": -0.0006184992595127774,
+      "completed_delta": -14,
+      "on_time_delta": -16,
+      "arrived_unfinished_past_deadline_delta": 14,
+      "per_job_comparison": {
+        "improved": 330,
+        "harmed": 548,
+        "equal": 2,
+        "unknown_incomplete": 27626
+      },
+      "incomplete_comparison_breakdown": {
+        "reference_only_finished": 111,
+        "neither_finished": 27418,
+        "candidate_only_finished": 97
+      },
+      "maximum_known_delay_seconds": 17805.398,
+      "comparison_kind": "C11_vs_C00",
+      "parent_seed": 902,
+      "model_seed": 29
+    },
+    {
+      "reference": "D_N22_C00_P902_001",
+      "candidate": "D_N22_C01_S43_P902_001",
+      "status": "complete_same_resource_comparison",
+      "advantage_bag_seconds": -109343.22100001574,
+      "strict_nonharm_certified": false,
+      "common_sources_and_full_warmup_verified": true,
+      "relative_advantage": -0.00022378277813898717,
+      "completed_delta": 23,
+      "on_time_delta": -28,
+      "arrived_unfinished_past_deadline_delta": -23,
+      "per_job_comparison": {
+        "improved": 470,
+        "harmed": 399,
+        "equal": 3,
+        "unknown_incomplete": 27634
+      },
+      "incomplete_comparison_breakdown": {
+        "reference_only_finished": 119,
+        "neither_finished": 27373,
+        "candidate_only_finished": 142
+      },
+      "maximum_known_delay_seconds": 18927.58599999998,
+      "comparison_kind": "C01_vs_C00",
+      "parent_seed": 902,
+      "model_seed": 43
+    },
+    {
+      "reference": "D_N22_C10_P902_001",
+      "candidate": "D_N22_C11_S43_P902_001",
+      "status": "complete_same_resource_comparison",
+      "advantage_bag_seconds": -28715.861999988556,
+      "strict_nonharm_certified": false,
+      "common_sources_and_full_warmup_verified": true,
+      "relative_advantage": -5.872528588353901e-05,
+      "completed_delta": 12,
+      "on_time_delta": -8,
+      "arrived_unfinished_past_deadline_delta": -12,
+      "per_job_comparison": {
+        "improved": 237,
+        "equal": 3,
+        "harmed": 645,
+        "unknown_incomplete": 27621
+      },
+      "incomplete_comparison_breakdown": {
+        "reference_only_finished": 110,
+        "neither_finished": 27389,
+        "candidate_only_finished": 122
+      },
+      "maximum_known_delay_seconds": 17106.999999999993,
+      "comparison_kind": "C11_vs_C10",
+      "parent_seed": 902,
+      "model_seed": 43
+    },
+    {
+      "reference": "D_N22_C00_P902_001",
+      "candidate": "D_N22_C11_S43_P902_001",
+      "status": "complete_same_resource_comparison",
+      "advantage_bag_seconds": -401838.02399998903,
+      "strict_nonharm_certified": false,
+      "common_sources_and_full_warmup_verified": true,
+      "relative_advantage": -0.0008224051619312149,
+      "completed_delta": 16,
+      "on_time_delta": -19,
+      "arrived_unfinished_past_deadline_delta": -16,
+      "per_job_comparison": {
+        "improved": 231,
+        "harmed": 646,
+        "equal": 4,
+        "unknown_incomplete": 27625
+      },
+      "incomplete_comparison_breakdown": {
+        "reference_only_finished": 110,
+        "neither_finished": 27389,
+        "candidate_only_finished": 126
+      },
+      "maximum_known_delay_seconds": 18513.47600000001,
+      "comparison_kind": "C11_vs_C00",
+      "parent_seed": 902,
+      "model_seed": 43
+    }
+  ],
+  "six_primary_cells": [
+    {
+      "parent_seed": 901,
+      "model_seed": 17,
+      "C11_vs_C10_gain": 1154482.8539999723,
+      "C11_vs_C10_relative_gain": 0.0023588901902783723,
+      "C11_vs_C00_gain": 922236.324000001,
+      "C11_vs_C00_relative_gain": 0.0018852484750572635,
+      "C01_vs_C00_gain": -288443.41100001335,
+      "C01_vs_C00_relative_gain": -0.0005896400809388312,
+      "learning_by_prediction_interaction": 1442926.2649999857,
+      "C10_vs_C00_gain": -232246.5299999714,
+      "C11_beats_C10_but_loses_C00": false,
+      "C11_completed_delta_vs_C10": 82,
+      "C11_on_time_delta_vs_C10": -1,
+      "C11_completed_delta_vs_C00": 70,
+      "C11_on_time_delta_vs_C00": -2
+    },
+    {
+      "parent_seed": 901,
+      "model_seed": 29,
+      "C11_vs_C10_gain": 1442849.476999998,
+      "C11_vs_C10_relative_gain": 0.002948093568952785,
+      "C11_vs_C00_gain": 1210602.9470000267,
+      "C11_vs_C00_relative_gain": 0.0024747315848856408,
+      "C01_vs_C00_gain": 219489.70600003004,
+      "C01_vs_C00_relative_gain": 0.00044868394657519834,
+      "learning_by_prediction_interaction": 1223359.770999968,
+      "C10_vs_C00_gain": -232246.5299999714,
+      "C11_beats_C10_but_loses_C00": false,
+      "C11_completed_delta_vs_C10": 75,
+      "C11_on_time_delta_vs_C10": 5,
+      "C11_completed_delta_vs_C00": 63,
+      "C11_on_time_delta_vs_C00": 4
+    },
+    {
+      "parent_seed": 901,
+      "model_seed": 43,
+      "C11_vs_C10_gain": 50005.433999955654,
+      "C11_vs_C10_relative_gain": 0.00010217330410271369,
+      "C11_vs_C00_gain": -182241.09600001574,
+      "C11_vs_C00_relative_gain": -0.0003725398136961624,
+      "C01_vs_C00_gain": 1282372.5320000052,
+      "C01_vs_C00_relative_gain": 0.002621443980782012,
+      "learning_by_prediction_interaction": -1232367.0980000496,
+      "C10_vs_C00_gain": -232246.5299999714,
+      "C11_beats_C10_but_loses_C00": true,
+      "C11_completed_delta_vs_C10": 36,
+      "C11_on_time_delta_vs_C10": -20,
+      "C11_completed_delta_vs_C00": 24,
+      "C11_on_time_delta_vs_C00": -21
+    },
+    {
+      "parent_seed": 902,
+      "model_seed": 17,
+      "C11_vs_C10_gain": -57072.30500000715,
+      "C11_vs_C10_relative_gain": -0.00011671554303887129,
+      "C11_vs_C00_gain": -430194.46700000763,
+      "C11_vs_C00_relative_gain": -0.0008804397024783886,
+      "C01_vs_C00_gain": -188788.2419999838,
+      "C01_vs_C00_relative_gain": -0.00038637564257162053,
+      "learning_by_prediction_interaction": 131715.93699997663,
+      "C10_vs_C00_gain": -373122.1620000005,
+      "C11_beats_C10_but_loses_C00": false,
+      "C11_completed_delta_vs_C10": 2,
+      "C11_on_time_delta_vs_C10": -6,
+      "C11_completed_delta_vs_C00": 6,
+      "C11_on_time_delta_vs_C00": -17
+    },
+    {
+      "parent_seed": 902,
+      "model_seed": 29,
+      "C11_vs_C10_gain": 70915.25499999523,
+      "C11_vs_C10_relative_gain": 0.00014502502565935332,
+      "C11_vs_C00_gain": -302206.90700000525,
+      "C11_vs_C00_relative_gain": -0.0006184992595127774,
+      "C01_vs_C00_gain": 337567.8289999962,
+      "C01_vs_C00_relative_gain": 0.0006908692271279885,
+      "learning_by_prediction_interaction": -266652.57400000095,
+      "C10_vs_C00_gain": -373122.1620000005,
+      "C11_beats_C10_but_loses_C00": true,
+      "C11_completed_delta_vs_C10": -18,
+      "C11_on_time_delta_vs_C10": -5,
+      "C11_completed_delta_vs_C00": -14,
+      "C11_on_time_delta_vs_C00": -16
+    },
+    {
+      "parent_seed": 902,
+      "model_seed": 43,
+      "C11_vs_C10_gain": -28715.861999988556,
+      "C11_vs_C10_relative_gain": -5.872528588353901e-05,
+      "C11_vs_C00_gain": -401838.02399998903,
+      "C11_vs_C00_relative_gain": -0.0008224051619312149,
+      "C01_vs_C00_gain": -109343.22100001574,
+      "C01_vs_C00_relative_gain": -0.00022378277813898717,
+      "learning_by_prediction_interaction": 80627.35900002718,
+      "C10_vs_C00_gain": -373122.1620000005,
+      "C11_beats_C10_but_loses_C00": false,
+      "C11_completed_delta_vs_C10": 12,
+      "C11_on_time_delta_vs_C10": -8,
+      "C11_completed_delta_vs_C00": 16,
+      "C11_on_time_delta_vs_C00": -19
+    }
+  ],
+  "two_parent_means_by_fixed_seed": [
+    {
+      "model_seed": 17,
+      "parent_count": 2,
+      "means": {
+        "C11_vs_C10_gain": 548705.2744999826,
+        "C11_vs_C00_gain": 246020.92849999666,
+        "C01_vs_C00_gain": -238615.82649999857,
+        "learning_by_prediction_interaction": 787321.1009999812
+      },
+      "mean_parent_relative_C11_vs_C10_gain": 0.0011210873236197506,
+      "ratio_of_mean_cost_C11_vs_C10_gain": 0.0011216331908515606,
+      "both_relative_mean_interpretations_above_0_001": true,
+      "both_parents_positive_same_information": false,
+      "all_harmed_and_unknown_job_counts_reported": true,
+      "numeric_and_parent_followup_conditions_met": false,
+      "interpretation": "A predeclared research-followup scalar gate only; not statistical significance, a safety certificate or airport SLA.",
+      "run_completion_failures": 0,
+      "run_completion_failure_scope": "Receipt/whole-run endpoint only; excludes actual transfer failures and quarantined trays, which require the separate protection audit.",
+      "full_G2_established": false,
+      "protected_takeover_eligible": false
+    },
+    {
+      "model_seed": 29,
+      "parent_count": 2,
+      "means": {
+        "C11_vs_C10_gain": 756882.3659999967,
+        "C11_vs_C00_gain": 454198.0200000107,
+        "C01_vs_C00_gain": 278528.7675000131,
+        "learning_by_prediction_interaction": 478353.59849998355
+      },
+      "mean_parent_relative_C11_vs_C10_gain": 0.0015465592973060692,
+      "ratio_of_mean_cost_C11_vs_C10_gain": 0.0015471773695805468,
+      "both_relative_mean_interpretations_above_0_001": true,
+      "both_parents_positive_same_information": true,
+      "all_harmed_and_unknown_job_counts_reported": true,
+      "numeric_and_parent_followup_conditions_met": true,
+      "interpretation": "A predeclared research-followup scalar gate only; not statistical significance, a safety certificate or airport SLA.",
+      "run_completion_failures": 0,
+      "run_completion_failure_scope": "Receipt/whole-run endpoint only; excludes actual transfer failures and quarantined trays, which require the separate protection audit.",
+      "full_G2_established": false,
+      "protected_takeover_eligible": false
+    },
+    {
+      "model_seed": 43,
+      "parent_count": 2,
+      "means": {
+        "C11_vs_C10_gain": 10644.78599998355,
+        "C11_vs_C00_gain": -292039.5600000024,
+        "C01_vs_C00_gain": 586514.6554999948,
+        "learning_by_prediction_interaction": -575869.8695000112
+      },
+      "mean_parent_relative_C11_vs_C10_gain": 2.172400910958734e-05,
+      "ratio_of_mean_cost_C11_vs_C10_gain": 2.175948699959863e-05,
+      "both_relative_mean_interpretations_above_0_001": false,
+      "both_parents_positive_same_information": false,
+      "all_harmed_and_unknown_job_counts_reported": true,
+      "numeric_and_parent_followup_conditions_met": false,
+      "interpretation": "A predeclared research-followup scalar gate only; not statistical significance, a safety certificate or airport SLA.",
+      "run_completion_failures": 0,
+      "run_completion_failure_scope": "Receipt/whole-run endpoint only; excludes actual transfer failures and quarantined trays, which require the separate protection audit.",
+      "full_G2_established": false,
+      "protected_takeover_eligible": false
+    }
+  ],
+  "three_seed_means_by_parent": [
+    {
+      "parent_seed": 901,
+      "model_seeds": [
+        17,
+        29,
+        43
+      ],
+      "means_across_all_three_fixed_seeds": {
+        "C11_vs_C10_gain": 882445.9216666421,
+        "C11_vs_C00_gain": 650199.3916666707,
+        "C01_vs_C00_gain": 404472.94233334064,
+        "learning_by_prediction_interaction": 477972.97933330137
+      },
+      "mean_relative_C11_vs_C10_gain": 0.001803052354444624,
+      "note": "Descriptive repeated-fit average within one synthetic parent; not three independent airport days."
+    },
+    {
+      "parent_seed": 902,
+      "model_seeds": [
+        17,
+        29,
+        43
+      ],
+      "means_across_all_three_fixed_seeds": {
+        "C11_vs_C10_gain": -4957.637333333492,
+        "C11_vs_C00_gain": -378079.79933333397,
+        "C01_vs_C00_gain": 13145.45533333222,
+        "learning_by_prediction_interaction": -18103.092666665714
+      },
+      "mean_relative_C11_vs_C10_gain": -1.0138601087685658e-05,
+      "note": "Descriptive repeated-fit average within one synthetic parent; not three independent airport days."
+    }
+  ],
+  "all_seed_descriptive_mean": {
+    "C11_vs_C10_gain": 438744.1421666543,
+    "C11_vs_C00_gain": 136059.79616666833,
+    "C01_vs_C00_gain": 208809.19883333644,
+    "learning_by_prediction_interaction": 229934.94333331785,
+    "mean_relative_C11_vs_C10_gain": 0.000896456876678469,
+    "independence_warning": "Six values are two synthetic parents crossed with three training seeds, not six independent days."
+  },
+  "closed_run_status_denominator": {
+    "complete": 16
+  },
+  "quarantine_outcomes": [
+    {
+      "name": "D_N22_C00_P901_001",
+      "final_quarantined_trays": 0
+    },
+    {
+      "name": "D_N22_C10_P901_001",
+      "final_quarantined_trays": 0
+    },
+    {
+      "name": "D_N22_C01_S17_P901_001",
+      "final_quarantined_trays": 1
+    },
+    {
+      "name": "D_N22_C01_S29_P901_001",
+      "final_quarantined_trays": 1
+    },
+    {
+      "name": "D_N22_C01_S43_P901_001",
+      "final_quarantined_trays": 0
+    },
+    {
+      "name": "D_N22_C11_S17_P901_001",
+      "final_quarantined_trays": 0
+    },
+    {
+      "name": "D_N22_C11_S29_P901_001",
+      "final_quarantined_trays": 0
+    },
+    {
+      "name": "D_N22_C11_S43_P901_001",
+      "final_quarantined_trays": 0
+    },
+    {
+      "name": "D_N22_C00_P902_001",
+      "final_quarantined_trays": 0
+    },
+    {
+      "name": "D_N22_C10_P902_001",
+      "final_quarantined_trays": 0
+    },
+    {
+      "name": "D_N22_C01_S17_P902_001",
+      "final_quarantined_trays": 0
+    },
+    {
+      "name": "D_N22_C01_S29_P902_001",
+      "final_quarantined_trays": 0
+    },
+    {
+      "name": "D_N22_C01_S43_P902_001",
+      "final_quarantined_trays": 0
+    },
+    {
+      "name": "D_N22_C11_S17_P902_001",
+      "final_quarantined_trays": 0
+    },
+    {
+      "name": "D_N22_C11_S29_P902_001",
+      "final_quarantined_trays": 1
+    },
+    {
+      "name": "D_N22_C11_S43_P902_001",
+      "final_quarantined_trays": 0
+    }
+  ],
+  "quarantine_interpretation": "Closed-run failure is distinct from a real in-policy failed transfer/quarantined tray. Detailed raw protection audit remains separate.",
+  "known_harm_and_unknown_not_certified_away": true,
+  "strict_nonharm_certified": false,
+  "protected_takeover_eligible": false,
+  "multistep_optimal_Q_established": false,
+  "independent_synthetic_parents": 2,
+  "independent_real_airport_days": 0,
+  "native_starts": 0,
+  "fit_calls": 0,
+  "policy_changes": false,
+  "artifact_wording_clarification": {
+    "at_utc": "2026-10-20T04:51:23.053047+00:00",
+    "prior_artifact_sha256": "24db8e53e51e46468e8a653ff4f27d3dacf8f1f2508387b9c556390bf514eaa2",
+    "prior_script": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\report_support\\summarize_closed_D_main_test_001.py",
+      "sha256": "4ddc152697503d9fdf242583ff09fd27e8f12a2e7e4d8f64fa374b33339be355"
+    },
+    "reason": "Separate full G2 increment acceptance from protected takeover; distinguish whole-run completion failures from actual failed transfers. Scientific numeric results unchanged.",
+    "new_reads_of_run_data": false,
+    "native_starts": 0,
+    "fit_calls": 0
+  }
+}

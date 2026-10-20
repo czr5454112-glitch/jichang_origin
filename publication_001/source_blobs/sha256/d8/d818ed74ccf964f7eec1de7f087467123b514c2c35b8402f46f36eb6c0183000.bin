@@ -1,0 +1,482 @@
+"""Finite paired-advantage regression on actual, closed native contrasts.
+
+This is a contextual action ranker, not optimal Q or unsupported-action FQI.
+The model may suggest one isolated patch; native/current protection remains
+the caller's responsibility. No fitting or native run occurs on import.
+"""
+from __future__ import annotations
+
+import copy
+import hashlib
+import json
+import math
+from pathlib import Path
+import time
+
+import numpy as np
+
+from . import foundation_airport_learning_public as public
+from .analytic_control import PublicTravel
+from .foundation_airport_batch_patch import digest
+from .foundation_airport_paired_continuation import validate_parent
+
+SCHEMA = "g31.foundation.airport_pair_ranker.v1"
+FEATURE_SCHEMA = "g31.foundation.airport_pair_ranker_features.v1"
+FORECAST_SCHEMA = "g31.foundation.airport_pair_absolute_forecast.v1"
+SEEDS = (17, 29, 43)
+VARIANTS = ("C01", "C11")
+ARCHITECTURES = ("linear", "small_mlp")
+SELECTION_RULE = "failures_then_known_harm_then_mean_paired_regret_then_parameter_count_then_model_id"
+
+
+def require(ok, reason):
+    if not ok:
+        raise ValueError("airport_pair_ranker:" + reason)
+
+
+def number(value):
+    require(type(value) in (int, float) and math.isfinite(value), "finite_number")
+    return float(value)
+
+
+def _parent_group(parent):
+    # Fleet/layout descendants never become independent physical parents.
+    return parent.get("parent_group", parent.get("parent_id",
+        "seed:" + str(parent.get("parent_seed", parent.get("seed")))))
+
+
+def source_pins():
+    from . import analytic_control, foundation_airport_batch_patch, foundation_airport_paired_continuation
+    paths = [Path(__file__), Path(public.__file__), Path(analytic_control.__file__),
+        Path(foundation_airport_batch_patch.__file__), Path(foundation_airport_paired_continuation.__file__)]
+    return {str(path.resolve()): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
+
+
+def make_registration(datasets, *, information_variant, seed, architecture,
+                      model_available_at_epoch_seconds, registration_id):
+    """Construct a record to persist before the separately budgeted fit call."""
+    require(information_variant in VARIANTS and seed in SEEDS and architecture in ARCHITECTURES,
+        "registered_model_identity")
+    require(type(registration_id) is str and registration_id, "registration_identity")
+    return {"schema": "g31.foundation.airport_pair_ranker_registration.v1",
+        "registration_id": registration_id, "information_variant": information_variant,
+        "seed": seed, "architecture": architecture, "epochs": 100, "selection_rule": SELECTION_RULE,
+        "test_opened": False, "training_dataset_sha256": digest(datasets),
+        "source_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+        "feature_source_sha256": source_pins(),
+        "model_available_at_epoch_seconds": number(model_available_at_epoch_seconds),
+        "fit_calls_requested": 1, "native_jobs_requested": 0, "bootstrap_used": False}
+
+
+def _absolute_now(row):
+    parent = validate_parent(row["parent"])
+    start = number(parent["calendar_start_epoch_seconds"])
+    require(start > 0, "absolute_parent_calendar_required")
+    return start + number(row["observation"]["now"])
+
+
+def _forecast(row):
+    """Validate an explicitly supplied forecast; never manufacture C11 inputs."""
+    evidence = row.get("forecast_evidence")
+    require(type(evidence) is dict and evidence.get("schema") == FORECAST_SCHEMA,
+        "C11_requires_actual_absolute_calendar_forecast_evidence")
+    require(evidence.get("forecast_provenance") == "actual_callback_received"
+        and evidence.get("actual_callback_consumption") is True,
+        "C11_requires_actual_recorded_plan_receipt_not_offline_reconstruction")
+    now = _absolute_now(row)
+    require(evidence["calendar_start_epoch_seconds"] == row["parent"]["calendar_start_epoch_seconds"]
+        and number(evidence["observed_at_epoch_seconds"]) == now
+        and evidence["public_state_sha256"] == digest(row["observation"]),
+        "forecast_absolute_current_binding")
+    closed = number(evidence["training_labels_closed_at_epoch_seconds"])
+    available = number(evidence["model_available_at_epoch_seconds"])
+    received = number(evidence["plan_received_at_epoch_seconds"])
+    require(0 < closed <= available <= now and 0 < received <= now,
+        "forecast_training_availability_and_plan_cutoffs")
+    require(type(evidence["model_id"]) is str and evidence["model_id"]
+        and type(evidence["provenance_sha256"]) is str and len(evidence["provenance_sha256"]) == 64,
+        "forecast_model_and_producer_provenance_required")
+    manifest = evidence["producer_manifest"]
+    require(manifest["schema"] == "g31.foundation.airport_absolute_forecast_binding.v1"
+        and digest(manifest) == evidence["provenance_sha256"]
+        and manifest["model_id"] == evidence["model_id"]
+        and manifest["time_basis"] == "absolute_epoch_seconds"
+        and manifest["training_labels_closed_at_epoch_seconds"] == closed
+        and manifest["model_available_at_epoch_seconds"] == available
+        and len(manifest["original_checkpoint_sha256"]) == len(manifest["original_training_receipt_sha256"]) == 64,
+        "forecast_original_model_calendar_manifest")
+    require(number(manifest["source_calendar_start_epoch_seconds"])
+        + number(manifest["original_training_labels_closed_at_sim_time"]) == closed
+        and number(manifest["source_calendar_start_epoch_seconds"])
+        + number(manifest["original_model_available_at_sim_time"]) == available,
+        "forecast_original_availability_clock_not_reset")
+    receipt = evidence.get("plan_receipt")
+    require(type(receipt) is dict and receipt.get("schema") == "g31.foundation.airport_controller_plan_receipt.v1"
+        and receipt.get("receipt_kind") == "actual_controller_startup_preload"
+        and receipt["receipt_sha256"] == digest({key: item for key, item in receipt.items()
+            if key != "receipt_sha256"})
+        and receipt["owner_id"] == row["observation"]["owner_id"]
+        and receipt["parent_group"] == row["parent"]["parent_group"]
+        and receipt["model_id"] == evidence["model_id"]
+        and receipt["calendar_start_epoch_seconds"] == row["parent"]["calendar_start_epoch_seconds"]
+        and receipt["target_plan_template_sha256"] == manifest["target_plan_template_sha256"]
+        and receipt["received_at_physical_seconds"] == 0.
+        and receipt["received_at_epoch_seconds"] == received == row["parent"]["calendar_start_epoch_seconds"]
+        and receipt["native_message_receipt_claimed"] is False, "actual_owner_startup_plan_receipt_binding")
+    forecast = evidence["forecast"]
+    require(evidence["forecast_sha256"] == digest(forecast)
+        and forecast["schema"] == "g31.foundation.new_demand_forecast.v1"
+        and forecast["owner_scope"] == row["observation"]["owner_id"]
+        and number(forecast["forecast_origin"]) == row["observation"]["now"]
+        and number(forecast["remaining_support_until"]) >= row["observation"]["now"] + 1800
+        and type(forecast["mapping_version"]) is str and forecast["mapping_version"]
+        and forecast.get("context_sha256") is not None, "actual_current_static_plan_forecast_binding")
+    return forecast
+
+
+def _mass(forecast, region, window):
+    means = forecast["new_demand_mean_by_region"].get(region)
+    mask = forecast["missing_mask_by_region"].get(region, True)
+    if means is None or mask is True or (type(mask) is list and any(mask)):
+        return 0., 1.
+    edges = forecast["bin_edges_seconds"]
+    require(len(edges) == len(means) + 1 and number(edges[0]) == 0, "forecast_bins")
+    total = 0.
+    for left, right, mass in zip(edges[:-1], edges[1:], means, strict=True):
+        left, right, mass = number(left), number(right), number(mass)
+        require(right > left and mass >= 0, "forecast_nonnegative_mass")
+        total += mass * max(0., min(right, window)-left) / (right-left)
+    return total, float(window > edges[-1])
+
+
+def _forecast_contract(row):
+    evidence = row["forecast_evidence"]
+    manifest = evidence["producer_manifest"]
+    return {"model_id": evidence["model_id"], "mapping_version": evidence["forecast"]["mapping_version"],
+        "source_calendar_start_epoch_seconds": manifest["source_calendar_start_epoch_seconds"],
+        "original_checkpoint_sha256": manifest["original_checkpoint_sha256"],
+        "original_training_receipt_sha256": manifest["original_training_receipt_sha256"],
+        "training_labels_closed_at_epoch_seconds": manifest["training_labels_closed_at_epoch_seconds"],
+        "model_available_at_epoch_seconds": manifest["model_available_at_epoch_seconds"]}
+
+
+def action_features(row, *, information_variant):
+    """Only current public observation and the compared tray's actual proposal."""
+    require(information_variant in VARIANTS, "information_variant")
+    observation, action = row["observation"], row["semantic_action"]
+    now, owner, nodes, trays, _ = public.validate_public(observation)
+    require(row["opportunity"]["public_state_digest"] == digest(observation)
+        and row["opportunity"]["owner_id"] == owner
+        and row["opportunity"]["observed_at"] == now, "opportunity_current_binding")
+    require(action["kind"] in ("transfer", "hold_optional"), "semantic_action_kind")
+    moved = action["kind"] == "transfer"
+    source = action["source"]
+    destination = action["destination"] if moved else source
+    require(type(source) is int and type(destination) is int and source in nodes and destination in nodes
+        and action["tray_id"] in trays and trays[action["tray_id"]]["node"] == source
+        and nodes[source]["resource_owner"] == owner, "semantic_action_owner_entity")
+    require(moved or action["destination"] in (None, source), "hold_stays_at_source")
+    accounts, _ = public.adapt_accounts(observation)
+    departure = max(now, number(action["earliest_departure"])) if moved else now
+    travel = PublicTravel(observation).complete(source, destination) if moved else 0.
+    require(math.isfinite(travel) and travel >= 0, "public_static_reachable")
+    result = {"transfer": float(moved), "hold_optional": float(not moved),
+        "local_empty_return": float(moved and action.get("transfer_scope") == "local_empty_return"),
+        "cross_owner": float(nodes[source]["resource_owner"] != nodes[destination]["resource_owner"]),
+        "static_travel_seconds": travel, "departure_delay_seconds": departure-now,
+        "decision_time_seconds": now,
+        "current_optional_batch_size": float(len(row["opportunity"]["optional_intents"])),
+        "current_mandatory_batch_size": float(len(row["opportunity"]["mandatory_intents"]))}
+    for role, node in (("source", source), ("destination", destination)):
+        region = public.region(node)
+        free = [r for r in accounts["current_free_trays"] if r["region"] == region]
+        waiting = [r for r in accounts["known_waiting_jobs"] if r["region"] == region]
+        groups = {r["origin"]: r for r in observation["control_projection"]["waiting_groups"]}
+        waiting_count = sum(r["count"] if r["count"] is not None else len(groups[r["origin"]]["jobs"])
+            for r in waiting)
+        coverage = accounts["coverage_by_account_region"]
+        result.update({role+"_observed_free": float(len(free)),
+            role+"_free_missing": float(not coverage["current_free_trays"][region]["complete"]),
+            role+"_observed_waiting": float(waiting_count),
+            role+"_waiting_visible": float(coverage["known_waiting_jobs"][region]["visible"]),
+            role+"_waiting_missing": float(not coverage["known_waiting_jobs"][region]["complete"]
+                or any(r["count"] is None for r in waiting)),
+            role+"_waiting_age_seconds": max((now-r["observed_at"] for r in waiting), default=0.),
+            role+"_capacity": number(nodes[node]["capacity"]),
+            role+"_export_min_stock": number(nodes[node].get("export_min_stock", 0)),
+            role+"_local_owner": float(nodes[node]["resource_owner"] == owner)})
+    result["transfer_x_destination_waiting"] = float(moved)*result["destination_observed_waiting"]
+    result["travel_x_destination_waiting"] = travel*result["destination_observed_waiting"]
+    if information_variant == "C11":
+        forecast = _forecast(row)
+        for role, node in (("source", source), ("destination", destination)):
+            for window in (300, 900, 1800):
+                mass, missing = _mass(forecast, public.region(node), window)
+                result[f"{role}_forecast_{window}"] = mass
+                result[f"{role}_forecast_{window}_missing"] = missing
+        result["transfer_x_destination_forecast_300"] = float(moved)*result["destination_forecast_300"]
+        result["travel_x_destination_forecast_300"] = travel*result["destination_forecast_300"]
+    require(all(math.isfinite(v) for v in result.values()), "finite_features")
+    return result
+
+
+def prepare_pairs(datasets, *, information_variant, split):
+    """Retain zero effects, rejected attempts and incomplete-pair denominators."""
+    require(split in ("train", "dev", "test"), "declared_split")
+    pairs, unavailable = [], []
+    seen = set()
+    for dataset in datasets:
+        pair = dataset["pair"]
+        parent = validate_parent(pair["parent"])
+        require(parent["split"] == split, "parent_split_no_leakage")
+        if pair["status"] != "closed_actual_pair":
+            unavailable.append({"parent": parent, "reason": pair.get("reason", pair["status"])})
+            continue
+        require(pair["pair_id"] not in seen, "duplicate_pair")
+        seen.add(pair["pair_id"])
+        rows = dataset["rows"]
+        require(len(rows) == 2 and [r["branch"] for r in rows] == ["a_ref", "a_patch"]
+            and all(r["parent"] == parent and r["pair_id"] == pair["pair_id"]
+                and r["unexecuted_candidate_label"] is False for r in rows),
+            "two_actual_branch_rows_only")
+        reference, patch = rows
+        require(reference["observation"] == patch["observation"]
+            and reference["opportunity"] == patch["opportunity"]
+            and reference["semantic_action"]["tray_id"] == patch["semantic_action"]["tray_id"],
+            "same_public_current_and_intervention_tray")
+        advantage = number(pair["advantage_bag_seconds"])
+        require(all(number(r["paired_advantage_bag_seconds"]) == advantage for r in rows)
+            and math.isclose(number(patch["target_return"])-number(reference["target_return"]),
+                advantage, rel_tol=1e-12, abs_tol=1e-7), "realized_paired_target")
+        vectors = [action_features(row, information_variant=information_variant) for row in rows]
+        pairs.append({"pair_id": pair["pair_id"], "parent": parent, "reference": vectors[0],
+            "patch": vectors[1], "advantage": advantage, "action_difference": pair["action_difference"],
+            "raw": dataset, "observed_at_epoch_seconds": _absolute_now(reference)})
+    return pairs, unavailable
+
+
+def sufficiency(datasets, *, information_variant):
+    pairs, unavailable = prepare_pairs(datasets, information_variant=information_variant, split="train")
+    groups = {_parent_group(pair["parent"]) for pair in pairs}
+    distinct = [pair for pair in pairs if pair["action_difference"]]
+    nonzero = [pair for pair in distinct if abs(pair["advantage"]) > 1e-9]
+    patch_wins = sum(pair["advantage"] > 1e-9 for pair in distinct)
+    reference_wins = sum(pair["advantage"] < -1e-9 for pair in distinct)
+    feature_differences = sum(pair["reference"] != pair["patch"] for pair in distinct)
+    reasons = []
+    if len(groups) < 2: reasons.append("fewer_than_two_train_parent_groups")
+    if len(nonzero) < 2: reasons.append("fewer_than_two_actual_nonzero_contrasts")
+    if not patch_wins or not reference_wins: reasons.append("one_action_direction_dominates_use_rule_diagnostic")
+    if feature_differences < 2: reasons.append("insufficient_current_feature_action_identifiability")
+    return {"schema": SCHEMA, "eligible_to_fit": not reasons, "reasons": reasons,
+        "closed_pairs": len(pairs), "unavailable_pairs": unavailable, "train_parent_groups": len(groups),
+        "actual_action_differences": len(distinct), "nonzero_advantages": len(nonzero),
+        "patch_wins": patch_wins, "reference_wins": reference_wins,
+        "zero_advantages": sum(abs(pair["advantage"]) <= 1e-9 for pair in pairs),
+        "claim": "small_mechanism_training_gate_not_statistical_adequacy"}
+
+
+def _forward(x, layers):
+    activations = [x]
+    for index, layer in enumerate(layers):
+        x = x @ layer["weight"].T + layer["bias"]
+        if index < len(layers)-1:
+            x = np.tanh(x)
+        activations.append(x)
+    return activations
+
+
+def _backward(activations, derivative, layers):
+    gradients = []
+    for index in range(len(layers)-1, -1, -1):
+        if index < len(layers)-1:
+            derivative = derivative*(1.-activations[index+1]**2)
+        gradients.append({"weight": derivative.T @ activations[index],
+            "bias": derivative.sum(axis=0)})
+        derivative = derivative @ layers[index]["weight"]
+    return list(reversed(gradients))
+
+
+def fit_ranker(datasets, *, information_variant, seed, architecture, registration,
+               deadline, epochs=100):
+    """One explicitly registered finite primary fit; train-only normalization."""
+    require(seed in SEEDS and architecture in ARCHITECTURES and epochs == 100,
+        "fixed_seeds_architectures_and_100_epochs")
+    require(registration.get("schema") == "g31.foundation.airport_pair_ranker_registration.v1"
+        and registration["information_variant"] == information_variant
+        and registration["seed"] == seed and registration["architecture"] == architecture
+        and registration["epochs"] == epochs and registration["selection_rule"] == SELECTION_RULE
+        and registration["test_opened"] is False, "preregistered_fit_identity")
+    gate = sufficiency(datasets, information_variant=information_variant)
+    require(gate["eligible_to_fit"], "insufficient_action_information:" + ",".join(gate["reasons"]))
+    pairs, unavailable = prepare_pairs(datasets, information_variant=information_variant, split="train")
+    require(registration["training_dataset_sha256"] == digest(datasets), "frozen_training_dataset")
+    require(registration["source_sha256"] == hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
+        "registered_training_source")
+    require(registration["feature_source_sha256"] == source_pins(), "registered_feature_dependency_sources")
+    forecast_contract = None
+    if information_variant == "C11":
+        forecast_contracts = [_forecast_contract(row)
+            for pair in pairs for row in pair["raw"]["rows"]]
+        require(all(contract == forecast_contracts[0] for contract in forecast_contracts),
+            "one_frozen_C11_forecast_model_and_mapping")
+        forecast_contract = forecast_contracts[0]
+    available = number(registration["model_available_at_epoch_seconds"])
+    closed = max(pair["parent"]["calendar_start_epoch_seconds"]
+        + pair["raw"]["pair"]["reference_cost"]["label_end"] for pair in pairs)
+    require(closed <= available, "labels_closed_before_model_available")
+    names = sorted(pairs[0]["reference"])
+    require(all(sorted(pair[arm]) == names for pair in pairs for arm in ("reference", "patch")), "feature_schema")
+    raw = np.array([[pair[arm][name] for name in names] for pair in pairs for arm in ("reference", "patch")])
+    center, scale = raw.mean(axis=0), raw.std(axis=0)
+    scale[scale < 1e-9] = 1.
+    x = (raw-center)/scale
+    target = np.array([pair["advantage"] for pair in pairs])
+    target_scale = max(float(np.std(target)), float(np.mean(np.abs(target))), 1.)
+    target = target/target_scale
+    rng = np.random.default_rng(seed)
+    widths = [len(names), 1] if architecture == "linear" else [len(names), 16, 1]
+    layers = [{"weight": rng.normal(0., 1./math.sqrt(a), size=(b, a)), "bias": np.zeros(b)}
+        for a, b in zip(widths[:-1], widths[1:], strict=True)]
+    first = [{key: np.zeros_like(item) for key, item in layer.items()} for layer in layers]
+    second = copy.deepcopy(first)
+    curve = []
+    started = time.perf_counter()
+    for epoch in range(epochs+1):
+        require(time.monotonic() <= deadline, "finite_training_wall_budget")
+        activations = _forward(x, layers)
+        prediction = (activations[-1][1::2, 0]-activations[-1][::2, 0])
+        error = prediction-target
+        if epoch % 10 == 0:
+            curve.append({"epoch": epoch, "paired_advantage_mse": float(np.mean(error**2))*target_scale**2})
+        if epoch == epochs:
+            break
+        derivative = np.zeros((len(raw), 1))
+        derivative[1::2, 0] = 2.*error/len(pairs)
+        derivative[::2, 0] = -2.*error/len(pairs)
+        gradients = _backward(activations, derivative, layers)
+        for i, layer in enumerate(layers):
+            for key in layer:
+                gradient = gradients[i][key] + (1e-4*layer[key] if key == "weight" else 0.)
+                first[i][key] = .9*first[i][key] + .1*gradient
+                second[i][key] = .999*second[i][key] + .001*gradient**2
+                layer[key] -= .01*(first[i][key]/(1.-.9**(epoch+1))) / (
+                    np.sqrt(second[i][key]/(1.-.999**(epoch+1)))+1e-8)
+    model = {"schema": SCHEMA, "feature_schema": FEATURE_SCHEMA, "information_variant": information_variant,
+        "architecture": architecture, "seed": seed, "epochs": epochs, "feature_names": names,
+        "parameters": {"center": center.tolist(), "scale": scale.tolist(), "target_scale": target_scale,
+            "layers": [{key: item.tolist() for key, item in layer.items()} for layer in layers]},
+        "training_curve": curve, "training_dataset_sha256": digest(datasets), "registration": copy.deepcopy(registration),
+        "training_parent_groups": [pair["parent"] for pair in pairs],
+        "training_labels_closed_at_epoch_seconds": closed, "model_available_at_epoch_seconds": available,
+        "forecast_contract": forecast_contract,
+        "sufficiency": gate, "fit_calls": 1, "wall_seconds": time.perf_counter()-started,
+        "target": "actual_J_reference_minus_J_patch", "target_center": 0.,
+        "training_method": "paired_score_difference_regression", "bootstrap_used": False,
+        "optimal_Q_established": False, "native_execution_authority": False,
+        "protected_takeover_eligible": False, "unavailable_pairs": unavailable}
+    model["model_id"] = digest(model)
+    return model
+
+
+def predict_advantage(model, reference, patched):
+    require(model["schema"] == SCHEMA and model["feature_schema"] == FEATURE_SCHEMA
+        and model["model_id"] == digest({key: item for key, item in model.items() if key != "model_id"}),
+        "immutable_model_identity")
+    require(_absolute_now(reference) >= model["model_available_at_epoch_seconds"]
+        and reference["observation"] == patched["observation"], "current_model_availability")
+    if model["information_variant"] == "C11":
+        for row in (reference, patched):
+            _forecast(row)
+            require(model["forecast_contract"] == _forecast_contract(row),
+                "current_frozen_forecast_model_and_mapping")
+    vectors = [action_features(row, information_variant=model["information_variant"]) for row in (reference, patched)]
+    names, p = model["feature_names"], model["parameters"]
+    require(all(sorted(vector) == names for vector in vectors), "model_feature_schema")
+    x = np.array([[vector[name] for name in names] for vector in vectors])
+    center, scale = np.array(p["center"]), np.array(p["scale"])
+    require(center.shape == scale.shape == (len(names),) and np.isfinite(center).all()
+        and np.isfinite(scale).all() and (scale > 0).all(), "model_normalization")
+    layers, width = [], len(names)
+    for layer in p["layers"]:
+        weight, bias = np.array(layer["weight"]), np.array(layer["bias"])
+        require(weight.ndim == 2 and weight.shape[1] == width and bias.shape == (weight.shape[0],)
+            and np.isfinite(weight).all() and np.isfinite(bias).all(), "model_layer_shape")
+        width = weight.shape[0]
+        layers.append({"weight": weight, "bias": bias})
+    require(layers and width == 1, "scalar_output")
+    scores = _forward((x-center)/scale, layers)[-1][:, 0]*number(p["target_scale"])
+    return number(float(scores[1]-scores[0]))
+
+
+def evaluate_on_dev(model, datasets):
+    pairs, unavailable = prepare_pairs(datasets, information_variant=model["information_variant"], split="dev")
+    require(pairs, "closed_development_pairs_required")
+    rows = []
+    for pair in pairs:
+        reference, patch = pair["raw"]["rows"]
+        predicted = predict_advantage(model, reference, patch)
+        choose_patch = predicted > 0.
+        gain = pair["advantage"] if choose_patch else 0.
+        execution = patch["actual_execution"] if choose_patch else reference["actual_execution"]
+        attempts = execution["attempts"]
+        failures = sum(not attempt["positive_delivered_ack"] for attempt in attempts)
+        harm = pair["raw"]["pair"].get("per_job_comparison_counts", {}).get("harmed", 0) if choose_patch else 0
+        rows.append({"pair_id": pair["pair_id"], "predicted_advantage": predicted,
+            "choose_patch": choose_patch, "actual_advantage": pair["advantage"],
+            "regret_bag_seconds": max(0., pair["advantage"])-gain,
+            "selected_attempts_without_positive_delivered_ack": failures, "selected_known_harmed_jobs": harm})
+    return {"schema": SCHEMA, "model_id": model["model_id"], "rows": rows,
+        "mean_paired_regret": float(np.mean([row["regret_bag_seconds"] for row in rows])),
+        "selected_failure_count": sum(row["selected_attempts_without_positive_delivered_ack"] for row in rows),
+        "selected_known_harmed_jobs": sum(row["selected_known_harmed_jobs"] for row in rows),
+        "unavailable_pairs": unavailable, "native_control_evaluation": False,
+        "strict_nonharm_certified": False, "test_used_for_selection": False}
+
+
+def select_on_dev(models, datasets):
+    require(models and len({model["information_variant"] for model in models}) == 1,
+        "separate_information_variant_selection")
+    require(len({model["seed"] for model in models}) == 1, "retain_each_registered_seed")
+    results = [evaluate_on_dev(model, datasets) for model in models]
+    parameters = {model["model_id"]: sum(np.asarray(item).size for layer in model["parameters"]["layers"]
+        for item in layer.values()) for model in models}
+    chosen = min(results, key=lambda result: (result["selected_failure_count"], result["selected_known_harmed_jobs"],
+        result["mean_paired_regret"], parameters[result["model_id"]], result["model_id"]))
+    return {"schema": SCHEMA, "selection_rule": SELECTION_RULE, "selected_model_id": chosen["model_id"],
+        "candidate_model_ids": [model["model_id"] for model in models], "development_results": results,
+        "development_dataset_sha256": digest(datasets), "frozen_before_test": True,
+        "protected_takeover_eligible": False, "native_control_benefit_established": False}
+
+
+def action_and_time_controls(train_datasets, dev_datasets):
+    """Small diagnostic regressions; never relabel them as learned control."""
+    train, _ = prepare_pairs(train_datasets, information_variant="C01", split="train")
+    dev, unavailable = prepare_pairs(dev_datasets, information_variant="C01", split="dev")
+    require(train and dev, "controls_need_train_and_dev")
+    train_times = np.array([pair["reference"]["decision_time_seconds"] for pair in train])
+    target = np.array([pair["advantage"] for pair in train])
+    center, scale = float(train_times.mean()), max(float(train_times.std()), 1.)
+    x = np.column_stack((np.ones(len(train)), (train_times-center)/scale))
+    weights = np.linalg.lstsq(x, target, rcond=None)[0]
+    actual = np.array([pair["advantage"] for pair in dev])
+    predictions = {
+        "reference_rule": np.zeros(len(dev)),
+        "always_patch": np.ones(len(dev)),
+        "train_mean_advantage": np.full(len(dev), target.mean()),
+        "train_only_time_regression": np.array([weights @ np.array([1.,
+            (pair["reference"]["decision_time_seconds"]-center)/scale]) for pair in dev])}
+    return {"schema": SCHEMA, "fit_calls": 1, "control_fit": "train_only_two_parameter_time_lstsq",
+        "train_time_center": center, "train_time_scale": scale, "time_weights": weights.tolist(),
+        "dev_mean_regret": {name: float(np.mean(np.maximum(actual, 0)-np.where(prediction > 0, actual, 0)))
+            for name, prediction in predictions.items()}, "unavailable_dev_pairs": unavailable,
+        "native_control_evaluation": False, "optimal_Q_established": False}
+
+
+def save_model(path, model):
+    path = Path(path)
+    with path.open("x", encoding="utf8", newline="\n") as stream:
+        json.dump(model, stream, sort_keys=True, separators=(",", ":"), allow_nan=False)
+        stream.write("\n")
+    return {"path": str(path.resolve()), "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
+        "model_id": model["model_id"]}

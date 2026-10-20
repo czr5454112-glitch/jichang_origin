@@ -1,0 +1,262 @@
+{
+  "schema": "g31.airport.prospective_actor_independent_code_audit.v1",
+  "status": "passed_after_two_audit_findings_corrected",
+  "sources": [
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_airport_prospective_campaign.py",
+      "sha256": "4ae488bfd56e65183fb4f734eb15a09b468fa3412784671fde8acd4a515f4443"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_airport_prospective_control.py",
+      "sha256": "f0c25e0469cf43141d2276196fe945b261eb1e1b2cfd9dac3d10f09466a0c12e"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_airport_pair_ranker.py",
+      "sha256": "57902869fb079577eca7d2cd3cc6225f976035836ab4d1ec83702442420f46d8"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_airport_pair_training_campaign.py",
+      "sha256": "9279244f6288f398dc46d413dd8d52c12c7f866e0e3e702516584f986744aedc"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_airport_batch_patch.py",
+      "sha256": "c326a1a036e52eeec7070cf71602b2e142c5c9853c8e65be0794a77db5104c71"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_airport_opportunities.py",
+      "sha256": "664e7eb20fae5480aa436c4435b6fb950c2b914036eabbc228fbc5f23f2974e1"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_airport_protocol_v2.py",
+      "sha256": "9850740cea7a08b71ac7a32e0d596d1c1a9a0dcc7a85fb807de7aefb0458c10a"
+    }
+  ],
+  "real_train_evidence": [
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\H_701_calendar_a_patch_001\\branch_evidence.json.gz",
+      "sha256": "3bbf71760a50fcd4c905bb093cdbacf946c0e6354b74b51347058ccba19a8178"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\H_701_calendar_a_patch_001\\final_result.json.gz",
+      "sha256": "756680f4267857b4a76bdb68f448a9c2ddd77ba6f4b3d78d001eb72921a221e2"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\H_701_calendar_a_patch_001\\client_calls.json.gz",
+      "sha256": "095de335aa8544ca1f7daf9b37601e4fd46778fd186bf6b9df84f350d65523ab"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\H_701_calendar_a_patch_001\\ack_views.json.gz",
+      "sha256": "f24d7b0859cebfb4542a371201d86bd4394cbc9165e8122a5fb420edec5f273a"
+    }
+  ],
+  "execution_binding_counterexamples": {
+    "actual_H701_patch": 1,
+    "wrong_selected_destination": 0,
+    "selected_hold_but_actual_submit": 0,
+    "future_ACK": 0,
+    "wrong_native_tray": 0
+  },
+  "actual_H701_execution": {
+    "rows": [
+      {
+        "owner_id": "owner:system_domestic",
+        "observed_at": 28860.0,
+        "tray_id": "initial:95:1",
+        "decision_differs": true,
+        "chosen_intent": {
+          "tray_id": "initial:95:1",
+          "source": 122,
+          "destination": 149,
+          "issued_at": 28860.0,
+          "owner_id": "owner:system_domestic",
+          "message_delay": 2.0,
+          "earliest_departure": 28862.0,
+          "expiry": 29155.603,
+          "forecast_dependency": "initial:95:1:empty",
+          "forecast_ledger": "actual_available",
+          "transfer_scope": "local_empty_return",
+          "control_reason": "isolated_bounded_optional_patch",
+          "service_window": {
+            "earliest_departure": 28860.0,
+            "conditional_dependencies": [],
+            "hard_guarantee": false
+          },
+          "expected_version": 0
+        },
+        "attempts": [
+          {
+            "actual_request": {
+              "tray_id": "initial:95:1",
+              "source": 122,
+              "destination": 149,
+              "issued_at": 28860.0,
+              "owner_id": "owner:system_domestic",
+              "message_delay": 2.0,
+              "earliest_departure": 28862.0,
+              "expiry": 29155.603,
+              "forecast_dependency": "initial:95:1:empty",
+              "forecast_ledger": "actual_available",
+              "transfer_scope": "local_empty_return",
+              "control_reason": "isolated_bounded_optional_patch",
+              "service_window": {
+                "earliest_departure": 28860.0,
+                "conditional_dependencies": [],
+                "hard_guarantee": false
+              },
+              "request_id": "live:21:owner:system_domestic:transfer:2057"
+            },
+            "submitted_at": 28860.0,
+            "selected_intent_matches_actual_submission": true,
+            "expected_effective_departure": 28862.0,
+            "actual_effective_departure": 28862.0,
+            "request_matches_native_transfer_entity": true,
+            "native_leg_matches_entity_and_endpoints": true,
+            "submission_reply": {
+              "status": "pending",
+              "reason": "request_enqueued"
+            },
+            "delivered_acks": [
+              {
+                "request_id": "live:21:owner:system_domestic:transfer:2057",
+                "sequence": 1,
+                "attempt": 1,
+                "observed_at": 28862.0,
+                "delivered_at": 28862.2,
+                "status": "dispatching",
+                "reason": "",
+                "received_at": -1.0,
+                "delivered_copies": 1
+              },
+              {
+                "request_id": "live:21:owner:system_domestic:transfer:2057",
+                "sequence": 2,
+                "attempt": 2,
+                "observed_at": 28922.0,
+                "delivered_at": 28922.2,
+                "status": "departed",
+                "reason": "",
+                "received_at": -1.0,
+                "delivered_copies": 1
+              },
+              {
+                "request_id": "live:21:owner:system_domestic:transfer:2057",
+                "sequence": 3,
+                "attempt": 3,
+                "observed_at": 28982.0,
+                "delivered_at": 28982.2,
+                "status": "departed",
+                "reason": "",
+                "received_at": -1.0,
+                "delivered_copies": 1
+              },
+              {
+                "request_id": "live:21:owner:system_domestic:transfer:2057",
+                "sequence": 4,
+                "attempt": 4,
+                "observed_at": 29042.0,
+                "delivered_at": 29042.2,
+                "status": "departed",
+                "reason": "",
+                "received_at": -1.0,
+                "delivered_copies": 1
+              },
+              {
+                "request_id": "live:21:owner:system_domestic:transfer:2057",
+                "sequence": 5,
+                "attempt": 5,
+                "observed_at": 29102.0,
+                "delivered_at": 29102.2,
+                "status": "received",
+                "reason": "",
+                "received_at": 29095.603000000003,
+                "delivered_copies": 1
+              }
+            ],
+            "ack_owner_and_clock_verified_count": 5,
+            "positive_delivered_ack": true,
+            "complete_G1_execution_chain": true,
+            "native_leg": {
+              "runtime_id": 563,
+              "transport_leg_id": "live:21:owner:system_domestic:transfer:2057:empty_return:563",
+              "tray": 13,
+              "job": -1,
+              "kind": "empty_return"
+            },
+            "native_transfer_at_export": {
+              "request_id": "live:21:owner:system_domestic:transfer:2057",
+              "transfer_scope": "local_empty_return",
+              "status": "received",
+              "reason": "",
+              "tray": 13,
+              "delivered_at": 28862.0,
+              "departed_at": 28865.0,
+              "received_at": 29095.603000000003
+            },
+            "first_edge_at": 28865.0,
+            "received_at": 29095.603000000003,
+            "next_load": {
+              "time": 29095.603000000003,
+              "event": "LOAD_START",
+              "business_bag_id": "projected:1x:215",
+              "transport_leg_id": "",
+              "tray_id": "initial:95:1",
+              "traversal_id": 7564,
+              "node": 149,
+              "from": -1,
+              "to": -1,
+              "reason": ""
+            },
+            "rejection_events": []
+          }
+        ],
+        "actual_submission_observed": true,
+        "strict_nonharm_certified": false
+      }
+    ],
+    "proposed_decision_differences": 1,
+    "different_decision_with_actual_submission": 1,
+    "different_decision_with_unique_leg": 1,
+    "mismatched_actual_submission_count": 0,
+    "different_decision_with_complete_G1_chain": 1,
+    "strict_nonharm_certified": false
+  },
+  "findings": [
+    {
+      "id": "chosen_action_native_entity_binding",
+      "original_gap": "same owner/time/tray plus request ID alone did not prove selected destination/scope/leg endpoints",
+      "resolution": "intent effective-departure match; native tray/scope/LEG_START endpoints; owner and time bound positive ACK; EDGE_ENTER required",
+      "verified": true
+    },
+    {
+      "id": "test_inputs_before_freeze_gate",
+      "original_gap": "prepare constructed parent input before validating all-domain frozen model manifest",
+      "resolution": "registered seed split and complete freeze validated before parent_input",
+      "regression_test": "test_test_model_freeze_precedes_any_test_input_read",
+      "verified": true
+    }
+  ],
+  "read_only_checks": {
+    "no_evaluator_future_jobs_or_outcome_targets_in_actor_rows": true,
+    "C00_C01_do_not_call_or_forward_forecast_provider": true,
+    "C10_C11_require_actual_owner_plan_receipt_and_absolute_calendar": true,
+    "common_catalog_does_not_use_plan": true,
+    "single_tray_patch_preserves_all_other_initial_batch_intents": true,
+    "residual_recomputes_current_without_repeated_selector": true,
+    "held_optional_exclusion_only_same_owner_timestamp": true,
+    "prepared_predictor_detaches_static_model_and_validates_each_current": true,
+    "selector_full_current_feature_forward_timing_separate_from_audit": true
+  },
+  "registration_sources_still_exact": [
+    "training_primary_001",
+    "training_resource_001"
+  ],
+  "fit_calls": 0,
+  "native_jobs": 0,
+  "test_data_opened": false,
+  "strict_nonharm_certified": false,
+  "limitations": [
+    "Static code audit plus rejoin of saved train native evidence; prospective native execution remains separate.",
+    "Preserved initial batch bytes and native residual admission do not certify completion of every mandatory business obligation.",
+    "Shared-resource per-job nonharm and out-of-parent generalization remain unproven."
+  ]
+}

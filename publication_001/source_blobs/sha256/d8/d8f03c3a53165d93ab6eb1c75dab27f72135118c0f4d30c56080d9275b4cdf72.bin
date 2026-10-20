@@ -1,0 +1,65 @@
+"""Prepare the fixed grid before launching at most two isolated native jobs."""
+from __future__ import annotations
+
+import argparse
+from concurrent.futures import ThreadPoolExecutor, as_completed
+import json
+from pathlib import Path
+
+from . import foundation_airport_action_campaign as common
+from . import foundation_airport_prospective_campaign as run
+
+
+def execute(*, binary, rule, models=None, batch="E", prepare_only=False):
+    grid_path = common.CYCLE/"prospective_evaluation_grid_001.json"
+    grid = common.read(grid_path)
+    batches = ("D", "G") if batch == "DG" else (batch,)
+    specs = [row for row in grid["rows"] if row["batch"] in batches]
+    if not specs:
+        raise ValueError("prospective_grid:no_registered_cells")
+    paths = []
+    for spec in specs:
+        path = common.CYCLE/spec["name"]
+        if not path.exists():
+            path = run.prepare(spec["name"], binary, seed=spec["parent_seed"], fleet=spec["fleet"],
+                information_variant=spec["variant"], batch=spec["batch"], rule_freeze=run.bound(rule),
+                grid_freeze=run.bound(grid_path), model_freeze=run.bound(models) if models else None,
+                training_domain=spec["training_domain"], model_seed=spec["model_seed"])
+        plan = common.read(path/"plan.json")
+        run.verify(plan)
+        paths.append(path)
+    sources = [common.read(path/"plan.json")["sources"] for path in paths]
+    if any(source != sources[0] for source in sources[1:]):
+        raise ValueError("prospective_grid:all_cell_sources_must_be_frozen_together")
+    common.event(common.CYCLE, "prospective_grid_prepared", batch=batch,
+        cells=len(paths), source_manifest_sha256=common.digest(sources[0]))
+    print(json.dumps(dict(event="grid_prepared", batch=batch, cells=len(paths))), flush=True)
+    if prepare_only:
+        return
+    pending = [path for path in paths if not (path/"receipt.json").exists()]
+    with ThreadPoolExecutor(max_workers=2) as pool:
+        work = {pool.submit(run.launch, path): path for path in pending}
+        for future in as_completed(work):
+            try:
+                result = future.result()
+            except Exception as exc:
+                # Preserve each failed preparation/launch; never silently retry.
+                result = dict(name=work[future].name, status="launcher_error", reason=repr(exc))
+                common.event(common.CYCLE, "prospective_grid_launcher_error", **result)
+            print(json.dumps(result), flush=True)
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--binary", type=Path, required=True)
+    parser.add_argument("--rule", type=Path, required=True)
+    parser.add_argument("--models", type=Path)
+    parser.add_argument("--batch", choices=("E", "DG"), required=True)
+    parser.add_argument("--prepare-only", action="store_true")
+    args = parser.parse_args()
+    execute(binary=args.binary, rule=args.rule, models=args.models, batch=args.batch,
+        prepare_only=args.prepare_only)
+
+
+if __name__ == "__main__":
+    main()

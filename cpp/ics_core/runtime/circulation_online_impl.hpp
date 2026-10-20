@@ -52,9 +52,32 @@ inline std::string EventDrivenJunctionRuntime::submit_circulation_transfer(
     if (old.request_id == request.request_id) {
       if (old.tray_id != request.tray_id || old.source != request.source ||
           old.destination != request.destination || old.earliest_departure != request.earliest_departure ||
-          old.expiry != request.expiry || old.message_delay != request.message_delay)
+          old.expiry != request.expiry || old.message_delay != request.message_delay ||
+          old.transfer_scope != request.transfer_scope)
         return "rejected:request_identity_conflict";
       return "duplicate:"+circulation_.transfers[i].status;
+    }
+  }
+  if(request.transfer_scope!="cross_zone_transfer" && request.transfer_scope!="local_empty_return")
+    return "rejected:unknown_transfer_scope";
+  if(request.transfer_scope=="local_empty_return") {
+    const auto& source=circulation_.node_contract(request.source);
+    const auto& destination=circulation_.node_contract(request.destination);
+    if(source.zone!=destination.zone) return "rejected:local_return_requires_same_zone";
+    if(circulation_.owner(request.destination)!=owner) return "rejected:local_return_requires_same_owner";
+    const auto& roles=circulation_.input.static_role_contract;
+    if(roles.schema!="g31.static_node_roles.v1") return "rejected:local_return_requires_static_roles";
+    if(std::find(roles.loader_nodes.begin(),roles.loader_nodes.end(),request.destination)==roles.loader_nodes.end())
+      return "rejected:local_return_destination_not_loader";
+    if(visible_tray->node!=request.source || visible_tray->mode!="empty" ||
+       visible_tray->active_leg>=0 || visible_tray->edge_to>=0 || visible_tray->reception_node>=0 ||
+       visible_tray->transfer>=0 || visible_tray->available_at>now_+1e-9)
+      return "rejected:local_return_tray_not_available";
+    for(std::size_t i=0;i<circulation_.input.transfers.size();++i) {
+      if(circulation_.input.transfers[i].tray_id!=request.tray_id) continue;
+      const auto& status=circulation_.transfers[i].status;
+      if(status=="undelivered" || status=="pending" || status=="dispatching" || status=="departed")
+        return "rejected:local_return_tray_already_committed";
     }
   }
   request.issued_at=now_;

@@ -1,0 +1,1639 @@
+{
+  "schema": "g31.protection_execution_audit.v1",
+  "created_at_utc": "2026-10-20T04:41:08.523053+00:00",
+  "read_scope": [
+    "D_N22_C00_P901_001",
+    "D_N22_C10_P901_001",
+    "D_N22_C01_S17_P901_001",
+    "D_N22_C01_S29_P901_001",
+    "D_N22_C01_S43_P901_001",
+    "D_N22_C11_S17_P901_001",
+    "D_N22_C11_S29_P901_001"
+  ],
+  "status": "completed_limited_read_only_audit",
+  "native_starts": 0,
+  "fit_calls": 0,
+  "runtime_source_edits": 0,
+  "source_inputs": [
+    {
+      "path": "scripts/experiments/g31_ics_circulation/native_host.py",
+      "sha256": "0860305487d8a56eae9fc856da8aea82821b7d6c002c45ba01c9dfd26c293ac1"
+    },
+    {
+      "path": "scripts/experiments/g31_ics_circulation/analytic_control.py",
+      "sha256": "e4829bef8b733c2b85ba79c16f087ec5732190f518aaa6c91b94e82435c23b56"
+    },
+    {
+      "path": "scripts/experiments/g31_ics_circulation/protocol_control.py",
+      "sha256": "3ff5770e11de5c20b203455546829986d8c3e22e6d4a4189bf0214f14fe1da2f"
+    },
+    {
+      "path": "scripts/experiments/g31_ics_circulation/foundation_airport_protocol_v2.py",
+      "sha256": "9850740cea7a08b71ac7a32e0d596d1c1a9a0dcc7a85fb807de7aefb0458c10a"
+    },
+    {
+      "path": "scripts/experiments/g31_ics_circulation/foundation_airport_batch_patch.py",
+      "sha256": "c326a1a036e52eeec7070cf71602b2e142c5c9853c8e65be0794a77db5104c71"
+    },
+    {
+      "path": "scripts/experiments/g31_ics_circulation/foundation_airport_opportunities.py",
+      "sha256": "664e7eb20fae5480aa436c4435b6fb950c2b914036eabbc228fbc5f23f2974e1"
+    },
+    {
+      "path": "scripts/experiments/g31_ics_circulation/foundation_airport_prospective_control.py",
+      "sha256": "f0c25e0469cf43141d2276196fe945b261eb1e1b2cfd9dac3d10f09466a0c12e"
+    },
+    {
+      "path": "scripts/experiments/g31_ics_circulation/foundation_airport_prospective_campaign.py",
+      "sha256": "4ae488bfd56e65183fb4f734eb15a09b468fa3412784671fde8acd4a515f4443"
+    }
+  ],
+  "protection_scope": {
+    "artifact": {
+      "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/protection_scope_001.json",
+      "sha256": "6aa4f5c27cd7674910d5ff2c4cf00ea9c251bb25b8fb805ef2f4c39dfd2139f6"
+    },
+    "content": {
+      "schema": "g31.airport.protection_scope.v1",
+      "mode": "isolated_simulation_only",
+      "checks_retained": [
+        "actual current empty entity and source owner",
+        "no outstanding tray pledge/reception commitment at optional selection",
+        "source FIFO and export_min_stock",
+        "static loader role and explicit local/cross-zone scope",
+        "native receiver lease/reserve/capacity admission",
+        "ordinary ACK/retry/recovery and unique entity leg"
+      ],
+      "patch_limit": "at most one optional actual tray; preserve all other initial batch allocations; refresh current for residual",
+      "certified": false,
+      "unknown": [
+        "per-job effects through shared loaded/empty channels",
+        "future route interference and downstream FIFO interactions",
+        "completion times for unfinished jobs",
+        "wall-clock freshness under asynchronous physical execution"
+      ],
+      "known_negative_evidence": "paired datasets preserve known delayed jobs even when aggregate backlog cost improves",
+      "unsupported_claims": [
+        "protected model takeover",
+        "per-job nonharm from native legality",
+        "global deadlock from a short local wait cycle",
+        "optimal multistep Q from a finite conditional continuation label"
+      ]
+    }
+  },
+  "runs": [
+    {
+      "name": "D_N22_C00_P901_001",
+      "status": "complete",
+      "closed_receipt_checked_before_output_read": true,
+      "source_pins_verified": [
+        {
+          "path": "scripts/experiments/g31_ics_circulation/native_host.py",
+          "sha256": "0860305487d8a56eae9fc856da8aea82821b7d6c002c45ba01c9dfd26c293ac1"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/analytic_control.py",
+          "sha256": "e4829bef8b733c2b85ba79c16f087ec5732190f518aaa6c91b94e82435c23b56"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/protocol_control.py",
+          "sha256": "3ff5770e11de5c20b203455546829986d8c3e22e6d4a4189bf0214f14fe1da2f"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/foundation_airport_protocol_v2.py",
+          "sha256": "9850740cea7a08b71ac7a32e0d596d1c1a9a0dcc7a85fb807de7aefb0458c10a"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/foundation_airport_batch_patch.py",
+          "sha256": "c326a1a036e52eeec7070cf71602b2e142c5c9853c8e65be0794a77db5104c71"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/foundation_airport_opportunities.py",
+          "sha256": "664e7eb20fae5480aa436c4435b6fb950c2b914036eabbc228fbc5f23f2974e1"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/foundation_airport_prospective_control.py",
+          "sha256": "f0c25e0469cf43141d2276196fe945b261eb1e1b2cfd9dac3d10f09466a0c12e"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/foundation_airport_prospective_campaign.py",
+          "sha256": "4ae488bfd56e65183fb4f734eb15a09b468fa3412784671fde8acd4a515f4443"
+        }
+      ],
+      "inputs": {
+        "receipt.json": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C00_P901_001/receipt.json",
+          "sha256": "df6c9d30c7241fa8e4769dd78895a38dc9bd0a73f22ba925e31dede57bdd4a0b"
+        },
+        "plan.json": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C00_P901_001/plan.json",
+          "sha256": "93bd495b2fd2681d1e139738a95fd835fc7a58a821076787e1029f49bf472603"
+        },
+        "input.json": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C00_P901_001/input.json",
+          "sha256": "94f55dbde869edb89683518cf16f19ee94307f1215b32d659e01865352f770de"
+        },
+        "final_result.json.gz": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C00_P901_001/final_result.json.gz",
+          "sha256": "a6ba3aeffab6c01b91905f01db6d095383f773f93d8d3cb630c49bb2fcda5b55"
+        },
+        "client_calls.json.gz": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C00_P901_001/client_calls.json.gz",
+          "sha256": "f82f33e4386d26fea93c4fff7b1d6cb9d87ea60489488252ebe324b86207c4c3"
+        },
+        "execution_evidence.json.gz": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C00_P901_001/execution_evidence.json.gz",
+          "sha256": "0feef63e3670f535c9498d5ddf55e0e9cc3341dcf71f72380c8edce9b91bf3b6"
+        },
+        "activation_prefix.json.gz": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C00_P901_001/activation_prefix.json.gz",
+          "sha256": "9063ba51a7185ef270c9d6390664abdada866dfd466e3d437a8c72b0ffe7d5f9"
+        },
+        "planner_summary.json": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C00_P901_001/planner_summary.json",
+          "sha256": "5b01a3fa7109da4bb28c57c27696137e84a517f62f03fe9c9c876f44c72f4158"
+        },
+        "callback_audit_receipt.json": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C00_P901_001/callback_audit_receipt.json",
+          "sha256": "3017bb75365db56ac864a389054ce80b01e58d5e6c3927f868cec89e3722612e"
+        },
+        "callback_audit.jsonl.gz": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C00_P901_001/callback_audit.jsonl.gz",
+          "sha256": "de881d6301db085daae25144f8295c6011077f01c3426301a91ec21deace7e96"
+        }
+      },
+      "activation_prefix": {
+        "native_state_sha256": "4975b19043746490e68ad19a1ef1d582d8278a2cd077f9b907959efcd76d9163",
+        "controller_state_sha256": "10d63a9c2dbeff70711cc7eb4af70c270b2f2508e62dcd4f00c27268e72304bb",
+        "public_state_digest": "651c39d7807ba870ffc6136b8f4b65f4fba1e854da7cafeefee126346d405c00",
+        "observed_at": 7200.0,
+        "owner_id": "owner:system_domestic",
+        "complete_prefix_sha256": "f4e5e5a00077b725ed9fe5bf53afefd8a528cd17eed7513b2c1283ca616344e8"
+      },
+      "same_full_activation_prefix_as_C00": true,
+      "physical_receipt_replay": {
+        "status": "passed",
+        "completed_traversals": 36054,
+        "open_traversals": 16,
+        "tray_count": 22,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "native_summary": {
+        "event_count": 508724,
+        "completed_count": 2874,
+        "failed_count": 0,
+        "runtime_seconds": 0.0,
+        "edge_enter_event_count": 36070,
+        "edge_exit_event_count": 36054,
+        "reservation_conflicts": 0,
+        "physical_fault_edge_entry_violation_count": 0,
+        "merge_grant_timing_mode": "jit_fair_aging_deadline",
+        "g4irsf20_event_hotpath_policy": "E2",
+        "local_queue_capacity": 0
+      },
+      "job_status_counts": {
+        "completed": 969,
+        "waiting_for_tray": 19933,
+        "in_transit": 19,
+        "unreleased": 7585
+      },
+      "tray_mode_counts": {
+        "loaded": 19,
+        "empty_transit": 2,
+        "empty": 1
+      },
+      "quarantined_trays": [],
+      "transfer_status_counts": {
+        "received": 976,
+        "rejected": 533,
+        "pending": 15,
+        "departed": 2,
+        "undelivered": 3
+      },
+      "rejection_or_failure_reasons": {
+        "receiving_full": 421,
+        "departure_lease_expired": 8,
+        "receiver_transit_reserve": 104
+      },
+      "receipt_rejection_counts": {
+        "TRANSFER_REJECTED:receiving_full": 421,
+        "TRANSFER_REJECTED:departure_lease_expired": 8,
+        "TRANSFER_REJECTED:receiver_transit_reserve": 104
+      },
+      "immutable_retry_payload_error_count": 0,
+      "direct_submit_reply_rejection_count": 0,
+      "failed_transfer_details": [],
+      "callback_guard_audit": {
+        "complete_initial_stream_hash_chain_verified": true,
+        "record_count": 1982,
+        "status_counts": {
+          "ordinary_warmup": 240,
+          "reference_rule": 1742
+        },
+        "patched_batches_checked": 0,
+        "failures": [],
+        "residual_callback_count_from_frozen_planner": 1529,
+        "residual_full_observations_saved_in_this_stream": false,
+        "scope": "All recorded initial owner callbacks were independently checked for exact observed state/prefix binding, current actual unpledged empty tray, static scope/owner/loader/timing, one tray change and all other initial intents preserved. Native async physical freshness and shared future nonharm are not proven."
+      },
+      "timing_wall_measurements": {
+        "planning": {
+          "sum_ms": 58004.33680001879,
+          "max_ms": 285.58550000889227
+        },
+        "audit_persistence": {
+          "sum_ms": 24920.10820080759,
+          "max_ms": 53.367899963632226
+        }
+      },
+      "execution_mismatch_count": 0
+    },
+    {
+      "name": "D_N22_C10_P901_001",
+      "status": "complete",
+      "closed_receipt_checked_before_output_read": true,
+      "source_pins_verified": [
+        {
+          "path": "scripts/experiments/g31_ics_circulation/native_host.py",
+          "sha256": "0860305487d8a56eae9fc856da8aea82821b7d6c002c45ba01c9dfd26c293ac1"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/analytic_control.py",
+          "sha256": "e4829bef8b733c2b85ba79c16f087ec5732190f518aaa6c91b94e82435c23b56"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/protocol_control.py",
+          "sha256": "3ff5770e11de5c20b203455546829986d8c3e22e6d4a4189bf0214f14fe1da2f"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/foundation_airport_protocol_v2.py",
+          "sha256": "9850740cea7a08b71ac7a32e0d596d1c1a9a0dcc7a85fb807de7aefb0458c10a"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/foundation_airport_batch_patch.py",
+          "sha256": "c326a1a036e52eeec7070cf71602b2e142c5c9853c8e65be0794a77db5104c71"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/foundation_airport_opportunities.py",
+          "sha256": "664e7eb20fae5480aa436c4435b6fb950c2b914036eabbc228fbc5f23f2974e1"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/foundation_airport_prospective_control.py",
+          "sha256": "f0c25e0469cf43141d2276196fe945b261eb1e1b2cfd9dac3d10f09466a0c12e"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/foundation_airport_prospective_campaign.py",
+          "sha256": "4ae488bfd56e65183fb4f734eb15a09b468fa3412784671fde8acd4a515f4443"
+        }
+      ],
+      "inputs": {
+        "receipt.json": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C10_P901_001/receipt.json",
+          "sha256": "09cbf659cf3a7edfc9d71273681f01af8e5e9f76e27c77ea2724435d0a03eccc"
+        },
+        "plan.json": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C10_P901_001/plan.json",
+          "sha256": "78815e9706bdb12f26d95fa6ddd2c979f566649d56a2abec6dd83b61c149b143"
+        },
+        "input.json": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C10_P901_001/input.json",
+          "sha256": "94f55dbde869edb89683518cf16f19ee94307f1215b32d659e01865352f770de"
+        },
+        "final_result.json.gz": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C10_P901_001/final_result.json.gz",
+          "sha256": "8524a360908c0144d3ae402aa68ed9408c04068b7652484c4b54495356abc308"
+        },
+        "client_calls.json.gz": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C10_P901_001/client_calls.json.gz",
+          "sha256": "e21844fe45a1cf9b0e1cfddc27478dd56b982a31a43a7e6b2265c7c0a1ce8d19"
+        },
+        "execution_evidence.json.gz": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C10_P901_001/execution_evidence.json.gz",
+          "sha256": "aef9e4581830196047bc9c0cca9a6134696220398dc359056eff087de5c3b31a"
+        },
+        "activation_prefix.json.gz": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C10_P901_001/activation_prefix.json.gz",
+          "sha256": "77d76c3d76fd9fdfbba2faf28d4a1670041e2041cc79eeb883e220fa5e0ba417"
+        },
+        "planner_summary.json": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C10_P901_001/planner_summary.json",
+          "sha256": "9f37fe2cf4341143f64f58ccb7f5a172422f6c361e934f38ff36629f5ad042aa"
+        },
+        "callback_audit_receipt.json": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C10_P901_001/callback_audit_receipt.json",
+          "sha256": "6fee479b7d1b59974a8b1e60c6e28dd784fa1411e24c753d0b9a32e9e66753d4"
+        },
+        "callback_audit.jsonl.gz": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C10_P901_001/callback_audit.jsonl.gz",
+          "sha256": "34b0cc0bc6a3b2e8a94044629226647fcc0ea48b5db413cdaa458cbc0e8d823f"
+        }
+      },
+      "activation_prefix": {
+        "native_state_sha256": "4975b19043746490e68ad19a1ef1d582d8278a2cd077f9b907959efcd76d9163",
+        "controller_state_sha256": "10d63a9c2dbeff70711cc7eb4af70c270b2f2508e62dcd4f00c27268e72304bb",
+        "public_state_digest": "651c39d7807ba870ffc6136b8f4b65f4fba1e854da7cafeefee126346d405c00",
+        "observed_at": 7200.0,
+        "owner_id": "owner:system_domestic",
+        "complete_prefix_sha256": "f4e5e5a00077b725ed9fe5bf53afefd8a528cd17eed7513b2c1283ca616344e8"
+      },
+      "same_full_activation_prefix_as_C00": true,
+      "physical_receipt_replay": {
+        "status": "passed",
+        "completed_traversals": 35607,
+        "open_traversals": 16,
+        "tray_count": 22,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "native_summary": {
+        "event_count": 504319,
+        "completed_count": 2831,
+        "failed_count": 0,
+        "runtime_seconds": 0.0,
+        "edge_enter_event_count": 35623,
+        "edge_exit_event_count": 35607,
+        "reservation_conflicts": 0,
+        "physical_fault_edge_entry_violation_count": 0,
+        "merge_grant_timing_mode": "jit_fair_aging_deadline",
+        "g4irsf20_event_hotpath_policy": "E2",
+        "local_queue_capacity": 0
+      },
+      "job_status_counts": {
+        "completed": 957,
+        "waiting_for_tray": 19952,
+        "in_transit": 12,
+        "unreleased": 7585
+      },
+      "tray_mode_counts": {
+        "empty": 4,
+        "loaded": 12,
+        "empty_transit": 6
+      },
+      "quarantined_trays": [],
+      "transfer_status_counts": {
+        "received": 959,
+        "rejected": 533,
+        "departed": 6,
+        "pending": 7,
+        "undelivered": 4
+      },
+      "rejection_or_failure_reasons": {
+        "departure_lease_expired": 13,
+        "receiving_full": 400,
+        "receiver_transit_reserve": 120
+      },
+      "receipt_rejection_counts": {
+        "TRANSFER_REJECTED:departure_lease_expired": 13,
+        "TRANSFER_REJECTED:receiving_full": 400,
+        "TRANSFER_REJECTED:receiver_transit_reserve": 120
+      },
+      "immutable_retry_payload_error_count": 0,
+      "direct_submit_reply_rejection_count": 0,
+      "failed_transfer_details": [],
+      "callback_guard_audit": {
+        "complete_initial_stream_hash_chain_verified": true,
+        "record_count": 1982,
+        "status_counts": {
+          "ordinary_warmup": 240,
+          "reference_selected": 395,
+          "isolated_current_patch_proposed": 5,
+          "reference_no_distinct_current_candidate": 1342
+        },
+        "patched_batches_checked": 5,
+        "failures": [],
+        "residual_callback_count_from_frozen_planner": 1509,
+        "residual_full_observations_saved_in_this_stream": false,
+        "scope": "All recorded initial owner callbacks were independently checked for exact observed state/prefix binding, current actual unpledged empty tray, static scope/owner/loader/timing, one tray change and all other initial intents preserved. Native async physical freshness and shared future nonharm are not proven."
+      },
+      "timing_wall_measurements": {
+        "planning": {
+          "sum_ms": 157931.57409928972,
+          "max_ms": 838.6936000315472
+        },
+        "audit_persistence": {
+          "sum_ms": 26318.809300428256,
+          "max_ms": 52.42319998797029
+        }
+      },
+      "execution_mismatch_count": 0
+    },
+    {
+      "name": "D_N22_C01_S17_P901_001",
+      "status": "complete",
+      "closed_receipt_checked_before_output_read": true,
+      "source_pins_verified": [
+        {
+          "path": "scripts/experiments/g31_ics_circulation/native_host.py",
+          "sha256": "0860305487d8a56eae9fc856da8aea82821b7d6c002c45ba01c9dfd26c293ac1"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/analytic_control.py",
+          "sha256": "e4829bef8b733c2b85ba79c16f087ec5732190f518aaa6c91b94e82435c23b56"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/protocol_control.py",
+          "sha256": "3ff5770e11de5c20b203455546829986d8c3e22e6d4a4189bf0214f14fe1da2f"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/foundation_airport_protocol_v2.py",
+          "sha256": "9850740cea7a08b71ac7a32e0d596d1c1a9a0dcc7a85fb807de7aefb0458c10a"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/foundation_airport_batch_patch.py",
+          "sha256": "c326a1a036e52eeec7070cf71602b2e142c5c9853c8e65be0794a77db5104c71"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/foundation_airport_opportunities.py",
+          "sha256": "664e7eb20fae5480aa436c4435b6fb950c2b914036eabbc228fbc5f23f2974e1"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/foundation_airport_prospective_control.py",
+          "sha256": "f0c25e0469cf43141d2276196fe945b261eb1e1b2cfd9dac3d10f09466a0c12e"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/foundation_airport_prospective_campaign.py",
+          "sha256": "4ae488bfd56e65183fb4f734eb15a09b468fa3412784671fde8acd4a515f4443"
+        }
+      ],
+      "inputs": {
+        "receipt.json": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C01_S17_P901_001/receipt.json",
+          "sha256": "0b985cfcd4f0a63b220adbf4ce981ae5cffa3226187873654efd1623a67a82dd"
+        },
+        "plan.json": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C01_S17_P901_001/plan.json",
+          "sha256": "4da6820511ac9600e8590950d23eb67a7afebd47741d50756828444add101348"
+        },
+        "input.json": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C01_S17_P901_001/input.json",
+          "sha256": "94f55dbde869edb89683518cf16f19ee94307f1215b32d659e01865352f770de"
+        },
+        "final_result.json.gz": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C01_S17_P901_001/final_result.json.gz",
+          "sha256": "5c73cd1cfde1d8d5621b99f1b9f5ce29572f5a0ba7590e1287b1a71d8edf1fa4"
+        },
+        "client_calls.json.gz": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C01_S17_P901_001/client_calls.json.gz",
+          "sha256": "90bf023af975a30fc9ed74b834b32997bc4b4aee45af2746666d0968ada7b61e"
+        },
+        "execution_evidence.json.gz": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C01_S17_P901_001/execution_evidence.json.gz",
+          "sha256": "5021bb05c770f51abb2b4684ea4ec205bf1dc3d18abc36e2625967c94cddfc7f"
+        },
+        "activation_prefix.json.gz": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C01_S17_P901_001/activation_prefix.json.gz",
+          "sha256": "9063ba51a7185ef270c9d6390664abdada866dfd466e3d437a8c72b0ffe7d5f9"
+        },
+        "planner_summary.json": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C01_S17_P901_001/planner_summary.json",
+          "sha256": "6d695c903fa60f0235b2426c45075b59a1c6d2347761a564d03f32daa525c752"
+        },
+        "callback_audit_receipt.json": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C01_S17_P901_001/callback_audit_receipt.json",
+          "sha256": "7da9e1735a1fd2a265986a5956a4d5193a7b1ad855a75b342c5bc1ff3231e8d5"
+        },
+        "callback_audit.jsonl.gz": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C01_S17_P901_001/callback_audit.jsonl.gz",
+          "sha256": "0d87f3c681cf67382fabcb59846dc96252f89d58cd78a0400a7dae7ae6079fc7"
+        }
+      },
+      "activation_prefix": {
+        "native_state_sha256": "4975b19043746490e68ad19a1ef1d582d8278a2cd077f9b907959efcd76d9163",
+        "controller_state_sha256": "10d63a9c2dbeff70711cc7eb4af70c270b2f2508e62dcd4f00c27268e72304bb",
+        "public_state_digest": "651c39d7807ba870ffc6136b8f4b65f4fba1e854da7cafeefee126346d405c00",
+        "observed_at": 7200.0,
+        "owner_id": "owner:system_domestic",
+        "complete_prefix_sha256": "f4e5e5a00077b725ed9fe5bf53afefd8a528cd17eed7513b2c1283ca616344e8"
+      },
+      "same_full_activation_prefix_as_C00": true,
+      "physical_receipt_replay": {
+        "status": "passed",
+        "completed_traversals": 34924,
+        "open_traversals": 16,
+        "tray_count": 22,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "native_summary": {
+        "event_count": 496079,
+        "completed_count": 2807,
+        "failed_count": 1,
+        "runtime_seconds": 0.0,
+        "edge_enter_event_count": 34940,
+        "edge_exit_event_count": 34924,
+        "reservation_conflicts": 0,
+        "physical_fault_edge_entry_violation_count": 0,
+        "merge_grant_timing_mode": "jit_fair_aging_deadline",
+        "g4irsf20_event_hotpath_policy": "E2",
+        "local_queue_capacity": 0
+      },
+      "job_status_counts": {
+        "completed": 948,
+        "waiting_for_tray": 19958,
+        "in_transit": 15,
+        "unreleased": 7585
+      },
+      "tray_mode_counts": {
+        "empty_transit": 6,
+        "loaded": 15,
+        "quarantined": 1
+      },
+      "quarantined_trays": [
+        {
+          "tray_id": "initial:138:0",
+          "node": 41,
+          "mode": "quarantined",
+          "job": -1,
+          "active_leg": 1374,
+          "edge_from": -1,
+          "edge_to": -1,
+          "reception_node": -1,
+          "available_at": 39716.51799999999,
+          "traversal_id": 17012
+        }
+      ],
+      "transfer_status_counts": {
+        "received": 957,
+        "rejected": 553,
+        "failed": 1,
+        "departed": 6,
+        "pending": 12
+      },
+      "rejection_or_failure_reasons": {
+        "receiving_full": 423,
+        "departure_lease_expired": 10,
+        "receiver_transit_reserve": 120,
+        "departure_lease_expired_before_physical_entry": 1
+      },
+      "receipt_rejection_counts": {
+        "TRANSFER_REJECTED:receiving_full": 423,
+        "TRANSFER_REJECTED:departure_lease_expired": 10,
+        "TRANSFER_REJECTED:receiver_transit_reserve": 120
+      },
+      "immutable_retry_payload_error_count": 0,
+      "direct_submit_reply_rejection_count": 0,
+      "failed_transfer_details": [
+        {
+          "transfer": {
+            "request_id": "live:26:owner:system_international:transfer:1603",
+            "transfer_scope": "cross_zone_transfer",
+            "status": "failed",
+            "reason": "departure_lease_expired_before_physical_entry",
+            "tray": 18,
+            "delivered_at": 39122.0,
+            "departed_at": -1.0,
+            "received_at": -1.0
+          },
+          "first_actual_call": {
+            "at": 39120.0,
+            "retry": false,
+            "kind": "transfer",
+            "request": {
+              "request_id": "live:26:owner:system_international:transfer:1603",
+              "tray_id": "initial:138:0",
+              "source": 41,
+              "destination": 138,
+              "issued_at": 39120.0,
+              "message_delay": 2.0,
+              "earliest_departure": 39120.0,
+              "expiry": 39717.515,
+              "forecast_dependency": "initial:138:0:projected:1x:668:loaded",
+              "forecast_ledger": "conditional_release",
+              "control_reason": "observed_source_queue",
+              "service_window": {
+                "earliest_departure": 39120.0,
+                "conditional_dependencies": [],
+                "hard_guarantee": false
+              },
+              "owner_id": "owner:system_international"
+            },
+            "reply": {
+              "status": "pending",
+              "reason": "request_enqueued"
+            },
+            "submit_compute_ms": 0.10500004282221198
+          },
+          "matched_selected_execution_rows": [],
+          "receipt_events": [
+            {
+              "time": 39122.0,
+              "event": "MODULE_REQUEST_DELIVERED",
+              "business_bag_id": "projected:1x:668",
+              "transport_leg_id": "",
+              "tray_id": "initial:138:0",
+              "traversal_id": 16656,
+              "node": 53,
+              "from": 41,
+              "to": 138,
+              "reason": "live:26:owner:system_international:transfer:1603"
+            },
+            {
+              "time": 39716.51799999999,
+              "event": "EXPORT_GRANTED",
+              "business_bag_id": "",
+              "transport_leg_id": "",
+              "tray_id": "initial:138:0",
+              "traversal_id": 17012,
+              "node": 41,
+              "from": 41,
+              "to": 138,
+              "reason": "live:26:owner:system_international:transfer:1603"
+            },
+            {
+              "time": 39716.51799999999,
+              "event": "LEG_START",
+              "business_bag_id": "",
+              "transport_leg_id": "live:26:owner:system_international:transfer:1603:empty_return:1374",
+              "tray_id": "initial:138:0",
+              "traversal_id": 17012,
+              "node": 41,
+              "from": 41,
+              "to": 138,
+              "reason": "empty_return"
+            },
+            {
+              "time": 39717.51500001,
+              "event": "UNUSED_RECEIVING_RELEASED",
+              "business_bag_id": "",
+              "transport_leg_id": "live:26:owner:system_international:transfer:1603:empty_return:1374",
+              "tray_id": "initial:138:0",
+              "traversal_id": 17012,
+              "node": 41,
+              "from": 41,
+              "to": 138,
+              "reason": "departure_lease_expired_before_physical_entry"
+            },
+            {
+              "time": 39717.51500001,
+              "event": "LEG_FAILED",
+              "business_bag_id": "",
+              "transport_leg_id": "live:26:owner:system_international:transfer:1603:empty_return:1374",
+              "tray_id": "initial:138:0",
+              "traversal_id": 17012,
+              "node": 41,
+              "from": -1,
+              "to": 41,
+              "reason": "departure_lease_expired_before_physical_entry"
+            }
+          ],
+          "first_edge_count": 0,
+          "unused_receiving_released": true,
+          "causal_scope": "Observed under changed whole policy; failed request itself is ordinary observed_source_queue allocation, not a proven isolated patch counterfactual."
+        }
+      ],
+      "callback_guard_audit": {
+        "complete_initial_stream_hash_chain_verified": true,
+        "record_count": 1982,
+        "status_counts": {
+          "ordinary_warmup": 240,
+          "reference_selected": 296,
+          "isolated_current_patch_proposed": 121,
+          "reference_no_distinct_current_candidate": 1325
+        },
+        "patched_batches_checked": 121,
+        "failures": [],
+        "residual_callback_count_from_frozen_planner": 1529,
+        "residual_full_observations_saved_in_this_stream": false,
+        "scope": "All recorded initial owner callbacks were independently checked for exact observed state/prefix binding, current actual unpledged empty tray, static scope/owner/loader/timing, one tray change and all other initial intents preserved. Native async physical freshness and shared future nonharm are not proven."
+      },
+      "timing_wall_measurements": {
+        "planning": {
+          "sum_ms": 112012.9351001815,
+          "max_ms": 523.3267999719828
+        },
+        "audit_persistence": {
+          "sum_ms": 26950.738000217825,
+          "max_ms": 43.83729997789487
+        }
+      },
+      "execution_mismatch_count": 0
+    },
+    {
+      "name": "D_N22_C01_S29_P901_001",
+      "status": "complete",
+      "closed_receipt_checked_before_output_read": true,
+      "source_pins_verified": [
+        {
+          "path": "scripts/experiments/g31_ics_circulation/native_host.py",
+          "sha256": "0860305487d8a56eae9fc856da8aea82821b7d6c002c45ba01c9dfd26c293ac1"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/analytic_control.py",
+          "sha256": "e4829bef8b733c2b85ba79c16f087ec5732190f518aaa6c91b94e82435c23b56"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/protocol_control.py",
+          "sha256": "3ff5770e11de5c20b203455546829986d8c3e22e6d4a4189bf0214f14fe1da2f"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/foundation_airport_protocol_v2.py",
+          "sha256": "9850740cea7a08b71ac7a32e0d596d1c1a9a0dcc7a85fb807de7aefb0458c10a"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/foundation_airport_batch_patch.py",
+          "sha256": "c326a1a036e52eeec7070cf71602b2e142c5c9853c8e65be0794a77db5104c71"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/foundation_airport_opportunities.py",
+          "sha256": "664e7eb20fae5480aa436c4435b6fb950c2b914036eabbc228fbc5f23f2974e1"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/foundation_airport_prospective_control.py",
+          "sha256": "f0c25e0469cf43141d2276196fe945b261eb1e1b2cfd9dac3d10f09466a0c12e"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/foundation_airport_prospective_campaign.py",
+          "sha256": "4ae488bfd56e65183fb4f734eb15a09b468fa3412784671fde8acd4a515f4443"
+        }
+      ],
+      "inputs": {
+        "receipt.json": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C01_S29_P901_001/receipt.json",
+          "sha256": "4a580b9c62f91f1da924d5aedcef9500fd3fe5df73a528624737cb22099927ea"
+        },
+        "plan.json": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C01_S29_P901_001/plan.json",
+          "sha256": "b17f800e947acf8022a97dde20891471a47f9b3c53024ed5a929f707c2fd70e4"
+        },
+        "input.json": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C01_S29_P901_001/input.json",
+          "sha256": "94f55dbde869edb89683518cf16f19ee94307f1215b32d659e01865352f770de"
+        },
+        "final_result.json.gz": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C01_S29_P901_001/final_result.json.gz",
+          "sha256": "2e9746627b84d533191990feb911582778dff4e193c54cf00401abce168f9c9a"
+        },
+        "client_calls.json.gz": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C01_S29_P901_001/client_calls.json.gz",
+          "sha256": "5ac72705a5f0406d88d23be43c3c24a957c1a41aef37287bd878bbbd11ecf3d1"
+        },
+        "execution_evidence.json.gz": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C01_S29_P901_001/execution_evidence.json.gz",
+          "sha256": "8cdaaa9cf592d294fc874e808d4f1cfb97753b9068c961801f78ce3c934298e6"
+        },
+        "activation_prefix.json.gz": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C01_S29_P901_001/activation_prefix.json.gz",
+          "sha256": "9063ba51a7185ef270c9d6390664abdada866dfd466e3d437a8c72b0ffe7d5f9"
+        },
+        "planner_summary.json": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C01_S29_P901_001/planner_summary.json",
+          "sha256": "17b45633fbac121b53a6919acdcb24a9ca67b7464c80dd697905c98640d51b7b"
+        },
+        "callback_audit_receipt.json": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C01_S29_P901_001/callback_audit_receipt.json",
+          "sha256": "8ed594bd490465aff1c3a0f62f914ab18f0217a2486a0666329a1175ba79c592"
+        },
+        "callback_audit.jsonl.gz": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C01_S29_P901_001/callback_audit.jsonl.gz",
+          "sha256": "e44b7bf93be0e56b63cd03e123346642ae82646bdea9e5bb9d4d04915bdb22ce"
+        }
+      },
+      "activation_prefix": {
+        "native_state_sha256": "4975b19043746490e68ad19a1ef1d582d8278a2cd077f9b907959efcd76d9163",
+        "controller_state_sha256": "10d63a9c2dbeff70711cc7eb4af70c270b2f2508e62dcd4f00c27268e72304bb",
+        "public_state_digest": "651c39d7807ba870ffc6136b8f4b65f4fba1e854da7cafeefee126346d405c00",
+        "observed_at": 7200.0,
+        "owner_id": "owner:system_domestic",
+        "complete_prefix_sha256": "f4e5e5a00077b725ed9fe5bf53afefd8a528cd17eed7513b2c1283ca616344e8"
+      },
+      "same_full_activation_prefix_as_C00": true,
+      "physical_receipt_replay": {
+        "status": "passed",
+        "completed_traversals": 35559,
+        "open_traversals": 11,
+        "tray_count": 22,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "native_summary": {
+        "event_count": 497672,
+        "completed_count": 2845,
+        "failed_count": 1,
+        "runtime_seconds": 0.0,
+        "edge_enter_event_count": 35570,
+        "edge_exit_event_count": 35559,
+        "reservation_conflicts": 0,
+        "physical_fault_edge_entry_violation_count": 0,
+        "merge_grant_timing_mode": "jit_fair_aging_deadline",
+        "g4irsf20_event_hotpath_policy": "E2",
+        "local_queue_capacity": 0
+      },
+      "job_status_counts": {
+        "completed": 968,
+        "waiting_for_tray": 19939,
+        "in_transit": 14,
+        "unreleased": 7585
+      },
+      "tray_mode_counts": {
+        "loaded": 14,
+        "empty_transit": 7,
+        "quarantined": 1
+      },
+      "quarantined_trays": [
+        {
+          "tray_id": "initial:57:1",
+          "node": 149,
+          "mode": "quarantined",
+          "job": -1,
+          "active_leg": 26,
+          "edge_from": -1,
+          "edge_to": -1,
+          "reception_node": -1,
+          "available_at": 10950.703,
+          "traversal_id": 216
+        }
+      ],
+      "transfer_status_counts": {
+        "received": 974,
+        "rejected": 547,
+        "failed": 1,
+        "departed": 7,
+        "pending": 11
+      },
+      "rejection_or_failure_reasons": {
+        "receiver_transit_reserve": 163,
+        "departure_lease_expired": 13,
+        "departure_lease_expired_before_physical_entry": 1,
+        "receiving_full": 371
+      },
+      "receipt_rejection_counts": {
+        "TRANSFER_REJECTED:receiver_transit_reserve": 163,
+        "TRANSFER_REJECTED:departure_lease_expired": 13,
+        "TRANSFER_REJECTED:receiving_full": 371
+      },
+      "immutable_retry_payload_error_count": 0,
+      "direct_submit_reply_rejection_count": 0,
+      "failed_transfer_details": [
+        {
+          "transfer": {
+            "request_id": "live:21:owner:system_domestic:transfer:100",
+            "transfer_scope": "local_empty_return",
+            "status": "failed",
+            "reason": "departure_lease_expired_before_physical_entry",
+            "tray": 9,
+            "delivered_at": 11042.0,
+            "departed_at": -1.0,
+            "received_at": -1.0
+          },
+          "first_actual_call": {
+            "at": 11040.0,
+            "retry": false,
+            "kind": "transfer",
+            "request": {
+              "request_id": "live:21:owner:system_domestic:transfer:100",
+              "tray_id": "initial:57:1",
+              "source": 149,
+              "destination": 95,
+              "issued_at": 11040.0,
+              "message_delay": 2.0,
+              "earliest_departure": 11040.0,
+              "expiry": 11383.053,
+              "forecast_dependency": "initial:57:1:empty",
+              "forecast_ledger": "actual_available",
+              "control_reason": "observed_source_queue",
+              "service_window": {
+                "earliest_departure": 11040.0,
+                "conditional_dependencies": [],
+                "hard_guarantee": false
+              },
+              "owner_id": "owner:system_domestic",
+              "transfer_scope": "local_empty_return"
+            },
+            "reply": {
+              "status": "pending",
+              "reason": "request_enqueued"
+            },
+            "submit_compute_ms": 0.04600000102072954
+          },
+          "matched_selected_execution_rows": [
+            {
+              "audit_sequence": 368,
+              "selected_action_id": "a_ref",
+              "decision_differs": false
+            }
+          ],
+          "receipt_events": [
+            {
+              "time": 11042.0,
+              "event": "MODULE_REQUEST_DELIVERED",
+              "business_bag_id": "",
+              "transport_leg_id": "",
+              "tray_id": "initial:57:1",
+              "traversal_id": 216,
+              "node": 149,
+              "from": 149,
+              "to": 95,
+              "reason": "live:21:owner:system_domestic:transfer:100"
+            },
+            {
+              "time": 11042.0,
+              "event": "EXPORT_GRANTED",
+              "business_bag_id": "",
+              "transport_leg_id": "",
+              "tray_id": "initial:57:1",
+              "traversal_id": 216,
+              "node": 149,
+              "from": 149,
+              "to": 95,
+              "reason": "live:21:owner:system_domestic:transfer:100"
+            },
+            {
+              "time": 11042.0,
+              "event": "LEG_START",
+              "business_bag_id": "",
+              "transport_leg_id": "live:21:owner:system_domestic:transfer:100:empty_return:26",
+              "tray_id": "initial:57:1",
+              "traversal_id": 216,
+              "node": 149,
+              "from": 149,
+              "to": 95,
+              "reason": "empty_return"
+            },
+            {
+              "time": 11042.001,
+              "event": "RESOURCE_WAIT",
+              "business_bag_id": "",
+              "transport_leg_id": "live:21:owner:system_domestic:transfer:100:empty_return:26",
+              "tray_id": "initial:57:1",
+              "traversal_id": 216,
+              "node": 149,
+              "from": 149,
+              "to": -1,
+              "reason": "committed_resource_change_required"
+            },
+            {
+              "time": 11383.05300001,
+              "event": "UNUSED_RECEIVING_RELEASED",
+              "business_bag_id": "",
+              "transport_leg_id": "live:21:owner:system_domestic:transfer:100:empty_return:26",
+              "tray_id": "initial:57:1",
+              "traversal_id": 216,
+              "node": 149,
+              "from": 149,
+              "to": 95,
+              "reason": "departure_lease_expired_before_physical_entry"
+            },
+            {
+              "time": 11383.05300001,
+              "event": "LEG_FAILED",
+              "business_bag_id": "",
+              "transport_leg_id": "live:21:owner:system_domestic:transfer:100:empty_return:26",
+              "tray_id": "initial:57:1",
+              "traversal_id": 216,
+              "node": 149,
+              "from": -1,
+              "to": 149,
+              "reason": "departure_lease_expired_before_physical_entry"
+            }
+          ],
+          "first_edge_count": 0,
+          "unused_receiving_released": true,
+          "causal_scope": "Observed under changed whole policy; failed request itself is ordinary observed_source_queue allocation, not a proven isolated patch counterfactual."
+        }
+      ],
+      "callback_guard_audit": {
+        "complete_initial_stream_hash_chain_verified": true,
+        "record_count": 1982,
+        "status_counts": {
+          "ordinary_warmup": 240,
+          "reference_selected": 258,
+          "isolated_current_patch_proposed": 159,
+          "reference_no_distinct_current_candidate": 1325
+        },
+        "patched_batches_checked": 159,
+        "failures": [],
+        "residual_callback_count_from_frozen_planner": 1540,
+        "residual_full_observations_saved_in_this_stream": false,
+        "scope": "All recorded initial owner callbacks were independently checked for exact observed state/prefix binding, current actual unpledged empty tray, static scope/owner/loader/timing, one tray change and all other initial intents preserved. Native async physical freshness and shared future nonharm are not proven."
+      },
+      "timing_wall_measurements": {
+        "planning": {
+          "sum_ms": 106897.85899868002,
+          "max_ms": 408.78019999945536
+        },
+        "audit_persistence": {
+          "sum_ms": 24768.440098676365,
+          "max_ms": 37.599399976897985
+        }
+      },
+      "execution_mismatch_count": 0
+    },
+    {
+      "name": "D_N22_C01_S43_P901_001",
+      "status": "complete",
+      "closed_receipt_checked_before_output_read": true,
+      "source_pins_verified": [
+        {
+          "path": "scripts/experiments/g31_ics_circulation/native_host.py",
+          "sha256": "0860305487d8a56eae9fc856da8aea82821b7d6c002c45ba01c9dfd26c293ac1"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/analytic_control.py",
+          "sha256": "e4829bef8b733c2b85ba79c16f087ec5732190f518aaa6c91b94e82435c23b56"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/protocol_control.py",
+          "sha256": "3ff5770e11de5c20b203455546829986d8c3e22e6d4a4189bf0214f14fe1da2f"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/foundation_airport_protocol_v2.py",
+          "sha256": "9850740cea7a08b71ac7a32e0d596d1c1a9a0dcc7a85fb807de7aefb0458c10a"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/foundation_airport_batch_patch.py",
+          "sha256": "c326a1a036e52eeec7070cf71602b2e142c5c9853c8e65be0794a77db5104c71"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/foundation_airport_opportunities.py",
+          "sha256": "664e7eb20fae5480aa436c4435b6fb950c2b914036eabbc228fbc5f23f2974e1"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/foundation_airport_prospective_control.py",
+          "sha256": "f0c25e0469cf43141d2276196fe945b261eb1e1b2cfd9dac3d10f09466a0c12e"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/foundation_airport_prospective_campaign.py",
+          "sha256": "4ae488bfd56e65183fb4f734eb15a09b468fa3412784671fde8acd4a515f4443"
+        }
+      ],
+      "inputs": {
+        "receipt.json": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C01_S43_P901_001/receipt.json",
+          "sha256": "ba520b0ecaedb351424be7dfc95385d21bc8d7c38163ca56f97dc63b240e1dd5"
+        },
+        "plan.json": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C01_S43_P901_001/plan.json",
+          "sha256": "a54256d59b4b722a56907e95d0eadddd3b61fdbaa0c6985f1cc055d65ba36cff"
+        },
+        "input.json": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C01_S43_P901_001/input.json",
+          "sha256": "94f55dbde869edb89683518cf16f19ee94307f1215b32d659e01865352f770de"
+        },
+        "final_result.json.gz": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C01_S43_P901_001/final_result.json.gz",
+          "sha256": "59a82ae8d02ebf8936d9863f8834c4b972ebb4d4ad98d9388cee1fa31b4e9a84"
+        },
+        "client_calls.json.gz": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C01_S43_P901_001/client_calls.json.gz",
+          "sha256": "e3f4b8b9490b4f257c16e5a6f0c4917b2f81702140dae99f0eba9ed7f8904b4e"
+        },
+        "execution_evidence.json.gz": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C01_S43_P901_001/execution_evidence.json.gz",
+          "sha256": "7170a9ed243b3863ac06b26de3ba297a9a7a2f24a29eb52259b46c3115336ccb"
+        },
+        "activation_prefix.json.gz": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C01_S43_P901_001/activation_prefix.json.gz",
+          "sha256": "9063ba51a7185ef270c9d6390664abdada866dfd466e3d437a8c72b0ffe7d5f9"
+        },
+        "planner_summary.json": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C01_S43_P901_001/planner_summary.json",
+          "sha256": "49a672175701768cda5c8b2f7f68f6e10e68315d427e77137fde57a9ba03be81"
+        },
+        "callback_audit_receipt.json": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C01_S43_P901_001/callback_audit_receipt.json",
+          "sha256": "e79e9091109b4ca9e63b96bf51ba61254d295f6302304729bed31361009d3260"
+        },
+        "callback_audit.jsonl.gz": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C01_S43_P901_001/callback_audit.jsonl.gz",
+          "sha256": "61076c2d11b1e3aad666fef9de9f667a074e029eea54b253f6d47b1c8afb1cbb"
+        }
+      },
+      "activation_prefix": {
+        "native_state_sha256": "4975b19043746490e68ad19a1ef1d582d8278a2cd077f9b907959efcd76d9163",
+        "controller_state_sha256": "10d63a9c2dbeff70711cc7eb4af70c270b2f2508e62dcd4f00c27268e72304bb",
+        "public_state_digest": "651c39d7807ba870ffc6136b8f4b65f4fba1e854da7cafeefee126346d405c00",
+        "observed_at": 7200.0,
+        "owner_id": "owner:system_domestic",
+        "complete_prefix_sha256": "f4e5e5a00077b725ed9fe5bf53afefd8a528cd17eed7513b2c1283ca616344e8"
+      },
+      "same_full_activation_prefix_as_C00": true,
+      "physical_receipt_replay": {
+        "status": "passed",
+        "completed_traversals": 37912,
+        "open_traversals": 19,
+        "tray_count": 22,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "native_summary": {
+        "event_count": 526334,
+        "completed_count": 3051,
+        "failed_count": 0,
+        "runtime_seconds": 0.0,
+        "edge_enter_event_count": 37931,
+        "edge_exit_event_count": 37912,
+        "reservation_conflicts": 0,
+        "physical_fault_edge_entry_violation_count": 0,
+        "merge_grant_timing_mode": "jit_fair_aging_deadline",
+        "g4irsf20_event_hotpath_policy": "E2",
+        "local_queue_capacity": 0
+      },
+      "job_status_counts": {
+        "completed": 1039,
+        "waiting_for_tray": 19865,
+        "in_transit": 17,
+        "unreleased": 7585
+      },
+      "tray_mode_counts": {
+        "loaded": 17,
+        "empty_transit": 4,
+        "empty": 1
+      },
+      "quarantined_trays": [],
+      "transfer_status_counts": {
+        "received": 1059,
+        "rejected": 645,
+        "pending": 10,
+        "departed": 4,
+        "undelivered": 4
+      },
+      "rejection_or_failure_reasons": {
+        "receiver_transit_reserve": 170,
+        "receiving_full": 467,
+        "departure_lease_expired": 8
+      },
+      "receipt_rejection_counts": {
+        "TRANSFER_REJECTED:receiver_transit_reserve": 170,
+        "TRANSFER_REJECTED:receiving_full": 467,
+        "TRANSFER_REJECTED:departure_lease_expired": 8
+      },
+      "immutable_retry_payload_error_count": 0,
+      "direct_submit_reply_rejection_count": 0,
+      "failed_transfer_details": [],
+      "callback_guard_audit": {
+        "complete_initial_stream_hash_chain_verified": true,
+        "record_count": 1982,
+        "status_counts": {
+          "ordinary_warmup": 240,
+          "isolated_current_patch_proposed": 214,
+          "reference_selected": 194,
+          "reference_no_distinct_current_candidate": 1334
+        },
+        "patched_batches_checked": 214,
+        "failures": [],
+        "residual_callback_count_from_frozen_planner": 1722,
+        "residual_full_observations_saved_in_this_stream": false,
+        "scope": "All recorded initial owner callbacks were independently checked for exact observed state/prefix binding, current actual unpledged empty tray, static scope/owner/loader/timing, one tray change and all other initial intents preserved. Native async physical freshness and shared future nonharm are not proven."
+      },
+      "timing_wall_measurements": {
+        "planning": {
+          "sum_ms": 121862.64769954141,
+          "max_ms": 600.0338000012562
+        },
+        "audit_persistence": {
+          "sum_ms": 27831.93749928614,
+          "max_ms": 54.77919999975711
+        }
+      },
+      "execution_mismatch_count": 0
+    },
+    {
+      "name": "D_N22_C11_S17_P901_001",
+      "status": "complete",
+      "closed_receipt_checked_before_output_read": true,
+      "source_pins_verified": [
+        {
+          "path": "scripts/experiments/g31_ics_circulation/native_host.py",
+          "sha256": "0860305487d8a56eae9fc856da8aea82821b7d6c002c45ba01c9dfd26c293ac1"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/analytic_control.py",
+          "sha256": "e4829bef8b733c2b85ba79c16f087ec5732190f518aaa6c91b94e82435c23b56"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/protocol_control.py",
+          "sha256": "3ff5770e11de5c20b203455546829986d8c3e22e6d4a4189bf0214f14fe1da2f"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/foundation_airport_protocol_v2.py",
+          "sha256": "9850740cea7a08b71ac7a32e0d596d1c1a9a0dcc7a85fb807de7aefb0458c10a"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/foundation_airport_batch_patch.py",
+          "sha256": "c326a1a036e52eeec7070cf71602b2e142c5c9853c8e65be0794a77db5104c71"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/foundation_airport_opportunities.py",
+          "sha256": "664e7eb20fae5480aa436c4435b6fb950c2b914036eabbc228fbc5f23f2974e1"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/foundation_airport_prospective_control.py",
+          "sha256": "f0c25e0469cf43141d2276196fe945b261eb1e1b2cfd9dac3d10f09466a0c12e"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/foundation_airport_prospective_campaign.py",
+          "sha256": "4ae488bfd56e65183fb4f734eb15a09b468fa3412784671fde8acd4a515f4443"
+        }
+      ],
+      "inputs": {
+        "receipt.json": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C11_S17_P901_001/receipt.json",
+          "sha256": "4056cd76a25b5e953985aef765ce4f6c6de9306afbd838966987345a26e89040"
+        },
+        "plan.json": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C11_S17_P901_001/plan.json",
+          "sha256": "5a9df25ecb615f22dbb0e1c1c878206d1de013a4892378e190756f376815fe7c"
+        },
+        "input.json": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C11_S17_P901_001/input.json",
+          "sha256": "94f55dbde869edb89683518cf16f19ee94307f1215b32d659e01865352f770de"
+        },
+        "final_result.json.gz": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C11_S17_P901_001/final_result.json.gz",
+          "sha256": "55d74e2856fcc2a9f3fc5a5849cefa3f9894138944584092bca10c183a683cc3"
+        },
+        "client_calls.json.gz": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C11_S17_P901_001/client_calls.json.gz",
+          "sha256": "b80cb2b59e6469c1684f2d5feb1af17e92d54766073e12a4d1c123b355c2c5a6"
+        },
+        "execution_evidence.json.gz": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C11_S17_P901_001/execution_evidence.json.gz",
+          "sha256": "ae81aa08b4770004b6a63d3daf5cbba1739056bd5c9dec49f2ea606f2c85f518"
+        },
+        "activation_prefix.json.gz": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C11_S17_P901_001/activation_prefix.json.gz",
+          "sha256": "77d76c3d76fd9fdfbba2faf28d4a1670041e2041cc79eeb883e220fa5e0ba417"
+        },
+        "planner_summary.json": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C11_S17_P901_001/planner_summary.json",
+          "sha256": "c7f736f825a1338f2876de93f07e83645c93a293ae2fd13bd6176085ba6f8d9b"
+        },
+        "callback_audit_receipt.json": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C11_S17_P901_001/callback_audit_receipt.json",
+          "sha256": "bf507dd6da05c369ba6f1777c4aec3a93a808ae2e52bf36587f1a7f88938ac84"
+        },
+        "callback_audit.jsonl.gz": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C11_S17_P901_001/callback_audit.jsonl.gz",
+          "sha256": "fc52b08dace26f40141198d98191d8682bfb721e36e5a42ee77c70468d7a665f"
+        }
+      },
+      "activation_prefix": {
+        "native_state_sha256": "4975b19043746490e68ad19a1ef1d582d8278a2cd077f9b907959efcd76d9163",
+        "controller_state_sha256": "10d63a9c2dbeff70711cc7eb4af70c270b2f2508e62dcd4f00c27268e72304bb",
+        "public_state_digest": "651c39d7807ba870ffc6136b8f4b65f4fba1e854da7cafeefee126346d405c00",
+        "observed_at": 7200.0,
+        "owner_id": "owner:system_domestic",
+        "complete_prefix_sha256": "f4e5e5a00077b725ed9fe5bf53afefd8a528cd17eed7513b2c1283ca616344e8"
+      },
+      "same_full_activation_prefix_as_C00": true,
+      "physical_receipt_replay": {
+        "status": "passed",
+        "completed_traversals": 37811,
+        "open_traversals": 21,
+        "tray_count": 22,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "native_summary": {
+        "event_count": 526067,
+        "completed_count": 3035,
+        "failed_count": 0,
+        "runtime_seconds": 0.0,
+        "edge_enter_event_count": 37832,
+        "edge_exit_event_count": 37811,
+        "reservation_conflicts": 0,
+        "physical_fault_edge_entry_violation_count": 0,
+        "merge_grant_timing_mode": "jit_fair_aging_deadline",
+        "g4irsf20_event_hotpath_policy": "E2",
+        "local_queue_capacity": 0
+      },
+      "job_status_counts": {
+        "completed": 1039,
+        "waiting_for_tray": 19867,
+        "in_transit": 15,
+        "unreleased": 7585
+      },
+      "tray_mode_counts": {
+        "empty_transit": 7,
+        "loaded": 15
+      },
+      "quarantined_trays": [],
+      "transfer_status_counts": {
+        "received": 1050,
+        "rejected": 587,
+        "departed": 7,
+        "pending": 9,
+        "undelivered": 3
+      },
+      "rejection_or_failure_reasons": {
+        "receiving_full": 420,
+        "departure_lease_expired": 17,
+        "receiver_transit_reserve": 150
+      },
+      "receipt_rejection_counts": {
+        "TRANSFER_REJECTED:receiving_full": 420,
+        "TRANSFER_REJECTED:receiver_transit_reserve": 150,
+        "TRANSFER_REJECTED:departure_lease_expired": 17
+      },
+      "immutable_retry_payload_error_count": 0,
+      "direct_submit_reply_rejection_count": 0,
+      "failed_transfer_details": [],
+      "callback_guard_audit": {
+        "complete_initial_stream_hash_chain_verified": true,
+        "record_count": 1982,
+        "status_counts": {
+          "ordinary_warmup": 240,
+          "reference_selected": 257,
+          "isolated_current_patch_proposed": 159,
+          "reference_no_distinct_current_candidate": 1326
+        },
+        "patched_batches_checked": 159,
+        "failures": [],
+        "residual_callback_count_from_frozen_planner": 1656,
+        "residual_full_observations_saved_in_this_stream": false,
+        "scope": "All recorded initial owner callbacks were independently checked for exact observed state/prefix binding, current actual unpledged empty tray, static scope/owner/loader/timing, one tray change and all other initial intents preserved. Native async physical freshness and shared future nonharm are not proven."
+      },
+      "timing_wall_measurements": {
+        "planning": {
+          "sum_ms": 172992.22289887257,
+          "max_ms": 723.5012000310235
+        },
+        "audit_persistence": {
+          "sum_ms": 28674.810898432042,
+          "max_ms": 62.0794000569731
+        }
+      },
+      "execution_mismatch_count": 0
+    },
+    {
+      "name": "D_N22_C11_S29_P901_001",
+      "status": "complete",
+      "closed_receipt_checked_before_output_read": true,
+      "source_pins_verified": [
+        {
+          "path": "scripts/experiments/g31_ics_circulation/native_host.py",
+          "sha256": "0860305487d8a56eae9fc856da8aea82821b7d6c002c45ba01c9dfd26c293ac1"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/analytic_control.py",
+          "sha256": "e4829bef8b733c2b85ba79c16f087ec5732190f518aaa6c91b94e82435c23b56"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/protocol_control.py",
+          "sha256": "3ff5770e11de5c20b203455546829986d8c3e22e6d4a4189bf0214f14fe1da2f"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/foundation_airport_protocol_v2.py",
+          "sha256": "9850740cea7a08b71ac7a32e0d596d1c1a9a0dcc7a85fb807de7aefb0458c10a"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/foundation_airport_batch_patch.py",
+          "sha256": "c326a1a036e52eeec7070cf71602b2e142c5c9853c8e65be0794a77db5104c71"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/foundation_airport_opportunities.py",
+          "sha256": "664e7eb20fae5480aa436c4435b6fb950c2b914036eabbc228fbc5f23f2974e1"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/foundation_airport_prospective_control.py",
+          "sha256": "f0c25e0469cf43141d2276196fe945b261eb1e1b2cfd9dac3d10f09466a0c12e"
+        },
+        {
+          "path": "scripts/experiments/g31_ics_circulation/foundation_airport_prospective_campaign.py",
+          "sha256": "4ae488bfd56e65183fb4f734eb15a09b468fa3412784671fde8acd4a515f4443"
+        }
+      ],
+      "inputs": {
+        "receipt.json": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C11_S29_P901_001/receipt.json",
+          "sha256": "051b6b02f2f3a0901219525352d7b310487aa47b840c9da3b52934e8a678a382"
+        },
+        "plan.json": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C11_S29_P901_001/plan.json",
+          "sha256": "819099ed87a09f03cf20ef244989c2cda044aaf6e6cdc63203b77b6bfcf02d4e"
+        },
+        "input.json": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C11_S29_P901_001/input.json",
+          "sha256": "94f55dbde869edb89683518cf16f19ee94307f1215b32d659e01865352f770de"
+        },
+        "final_result.json.gz": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C11_S29_P901_001/final_result.json.gz",
+          "sha256": "30143051a17ef21f4f6105b28b67cfed90f95c18d27790cb3505c8d26dddfe81"
+        },
+        "client_calls.json.gz": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C11_S29_P901_001/client_calls.json.gz",
+          "sha256": "774c317b7725eae06dfd4e9281d765c4630515041d1b0cdd9ad0d58f908086bf"
+        },
+        "execution_evidence.json.gz": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C11_S29_P901_001/execution_evidence.json.gz",
+          "sha256": "3c786542a1d0365588b1ff5a006711790a4c02698267e4fd90200e3d4d22fc2f"
+        },
+        "activation_prefix.json.gz": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C11_S29_P901_001/activation_prefix.json.gz",
+          "sha256": "77d76c3d76fd9fdfbba2faf28d4a1670041e2041cc79eeb883e220fa5e0ba417"
+        },
+        "planner_summary.json": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C11_S29_P901_001/planner_summary.json",
+          "sha256": "904edc506701479dc740f0df07914b2f311df7f871f9f116a6d832d151deb0bb"
+        },
+        "callback_audit_receipt.json": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C11_S29_P901_001/callback_audit_receipt.json",
+          "sha256": "b7cc1c4116b20de4efb4d20bba7000f58575382f37db640c7e8c696debcaf678"
+        },
+        "callback_audit.jsonl.gz": {
+          "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C11_S29_P901_001/callback_audit.jsonl.gz",
+          "sha256": "47f3e13d4a1f349780073a97c976ac3d46b40e812a34e2ce33aa0c2b5f17d1ea"
+        }
+      },
+      "activation_prefix": {
+        "native_state_sha256": "4975b19043746490e68ad19a1ef1d582d8278a2cd077f9b907959efcd76d9163",
+        "controller_state_sha256": "10d63a9c2dbeff70711cc7eb4af70c270b2f2508e62dcd4f00c27268e72304bb",
+        "public_state_digest": "651c39d7807ba870ffc6136b8f4b65f4fba1e854da7cafeefee126346d405c00",
+        "observed_at": 7200.0,
+        "owner_id": "owner:system_domestic",
+        "complete_prefix_sha256": "f4e5e5a00077b725ed9fe5bf53afefd8a528cd17eed7513b2c1283ca616344e8"
+      },
+      "same_full_activation_prefix_as_C00": true,
+      "physical_receipt_replay": {
+        "status": "passed",
+        "completed_traversals": 37695,
+        "open_traversals": 16,
+        "tray_count": 22,
+        "optimality": "unknown",
+        "scope": "independent identity, lifecycle, edge/headway, parked/incoming/reception capacity replay"
+      },
+      "native_summary": {
+        "event_count": 524889,
+        "completed_count": 3023,
+        "failed_count": 0,
+        "runtime_seconds": 0.0,
+        "edge_enter_event_count": 37711,
+        "edge_exit_event_count": 37695,
+        "reservation_conflicts": 0,
+        "physical_fault_edge_entry_violation_count": 0,
+        "merge_grant_timing_mode": "jit_fair_aging_deadline",
+        "g4irsf20_event_hotpath_policy": "E2",
+        "local_queue_capacity": 0
+      },
+      "job_status_counts": {
+        "completed": 1032,
+        "waiting_for_tray": 19877,
+        "in_transit": 12,
+        "unreleased": 7585
+      },
+      "tray_mode_counts": {
+        "empty_transit": 9,
+        "loaded": 12,
+        "empty": 1
+      },
+      "quarantined_trays": [],
+      "transfer_status_counts": {
+        "received": 1046,
+        "rejected": 602,
+        "departed": 9,
+        "pending": 8,
+        "undelivered": 2
+      },
+      "rejection_or_failure_reasons": {
+        "receiving_full": 459,
+        "receiver_transit_reserve": 129,
+        "departure_lease_expired": 14
+      },
+      "receipt_rejection_counts": {
+        "TRANSFER_REJECTED:receiving_full": 459,
+        "TRANSFER_REJECTED:receiver_transit_reserve": 129,
+        "TRANSFER_REJECTED:departure_lease_expired": 14
+      },
+      "immutable_retry_payload_error_count": 0,
+      "direct_submit_reply_rejection_count": 0,
+      "failed_transfer_details": [],
+      "callback_guard_audit": {
+        "complete_initial_stream_hash_chain_verified": true,
+        "record_count": 1982,
+        "status_counts": {
+          "ordinary_warmup": 240,
+          "isolated_current_patch_proposed": 159,
+          "reference_selected": 261,
+          "reference_no_distinct_current_candidate": 1322
+        },
+        "patched_batches_checked": 159,
+        "failures": [],
+        "residual_callback_count_from_frozen_planner": 1667,
+        "residual_full_observations_saved_in_this_stream": false,
+        "scope": "All recorded initial owner callbacks were independently checked for exact observed state/prefix binding, current actual unpledged empty tray, static scope/owner/loader/timing, one tray change and all other initial intents preserved. Native async physical freshness and shared future nonharm are not proven."
+      },
+      "timing_wall_measurements": {
+        "planning": {
+          "sum_ms": 182079.3056002003,
+          "max_ms": 836.143099993933
+        },
+        "audit_persistence": {
+          "sum_ms": 29999.59290213883,
+          "max_ms": 60.37730001844466
+        }
+      },
+      "execution_mismatch_count": 0
+    }
+  ],
+  "same_information_all_job_completion_comparisons": [
+    {
+      "reference": "D_N22_C00_P901_001",
+      "candidate": "D_N22_C01_S17_P901_001",
+      "all_job_population": 28506,
+      "counts": {
+        "improved": 313,
+        "equal": 4,
+        "harmed": 548,
+        "unknown_incomplete": 27641
+      },
+      "unknown_breakdown": {
+        "neither_finished": 27454,
+        "candidate_only_finished": 83,
+        "reference_only_finished": 104
+      },
+      "maximum_known_completion_delay_seconds": 13316.74499999998,
+      "protected_nonharm_established": false
+    },
+    {
+      "reference": "D_N22_C00_P901_001",
+      "candidate": "D_N22_C01_S29_P901_001",
+      "all_job_population": 28506,
+      "counts": {
+        "improved": 527,
+        "harmed": 326,
+        "equal": 2,
+        "unknown_incomplete": 27651
+      },
+      "unknown_breakdown": {
+        "neither_finished": 27424,
+        "candidate_only_finished": 113,
+        "reference_only_finished": 114
+      },
+      "maximum_known_completion_delay_seconds": 21038.036000000015,
+      "protected_nonharm_established": false
+    },
+    {
+      "reference": "D_N22_C00_P901_001",
+      "candidate": "D_N22_C01_S43_P901_001",
+      "all_job_population": 28506,
+      "counts": {
+        "improved": 658,
+        "harmed": 232,
+        "equal": 2,
+        "unknown_incomplete": 27614
+      },
+      "unknown_breakdown": {
+        "neither_finished": 27390,
+        "candidate_only_finished": 147,
+        "reference_only_finished": 77
+      },
+      "maximum_known_completion_delay_seconds": 17536.52600000002,
+      "protected_nonharm_established": false
+    },
+    {
+      "reference": "D_N22_C10_P901_001",
+      "candidate": "D_N22_C11_S17_P901_001",
+      "all_job_population": 28506,
+      "counts": {
+        "improved": 554,
+        "harmed": 295,
+        "equal": 5,
+        "unknown_incomplete": 27652
+      },
+      "unknown_breakdown": {
+        "candidate_only_finished": 185,
+        "neither_finished": 27364,
+        "reference_only_finished": 103
+      },
+      "maximum_known_completion_delay_seconds": 17394.698999999993,
+      "protected_nonharm_established": false
+    },
+    {
+      "reference": "D_N22_C10_P901_001",
+      "candidate": "D_N22_C11_S29_P901_001",
+      "all_job_population": 28506,
+      "counts": {
+        "improved": 591,
+        "equal": 4,
+        "harmed": 274,
+        "unknown_incomplete": 27637
+      },
+      "unknown_breakdown": {
+        "candidate_only_finished": 163,
+        "neither_finished": 27386,
+        "reference_only_finished": 88
+      },
+      "maximum_known_completion_delay_seconds": 15655.694999999956,
+      "protected_nonharm_established": false
+    }
+  ],
+  "interpretation": {
+    "current_physical_invariants": "Conclude no observed violation only for invariant checks whose actual receipt replay passes and the two explicitly zero native diagnostic counters. Reject/expiry/quarantine events remain separately counted.",
+    "batch_and_prefix": "All original streamed initial batches checked. Same native/controller/public activation prefix supports common warmup. Residual native observations are refreshed in frozen foundation_airport_protocol_v2 after every pending submission; they are not individually persisted in this initial callback stream.",
+    "quarantine": "C01 seed17 and seed29 each have one real empty-leg failure before physical entry. Native released unused receiver reservation and quarantined the physical tray. This is protective expiry enforcement with actual availability loss; it is neither a successful transfer nor evidence of an illegal physical entry. Both failed payloads are observed_source_queue rule allocations, so their individual causal effect cannot be attributed to a learned patch from these saved full-policy runs.",
+    "rejections": "receiving_full, receiver_transit_reserve and departure_lease_expired are documented native admission/lease refusals. Their existence does not establish physical capacity violation, and zero actual violation does not imply absence of performance harm.",
+    "G2": "No protected takeover or full G2 conclusion follows. Shared loaded/empty channel interference, future FIFO/route impacts and all unfinished job completion times remain uncertified; observed known harms must be retained.",
+    "compute_cost_units": "J is physical unfinished-bag integral in bag-seconds. Synchronous callback planning/audit wall time pauses the simulated physical clock. Saved wall milliseconds cannot be subtracted directly from J and have no validated asynchronous deployment latency mapping. Positive J advantage does not by itself prove benefit exceeds decision cost or real-time/SLA feasibility.",
+    "full_protection_violation_claim_allowed": false,
+    "strict_nonharm_certified": false,
+    "protected_takeover_eligible": false
+  },
+  "limits": [
+    "This is the seven explicitly released P901 branches only; no other D/G outputs were opened.",
+    "The pure audit_result receipt checker was extracted unchanged from pinned native_host source; it was not a native replay or a proof of every owner-internal invariant.",
+    "Initial callback hash chains were fully checked locally here, while the lightweight review ZIP may omit those raw streams and cannot claim the recipient has repeated this full stream audit.",
+    "Source inspection establishes residual refresh control flow; individual residual observation snapshots were not reconstructed.",
+    "No model rescore, training, strategy selection or tuning was performed."
+  ]
+}

@@ -1,0 +1,34 @@
+RESOURCE GRID: all18points; two conditional synthetic parents; fixed mixed C11seed29.
+J in bag-seconds; E rows excluded; N22 rules reused fromD.
+parent | N | variant | J | completed | ontime | overdueunfinished
+901 | 18 | C00 | 491685353.367640 | 831 | 79 | 17707
+901 | 18 | C10 | 491973714.535640 | 818 | 79 | 17720
+901 | 18 | C11 | 491422020.582640 | 846 | 92 | 17692
+901 | 22 | C00 | 489185556.281640 | 969 | 91 | 17569
+901 | 22 | C10 | 489417802.811640 | 957 | 90 | 17581
+901 | 22 | C11 | 488993685.567640 | 971 | 102 | 17567
+901 | 26 | C00 | 486579226.370640 | 1138 | 94 | 17400
+901 | 26 | C10 | 486436315.039640 | 1150 | 107 | 17388
+901 | 26 | C11 | 486741590.620640 | 1142 | 87 | 17396
+902 | 18 | C00 | 491578602.316495 | 831 | 81 | 17707
+902 | 18 | C10 | 491808173.687495 | 825 | 82 | 17713
+902 | 18 | C11 | 491241915.473495 | 859 | 83 | 17679
+902 | 22 | C00 | 488613207.456495 | 991 | 97 | 17547
+902 | 22 | C10 | 488986329.618495 | 995 | 86 | 17543
+902 | 22 | C11 | 488258706.476495 | 1024 | 94 | 17514
+902 | 26 | C00 | 506475406.885495 | 23 | 22 | 18515
+902 | 26 | C10 | 506324475.700495 | 27 | 26 | 18511
+902 | 26 | C11 | 488543527.809495 | 1003 | 80 | 17535
+
+C11vs same-N C10: parent N gain relative% completed_delta ontime_delta known_harmed unknown
+901 18 +551693.953000 +0.112138908% +28 +13 263 27763
+901 22 +424117.244000 +0.086657502% +14 +12 296 27660
+901 26 -305275.581000 -0.062757564% -8 -20 642 27502
+902 18 +566258.214000 +0.115138024% +34 +1 248 27777
+902 22 +727623.142000 +0.148802348% +29 +8 396 27602
+902 26 +17780947.891000 +3.511769378% +976 +54 14 28479
+
+Only N22 meets the aggregate22C10 reference vector on both parents.
+N18 fails throughput/cost; N26 fails ontime even when aggregatecost/completion improve.
+N22 still has known individual harm and unfinished comparisons; candidate andcertified N*=None.
+P902 N26 rules completed only23/27 vsC11 1003; retain separately. All three runsreached59400; no blanket physical deadlock proof or generic3.5%RL claim.

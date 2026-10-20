@@ -162,3 +162,11 @@ tests/test_g31_airport_recorded_budget_campaign.py -text
 tests/fixtures/g31_airport_conditional_release_seq32.json -text
 tests/test_g31_airport_shadow_planner.py -text
 tests/test_g31_airport_shadow_campaign.py -text
+
+# The action-value campaign publishes these new tests by exact byte hash.
+tests/test_g31_airport_action_campaign.py -text
+tests/test_g31_airport_formal_learning_entries.py -text
+
+# Preserve deduplicated execution-source blobs and publication audit receipts.
+publication_001/** -text
+publication_001.*.json -text

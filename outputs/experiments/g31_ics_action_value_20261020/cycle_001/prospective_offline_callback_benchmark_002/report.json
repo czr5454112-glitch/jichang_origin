@@ -1,0 +1,77 @@
+{
+  "schema": "g31.prospective.actual_saved_callback_offline_timing.v1",
+  "source": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\H_701_calendar_dataset_001.json.gz",
+    "sha256": "3c435804eab67b84aaefbb82572ab6ee9133ff39906d20a24cb977adee5a054a"
+  },
+  "observed_at": 28860.0,
+  "measure": {
+    "forecast_generation_ms": 138.0127999582328,
+    "C10_scoring_ms": 31.233999994583428,
+    "callback_with_streamed_audit_ms": 289.87039998173714
+  },
+  "audit": {
+    "path": "outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\prospective_offline_callback_benchmark_002\\C10.jsonl.gz",
+    "sha256": "4d6b11450263fe5ea12ed6417fec759584d4dcfd1b12ca3123d0dbd04769d9a8",
+    "records": 1,
+    "tail_record_sha256": "9bfd7ba52383f8cf42c09479b6e41db1f9ab9e4605e52606c755a33cf674af7c",
+    "storage": "one shared full observation per streamed callback",
+    "timings_ms": [
+      {
+        "planning": 273.7032000441104,
+        "audit_persistence": 16.123600013088435
+      }
+    ]
+  },
+  "planner": {
+    "schema": "g31.foundation.airport_prospective_control.v1",
+    "policy_id": "offline_saved_H_benchmark",
+    "parent": {
+      "parent_seed": 701,
+      "split": "train",
+      "parent_group": "conditional_timing_parent_701",
+      "synthetic": true,
+      "common_historical_template_sha256": "a9611267471a269cc34f5646a4ebb409c61a08fa77dcef4c02266b346c86890c",
+      "sampling": "sha256(seed:business_identity), uniform[-120,120], clip_zero",
+      "calendar_start": "2026-09-02T00:00:00+08:00",
+      "calendar_start_epoch_seconds": 1788278400.0,
+      "fleet": 22,
+      "layout_seed": 1701,
+      "static_layout_order": [
+        92,
+        134,
+        49,
+        57,
+        136,
+        0,
+        95,
+        138,
+        26,
+        149,
+        24
+      ],
+      "offered_count": 28506,
+      "jobs_digest": "017f0caff9a896a747439ad9d4e409c689f5ed1e4bebb0afd2451be2f478b8f8"
+    },
+    "information_variant": "C10",
+    "activation_at": 7200.0,
+    "counts": {
+      "callbacks": 1,
+      "actual_scored_callbacks": 1,
+      "recorded_callbacks": 1
+    },
+    "records": [],
+    "records_retained_in_memory": false,
+    "state": {
+      "held_optional": {},
+      "last_evaluated_at_by_owner": {
+        "owner:system_domestic": 28860.0
+      }
+    },
+    "strict_nonharm_certified": false,
+    "native_jobs_started_by_planner": 0,
+    "scope": "prospective isolated one-patch controller; actual submit/ACK evidence is separate"
+  },
+  "scope": "saved actual H observation and actual original startup receipt; baseline output replay excludes R1 compute; no new native callback or jobs",
+  "new_native_jobs": 0
+}

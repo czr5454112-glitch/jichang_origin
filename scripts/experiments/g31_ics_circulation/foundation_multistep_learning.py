@@ -19,6 +19,54 @@ GATE_SCHEMA = 'g31.foundation.multistep_gate.v1'
 REWARD_SCHEMA = 'g31.foundation.exact_arrived_unfinished_integral.v1'
 
 
+def airport_paired_transition_gate(datasets):
+    """Audit new airport successors without relabeling closed MC as FQI.
+
+    The old small-domain transition/checkpoint schemas remain unchanged.
+    Observing a legal successor does not provide an action-value target there.
+    """
+    counts = dict(actual_rows=0, natural_successors=0, unknown_successors=0,
+                  singleton_supported_successors=0, closed_pairs=0)
+    for dataset in datasets:
+        require(dataset.get('schema') == 'g31.foundation.airport_pair_dataset.v1',
+                'explicit_airport_pair_schema')
+        pair = dataset['pair']
+        if pair['status'] != 'closed_actual_pair':
+            require(not dataset['rows'], 'unclosed_pair_has_no_fabricated_training_rows')
+            continue
+        require(len(dataset['rows']) == 2, 'two_actual_paired_rows')
+        counts['closed_pairs'] += 1
+        for row in dataset['rows']:
+            counts['actual_rows'] += 1
+            require(row['unexecuted_candidate_label'] is False, 'no_unexecuted_candidate_target')
+            transition = row['transition']
+            if transition is None or transition.get('next_state') is None:
+                require(transition is None or (transition['reward'] is None
+                        and transition['elapsed_seconds'] is None),
+                        'unknown_successor_is_not_zero_terminal')
+                counts['unknown_successors'] += 1
+                continue
+            current, successor = row['observation'], transition['next_state']
+            elapsed = number(transition['elapsed_seconds'])
+            require(elapsed > 0 and successor['now']-current['now'] == elapsed
+                    and successor['owner_id'] == current['owner_id'],
+                    'natural_same_owner_successor_not_residual')
+            require(transition['reward_unit'] == 'negative_bag_seconds'
+                    and number(transition['reward']) <= 0
+                    and transition['unexecuted_candidates_have_labels'] is False
+                    and transition['candidate_labels'] is None,
+                    'actual_interval_reward_without_fabricated_action_labels')
+            supported = transition['supported_next_action_ids']
+            require(len(supported) == len(set(supported)) and bool(supported),
+                    'observed_supported_successor_actions')
+            counts['natural_successors'] += 1
+            counts['singleton_supported_successors'] += len(supported) == 1
+    return dict(schema='g31.foundation.airport_paired_transition_gate.v1', **counts,
+        mc_pair_targets_available=counts['closed_pairs'] > 0,
+        bootstrap_authorized=False, optimal_multistep_Q_established=False,
+        reason='Real successor identity and interval reward are retained; no closed supported successor value graph is supplied.')
+
+
 def require(ok, reason):
     if not ok:
         raise ValueError('multistep:' + reason)

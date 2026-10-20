@@ -1,0 +1,154 @@
+{
+  "schema": "g31.foundation.airport_C10_strong_rule.v1",
+  "rule_contract_sha256": "d70e73a2da016fd36b291e1e1f348beef13ee1c5447044e0aedad3b834874bb6",
+  "public_state_digest": "823db9f7813feac3b2a5ca2ab4ce1eb2d672ba78ac962f53c5a0c6dae658a8e0",
+  "forecast_sha256": "a49ac1b37b1f65e9786af01397b1c19429f5c8d9e69979e620705d142ad227a9",
+  "reference": {
+    "cost": 2018348.250647058,
+    "visible_account_shortage_area": 2018188.823647058,
+    "shortage_by_horizon": {
+      "300": 593309.2648235294,
+      "900": 1799386.4707058822,
+      "1800": 3661870.7354117637
+    },
+    "shortage_by_node": {
+      "57": {
+        "300": 298843.0814117647,
+        "900": 906381.6843529411,
+        "1800": 1844373.8167058819
+      },
+      "122": {
+        "300": 0.0,
+        "900": 0.0,
+        "1800": 0.0
+      },
+      "149": {
+        "300": 294466.18341176474,
+        "900": 893004.7863529411,
+        "1800": 1817496.9187058818
+      }
+    },
+    "candidate_arrival_offset": 158.302,
+    "resource_occupation_proxy": 159.427,
+    "visible_path_pressure_seconds": 1.125,
+    "unknown_pressure_nodes": [],
+    "unknown_edge_capacity": []
+  },
+  "patch": {
+    "cost": 2018503.8567432119,
+    "visible_account_shortage_area": 2018266.124647058,
+    "shortage_by_horizon": {
+      "300": 593386.5658235294,
+      "900": 1799463.7717058822,
+      "1800": 3661948.0364117636
+    },
+    "shortage_by_node": {
+      "57": {
+        "300": 298984.7794117647,
+        "900": 907123.382352941,
+        "1800": 1846015.5147058817
+      },
+      "122": {
+        "300": 0.0,
+        "900": 0.0,
+        "1800": 0.0
+      },
+      "149": {
+        "300": 294401.78641176474,
+        "900": 892340.3893529412,
+        "1800": 1815932.521705882
+      }
+    },
+    "candidate_arrival_offset": 235.60299999999998,
+    "resource_occupation_proxy": 237.73209615384613,
+    "visible_path_pressure_seconds": 2.129096153846154,
+    "unknown_pressure_nodes": [],
+    "unknown_edge_capacity": []
+  },
+  "predicted_patch_advantage": -155.606096153846,
+  "selected_branch": "a_ref",
+  "account_coverage": {
+    "57": {
+      "forecast_missing": false,
+      "observed_free_complete": true,
+      "waiting_group_present": true,
+      "waiting_exact_captured_count": true,
+      "waiting_complete_current_region": false,
+      "unobserved_inventory_imputed_as_actual_zero": false
+    },
+    "122": {
+      "forecast_missing": true,
+      "observed_free_complete": true,
+      "waiting_group_present": false,
+      "waiting_exact_captured_count": false,
+      "waiting_complete_current_region": false,
+      "unobserved_inventory_imputed_as_actual_zero": false
+    },
+    "149": {
+      "forecast_missing": false,
+      "observed_free_complete": true,
+      "waiting_group_present": true,
+      "waiting_exact_captured_count": true,
+      "waiting_complete_current_region": false,
+      "unobserved_inventory_imputed_as_actual_zero": false
+    }
+  },
+  "conditional_supply_events": [
+    {
+      "kind": "delivered_ACK_committed_inbound",
+      "tray_id": "initial:134:0",
+      "request_id": "live:21:owner:system_domestic:transfer:2010",
+      "eta_offset": 452.029,
+      "destination": 49
+    },
+    {
+      "kind": "delivered_ACK_committed_inbound",
+      "tray_id": "initial:92:1",
+      "request_id": "live:21:owner:system_domestic:transfer:2031",
+      "eta_offset": 376.12800000000004,
+      "destination": 49
+    },
+    {
+      "kind": "delivered_ACK_committed_inbound",
+      "tray_id": "initial:49:0",
+      "request_id": "live:21:owner:system_domestic:transfer:2051",
+      "eta_offset": 142.102,
+      "destination": 149
+    },
+    {
+      "kind": "retained_baseline_allocation",
+      "tray_id": "initial:149:1",
+      "destination": 149,
+      "eta_offset": 139.30200000000002
+    }
+  ],
+  "current_account_audit": {
+    "schema": "g31.foundation.airport_learning_public.v1",
+    "observation_sha256": "823db9f7813feac3b2a5ca2ab4ce1eb2d672ba78ac962f53c5a0c6dae658a8e0",
+    "owner": "owner:system_domestic",
+    "now": 28860.0,
+    "unknown_inbound_not_zero": true,
+    "unknown_outbound_generation_not_inferred": true,
+    "excluded_active_claim_trays": [
+      "initial:0:0",
+      "initial:134:0",
+      "initial:136:1",
+      "initial:138:0",
+      "initial:138:1",
+      "initial:149:0",
+      "initial:26:0",
+      "initial:49:0",
+      "initial:92:0",
+      "initial:92:1"
+    ],
+    "observed_counts_for_flight_model": null,
+    "waiting_coverage_basis": "captured_group_counts_only_complete_native_origin_scope_not_attested",
+    "private_lookup_used": false,
+    "native_execution_authority": false,
+    "label_status": "no_outcome_labels_created",
+    "coverage_source": "caller_must_bind_actual_native_callback_artifact"
+  },
+  "native_execution_authority": false,
+  "strict_nonharm_certified": false,
+  "outcome_labels_read": false
+}

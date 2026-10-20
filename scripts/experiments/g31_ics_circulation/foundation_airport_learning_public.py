@@ -78,7 +78,11 @@ No generation is invented for a departed request whose original generation
 was not carried in this public ledger. Active own claims conservatively exclude
 the same physical tray from reusable supply, without minting an inbound row.
 """
-    now, owner, nodes, trays, jobs = validate_public(observation)
+    return _adapt_accounts(observation, validate_public(observation))
+
+
+def _adapt_accounts(observation, validated):
+    now, owner, nodes, trays, jobs = validated
     regions = {region(node) for node in nodes}
     accounts = {name: [] for name in ACCOUNT_NAMES}
     coverage = {name: {key: {'visible': False, 'complete': False, 'observed_at': None} for key in regions}
@@ -165,7 +169,11 @@ the same physical tray from reusable supply, without minting an inbound row.
 
 def extend_forecast_with_unknown_nodes(forecast, observation):
     """Support terminal-source actions without fabricating zero demand there."""
-    now, owner, nodes, _, _ = validate_public(observation)
+    return _extend_forecast(forecast, validate_public(observation))
+
+
+def _extend_forecast(forecast, validated):
+    now, owner, nodes, _, _ = validated
     require(forecast['schema'] == 'g31.foundation.new_demand_forecast.v1'
             and forecast['owner_scope'] == owner and number(forecast['forecast_origin']) == now, 'current_owner_forecast')
     result = copy.deepcopy(forecast)
@@ -189,25 +197,48 @@ def extend_forecast_with_unknown_nodes(forecast, observation):
 def wrap_record(record, forecast, *, episode_id, episode_end):
     """Produce inputs consumed by the existing action-conditioned NN API."""
     from . import foundation_action_value as value
+    kwargs, audit, _ = _record_inputs(record, forecast, episode_id=episode_id, episode_end=episode_end)
+    return value.wrap_observation(**kwargs), audit
+
+
+def _record_inputs(record, forecast, *, episode_id, episode_end):
     require(record['schema'] == 'g31.foundation.airport_policy_observation.v1'
             and record['readonly'] is True and record['native_execution_authority'] is False
             and record['candidate_conditional_labels'] is None, 'actual_callback_record_without_labels')
     observation = record['observation']
     require(record['owner_id'] == observation['owner_id'] and record['now'] == observation['now'], 'record_owner_time')
-    accounts, audit = adapt_accounts(observation)
-    expanded = extend_forecast_with_unknown_nodes(forecast, observation)
-    wrapped = value.wrap_observation(episode_id=episode_id, owner=record['owner_id'], decision_id=str(record['sequence']),
+    validated = validate_public(observation)
+    accounts, audit = _adapt_accounts(observation, validated)
+    expanded = _extend_forecast(forecast, validated)
+    kwargs = dict(episode_id=episode_id, owner=record['owner_id'], decision_id=str(record['sequence']),
         now=record['now'], base_observation=observation, forecast=expanded, accounts=accounts,
         information_variant='static_plan' if expanded.get('context_sha256') is not None else 'no_plan',
         remaining_episode_seconds=number(episode_end)-record['now'], mapping_version=expanded['mapping_version'],
         flight_context_sha256=expanded.get('context_sha256'))
-    return wrapped, audit
+    return kwargs, audit, validated
+
+
+def prepare_record(record, forecast, *, episode_id, episode_end):
+    """One detached current, public validation/index and feature-context build.
+
+    The returned proposals are still an entire original batch, not mutually
+    exclusive choices. Preparing them gives no native execution authority.
+    """
+    from . import foundation_action_value as value
+    snapshot = value.detached(record)
+    kwargs, audit, validated = _record_inputs(snapshot, forecast, episode_id=episode_id, episode_end=episode_end)
+    candidates = _proposal_actions(snapshot, validated)
+    return value.prepare_wrapped_observation(**kwargs), audit, candidates
 
 
 def proposal_actions(record):
     """Recorded proposals are features only; neither chosen nor executed labels."""
+    return _proposal_actions(record, validate_public(record['observation']))
+
+
+def _proposal_actions(record, validated):
     from .analytic_control import PublicTravel
-    observation = record['observation']; now, owner, nodes, trays, _ = validate_public(observation)
+    observation = record['observation']; now, owner, nodes, trays, _ = validated
     travel = PublicTravel(observation); result = []
     for index, proposal in enumerate(record['decision']['intents']):
         source, destination = proposal['source'], proposal['destination']

@@ -1,0 +1,111 @@
+"""One uncommitted R2 allocation per patch; all other batch intents survive.
+
+These operations are for isolated native experiments. Current source/FIFO
+checks do not certify absence of harm through shared channels or receivers.
+"""
+from __future__ import annotations
+
+import copy
+import hashlib
+import json
+
+
+SCHEMA = "g31.foundation.airport_batch_patch.v1"
+ACTIVE = frozenset(("pending", "granted", "in_transit", "requested", "delivered",
+                    "undelivered", "dispatching", "departed"))
+MANDATORY_REASONS = frozenset(("terminal_receiving_pressure",))
+
+
+def require(condition, reason):
+    if not condition:
+        raise ValueError("airport_batch_patch:" + reason)
+
+
+def digest(value):
+    return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(",", ":"),
+        ensure_ascii=False, allow_nan=False).encode("utf8")).hexdigest()
+
+
+def fixed_public_prefix(observation):
+    """Exact publicly received commitments; the evaluator also hashes native."""
+    return {key: copy.deepcopy(observation.get(key, [])) for key in
+        ("transfers", "client_transfer_ledger", "delivered_messages",
+         "delivered_transfer_acks", "delivered_command_acks")}
+
+
+def mandatory(intent):
+    return bool(intent.get("mandatory")) or intent.get("control_reason") in MANDATORY_REASONS
+
+
+def actual_uncommitted(observation, baseline):
+    """Use baseline surplus after its local FIFO/min-stock reservation."""
+    pledged = {row["tray_id"] for row in observation.get("transfers", [])
+        if row.get("status") in ACTIVE}
+    pledged.update(row["tray_id"] for row in observation.get("client_transfer_ledger", [])
+        if row.get("status") in ACTIVE)
+    trays = {row["tray_id"]: row for row in observation.get("trays", [])}
+    contracts = {int(row["node"]): row for row in observation["node_contracts"]}
+    result = []
+    for supply in baseline.get("supplies", []):
+        tray = trays.get(supply["tray_id"])
+        source = int(supply["node"])
+        contract = contracts[source]
+        if (supply["ledger"] != "actual_available" or supply["tray_id"] in pledged
+                or tray is None or tray.get("mode") != "empty"
+                or int(tray["node"]) != source or tray.get("edge_to", -1) >= 0
+                or tray.get("reception_node", -1) >= 0
+                or supply["estimate"] > observation["now"]
+                or tray.get("available_at", observation["now"]) > observation["now"]
+                or contract.get("resource_owner", contract.get("zone")) != observation["owner_id"]
+                or not contract.get("allow_export", True)):
+            continue
+        result.append(copy.deepcopy(supply))
+    return result
+
+
+def apply_patch(observation, baseline, action):
+    """Validate the exact current binding, then replace/add/hold one tray."""
+    require(action.get("schema") == SCHEMA, "action_schema")
+    require(action["public_state_digest"] == digest(observation), "stale_public_state")
+    require(action["baseline_batch_digest"] == digest(baseline["intents"]), "changed_baseline_batch")
+    require(action["immutable_request_prefix_digest"] == digest(fixed_public_prefix(observation)),
+        "changed_immutable_request_prefix")
+    result = copy.deepcopy(baseline)
+    if action["kind"] == "a_ref":
+        return result
+    require(action["kind"] in ("replace_optional", "hold_optional", "add_optional"), "unknown_patch_kind")
+    tray_id = action["tray_id"]
+    available = {row["tray_id"]: row for row in actual_uncommitted(observation, baseline)}
+    require(tray_id in available, "tray_not_actual_uncommitted_surplus")
+    indices = [i for i, row in enumerate(baseline["intents"]) if row.get("tray_id") == tray_id]
+    require(len(indices) <= 1, "duplicate_baseline_tray")
+    if action["kind"] == "add_optional":
+        require(not indices, "addition_already_assigned")
+    else:
+        require(len(indices) == 1 and not mandatory(baseline["intents"][indices[0]]),
+            "cannot_patch_mandatory_or_missing_allocation")
+    replacement = copy.deepcopy(action.get("intent"))
+    if action["kind"] != "hold_optional":
+        require(isinstance(replacement, dict) and replacement["tray_id"] == tray_id
+            and replacement["source"] == available[tray_id]["node"]
+            and replacement["owner_id"] == observation["owner_id"]
+            and replacement["forecast_ledger"] == "actual_available", "replacement_source_binding")
+        if indices:
+            require(replacement["destination"] != baseline["intents"][indices[0]]["destination"]
+                or replacement["earliest_departure"] != baseline["intents"][indices[0]]["earliest_departure"],
+                "patch_must_change_action")
+    if action["kind"] == "hold_optional":
+        del result["intents"][indices[0]]
+    elif action["kind"] == "replace_optional":
+        result["intents"][indices[0]] = replacement
+    else:
+        result["intents"].insert(0, replacement)
+    before_other = [row for row in baseline["intents"] if row.get("tray_id") != tray_id]
+    after_other = [row for row in result["intents"] if row.get("tray_id") != tray_id]
+    require(before_other == after_other, "unaffected_batch_must_be_preserved")
+    result["batch_patch"] = {"schema": SCHEMA, "action_id": action["action_id"],
+        "kind": action["kind"], "tray_id": tray_id, "modified_tray_count": 1,
+        "preserved_intent_count": len(before_other), "revalidate_residual_after_each_submit": True,
+        "guard_scope": "current public surplus/FIFO only; shared-resource nonharm unknown",
+        "strict_nonharm_certified": False, "mode": "isolated_evaluation_only"}
+    return result

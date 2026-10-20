@@ -451,6 +451,35 @@ def _assignment_representatives(demand: list[dict[str, Any]], supply_count: int)
     return retained
 
 
+def public_transfer_scope(observation: dict[str, Any], source: int, destination: int,
+                          *, actual_available: bool, contracts=None):
+    """Static scope eligibility only; native still owns current admission.
+
+    Missing role contract retains the historical cross-zone-only behaviour.
+    Same-zone return cannot reserve a merely forecast future release.
+    """
+    contracts = contracts if contracts is not None else {
+        int(row["node"]): row for row in observation["node_contracts"]}
+    if source == destination:
+        return None
+    origin, target = contracts[source], contracts[destination]
+    if origin["zone"] != target["zone"]:
+        return "cross_zone_transfer"
+    roles = observation.get("static_role_contract")
+    if roles is None:
+        return None
+    if (roles.get("schema") != "g31.static_node_roles.v1"
+            or not isinstance(roles.get("loader_nodes"), list)
+            or any(type(node) is not int or node not in contracts for node in roles["loader_nodes"])
+            or len(set(roles["loader_nodes"])) != len(roles["loader_nodes"])):
+        raise ValueError("analytic_control:invalid_static_role_contract")
+    if (actual_available and destination in roles["loader_nodes"]
+            and origin.get("resource_owner", origin["zone"])
+            == target.get("resource_owner", target["zone"])):
+        return "local_empty_return"
+    return None
+
+
 def transfer_candidates(observation: dict[str, Any], *, predictive: bool,
                         message_delay: float = 0, expiry_slack: float = 60,
                         request_prefix: str = "analytic", terminal_clearing: bool = True,
@@ -560,7 +589,8 @@ def transfer_candidates(observation: dict[str, Any], *, predictive: bool,
             if source not in supply_sources:
                 clearing_pressure_without_supply += required
                 continue
-            destinations = [port for port in known_ports if contracts[port]["zone"] != contract["zone"]
+            destinations = [port for port in known_ports if public_transfer_scope(
+                                observation, source, port, actual_available=True, contracts=contracts)
                             and contracts[port].get("allow_receive", True)
                             and math.isfinite(travel.complete(source, port))]
             if not destinations or not required:
@@ -589,18 +619,22 @@ def transfer_candidates(observation: dict[str, Any], *, predictive: bool,
                 message_delay, _windows=windows) if respect_service_forecasts else None
             if window:
                 eta = max(eta, window["earliest_departure"] + travel.complete(supply.node, destination))
-            same_zone = contracts[supply.node]["zone"] == contracts[destination]["zone"]
+            scope = public_transfer_scope(observation, supply.node, destination,
+                actual_available=supply.ledger == "actual_available", contracts=contracts)
             wrong_clear_source = job.get("clearing_source", supply.node) != supply.node
             # For a fixed served count, minimizing total restricted queue area
             # (including unserved jobs at the common horizon) minimizes ETA.
             # Minimizing only served-job waiting would favor younger jobs by
             # dropping the older unserved population from the objective.
-            cost = math.inf if same_zone or wrong_clear_source else eta - now
+            cost = math.inf if scope is None or wrong_clear_source else eta - now
             row.append(cost)
             if math.isfinite(cost):
-                pool.append({"supply": i, "demand": j, "predicted_arrival": eta,
+                candidate = {"supply": i, "demand": j, "predicted_arrival": eta,
                              "assignment_cost": cost, "predicted_wait": eta - float(job["arrival"]),
-                             "path": list(travel.path(supply.node, destination)[1]), "service_window": window})
+                             "path": list(travel.path(supply.node, destination)[1]), "service_window": window}
+                if scope == "local_empty_return":
+                    candidate["transfer_scope"] = scope
+                pool.append(candidate)
         costs.append(row)
     chosen = _min_cost_matching(costs)
     intents = []
@@ -621,6 +655,8 @@ def transfer_candidates(observation: dict[str, Any], *, predictive: bool,
                         "service_window": choice["service_window"],
                         "owner_id": contracts[supply.node].get("resource_owner", contracts[supply.node]["zone"]),
                         "expected_version": observation.get("version", 0)})
+        if choice.get("transfer_scope") == "local_empty_return":
+            intents[-1]["transfer_scope"] = choice["transfer_scope"]
     serialize_forecast = _scalar_forecast_dict if _reuse_observation_work else asdict
     return {"policy": "analytic_predictive_matching" if predictive else "reactive_matching",
             "now": now, "version": observation.get("version", 0),

@@ -62,6 +62,13 @@ inline void EventDrivenJunctionRuntime::initialize_circulation(
   }
   if (nodes.size() != graph_.node_count())
     throw std::invalid_argument("circulation:node_contract_coverage");
+  const auto& roles=input.static_role_contract;
+  if(!roles.schema.empty() && roles.schema!="g31.static_node_roles.v1")
+    throw std::invalid_argument("circulation:unsupported_static_role_contract");
+  std::set<int> loaders;
+  for(int node:roles.loader_nodes)
+    if(roles.schema.empty() || !nodes.count(node) || !loaders.insert(node).second)
+      throw std::invalid_argument("circulation:invalid_loader_role");
   const auto& protocol=input.owner_protocol;
   if(protocol.enabled) {
     if(!input.transfers.empty()) throw std::invalid_argument("circulation:protocol_disallows_preloaded_transfers");
@@ -450,9 +457,19 @@ inline void EventDrivenJunctionRuntime::circulation_progress(double time) {
     if (tray.node != request.source) { reject("carrier_not_at_export_port"); continue; }
     const auto& source = circulation_.node_contract(request.source);
     const auto& destination = circulation_.node_contract(request.destination);
-    if (source.zone == destination.zone) {
-      reject("same_zone_transfer_not_authorized"); continue;
-    }
+    if(request.transfer_scope=="cross_zone_transfer") {
+      if(source.zone==destination.zone) {reject("same_zone_transfer_not_authorized");continue;}
+    } else if(request.transfer_scope=="local_empty_return") {
+      if(source.zone!=destination.zone) {reject("local_return_requires_same_zone");continue;}
+      if(circulation_.owner(request.source)!=circulation_.owner(request.destination)) {
+        reject("local_return_requires_same_owner");continue;
+      }
+      const auto& roles=circulation_.input.static_role_contract;
+      if(roles.schema!="g31.static_node_roles.v1") {reject("local_return_requires_static_roles");continue;}
+      if(std::find(roles.loader_nodes.begin(),roles.loader_nodes.end(),request.destination)==roles.loader_nodes.end()) {
+        reject("local_return_destination_not_loader");continue;
+      }
+    } else {reject("unknown_transfer_scope");continue;}
     if (!source.allow_export) { reject("source_module_refused"); continue; }
     timing_source.finish();
     auto timing_receive_permission = request_timing_.scoped(TimingPhase::receiver_validate, timing_identity,

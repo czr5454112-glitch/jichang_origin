@@ -1,0 +1,346 @@
+"""Frozen-source, finite native runs for the airport action-value campaign."""
+from __future__ import annotations
+
+import argparse
+from collections import Counter, defaultdict
+import copy
+from datetime import datetime, timedelta, timezone
+import gzip
+import hashlib
+import json
+import math
+from pathlib import Path
+import secrets
+import shutil
+import sys
+import time
+import traceback
+
+ROOT = Path(__file__).resolve().parents[3]
+CYCLE = ROOT / "outputs/experiments/g31_ics_action_value_20261020/cycle_001"
+HISTORY = ROOT / "outputs/experiments/g31_ics_sustained_flight_20261019/cycle_001"
+MODULE = "scripts.experiments.g31_ics_circulation.foundation_airport_action_campaign"
+LOADERS = (0, 24, 26, 49, 57, 92, 95, 134, 136, 138, 149)
+CONTROLLER = dict(control_period=60., command_delay=2., publication_delay=.5,
+    retry_period=60., compact=True, lease_seconds=120., predictive=True,
+    routes=False, forecasts=True, prebalance=True)
+
+
+def digest(value):
+    return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(",", ":"),
+                                    allow_nan=False).encode()).hexdigest()
+
+
+def sha(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def read(path):
+    return json.loads(Path(path).read_text(encoding="utf8"))
+
+
+def write(path, value):
+    path = Path(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("x", encoding="utf8") as stream:
+        json.dump(value, stream, indent=2, allow_nan=False)
+
+
+def gz(path, value):
+    with Path(path).open("xb") as raw:
+        with gzip.GzipFile(fileobj=raw, mode="wb", compresslevel=1, mtime=0) as stream:
+            stream.write(json.dumps(value, separators=(",", ":"), allow_nan=False).encode())
+
+
+def event(cycle, kind, **fields):
+    with (Path(cycle) / "ledger.jsonl").open("a", encoding="utf8") as stream:
+        stream.write(json.dumps(dict(at=datetime.now(timezone.utc).isoformat(),
+                                     event=kind, **fields), allow_nan=False) + "\n")
+
+
+def parent_input(seed=0, fleet=22):
+    """Identity-keyed synthetic timing only; no results or policy inputs."""
+    path = HISTORY / "C00_receiver_recorded_budget_002/inputs/C00.json"
+    data = read(path)
+    if digest(data) != "43988c9a00a791f7dfdecf1ac1285cdc4a8c0a495a004c3abe1db3329d684afa":
+        raise ValueError("action_campaign:historical_input_changed")
+    splits = {701: "train", 702: "train", 801: "dev", 802: "dev", 901: "test", 902: "test"}
+    if seed and seed not in splits:
+        raise ValueError("action_campaign:unregistered_parent")
+    if fleet not in (18, 22, 26):
+        raise ValueError("action_campaign:unregistered_fleet")
+    parent = dict(parent_seed=seed, split=splits.get(seed, "historical_development"),
+        parent_group=f"conditional_timing_parent_{seed}" if seed else "historical_28506",
+        synthetic=bool(seed), common_historical_template_sha256=sha(path),
+        sampling="sha256(seed:business_identity), uniform[-120,120], clip_zero" if seed else "unchanged",
+        calendar_start=(datetime(2026, 9, 1, tzinfo=timezone(timedelta(hours=8)))
+            + timedelta(days=([0, 701, 702, 801, 802, 901, 902].index(seed)))).isoformat())
+    for job in data["jobs"] if seed else []:
+        integer = int(hashlib.sha256(f"{seed}:{job['business_bag_id']}".encode()).hexdigest()[:16], 16)
+        delta = 240. * integer / (2**64 - 1) - 120.
+        job["arrival"] = round(max(0., job["arrival"] + delta), 6)
+    data["static_role_contract"] = {"schema": "g31.static_node_roles.v1", "loader_nodes": list(LOADERS)}
+    calibration_path = CYCLE / "event_budget_calibration_001.json"
+    if calibration_path.exists():
+        calibration = read(calibration_path)
+        if (calibration["old_global_events"] != data["options"]["max_events"]
+                or calibration["new_global_events"] != 750000):
+            raise ValueError("action_campaign:invalid_event_budget_calibration")
+        data["options"]["max_events"] = calibration["new_global_events"]
+    parent["calendar_start_epoch_seconds"] = datetime.fromisoformat(parent["calendar_start"]).timestamp()
+    contracts = {row["node"]: row for row in data["node_contracts"]}
+    groups = defaultdict(list)
+    for node in LOADERS:
+        groups[(contracts[node]["resource_owner"], "transfer" if node in (134, 136, 138) else "standard")].append(node)
+    for key in groups:
+        groups[key].sort(key=lambda n: (hashlib.sha256(f"1701:{key}:{n}".encode()).hexdigest(), n))
+    order = [groups[key][rank] for rank in range(max(map(len, groups.values())))
+             for key in sorted(groups) if rank < len(groups[key])]
+    if fleet == 18:
+        removed = {f"initial:{node}:1" for node in order[:4]}
+        data["trays"] = [row for row in data["trays"] if row["tray_id"] not in removed]
+    elif fleet == 26:
+        for node in order[:4]:
+            if contracts[node]["capacity"] < 3:
+                raise ValueError("action_campaign:fleet_exceeds_capacity")
+            data["trays"].append({"tray_id": f"initial:{node}:2", "node": node})
+    parent.update(fleet=fleet, layout_seed=1701, static_layout_order=order,
+                  offered_count=len(data["jobs"]), jobs_digest=digest(data["jobs"]))
+    return data, parent
+
+
+def prepare(name, binary, *, seed=0, fleet=22, branch="baseline", window=(7200., 14400.),
+            batch="A", anchor_rank=0, horizon=59400.):
+    directory = CYCLE / name
+    if directory.exists() or directory.parent != CYCLE or branch not in ("baseline", "a_ref", "a_patch"):
+        raise ValueError("action_campaign:fresh_registered_run_required")
+    data, parent = parent_input(seed, fleet)
+    if parent["split"] == "test":
+        raise ValueError("action_campaign:test_locked_pending_all_model_freezes")
+    acceptance_path = CYCLE / "native029_accepted_contract_001.json"
+    accepted = read(acceptance_path)
+    if (accepted["status"] != "accepted_short_native_semantics"
+            or sha(binary) != accepted["binary"]["sha256"]):
+        raise ValueError("action_campaign:accepted_native029_required")
+    directory.mkdir()
+    write(directory / "input.json", data)
+    # Each worker imports this immutable snapshot, so unrelated implementation
+    # work cannot change its control halfway through a run.
+    paths = list((ROOT / "scripts/experiments/g31_ics_circulation").glob("*.py"))
+    from .foundation_airport_campaign import source_dependency_closure
+    paths.extend(source_dependency_closure(roots=(MODULE,)).values())
+    paths.extend((ROOT / "src").rglob("*.py"))
+    sources = {}
+    for source in sorted(set(paths)):
+        relative = source.relative_to(ROOT)
+        target = directory / "source" / relative
+        target.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(source, target)
+        sources[str(relative)] = sha(target)
+    plan = dict(schema="g31.airport.action_campaign.v1", name=name, batch=batch,
+        cycle=str(CYCLE), output=str(directory), branch=branch, parent=parent,
+        window=list(window), anchor_rank=anchor_rank, pair_horizon=1800.,
+        requested_horizon=horizon if branch == "baseline" else window[1] + 1800.,
+        binary={"path": str(Path(binary).resolve()), "sha256": sha(binary)},
+        native_acceptance={"path": str(acceptance_path), "sha256": sha(acceptance_path)},
+        event_budget_calibration={"path": str(CYCLE / "event_budget_calibration_001.json"),
+            "sha256": sha(CYCLE / "event_budget_calibration_001.json")},
+        input={"path": str(directory / "input.json"), "sha256": sha(directory / "input.json"),
+               "semantic_sha256": digest(data)}, sources=sources,
+        controller=CONTROLLER, continuation_version="airport_local_return_analytic_v1",
+        soft_seconds=600, hard_seconds=660, outer_seconds=720,
+        event_budget=100000, global_event_budget=data["options"]["max_events"],
+        strict_nonharm_certified=False, model_control=False,
+        scope="isolated native mechanism evaluation; no protected model takeover")
+    write(directory / "plan.json", plan)
+    event(CYCLE, "prepared", name=name, batch=batch, plan_sha256=sha(directory / "plan.json"))
+    return directory
+
+
+def verify(plan):
+    output = Path(plan["output"])
+    for item in (plan["binary"], plan["input"],
+                 *([plan["native_acceptance"]] if "native_acceptance" in plan else []),
+                 *([plan["event_budget_calibration"]] if "event_budget_calibration" in plan else [])):
+        if sha(item["path"]) != item["sha256"]:
+            raise ValueError("action_campaign:artifact_changed")
+    for relative, expected in plan["sources"].items():
+        if sha(output / "source" / relative) != expected:
+            raise ValueError("action_campaign:source_archive_changed:" + relative)
+
+
+def summary(data, result, at):
+    specs = {row["business_bag_id"]: row for row in data["jobs"]}
+    jobs = result["jobs"]
+    if len(jobs) != len(specs) or {row["business_bag_id"] for row in jobs} != set(specs):
+        raise ValueError("action_campaign:population_lost")
+    done = [row for row in jobs if row["status"] == "completed"]
+    return dict(offered=len(specs), arrived=sum(j["arrival"] <= at for j in specs.values()),
+        completed=len(done), jobs_by_status=dict(Counter(row["status"] for row in jobs)),
+        trays_by_mode=dict(Counter(row["mode"] for row in result["trays"])), at=at)
+
+
+def worker(plan_path, expected):
+    from .analytic_control import transfer_candidates
+    from .native_host import load_native
+    from .foundation_airport_protocol_v2 import run_airport_bounded_protocol_control
+    from .foundation_airport_paired_continuation import make_paired_planner
+    plan = read(plan_path)
+    output = Path(plan["output"])
+    report = {"status": "failed_before_native", "native_constructor_attempts": 0}
+    started = time.monotonic()
+    try:
+        if sha(plan_path) != expected:
+            raise ValueError("action_campaign:plan_changed")
+        verify(plan)
+        data = read(plan["input"]["path"])
+        owners = sorted({row["resource_owner"] for row in data["node_contracts"]})
+        report["native_constructor_attempts"] = 1
+        session = load_native(plan["binary"]["path"]).NativeSession(data)
+        paired = None if plan["branch"] == "baseline" else make_paired_planner(
+            transfer_candidates, branch=plan["branch"], window=tuple(plan["window"]),
+            parent=plan["parent"], continuation_version=plan["continuation_version"],
+            anchor_rank=plan["anchor_rank"])
+        max_batch, saved_max = 0, None
+        def planner(observation, **options):
+            nonlocal max_batch, saved_max
+            decision = (paired or transfer_candidates)(observation, **options)
+            if len(decision["intents"]) > max_batch:
+                max_batch = len(decision["intents"])
+                saved_max = dict(observation=copy.deepcopy(observation), options=copy.deepcopy(options),
+                                 decision=copy.deepcopy(decision))
+            return decision
+        def precommit(**kwargs):
+            if paired is not None and paired.needs_prefix:
+                paired.bind_prefix(native_state_sha256=session.offline_state_sha256(),
+                    controller_state={**kwargs["controller_state"], "client": kwargs["client_state"]},
+                    observation=kwargs["observation"])
+        state, calls, segments, final = None, [], [], None
+        target = min(3600., plan["requested_horizon"])
+        with (output / "progress.jsonl").open("x", encoding="utf8") as progress:
+            while session.physical_time <= target:
+                run = run_airport_bounded_protocol_control(session, owners, horizon=target,
+                    state=state, event_budget=plan["event_budget"], planner=planner,
+                    planner_identity=plan["continuation_version"],
+                    precommit_observer=precommit,
+                    soft_deadline=started + plan["soft_seconds"], **plan["controller"])
+                state = run["controller_state"]
+                calls.extend(run["client_calls"])
+                if run["result"] is not None:
+                    final = run["result"]
+                path = output / f"segment_{len(segments):02d}.json.gz"
+                gz(path, run)
+                row = dict(target=target, physical_time=session.physical_time, status=run["status"],
+                    elapsed=time.monotonic()-started, raw=str(path),
+                    summary=summary(data, final, final["physical_clock"]) if final is not None else None)
+                segments.append(row)
+                progress.write(json.dumps(row) + "\n")
+                progress.flush()
+                if run["status"] != "reached":
+                    report["status"] = "censored_" + run["status"]
+                    break
+                endpoint = (paired.label_end if paired is not None and paired.label_end is not None
+                            else plan["requested_horizon"])
+                if session.physical_time >= endpoint:
+                    report["status"] = "complete" if paired is None or paired.selected else "no_eligible_opportunity"
+                    break
+                step = (600. if paired is not None and paired.selected else
+                        60. if paired is not None and target >= plan["window"][0] else 3600.)
+                next_target = min(target + step, endpoint)
+                if paired is not None and target < plan["window"][0]:
+                    next_target = min(next_target, plan["window"][0])
+                target = next_target
+        gz(output / "client_calls.json.gz", calls)
+        gz(output / "final_result.json.gz", final)
+        if saved_max is not None:
+            gz(output / "largest_batch.json.gz", saved_max)
+        ack_views = {owner: session.observe_protocol(owner) for owner in owners}
+        gz(output / "ack_views.json.gz", ack_views)
+        diagnostics = session.offline_diagnostics()
+        gz(output / "offline_diagnostics.json.gz", diagnostics)
+        if final is not None and final["physical_clock"] == session.physical_time:
+            from .foundation_airport_wait_graph import analyze_wait_graph
+            gz(output / "wait_graph_report.json.gz",
+               analyze_wait_graph(data, final, diagnostics, client_calls=calls))
+        if paired is not None:
+            gz(output / "pair_trace.json.gz", paired.report())
+            from .foundation_airport_pair_dataset import branch_evidence
+            gz(output / "branch_evidence.json.gz", branch_evidence(data=data,
+                planner_report=paired.report(), result=final, client_calls=calls,
+                delivered_ack_views=ack_views, stop_reason=report["status"],
+                input_sha256=plan["input"]["semantic_sha256"]))
+        report.update(final_physical_time=session.physical_time, segments=segments,
+            summary=summary(data, final, final["physical_clock"]) if final is not None else None,
+            max_actual_batch_size=max_batch, pair_selected=bool(paired and paired.selected),
+            strict_nonharm_certified=False, final_native_state_sha256=session.offline_state_sha256())
+        verify(plan)
+    except Exception:
+        report.update(status="failed", exception=traceback.format_exc())
+    report["wall_seconds"] = time.monotonic() - started
+    write(output / "worker_report.json", report)
+    return report
+
+
+def launch(directory):
+    from .bounded_windows_job import run
+    directory = Path(directory).resolve()
+    plan = read(directory / "plan.json")
+    verify(plan)
+    cycle = Path(plan["cycle"])
+    manifest = read(cycle / "manifest.json")
+    age = datetime.now(timezone.utc) - datetime.fromisoformat(manifest["created_at"])
+    rows = [json.loads(line) for line in (cycle / "ledger.jsonl").read_text().splitlines()]
+    if age.total_seconds() >= 16 * 3600 or sum(r["event"] == "long_native_launch" for r in rows) >= 72:
+        raise ValueError("action_campaign:budget_exhausted")
+    if (directory / "receipt.json").exists():
+        raise ValueError("action_campaign:attempt_already_closed")
+    token = secrets.token_hex(24)
+    plan_sha = sha(directory / "plan.json")
+    event(cycle, "long_native_launch", name=plan["name"], batch=plan["batch"], plan_sha256=plan_sha)
+    with (directory / "stdout.log").open("xb") as stdout, (directory / "stderr.log").open("xb") as stderr:
+        process = run([sys.executable, "-m", MODULE, "--worker", str(directory / "plan.json"),
+            "--expected", plan_sha, "--admission", token], timeout=plan["hard_seconds"],
+            stdout=stdout, stderr=stderr, admission=token, cwd=directory / "source")
+    report_path = directory / "worker_report.json"
+    report = read(report_path) if report_path.exists() else {"status": "unknown_hard_stop"}
+    receipt = dict(schema="g31.airport.action_run_receipt.v1", process=process,
+        worker=report, plan_sha256=plan_sha, status=report["status"])
+    write(directory / "receipt.json", receipt)
+    event(cycle, "long_native_closed", name=plan["name"], status=receipt["status"],
+          wall_seconds=process["wall_seconds"])
+    return {"name": plan["name"], "status": receipt["status"],
+            "wall_seconds": process["wall_seconds"], "summary": report.get("summary")}
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--worker", type=Path)
+    parser.add_argument("--expected")
+    parser.add_argument("--admission")
+    parser.add_argument("--prepare")
+    parser.add_argument("--binary", type=Path)
+    parser.add_argument("--launch", type=Path)
+    parser.add_argument("--seed", type=int, default=0)
+    parser.add_argument("--fleet", type=int, default=22)
+    parser.add_argument("--branch", default="baseline")
+    parser.add_argument("--batch", default="A")
+    parser.add_argument("--window", nargs=2, type=float, default=(7200., 14400.))
+    parser.add_argument("--anchor-rank", type=int, default=0)
+    parser.add_argument("--horizon", type=float, default=59400.)
+    args = parser.parse_args()
+    if args.worker:
+        if not args.admission or sys.stdin.readline().strip() != args.admission:
+            raise SystemExit("action_campaign:parent_admission_required")
+        worker(args.worker, args.expected)
+    elif args.prepare:
+        print(prepare(args.prepare, args.binary, seed=args.seed, fleet=args.fleet,
+            branch=args.branch, batch=args.batch, window=tuple(args.window),
+            anchor_rank=args.anchor_rank, horizon=args.horizon))
+    elif args.launch:
+        print(json.dumps(launch(args.launch)))
+    else:
+        parser.error("choose prepare/launch/worker")
+
+
+if __name__ == "__main__":
+    main()

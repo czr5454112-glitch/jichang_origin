@@ -7,6 +7,7 @@ The general action-value API intentionally keeps its existing contract.
 from __future__ import annotations
 
 import hashlib
+from dataclasses import dataclass
 import json
 import math
 from pathlib import Path
@@ -29,11 +30,16 @@ def read_bound(reference):
     return json.loads(data)
 
 
-def validate_behavior_checkpoint(observation,checkpoint):
-    """Check time before reading weights; validate exact completed artifacts."""
+def _available_now(observation):
     now=observation.get('now')
     require(type(now)in(int,float) and math.isfinite(now) and now>=EARLIEST_MODEL_USE,
         'model_unavailable_before_registered_57600_cutoff')
+    return now
+
+
+def validate_behavior_checkpoint(observation,checkpoint):
+    """Check time before reading weights; validate exact completed artifacts."""
+    now=_available_now(observation)
     model=read_bound({'path':checkpoint['path'],'sha256':checkpoint['sha256']})
     receipt=read_bound(checkpoint['training_receipt'])
     require(receipt['status']=='completed_train_only_behavior_pretraining' and receipt['source_exit_pins_passed'] is True
@@ -71,8 +77,50 @@ def validate_behavior_checkpoint(observation,checkpoint):
     return model
 
 
+@dataclass(frozen=True, init=False)
+class PreparedBehaviorCheckpoint:
+    """Frozen, provenance-validated weights; current gates are never cached."""
+    numerical_model: object
+    descriptor_sha256: str
+    model_content_sha256: str
+    seed: int
+    cutoff: float
+
+    def __init__(self):
+        raise TypeError('use prepare_behavior_checkpoint')
+
+
+def prepare_behavior_checkpoint(observation, checkpoint):
+    """Load exact artifacts/source pins once, then freeze numeric parameters."""
+    from . import foundation_action_value as value
+    model = validate_behavior_checkpoint(observation, checkpoint)
+    result = object.__new__(PreparedBehaviorCheckpoint)
+    fields = dict(numerical_model=value.prepare_model(model), descriptor_sha256=digest(checkpoint),
+        model_content_sha256=digest(model), seed=model['seed'],
+        cutoff=model['behavior_evidence']['model_first_permitted_sim_time'])
+    for name, item in fields.items():
+        object.__setattr__(result, name, item)
+    return result
+
+
+def predict_prepared_behavior_checkpoint(context, matrix, checkpoint, *, descriptor):
+    """Recheck the actual callback/variant and exact frozen-artifact binding."""
+    from . import foundation_action_value as value
+    require(type(context) is value.PreparedObservation, 'prepared_current_context_required')
+    now = _available_now(context.observation)
+    require(type(checkpoint) is PreparedBehaviorCheckpoint
+        and checkpoint.descriptor_sha256 == digest(descriptor), 'prepared_checkpoint_descriptor_binding')
+    require(now >= checkpoint.cutoff and context.observation['schema'] == value.OBSERVATION_SCHEMA,
+        'current_observation_and_model_availability')
+    return value.predict_prepared(checkpoint.numerical_model, matrix, context=context)
+
+
 def predict_behavior_checkpoint(observation,actions,checkpoint):
     """All supplied actions still require the current complete native guard."""
-    model=validate_behavior_checkpoint(observation,checkpoint)
+    # Availability still precedes weight access, including malformed external
+    # observations. The JSON API does not accept an arbitrary trusted flag.
+    prepared=prepare_behavior_checkpoint(observation,checkpoint)
     from . import foundation_action_value as value
-    return value.predict(model,[observation]*len(actions),actions)
+    context=value.prepare_observation(observation)
+    matrix=value.prepare_feature_matrix(context,actions)
+    return predict_prepared_behavior_checkpoint(context,matrix,prepared,descriptor=checkpoint)

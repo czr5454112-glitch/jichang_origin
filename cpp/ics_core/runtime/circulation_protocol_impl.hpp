@@ -42,7 +42,8 @@ inline std::string EventDrivenJunctionRuntime::submit_circulation_protocol_trans
     if(known.owner!=owner) return "rejected:request_not_owned";
     if(old.tray_id!=request.tray_id || old.source!=request.source || old.destination!=request.destination ||
        old.earliest_departure!=request.earliest_departure || old.expiry!=request.expiry ||
-       old.message_delay!=request.message_delay) return "rejected:request_identity_conflict";
+       old.message_delay!=request.message_delay || old.transfer_scope!=request.transfer_scope)
+      return "rejected:request_identity_conflict";
     if(!std::isfinite(now_+old.message_delay) || !std::isfinite(now_+circulation_.input.owner_protocol.timeout))
       return "rejected:invalid_protocol_time";
     ++known.attempt;known.client_status="pending";

@@ -1,0 +1,278 @@
+"""Explicit calendar coordinates for reusing frozen B1 parameters on synthetic days.
+
+This adapter does not fit, modify historical artifacts, read arrival labels, or
+claim independent airport days. The historical template and its retrospective
+static-plan assumption remain visible in every derived forecast's provenance.
+"""
+from __future__ import annotations
+
+import copy
+from datetime import datetime, timedelta
+import hashlib
+import json
+import math
+from pathlib import Path
+
+from . import foundation_flight_forecaster as original
+from . import foundation_flight_forecaster_arrays as arrays
+from . import foundation_flight_context as contexts
+from . import foundation_airport_feasible_domain as airport
+from . import foundation_airport_flight as flight
+
+ROOT = Path(__file__).resolve().parents[3]
+SOURCE = ROOT / "outputs/experiments/g31_ics_sustained_flight_20261019/cycle_001/B1_training_001"
+SOURCE_CALENDAR_START = "2026-09-01T00:00:00+08:00"
+PARENT_SEEDS = (701, 702, 801, 802, 901, 902)
+TEMPLATE_SHA256 = "a9611267471a269cc34f5646a4ebb409c61a08fa77dcef4c02266b346c86890c"
+SOURCE_MODEL_ID = "fd2e73b9bef85724154823af91167803ce3e0ceb5d29c214a28302cab30f288b"
+PINNED_FILES = {
+    "flight_forecaster_checkpoint.json": "43787d4753966a63f97cf291bd6cd04aee49fc38b5ced9a3e5bf13cb75786bc8",
+    "public/static_flight_plan.json": "c85693b61757e54bff51fbc014e32e16b902ed225607b250fe43da67681a2508",
+    "receipt.json": "5d2e943d5cc50a36dcb75b9ce7c57a99b7c58ed25e627ec6494f6c0b23d6feb8",
+}
+ABSOLUTE_TIME_BASIS = {
+    "unit": "seconds", "origin": "1970-01-01T00:00:00+00:00",
+    "timezone": "UTC", "conversion_version": "g31.explicit_synthetic_calendar_v1",
+}
+VERSION = "g31.foundation.airport_calendar_parameter_reuse.v1"
+MANIFEST_SCHEMA = "g31.foundation.airport_absolute_forecast_binding.v1"
+
+
+def require(condition, reason):
+    if not condition:
+        raise ValueError("airport_calendar_forecast:" + reason)
+
+
+def digest(value):
+    return original.digest(value)
+
+
+def _epoch(value):
+    require(type(value) is str, "calendar_iso_string")
+    parsed = datetime.fromisoformat(value)
+    require(parsed.tzinfo is not None and parsed.utcoffset() is not None, "calendar_timezone_required")
+    return parsed.timestamp()
+
+
+def _target_parent(parent):
+    require(type(parent) is dict and parent.get("synthetic") is True, "registered_synthetic_parent_required")
+    seed = parent.get("parent_seed")
+    require(type(seed) is int and seed in PARENT_SEEDS, "registered_parent_seed")
+    day = datetime.fromisoformat(SOURCE_CALENDAR_START) + timedelta(days=PARENT_SEEDS.index(seed) + 1)
+    require(parent.get("calendar_start") == day.isoformat(), "registered_target_calendar")
+    expected_split = "train" if seed in (701, 702) else "dev" if seed in (801, 802) else "test"
+    require(parent.get("split") == expected_split
+            and parent.get("parent_group") == f"conditional_timing_parent_{seed}", "parent_lineage")
+    require(parent.get("common_historical_template_sha256") == TEMPLATE_SHA256, "common_template_binding")
+    require(parent.get("sampling") == "sha256(seed:business_identity), uniform[-120,120], clip_zero",
+            "registered_synthetic_sampling")
+    epoch = _epoch(parent["calendar_start"])
+    require(parent.get("calendar_start_epoch_seconds", epoch) == epoch, "calendar_epoch_consistency")
+    # Public parent registration only; no future job IDs, arrivals, or counts.
+    return {key: parent[key] for key in ("parent_seed", "split", "parent_group", "synthetic",
+        "calendar_start", "common_historical_template_sha256", "sampling")} | {
+        "calendar_start_epoch_seconds": epoch}
+
+
+def static_mapping():
+    return airport.static_mapping({"nodes": list(range(151)), "edges": list(range(227)),
+        "business_roles": {"standard_loader_nodes": list(flight.STANDARD_LOADERS),
+                          "transfer_loader_nodes": list(flight.TRANSFER_LOADERS)}})
+
+
+def load_calendar_binding(parent, mapping=None, *, source_directory=SOURCE):
+    """Read only the three pinned public/model artifacts; return a new identity.
+
+    Calendar assignment is an explicit simulated experiment coordinate, not a
+    claim that the artifact's real file creation occurred on the assigned day.
+    """
+    parent = _target_parent(parent)
+    mapping = static_mapping() if mapping is None else copy.deepcopy(mapping)
+    airport.validate_mapping(mapping)
+    objects, refs = {}, {}
+    for name, expected in PINNED_FILES.items():
+        path = Path(source_directory) / name
+        raw = path.read_bytes()
+        require(hashlib.sha256(raw).hexdigest() == expected, "original_artifact_bytes:" + name)
+        objects[name] = json.loads(raw)
+        refs[name] = {"path": str(path.resolve()), "sha256": expected}
+    source_model = original.validate_checkpoint(objects["flight_forecaster_checkpoint.json"])
+    source_plan = objects["public/static_flight_plan.json"]
+    source_receipt = objects["receipt.json"]
+    require(source_model["model_sha256"] == SOURCE_MODEL_ID
+            and source_model["training_labels_closed_at"] == source_model["frozen_at"] == 43200.,
+            "frozen_source_model_identity_and_cutoffs")
+    require(source_model["static_plan_sha256"] == digest(source_plan)
+            and source_receipt["model_sha256"] == SOURCE_MODEL_ID
+            and source_receipt["training_performed"] is True, "source_training_plan_receipt_binding")
+    contexts.adapt_context(source_plan, owner=source_plan["owner_scope"], now=43200.,
+                           expected_time_basis=source_model["time_basis"])
+    source_start, target_start = _epoch(SOURCE_CALENDAR_START), parent["calendar_start_epoch_seconds"]
+    closed = source_start + source_model["training_labels_closed_at"]
+    available = source_start + source_model["frozen_at"]
+    require(closed <= available < target_start, "source_model_precedes_target_parent")
+    checkpoint = copy.deepcopy(source_model)
+    checkpoint.update(training_labels_closed_at=closed, frozen_at=available,
+                      time_basis=copy.deepcopy(ABSOLUTE_TIME_BASIS))
+    checkpoint["calendar_parameter_reuse"] = {
+        "schema": VERSION, "source_model_id": SOURCE_MODEL_ID,
+        "source_calendar_start": SOURCE_CALENDAR_START,
+        "source_calendar_start_epoch_seconds": source_start,
+        "source_time_basis": copy.deepcopy(source_model["time_basis"]),
+        "original_training_labels_closed_at_sim_time": source_model["training_labels_closed_at"],
+        "original_model_available_at_sim_time": source_model["frozen_at"],
+        "unchanged_parameters_sha256": digest(source_model["parameters"]),
+        "new_fit_performed": False,
+    }
+    checkpoint["model_sha256"] = digest({k: v for k, v in checkpoint.items() if k != "model_sha256"})
+    original.validate_checkpoint(checkpoint)
+
+    plan = copy.deepcopy(source_plan)
+    plan.update(time_basis=copy.deepcopy(ABSOLUTE_TIME_BASIS),
+                source_id=f"calendar:{parent['parent_group']}:{source_plan['source_id']}")
+    for key in ("published_at", "received_at"):
+        if plan[key] is not None:
+            plan[key] += target_start
+    if plan["validity_policy"]["valid_until"] is not None:
+        plan["validity_policy"]["valid_until"] += target_start
+    for entry in plan["entries"]:
+        entry["scheduled_event_at"] += target_start
+        if entry.get("estimated_event_at") is not None:
+            entry["estimated_event_at"] += target_start
+    manifest = {
+        "schema": MANIFEST_SCHEMA, "version": VERSION, "time_basis": "absolute_epoch_seconds",
+        "model_id": checkpoint["model_sha256"], "source_model_id": SOURCE_MODEL_ID,
+        "source_calendar_start": SOURCE_CALENDAR_START, "source_calendar_start_epoch_seconds": source_start,
+        "original_training_labels_closed_at_sim_time": source_model["training_labels_closed_at"],
+        "original_model_available_at_sim_time": source_model["frozen_at"],
+        "training_labels_closed_at_epoch_seconds": closed, "model_available_at_epoch_seconds": available,
+        "original_checkpoint_sha256": PINNED_FILES["flight_forecaster_checkpoint.json"],
+        "original_training_receipt_sha256": PINNED_FILES["receipt.json"],
+        "original_public_plan_sha256": PINNED_FILES["public/static_flight_plan.json"],
+        "original_model_time_basis": copy.deepcopy(source_model["time_basis"]),
+        "original_model_static_plan_sha256": source_model["static_plan_sha256"],
+        "source_references": refs, "parameter_sha256": digest(checkpoint["parameters"]),
+        "target_parent": parent, "target_plan_template_sha256": digest(plan),
+        "airport_mapping_sha256": mapping["sha256"],
+        "new_fit_performed": False, "observed_count_update": False,
+        "source_training_parent_split": "historical_train_STD_at_or_before_43200",
+        "synthetic_common_template_limits": {
+            "independent_real_airport_days": False, "template_groups_retrospectively_identified": True,
+            "static_plan_predeclared_assumption": source_plan["static_assumption"],
+            "calendar_dates_are_declared_experiment_coordinates": True,
+            "source_and_target_share_historical_template": True,
+            "target_actual_arrivals_or_future_counts_used": False,
+            "no_cross_day_or_field_generalization_claim": True,
+        },
+    }
+    bundle = {"schema": VERSION, "checkpoint": checkpoint, "absolute_plan_template": plan,
+              "mapping": mapping, "producer_manifest": manifest}
+    bundle["binding_sha256"] = digest(bundle)
+    return bundle
+
+
+def _validate_binding(binding):
+    require(binding.get("schema") == VERSION
+            and binding.get("binding_sha256") == digest({k: v for k, v in binding.items()
+                                                        if k != "binding_sha256"}), "calendar_binding_digest")
+    checkpoint, manifest = binding["checkpoint"], binding["producer_manifest"]
+    original.validate_checkpoint(checkpoint)
+    require(checkpoint["model_sha256"] == manifest["model_id"], "derived_model_binding")
+    require(digest(checkpoint["parameters"]) == manifest["parameter_sha256"], "parameters_unchanged")
+    _target_parent(manifest["target_parent"])
+    source_start = _epoch(SOURCE_CALENDAR_START)
+    require(manifest["source_calendar_start_epoch_seconds"] == source_start
+            and manifest["source_calendar_start"] == SOURCE_CALENDAR_START, "fixed_source_calendar")
+    require(checkpoint["training_labels_closed_at"] == manifest["training_labels_closed_at_epoch_seconds"]
+            == source_start + manifest["original_training_labels_closed_at_sim_time"]
+            and checkpoint["frozen_at"] == manifest["model_available_at_epoch_seconds"]
+            == source_start + manifest["original_model_available_at_sim_time"], "absolute_source_cutoff_binding")
+    require(manifest["original_training_labels_closed_at_sim_time"] == 43200.
+            and manifest["original_model_available_at_sim_time"] == 43200.
+            and manifest["source_model_id"] == SOURCE_MODEL_ID, "historical_source_cutoffs_preserved")
+    require(manifest["target_plan_template_sha256"] == digest(binding["absolute_plan_template"])
+            and manifest["airport_mapping_sha256"] == binding["mapping"]["sha256"], "plan_and_mapping_binding")
+    reconstructed = copy.deepcopy(checkpoint)
+    reconstructed.pop("calendar_parameter_reuse")
+    reconstructed.update(time_basis=copy.deepcopy(manifest["original_model_time_basis"]),
+        training_labels_closed_at=manifest["original_training_labels_closed_at_sim_time"],
+        frozen_at=manifest["original_model_available_at_sim_time"])
+    require(digest({k: v for k, v in reconstructed.items() if k != "model_sha256"}) == SOURCE_MODEL_ID,
+            "inverse_binding_must_recover_frozen_source_model")
+    source_plan = copy.deepcopy(binding["absolute_plan_template"])
+    target_start = manifest["target_parent"]["calendar_start_epoch_seconds"]
+    require(source_plan["source_id"] ==
+            f"calendar:{manifest['target_parent']['parent_group']}:legacy_static_declared_plan_v1",
+            "target_plan_source_identity")
+    source_plan.update(source_id="legacy_static_declared_plan_v1",
+                       time_basis=copy.deepcopy(manifest["original_model_time_basis"]))
+    for key in ("published_at", "received_at"):
+        if source_plan[key] is not None:
+            source_plan[key] -= target_start
+    if source_plan["validity_policy"]["valid_until"] is not None:
+        source_plan["validity_policy"]["valid_until"] -= target_start
+    for entry in source_plan["entries"]:
+        entry["scheduled_event_at"] -= target_start
+        if entry.get("estimated_event_at") is not None:
+            entry["estimated_event_at"] -= target_start
+    require(digest(source_plan) == reconstructed["static_plan_sha256"],
+            "inverse_binding_must_recover_frozen_public_plan")
+    return checkpoint, manifest
+
+
+def predict(binding, *, now, owner, horizon_seconds=1800):
+    """Predict on the absolute axis, then expose a fully translated day-clock view."""
+    checkpoint, manifest = _validate_binding(binding)
+    require(type(now) in (float, int) and math.isfinite(now) and 0 <= now <= 86400., "physical_day_clock")
+    require(type(horizon_seconds) is int and 0 < horizon_seconds <= 1800, "bounded_forecast_horizon")
+    start = manifest["target_parent"]["calendar_start_epoch_seconds"]
+    absolute_now = start + now
+    require(manifest["training_labels_closed_at_epoch_seconds"]
+            <= manifest["model_available_at_epoch_seconds"] < absolute_now, "model_unavailable_at_absolute_now")
+    plan = copy.deepcopy(binding["absolute_plan_template"])
+    plan["owner_scope"] = owner
+    regional = arrays.predict(plan, checkpoint, now=absolute_now, owner=owner,
+                              observed_counts=None, horizon_seconds=horizon_seconds)
+    projected = airport.project_forecast(regional, binding["mapping"], now=absolute_now, owner=owner)
+    absolute = {
+        "time_basis": copy.deepcopy(ABSOLUTE_TIME_BASIS), "forecast_origin": absolute_now,
+        "absolute_bin_edges": projected["absolute_bin_edges"],
+        "remaining_support_until": projected["remaining_support_until"],
+        "information_cutoffs": copy.deepcopy(projected["information_cutoffs"]),
+        "owner_plan_sha256": digest(plan), "absolute_regional_forecast_sha256": digest(regional),
+        "absolute_projected_forecast_sha256": digest(projected),
+    }
+    projected["forecast_origin"] = float(now)
+    projected["absolute_bin_edges"] = [value - start for value in projected["absolute_bin_edges"]]
+    projected["remaining_support_until"] -= start
+    projected["information_cutoffs"] = {key: None if value is None else value - start
+                                        for key, value in projected["information_cutoffs"].items()}
+    projected["time_basis"] = {"unit": "seconds", "origin": manifest["target_parent"]["calendar_start"],
+        "timezone": "Asia/Shanghai", "conversion_version": VERSION + ":epoch_minus_target_start"}
+    projected["calendar_provenance"] = {
+        "schema": VERSION, "binding_sha256": binding["binding_sha256"],
+        "producer_manifest_sha256": digest(manifest), "absolute": absolute,
+        "calendar_start_epoch_seconds": start,
+        "negative_source_day_cutoffs_are_prior_calendar_day": True,
+        "parameter_reuse_not_new_fit": True, "observed_future_counts_used": False,
+    }
+    return projected
+
+
+def make_forecast_evidence(binding, observation, *, horizon_seconds=1800):
+    """Bind one actual public current to the derived, causally available forecast."""
+    forecast = predict(binding, now=observation["now"], owner=observation["owner_id"],
+                       horizon_seconds=horizon_seconds)
+    manifest = copy.deepcopy(binding["producer_manifest"])
+    start = manifest["target_parent"]["calendar_start_epoch_seconds"]
+    return {
+        "schema": "g31.foundation.airport_pair_absolute_forecast.v1",
+        "calendar_start_epoch_seconds": start,
+        "observed_at_epoch_seconds": start + observation["now"],
+        "training_labels_closed_at_epoch_seconds": manifest["training_labels_closed_at_epoch_seconds"],
+        "model_available_at_epoch_seconds": manifest["model_available_at_epoch_seconds"],
+        "plan_received_at_epoch_seconds": forecast["calendar_provenance"]["absolute"]["information_cutoffs"]["plan_received_at"],
+        "public_state_sha256": digest(observation), "model_id": manifest["model_id"],
+        "forecast": forecast, "forecast_sha256": digest(forecast),
+        "producer_manifest": manifest, "provenance_sha256": digest(manifest),
+    }

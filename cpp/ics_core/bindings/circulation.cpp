@@ -46,6 +46,17 @@ EventDrivenJunctionConfig g31_config(const py::dict& options) {
 }
 CirculationInput read_input(const py::dict& data) {
   CirculationInput in;
+  if(data.contains("static_role_contract")) {
+    const auto roles=py::cast<py::dict>(data["static_role_contract"]);
+    in.static_role_contract.schema=required<std::string>(roles,"schema");
+    if(in.static_role_contract.schema!="g31.static_node_roles.v1")
+      throw py::value_error("circulation:unsupported_static_role_contract");
+    for(auto value:roles["loader_nodes"]) {
+      if(!py::isinstance<py::int_>(value) || py::isinstance<py::bool_>(value))
+        throw py::value_error("circulation:invalid_loader_role");
+      in.static_role_contract.loader_nodes.push_back(py::cast<int>(value));
+    }
+  }
   if(data.contains("owner_notifications"))
     in.owner_notifications_enabled=field<bool>(py::cast<py::dict>(data["owner_notifications"]),"enabled",false);
   if(data.contains("owner_protocol")) {
@@ -103,6 +114,7 @@ CirculationInput read_input(const py::dict& data) {
     t.source=required<int>(d,"source"); t.destination=required<int>(d,"destination");
     t.issued_at=required<double>(d,"issued_at"); t.message_delay=required<double>(d,"message_delay");
     t.earliest_departure=required<double>(d,"earliest_departure"); t.expiry=required<double>(d,"expiry");
+    t.transfer_scope=field<std::string>(d,"transfer_scope","cross_zone_transfer");
     in.transfers.push_back(t);
   }
   return in;
@@ -197,6 +209,10 @@ py::dict render_result(EventDrivenJunctionRuntime& runtime, const std::string& m
   } out["decisions"]=decisions;
   if(mode == "circulation") {
     const auto& state=runtime.circulation_state();
+    if(!state.input.static_role_contract.schema.empty()) {
+      py::dict roles;roles["schema"]=state.input.static_role_contract.schema;
+      roles["loader_nodes"]=state.input.static_role_contract.loader_nodes;out["static_role_contract"]=roles;
+    }
     py::list receipts,jobs,trays,transfers,identities;
     for(const auto& r:state.receipts) {
       py::dict d;
@@ -224,6 +240,7 @@ py::dict render_result(EventDrivenJunctionRuntime& runtime, const std::string& m
     }
     for(std::size_t i=0;i<state.transfers.size();++i) {
       const auto& r=state.transfers[i]; py::dict d; d["request_id"]=state.input.transfers[i].request_id;
+      d["transfer_scope"]=state.input.transfers[i].transfer_scope;
 #define FIELD(name) d[#name]=r.name
       FIELD(status);FIELD(reason);FIELD(tray);FIELD(delivered_at);FIELD(departed_at);FIELD(received_at);
 #undef FIELD

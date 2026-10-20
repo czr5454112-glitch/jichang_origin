@@ -24,6 +24,19 @@ TOKEN = 'g31_fqi_checkpoint_selection_v1'
 FEATURE_SOURCE_SHA = '4b4ff7a0aa74c47302c0da9e0a67770af99c0239bb44a3120c09193c757abc9d'
 
 
+def select_airport_paired_checkpoint(models, datasets):
+    """New-schema entry for dev action regret; not the historical DAG MSE."""
+    from .foundation_airport_pair_ranker import SCHEMA as PAIR_SCHEMA, select_on_dev
+    require(models and all(model.get('schema') == PAIR_SCHEMA for model in models),
+            'explicit_airport_paired_models')
+    require(all(dataset['pair']['parent']['split'] == 'dev' for dataset in datasets),
+            'airport_selection_development_only')
+    result = select_on_dev(models, datasets)
+    return dict(result, selection_entry_schema='g31.foundation.airport_paired_selection.v1',
+        historical_small_domain_checkpoints_modified=False,
+        historical_empirical_DAG_optimality_claimed=False)
+
+
 def require(ok, reason):
     if not ok:
         raise ValueError('fqi_selection:' + reason)

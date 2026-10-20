@@ -1,0 +1,85 @@
+{
+  "schema": "g31.native029_accepted_contract.v1",
+  "status": "accepted_short_native_semantics",
+  "recorded_at": "2026-10-20T03:00:43.846944+00:00",
+  "binary": {
+    "path": "build_lt_session_029_roles/python/czr005_circulation.cp311-win_amd64.pyd",
+    "sha256": "3483458a6a8342685406b83e296b3f072409a73c63e24092f19d88136e89c985",
+    "size_bytes": 1705472
+  },
+  "build": {
+    "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/native029_roles_build/receipt.json",
+    "sha256": "8249c54001f81f752fe16a241beb399f3fb8e204d777c33ad4f06e36ff347144",
+    "size_bytes": 20459
+  },
+  "build_source_archive": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/native029_roles_build/source",
+  "build_source_files": 69,
+  "gate_log": {
+    "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/native029_gates_001.log",
+    "sha256": "3a7595f1ed0b8ce91ff11c8a9ea43bcec9d3221574c06e918523636cb091325a",
+    "size_bytes": 81
+  },
+  "gate_junit": {
+    "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/native029_gates_001.xml",
+    "sha256": "5a84fe850c92f33c297b2db72831ea51ff478ff96d19bd7127fd036288ca331e",
+    "size_bytes": 1790
+  },
+  "gate_ledger": {
+    "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/native029_gate_ledger.jsonl",
+    "sha256": "1057c6cd651624072bbffe1a268bd3b0dca90973a0c80e93b50d8d6af5600f24",
+    "size_bytes": 235154
+  },
+  "test_and_auditor_sources": [
+    {
+      "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/native029_acceptance_sources/tests/test_g31_circulation_local_empty_return.py",
+      "sha256": "ecd8716fc10e393e57a5e54a0a42aa12d03db4c90e07eb97d9aa4e435f98585a",
+      "size_bytes": 10307
+    },
+    {
+      "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/native029_acceptance_sources/scripts/experiments/g31_ics_circulation/native_host.py",
+      "sha256": "0860305487d8a56eae9fc856da8aea82821b7d6c002c45ba01c9dfd26c293ac1",
+      "size_bytes": 14693
+    },
+    {
+      "path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/native029_acceptance_sources/scripts/experiments/g31_ics_circulation/build_native_local_empty_return.py",
+      "sha256": "e5710cb5739efb45960dfaf9299cc286dbb61b14a7856f7a79f996aca705443a",
+      "size_bytes": 7277
+    }
+  ],
+  "short_native_summary": 10,
+  "valid_constructor_runs": 8,
+  "expected_invalid_constructor_attempts": 2,
+  "unexpected_native_failures": 0,
+  "pytest_tests_passed": 10,
+  "long_native_runs": 0,
+  "training_runs": 0,
+  "scope_contract": {
+    "default": "cross_zone_transfer",
+    "opt_in": "local_empty_return",
+    "static_role_contract_schema": "g31.static_node_roles.v1",
+    "local_requirements": [
+      "distinct_nodes",
+      "same_zone",
+      "same_resource_owner",
+      "declared_loader_destination",
+      "current_real_available_uncommitted_empty_tray"
+    ],
+    "existing_controls_preserved": [
+      "FIFO_before_optional_empty_commit",
+      "source_export_min_stock",
+      "receiver_capacity",
+      "receiver_transit_reserve",
+      "ACK_retry_immutable_request_identity",
+      "irrevocable_reception_lease",
+      "empty_return_entity_leg"
+    ],
+    "checkpoint": "typed checkpoint plus versioned opt-in seal extension; default-only state seal unchanged",
+    "planning_static_contract_digest": "includes opt-in static_role_contract"
+  },
+  "limitations": [
+    "Small native binding gates establish semantic behavior only; no airport improvement or RL benefit claim.",
+    "C++ runtime executable compiled; full CTest suite not executed because it would exceed the short native branch budget.",
+    "Only first supplied versioned static loader-role schema is accepted.",
+    "No new capacity, trays, future business, legacy recovery or global transaction introduced."
+  ]
+}

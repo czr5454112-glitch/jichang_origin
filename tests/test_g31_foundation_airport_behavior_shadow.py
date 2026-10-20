@@ -30,18 +30,27 @@ def pipeline(monkeypatch):
         calls.append(('forecast',kwargs));assert kwargs['observed_counts']is None
         return deepcopy(forecast)
     def validate(obs,descriptor):
-        calls.append(('gate',descriptor['seed'],obs['now']));return {'seed':descriptor['seed'],'frozen_weights':'fixture'}
+        calls.append(('gate',descriptor['seed'],obs['now']))
+        return SimpleNamespace(seed=descriptor['seed'],model_content_sha256='fixture')
     def features(obs,action):return {'public_count':obs['count'],'source':action['source']}
-    def value(model,observations,actions):
-        calls.append(('forward',model['seed'],len(actions)))
-        return [float(model['seed']+action['source'])for action in actions]
+    def prepare(adapted,mapped,**kwargs):
+        obs,audit=wrap(adapted,mapped,**kwargs)
+        return SimpleNamespace(to_observation=lambda:deepcopy(obs)),audit,proposals(adapted)
+    def matrix(current,actions):
+        calls.append(('matrix',len(actions)))
+        return SimpleNamespace(feature_rows=lambda:[features(current.to_observation(),a)for a in actions],
+            actions=actions,actions_sha256=shadow.digest(actions))
+    def value(current,matrix,model,**kwargs):
+        calls.append(('forward',model.seed,len(matrix.actions)))
+        return [float(model.seed+action['source'])for action in matrix.actions]
     modules={
         'foundation_airport_behavior_training':training,
-        'foundation_airport_behavior_consumer':SimpleNamespace(validate_behavior_checkpoint=validate),
-        'foundation_airport_learning_public':SimpleNamespace(wrap_record=wrap,proposal_actions=proposals),
+        'foundation_airport_behavior_consumer':SimpleNamespace(prepare_behavior_checkpoint=validate,
+            predict_prepared_behavior_checkpoint=value),
+        'foundation_airport_learning_public':SimpleNamespace(prepare_record=prepare),
         'foundation_airport_learning_audit':SimpleNamespace(project=lambda forecast,mapping:deepcopy(forecast)),
         'foundation_flight_forecaster_arrays':SimpleNamespace(predict=predict),
-        'foundation_action_value':SimpleNamespace(features=features,predict=value)}
+        'foundation_action_value':SimpleNamespace(prepare_feature_matrix=matrix)}
     for name,module in modules.items():
         monkeypatch.setitem(sys.modules,package.__name__+'.'+name,module)
         monkeypatch.setattr(package,name,module,raising=False)
@@ -58,6 +67,7 @@ def test_three_fixed_models_score_original_proposals_without_mutation_or_choice(
     assert [row['seed']for row in result['models']]==[17,29,43]
     assert [c for c in calls if c[0]=='gate']==[('gate',17,57840.),('gate',29,57840.),('gate',43,57840.)]
     assert [c for c in calls if c[0]=='forward']==[('forward',17,2),('forward',29,2),('forward',43,2)]
+    assert [c for c in calls if c[0]=='matrix']==[('matrix',2)]
     assert result['scores_used_for_selection']is False and result['native_runtime_verified_by_this_scorer']is False
     assert result['deployment_latency_certified']is False and result['full_callback_wall_must_be_recorded_by_wrapper']is True
     assert result['full_scorer_wall_seconds']>=sum(stage['wall_seconds']for stage in result['stages'])
@@ -83,17 +93,18 @@ def test_invalid_or_early_callback_fails_before_forecast_and_model(pipeline,muta
 @pytest.mark.parametrize('mutation',['wrong_seed_weights','model_exception','missing_scores','nonfinite_scores','mutated_callback'])
 def test_shadow_failure_never_becomes_success_or_action_authority(pipeline,mutation):
     _,modules,kwargs=pipeline;original=record()
-    if mutation=='wrong_seed_weights':modules['foundation_airport_behavior_consumer'].validate_behavior_checkpoint=lambda o,d:{'seed':17}
+    consumer=modules['foundation_airport_behavior_consumer']
+    if mutation=='wrong_seed_weights':consumer.prepare_behavior_checkpoint=lambda o,d:SimpleNamespace(seed=17,model_content_sha256='fixture')
     elif mutation=='model_exception':
-        def failure(*args):raise ValueError('bounded_fixture_model_failure')
-        modules['foundation_action_value'].predict=failure
-    elif mutation=='missing_scores':modules['foundation_action_value'].predict=lambda *args:[]
-    elif mutation=='nonfinite_scores':modules['foundation_action_value'].predict=lambda *args:[float('nan'),0.]
+        def failure(*args,**kwargs):raise ValueError('bounded_fixture_model_failure')
+        consumer.predict_prepared_behavior_checkpoint=failure
+    elif mutation=='missing_scores':consumer.predict_prepared_behavior_checkpoint=lambda *args,**kwargs:[]
+    elif mutation=='nonfinite_scores':consumer.predict_prepared_behavior_checkpoint=lambda *args,**kwargs:[float('nan'),0.]
     else:
-        old=modules['foundation_action_value'].predict
-        def changed(*args):
-            original['decision']['intents'].clear();return old(*args)
-        modules['foundation_action_value'].predict=changed
+        old=consumer.predict_prepared_behavior_checkpoint
+        def changed(*args,**kwargs):
+            original['decision']['intents'].clear();return old(*args,**kwargs)
+        consumer.predict_prepared_behavior_checkpoint=changed
     result=shadow.score_record(original,**kwargs)
     assert result['status']=='failed_public_shadow_scoring'
     assert result['native_execution_authority']is False and result['scores_used_for_selection']is False

@@ -1,0 +1,831 @@
+{
+  "schema": "g31.pair_ranker_train_only_profile.v1",
+  "mode": "before",
+  "datasets": [
+    {
+      "dataset": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\H_701_calendar_dataset_001.json.gz",
+        "sha256": "3c435804eab67b84aaefbb82572ab6ee9133ff39906d20a24cb977adee5a054a"
+      },
+      "reference_plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\H_701_calendar_a_ref_001\\plan.json",
+        "sha256": "9e40972fbc4e90cc389d05daaf2b7173ada939e8b45a89c17edbd54f9350b5e7"
+      },
+      "patched_plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\H_701_calendar_a_patch_001\\plan.json",
+        "sha256": "d7f867de50bd5f5c857938591cd9fb9c563e53473a454acae5482b6827727649"
+      }
+    },
+    {
+      "dataset": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\H_702_calendar_dataset_001.json.gz",
+        "sha256": "45bb5f12c0ac55d289a0e0d28efe06f1625110b0d0a356b7e69ea450bdc5b54b"
+      },
+      "reference_plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\H_702_calendar_a_ref_001\\plan.json",
+        "sha256": "91d8e329f0366e38a30f39917396267a044aa327f38e8dd7c5868f395d750870"
+      },
+      "patched_plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\H_702_calendar_a_patch_001\\plan.json",
+        "sha256": "3f1bbe7e1e693bcbf82a9a66c32e8dabd2c395d91be3e4a8fb7bacc0cf5c1a25"
+      }
+    },
+    {
+      "dataset": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\C_701_extra_dataset_001.json.gz",
+        "sha256": "cb7370791c5b1b32baf9bae30510a8f391add2769fd9a05c7deb9f6fb774330b"
+      },
+      "reference_plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\C_701_extra_a_ref_001\\plan.json",
+        "sha256": "a924c081e7d2340f3bb8c439aaee7bac9b43fc6340c0cec972e15e276f6829db"
+      },
+      "patched_plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\C_701_extra_a_patch_001\\plan.json",
+        "sha256": "79854033227d5a0515d58164b81a165756bd8636befb5ffaa4a0ac5fde259e6a"
+      }
+    },
+    {
+      "dataset": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\C_702_extra_dataset_001.json.gz",
+        "sha256": "09236f204977e7d5d200cabfe569fc9c127e557fed8fb927e2d8e03dbc5ac3d4"
+      },
+      "reference_plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\C_702_extra_a_ref_001\\plan.json",
+        "sha256": "5ee400c8c7ed5b3b39636276b8f8e52e8c9ecb1b9628c65c0612d9f17b3677b3"
+      },
+      "patched_plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\C_702_extra_a_patch_001\\plan.json",
+        "sha256": "f136c932d8fa3a435ce6aa9d0799b6f75249dcc6c038a0cab22e2dfb83dadf7c"
+      }
+    }
+  ],
+  "provenance": {
+    "included": [
+      {
+        "batch": "H",
+        "parent": {
+          "parent_seed": 701,
+          "split": "train",
+          "parent_group": "conditional_timing_parent_701",
+          "synthetic": true,
+          "common_historical_template_sha256": "a9611267471a269cc34f5646a4ebb409c61a08fa77dcef4c02266b346c86890c",
+          "sampling": "sha256(seed:business_identity), uniform[-120,120], clip_zero",
+          "calendar_start": "2026-09-02T00:00:00+08:00",
+          "calendar_start_epoch_seconds": 1788278400.0,
+          "fleet": 22,
+          "layout_seed": 1701,
+          "static_layout_order": [
+            92,
+            134,
+            49,
+            57,
+            136,
+            0,
+            95,
+            138,
+            26,
+            149,
+            24
+          ],
+          "offered_count": 28506,
+          "jobs_digest": "017f0caff9a896a747439ad9d4e409c689f5ed1e4bebb0afd2451be2f478b8f8"
+        },
+        "input_sha256": "3afa9fa7c0a1fc8798bf14969d63790ebcfa0ba557f55394ce8d1d4dc9237eb6",
+        "artifacts": {
+          "dataset": {
+            "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\H_701_calendar_dataset_001.json.gz",
+            "sha256": "3c435804eab67b84aaefbb82572ab6ee9133ff39906d20a24cb977adee5a054a"
+          },
+          "reference_plan": {
+            "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\H_701_calendar_a_ref_001\\plan.json",
+            "sha256": "9e40972fbc4e90cc389d05daaf2b7173ada939e8b45a89c17edbd54f9350b5e7"
+          },
+          "patched_plan": {
+            "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\H_701_calendar_a_patch_001\\plan.json",
+            "sha256": "d7f867de50bd5f5c857938591cd9fb9c563e53473a454acae5482b6827727649"
+          }
+        },
+        "pair_status": "closed_actual_pair",
+        "pair_id": "d67e1d729b47c33eeba0e80f475a6efcb20c38ff1c66dda50b16784e2c97b321",
+        "physical_contrast_sha256": "b1554da0eed5e9934bc96642cc84803635f6453d33acbd6a86ae5a884669b6cb"
+      },
+      {
+        "batch": "H",
+        "parent": {
+          "parent_seed": 702,
+          "split": "train",
+          "parent_group": "conditional_timing_parent_702",
+          "synthetic": true,
+          "common_historical_template_sha256": "a9611267471a269cc34f5646a4ebb409c61a08fa77dcef4c02266b346c86890c",
+          "sampling": "sha256(seed:business_identity), uniform[-120,120], clip_zero",
+          "calendar_start": "2026-09-03T00:00:00+08:00",
+          "calendar_start_epoch_seconds": 1788364800.0,
+          "fleet": 22,
+          "layout_seed": 1701,
+          "static_layout_order": [
+            92,
+            134,
+            49,
+            57,
+            136,
+            0,
+            95,
+            138,
+            26,
+            149,
+            24
+          ],
+          "offered_count": 28506,
+          "jobs_digest": "c26e3d4775eb31c63688f6bff371f3431d96efe912ecdbf3f2b63319975df252"
+        },
+        "input_sha256": "a54375b8366f4d98af9eaeef2992d85d275e03915042a1fa774e1290ffe48c9e",
+        "artifacts": {
+          "dataset": {
+            "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\H_702_calendar_dataset_001.json.gz",
+            "sha256": "45bb5f12c0ac55d289a0e0d28efe06f1625110b0d0a356b7e69ea450bdc5b54b"
+          },
+          "reference_plan": {
+            "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\H_702_calendar_a_ref_001\\plan.json",
+            "sha256": "91d8e329f0366e38a30f39917396267a044aa327f38e8dd7c5868f395d750870"
+          },
+          "patched_plan": {
+            "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\H_702_calendar_a_patch_001\\plan.json",
+            "sha256": "3f1bbe7e1e693bcbf82a9a66c32e8dabd2c395d91be3e4a8fb7bacc0cf5c1a25"
+          }
+        },
+        "pair_status": "closed_actual_pair",
+        "pair_id": "99bbc8a89f462eefa384c665cb9807ed896fe55b3302127f5d8c62a0d1a83894",
+        "physical_contrast_sha256": "c585f6ceab466c9afc4b2c700990ffb9944c7318992db92ac9d3b29d81efe22f"
+      },
+      {
+        "batch": "C",
+        "parent": {
+          "parent_seed": 701,
+          "split": "train",
+          "parent_group": "conditional_timing_parent_701",
+          "synthetic": true,
+          "common_historical_template_sha256": "a9611267471a269cc34f5646a4ebb409c61a08fa77dcef4c02266b346c86890c",
+          "sampling": "sha256(seed:business_identity), uniform[-120,120], clip_zero",
+          "calendar_start": "2026-09-02T00:00:00+08:00",
+          "calendar_start_epoch_seconds": 1788278400.0,
+          "fleet": 22,
+          "layout_seed": 1701,
+          "static_layout_order": [
+            92,
+            134,
+            49,
+            57,
+            136,
+            0,
+            95,
+            138,
+            26,
+            149,
+            24
+          ],
+          "offered_count": 28506,
+          "jobs_digest": "017f0caff9a896a747439ad9d4e409c689f5ed1e4bebb0afd2451be2f478b8f8"
+        },
+        "input_sha256": "3afa9fa7c0a1fc8798bf14969d63790ebcfa0ba557f55394ce8d1d4dc9237eb6",
+        "artifacts": {
+          "dataset": {
+            "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\C_701_extra_dataset_001.json.gz",
+            "sha256": "cb7370791c5b1b32baf9bae30510a8f391add2769fd9a05c7deb9f6fb774330b"
+          },
+          "reference_plan": {
+            "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\C_701_extra_a_ref_001\\plan.json",
+            "sha256": "a924c081e7d2340f3bb8c439aaee7bac9b43fc6340c0cec972e15e276f6829db"
+          },
+          "patched_plan": {
+            "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\C_701_extra_a_patch_001\\plan.json",
+            "sha256": "79854033227d5a0515d58164b81a165756bd8636befb5ffaa4a0ac5fde259e6a"
+          }
+        },
+        "pair_status": "closed_actual_pair",
+        "pair_id": "b7c271f565621fcdd16275e2103f1e81dbab4ff7dc514cd7d3454f8db6a2204c",
+        "physical_contrast_sha256": "fd1b9281d1de5948bedf89c02cfa79cfc86b58421d9d7d3910ee002d19f2a54f"
+      },
+      {
+        "batch": "C",
+        "parent": {
+          "parent_seed": 702,
+          "split": "train",
+          "parent_group": "conditional_timing_parent_702",
+          "synthetic": true,
+          "common_historical_template_sha256": "a9611267471a269cc34f5646a4ebb409c61a08fa77dcef4c02266b346c86890c",
+          "sampling": "sha256(seed:business_identity), uniform[-120,120], clip_zero",
+          "calendar_start": "2026-09-03T00:00:00+08:00",
+          "calendar_start_epoch_seconds": 1788364800.0,
+          "fleet": 22,
+          "layout_seed": 1701,
+          "static_layout_order": [
+            92,
+            134,
+            49,
+            57,
+            136,
+            0,
+            95,
+            138,
+            26,
+            149,
+            24
+          ],
+          "offered_count": 28506,
+          "jobs_digest": "c26e3d4775eb31c63688f6bff371f3431d96efe912ecdbf3f2b63319975df252"
+        },
+        "input_sha256": "a54375b8366f4d98af9eaeef2992d85d275e03915042a1fa774e1290ffe48c9e",
+        "artifacts": {
+          "dataset": {
+            "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\C_702_extra_dataset_001.json.gz",
+            "sha256": "09236f204977e7d5d200cabfe569fc9c127e557fed8fb927e2d8e03dbc5ac3d4"
+          },
+          "reference_plan": {
+            "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\C_702_extra_a_ref_001\\plan.json",
+            "sha256": "5ee400c8c7ed5b3b39636276b8f8e52e8c9ecb1b9628c65c0612d9f17b3677b3"
+          },
+          "patched_plan": {
+            "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\C_702_extra_a_patch_001\\plan.json",
+            "sha256": "f136c932d8fa3a435ce6aa9d0799b6f75249dcc6c038a0cab22e2dfb83dadf7c"
+          }
+        },
+        "pair_status": "closed_actual_pair",
+        "pair_id": "8b7bac9895aa1570cb3b9b540639524e2b0032907d6c4229afce249e28b948a9",
+        "physical_contrast_sha256": "286e9bc7b3e82e11ce7cfdc70bf52f9c7f74bc43e33f371768c2e4c2437c94a0"
+      }
+    ],
+    "deduplicated": [],
+    "input_artifact_count": 4,
+    "included_dataset_count": 4
+  },
+  "sufficiency": {
+    "C01": {
+      "schema": "g31.foundation.airport_pair_ranker.v1",
+      "eligible_to_fit": true,
+      "reasons": [],
+      "closed_pairs": 4,
+      "unavailable_pairs": [],
+      "train_parent_groups": 2,
+      "actual_action_differences": 4,
+      "nonzero_advantages": 2,
+      "patch_wins": 1,
+      "reference_wins": 1,
+      "zero_advantages": 2,
+      "claim": "small_mechanism_training_gate_not_statistical_adequacy"
+    },
+    "C11": {
+      "schema": "g31.foundation.airport_pair_ranker.v1",
+      "eligible_to_fit": true,
+      "reasons": [],
+      "closed_pairs": 4,
+      "unavailable_pairs": [],
+      "train_parent_groups": 2,
+      "actual_action_differences": 4,
+      "nonzero_advantages": 2,
+      "patch_wins": 1,
+      "reference_wins": 1,
+      "zero_advantages": 2,
+      "claim": "small_mechanism_training_gate_not_statistical_adequacy"
+    }
+  },
+  "source_pins": {
+    "scripts/experiments/g31_ics_circulation/foundation_airport_pair_ranker.py": "773b7af8205154b88fdf986200e7b6facb7dcfb38023fb98d97722e5693bd3f9",
+    "scripts/experiments/g31_ics_circulation/foundation_airport_learning_public.py": "b1a4f31bf9456ef193cbbccd4795e00f170a1b5f858cd9d25283cecbac43cc8c",
+    "scripts/experiments/g31_ics_circulation/analytic_control.py": "e4829bef8b733c2b85ba79c16f087ec5732190f518aaa6c91b94e82435c23b56",
+    "scripts/experiments/g31_ics_circulation/foundation_airport_batch_patch.py": "c326a1a036e52eeec7070cf71602b2e142c5c9853c8e65be0794a77db5104c71",
+    "scripts/experiments/g31_ics_circulation/foundation_airport_paired_continuation.py": "0c882f36953b6001fb3a8b3e8e8d0fee43973d3c44b72292048d714e1660c226"
+  },
+  "fit_calls": 0,
+  "test_opened": false,
+  "claim": "saved_callback_replay_with_manual_fixed_weights_no_native_runtime_claim",
+  "profiles": [
+    {
+      "stem": "H_701_calendar",
+      "variant": "C01",
+      "features": [
+        {
+          "transfer": 1.0,
+          "hold_optional": 0.0,
+          "local_empty_return": 1.0,
+          "cross_owner": 0.0,
+          "static_travel_seconds": 158.302,
+          "departure_delay_seconds": 0.0,
+          "decision_time_seconds": 28860.0,
+          "current_optional_batch_size": 2.0,
+          "current_mandatory_batch_size": 0.0,
+          "source_observed_free": 1.0,
+          "source_free_missing": 0.0,
+          "source_observed_waiting": 0.0,
+          "source_waiting_visible": 1.0,
+          "source_waiting_missing": 1.0,
+          "source_waiting_age_seconds": 0.0,
+          "source_capacity": 4.0,
+          "source_export_min_stock": 0.0,
+          "source_local_owner": 1.0,
+          "destination_observed_free": 0.0,
+          "destination_free_missing": 0.0,
+          "destination_observed_waiting": 991.0,
+          "destination_waiting_visible": 1.0,
+          "destination_waiting_missing": 1.0,
+          "destination_waiting_age_seconds": 0.0,
+          "destination_capacity": 4.0,
+          "destination_export_min_stock": 0.0,
+          "destination_local_owner": 1.0,
+          "transfer_x_destination_waiting": 991.0,
+          "travel_x_destination_waiting": 156877.282
+        },
+        {
+          "transfer": 1.0,
+          "hold_optional": 0.0,
+          "local_empty_return": 1.0,
+          "cross_owner": 0.0,
+          "static_travel_seconds": 233.60299999999998,
+          "departure_delay_seconds": 2.0,
+          "decision_time_seconds": 28860.0,
+          "current_optional_batch_size": 2.0,
+          "current_mandatory_batch_size": 0.0,
+          "source_observed_free": 1.0,
+          "source_free_missing": 0.0,
+          "source_observed_waiting": 0.0,
+          "source_waiting_visible": 1.0,
+          "source_waiting_missing": 1.0,
+          "source_waiting_age_seconds": 0.0,
+          "source_capacity": 4.0,
+          "source_export_min_stock": 0.0,
+          "source_local_owner": 1.0,
+          "destination_observed_free": 0.0,
+          "destination_free_missing": 0.0,
+          "destination_observed_waiting": 977.0,
+          "destination_waiting_visible": 1.0,
+          "destination_waiting_missing": 1.0,
+          "destination_waiting_age_seconds": 0.0,
+          "destination_capacity": 4.0,
+          "destination_export_min_stock": 0.0,
+          "destination_local_owner": 1.0,
+          "transfer_x_destination_waiting": 977.0,
+          "travel_x_destination_waiting": 228230.131
+        }
+      ],
+      "fixed_weight_score": 71401.8774827586,
+      "predict_seconds": [
+        0.032969599997159094,
+        0.03339960001176223,
+        0.033108900010120124
+      ],
+      "predict_median_seconds": 0.033108900010120124,
+      "external_features_median_seconds": 0.03296270000282675,
+      "profile": "         22731 function calls (22657 primitive calls) in 0.043 seconds\n\n   Ordered by: cumulative time\n   List reduced from 74 to 18 due to restriction <18>\n\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\n        1    0.000    0.000    0.043    0.043 foundation_airport_pair_ranker.py:448(predict)\n        1    0.000    0.000    0.042    0.042 foundation_airport_pair_ranker.py:454(<listcomp>)\n        2    0.000    0.000    0.042    0.021 foundation_airport_pair_ranker.py:165(action_features)\n       66    0.000    0.000    0.027    0.000 __init__.py:183(dumps)\n       66    0.000    0.000    0.027    0.000 encoder.py:183(encode)\n       66    0.027    0.000    0.027    0.000 encoder.py:205(iterencode)\n        2    0.000    0.000    0.023    0.012 foundation_airport_learning_public.py:74(adapt_accounts)\n        2    0.002    0.001    0.021    0.010 foundation_airport_learning_public.py:84(_adapt_accounts)\n       64    0.000    0.000    0.015    0.000 foundation_airport_learning_public.py:31(digest)\n        2    0.000    0.000    0.014    0.007 foundation_airport_batch_patch.py:25(digest)\n        4    0.002    0.001    0.005    0.001 foundation_airport_learning_public.py:40(validate_public)\n     3196    0.002    0.000    0.003    0.000 foundation_airport_learning_public.py:26(number)\n     2476    0.002    0.000    0.002    0.000 foundation_airport_learning_public.py:35(region)\n       66    0.002    0.000    0.002    0.000 {built-in method _hashlib.openssl_sha256}\n        2    0.001    0.000    0.001    0.001 analytic_control.py:53(__init__)\n     7890    0.001    0.000    0.001    0.000 foundation_airport_learning_public.py:21(require)\n      192    0.000    0.000    0.001    0.000 {built-in method builtins.sum}\n      564    0.000    0.000    0.001    0.000 foundation_airport_learning_public.py:126(<genexpr>)\n\n\n"
+    },
+    {
+      "stem": "H_701_calendar",
+      "variant": "C11",
+      "features": [
+        {
+          "transfer": 1.0,
+          "hold_optional": 0.0,
+          "local_empty_return": 1.0,
+          "cross_owner": 0.0,
+          "static_travel_seconds": 158.302,
+          "departure_delay_seconds": 0.0,
+          "decision_time_seconds": 28860.0,
+          "current_optional_batch_size": 2.0,
+          "current_mandatory_batch_size": 0.0,
+          "source_observed_free": 1.0,
+          "source_free_missing": 0.0,
+          "source_observed_waiting": 0.0,
+          "source_waiting_visible": 1.0,
+          "source_waiting_missing": 1.0,
+          "source_waiting_age_seconds": 0.0,
+          "source_capacity": 4.0,
+          "source_export_min_stock": 0.0,
+          "source_local_owner": 1.0,
+          "destination_observed_free": 0.0,
+          "destination_free_missing": 0.0,
+          "destination_observed_waiting": 991.0,
+          "destination_waiting_visible": 1.0,
+          "destination_waiting_missing": 1.0,
+          "destination_waiting_age_seconds": 0.0,
+          "destination_capacity": 4.0,
+          "destination_export_min_stock": 0.0,
+          "destination_local_owner": 1.0,
+          "transfer_x_destination_waiting": 991.0,
+          "travel_x_destination_waiting": 156877.282,
+          "source_forecast_300": 0.0,
+          "source_forecast_300_missing": 1.0,
+          "source_forecast_900": 0.0,
+          "source_forecast_900_missing": 1.0,
+          "source_forecast_1800": 0.0,
+          "source_forecast_1800_missing": 1.0,
+          "destination_forecast_300": 11.26552287581699,
+          "destination_forecast_300_missing": 0.0,
+          "destination_forecast_900": 33.35620915032678,
+          "destination_forecast_900_missing": 0.0,
+          "destination_forecast_1800": 71.9240196078431,
+          "destination_forecast_1800_missing": 0.0,
+          "transfer_x_destination_forecast_300": 11.26552287581699,
+          "travel_x_destination_forecast_300": 1783.354802287581
+        },
+        {
+          "transfer": 1.0,
+          "hold_optional": 0.0,
+          "local_empty_return": 1.0,
+          "cross_owner": 0.0,
+          "static_travel_seconds": 233.60299999999998,
+          "departure_delay_seconds": 2.0,
+          "decision_time_seconds": 28860.0,
+          "current_optional_batch_size": 2.0,
+          "current_mandatory_batch_size": 0.0,
+          "source_observed_free": 1.0,
+          "source_free_missing": 0.0,
+          "source_observed_waiting": 0.0,
+          "source_waiting_visible": 1.0,
+          "source_waiting_missing": 1.0,
+          "source_waiting_age_seconds": 0.0,
+          "source_capacity": 4.0,
+          "source_export_min_stock": 0.0,
+          "source_local_owner": 1.0,
+          "destination_observed_free": 0.0,
+          "destination_free_missing": 0.0,
+          "destination_observed_waiting": 977.0,
+          "destination_waiting_visible": 1.0,
+          "destination_waiting_missing": 1.0,
+          "destination_waiting_age_seconds": 0.0,
+          "destination_capacity": 4.0,
+          "destination_export_min_stock": 0.0,
+          "destination_local_owner": 1.0,
+          "transfer_x_destination_waiting": 977.0,
+          "travel_x_destination_waiting": 228230.131,
+          "source_forecast_300": 0.0,
+          "source_forecast_300_missing": 1.0,
+          "source_forecast_900": 0.0,
+          "source_forecast_900_missing": 1.0,
+          "source_forecast_1800": 0.0,
+          "source_forecast_1800_missing": 1.0,
+          "destination_forecast_300": 11.26552287581699,
+          "destination_forecast_300_missing": 0.0,
+          "destination_forecast_900": 33.35620915032678,
+          "destination_forecast_900_missing": 0.0,
+          "destination_forecast_1800": 71.9240196078431,
+          "destination_forecast_1800_missing": 0.0,
+          "transfer_x_destination_forecast_300": 11.26552287581699,
+          "travel_x_destination_forecast_300": 2631.659940359476
+        }
+      ],
+      "fixed_weight_score": 72229.32001858184,
+      "predict_seconds": [
+        0.047653599991463125,
+        0.047684499993920326,
+        0.048732199997175485
+      ],
+      "predict_median_seconds": 0.047684499993920326,
+      "external_features_median_seconds": 0.048412100004497916,
+      "profile": "         25698 function calls (25550 primitive calls) in 0.059 seconds\n\n   Ordered by: cumulative time\n   List reduced from 80 to 18 due to restriction <18>\n\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\n        1    0.000    0.000    0.059    0.059 foundation_airport_pair_ranker.py:448(predict)\n        1    0.000    0.000    0.059    0.059 foundation_airport_pair_ranker.py:454(<listcomp>)\n        2    0.000    0.000    0.058    0.029 foundation_airport_pair_ranker.py:165(action_features)\n       74    0.000    0.000    0.041    0.001 __init__.py:183(dumps)\n       74    0.000    0.000    0.040    0.001 encoder.py:183(encode)\n       74    0.040    0.001    0.040    0.001 encoder.py:205(iterencode)\n       10    0.001    0.000    0.028    0.003 foundation_airport_batch_patch.py:25(digest)\n        2    0.000    0.000    0.024    0.012 foundation_airport_learning_public.py:74(adapt_accounts)\n        2    0.002    0.001    0.022    0.011 foundation_airport_learning_public.py:84(_adapt_accounts)\n       64    0.000    0.000    0.016    0.000 foundation_airport_learning_public.py:31(digest)\n        2    0.000    0.000    0.015    0.007 foundation_airport_pair_ranker.py:80(_forecast)\n        4    0.002    0.001    0.005    0.001 foundation_airport_learning_public.py:40(validate_public)\n     3196    0.002    0.000    0.003    0.000 foundation_airport_learning_public.py:26(number)\n       74    0.002    0.000    0.002    0.000 {built-in method _hashlib.openssl_sha256}\n     2488    0.002    0.000    0.002    0.000 foundation_airport_learning_public.py:35(region)\n        2    0.001    0.000    0.001    0.001 analytic_control.py:53(__init__)\n       12    0.000    0.000    0.001    0.000 foundation_airport_pair_ranker.py:139(_mass)\n     7902    0.001    0.000    0.001    0.000 foundation_airport_learning_public.py:21(require)\n\n\n"
+    },
+    {
+      "stem": "H_702_calendar",
+      "variant": "C01",
+      "features": [
+        {
+          "transfer": 1.0,
+          "hold_optional": 0.0,
+          "local_empty_return": 1.0,
+          "cross_owner": 0.0,
+          "static_travel_seconds": 188.302,
+          "departure_delay_seconds": 0.0,
+          "decision_time_seconds": 28920.0,
+          "current_optional_batch_size": 1.0,
+          "current_mandatory_batch_size": 0.0,
+          "source_observed_free": 1.0,
+          "source_free_missing": 0.0,
+          "source_observed_waiting": 0.0,
+          "source_waiting_visible": 1.0,
+          "source_waiting_missing": 1.0,
+          "source_waiting_age_seconds": 0.0,
+          "source_capacity": 4.0,
+          "source_export_min_stock": 0.0,
+          "source_local_owner": 1.0,
+          "destination_observed_free": 0.0,
+          "destination_free_missing": 0.0,
+          "destination_observed_waiting": 976.0,
+          "destination_waiting_visible": 1.0,
+          "destination_waiting_missing": 1.0,
+          "destination_waiting_age_seconds": 0.0,
+          "destination_capacity": 4.0,
+          "destination_export_min_stock": 0.0,
+          "destination_local_owner": 1.0,
+          "transfer_x_destination_waiting": 976.0,
+          "travel_x_destination_waiting": 183782.75199999998
+        },
+        {
+          "transfer": 1.0,
+          "hold_optional": 0.0,
+          "local_empty_return": 1.0,
+          "cross_owner": 0.0,
+          "static_travel_seconds": 193.00200000000004,
+          "departure_delay_seconds": 2.0,
+          "decision_time_seconds": 28920.0,
+          "current_optional_batch_size": 1.0,
+          "current_mandatory_batch_size": 0.0,
+          "source_observed_free": 1.0,
+          "source_free_missing": 0.0,
+          "source_observed_waiting": 0.0,
+          "source_waiting_visible": 1.0,
+          "source_waiting_missing": 1.0,
+          "source_waiting_age_seconds": 0.0,
+          "source_capacity": 4.0,
+          "source_export_min_stock": 0.0,
+          "source_local_owner": 1.0,
+          "destination_observed_free": 0.0,
+          "destination_free_missing": 0.0,
+          "destination_observed_waiting": 348.0,
+          "destination_waiting_visible": 1.0,
+          "destination_waiting_missing": 1.0,
+          "destination_waiting_age_seconds": 0.0,
+          "destination_capacity": 4.0,
+          "destination_export_min_stock": 0.0,
+          "destination_local_owner": 1.0,
+          "transfer_x_destination_waiting": 348.0,
+          "travel_x_destination_waiting": 67164.69600000001
+        }
+      ],
+      "fixed_weight_score": -117458.04910344825,
+      "predict_seconds": [
+        0.033634699997492135,
+        0.033556299982592463,
+        0.034064400009810925
+      ],
+      "predict_median_seconds": 0.033634699997492135,
+      "external_features_median_seconds": 0.03281920001609251,
+      "profile": "         22147 function calls (22073 primitive calls) in 0.042 seconds\n\n   Ordered by: cumulative time\n   List reduced from 74 to 18 due to restriction <18>\n\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\n        1    0.000    0.000    0.042    0.042 foundation_airport_pair_ranker.py:448(predict)\n        1    0.000    0.000    0.042    0.042 foundation_airport_pair_ranker.py:454(<listcomp>)\n        2    0.000    0.000    0.042    0.021 foundation_airport_pair_ranker.py:165(action_features)\n       68    0.000    0.000    0.027    0.000 __init__.py:183(dumps)\n       68    0.000    0.000    0.027    0.000 encoder.py:183(encode)\n       68    0.026    0.000    0.026    0.000 encoder.py:205(iterencode)\n        2    0.000    0.000    0.024    0.012 foundation_airport_learning_public.py:74(adapt_accounts)\n        2    0.002    0.001    0.021    0.011 foundation_airport_learning_public.py:84(_adapt_accounts)\n       66    0.000    0.000    0.016    0.000 foundation_airport_learning_public.py:31(digest)\n        2    0.000    0.000    0.013    0.007 foundation_airport_batch_patch.py:25(digest)\n        4    0.002    0.001    0.005    0.001 foundation_airport_learning_public.py:40(validate_public)\n     3174    0.002    0.000    0.003    0.000 foundation_airport_learning_public.py:26(number)\n     2290    0.002    0.000    0.002    0.000 foundation_airport_learning_public.py:35(region)\n       68    0.002    0.000    0.002    0.000 {built-in method _hashlib.openssl_sha256}\n        2    0.001    0.000    0.001    0.001 analytic_control.py:53(__init__)\n     7678    0.001    0.000    0.001    0.000 foundation_airport_learning_public.py:21(require)\n       12    0.000    0.000    0.000    0.000 foundation_airport_learning_public.py:88(<dictcomp>)\n      192    0.000    0.000    0.000    0.000 {built-in method builtins.sum}\n\n\n"
+    },
+    {
+      "stem": "H_702_calendar",
+      "variant": "C11",
+      "features": [
+        {
+          "transfer": 1.0,
+          "hold_optional": 0.0,
+          "local_empty_return": 1.0,
+          "cross_owner": 0.0,
+          "static_travel_seconds": 188.302,
+          "departure_delay_seconds": 0.0,
+          "decision_time_seconds": 28920.0,
+          "current_optional_batch_size": 1.0,
+          "current_mandatory_batch_size": 0.0,
+          "source_observed_free": 1.0,
+          "source_free_missing": 0.0,
+          "source_observed_waiting": 0.0,
+          "source_waiting_visible": 1.0,
+          "source_waiting_missing": 1.0,
+          "source_waiting_age_seconds": 0.0,
+          "source_capacity": 4.0,
+          "source_export_min_stock": 0.0,
+          "source_local_owner": 1.0,
+          "destination_observed_free": 0.0,
+          "destination_free_missing": 0.0,
+          "destination_observed_waiting": 976.0,
+          "destination_waiting_visible": 1.0,
+          "destination_waiting_missing": 1.0,
+          "destination_waiting_age_seconds": 0.0,
+          "destination_capacity": 4.0,
+          "destination_export_min_stock": 0.0,
+          "destination_local_owner": 1.0,
+          "transfer_x_destination_waiting": 976.0,
+          "travel_x_destination_waiting": 183782.75199999998,
+          "source_forecast_300": 0.0,
+          "source_forecast_300_missing": 1.0,
+          "source_forecast_900": 0.0,
+          "source_forecast_900_missing": 1.0,
+          "source_forecast_1800": 0.0,
+          "source_forecast_1800_missing": 1.0,
+          "destination_forecast_300": 11.093137254901956,
+          "destination_forecast_300_missing": 0.0,
+          "destination_forecast_900": 33.1127450980392,
+          "destination_forecast_900_missing": 0.0,
+          "destination_forecast_1800": 72.21732026143788,
+          "destination_forecast_1800_missing": 0.0,
+          "transfer_x_destination_forecast_300": 11.093137254901956,
+          "travel_x_destination_forecast_300": 2088.859931372548
+        },
+        {
+          "transfer": 1.0,
+          "hold_optional": 0.0,
+          "local_empty_return": 1.0,
+          "cross_owner": 0.0,
+          "static_travel_seconds": 193.00200000000004,
+          "departure_delay_seconds": 2.0,
+          "decision_time_seconds": 28920.0,
+          "current_optional_batch_size": 1.0,
+          "current_mandatory_batch_size": 0.0,
+          "source_observed_free": 1.0,
+          "source_free_missing": 0.0,
+          "source_observed_waiting": 0.0,
+          "source_waiting_visible": 1.0,
+          "source_waiting_missing": 1.0,
+          "source_waiting_age_seconds": 0.0,
+          "source_capacity": 4.0,
+          "source_export_min_stock": 0.0,
+          "source_local_owner": 1.0,
+          "destination_observed_free": 0.0,
+          "destination_free_missing": 0.0,
+          "destination_observed_waiting": 348.0,
+          "destination_waiting_visible": 1.0,
+          "destination_waiting_missing": 1.0,
+          "destination_waiting_age_seconds": 0.0,
+          "destination_capacity": 4.0,
+          "destination_export_min_stock": 0.0,
+          "destination_local_owner": 1.0,
+          "transfer_x_destination_waiting": 348.0,
+          "travel_x_destination_waiting": 67164.69600000001,
+          "source_forecast_300": 0.0,
+          "source_forecast_300_missing": 1.0,
+          "source_forecast_900": 0.0,
+          "source_forecast_900_missing": 1.0,
+          "source_forecast_1800": 0.0,
+          "source_forecast_1800_missing": 1.0,
+          "destination_forecast_300": 5.986928104575162,
+          "destination_forecast_300_missing": 0.0,
+          "destination_forecast_900": 22.328976034858382,
+          "destination_forecast_900_missing": 0.0,
+          "destination_forecast_1800": 38.91721132897603,
+          "destination_forecast_1800_missing": 0.0,
+          "transfer_x_destination_forecast_300": 5.986928104575162,
+          "travel_x_destination_forecast_300": 1155.4890980392156
+        }
+      ],
+      "fixed_weight_score": -118387.54650134261,
+      "predict_seconds": [
+        0.04861430003074929,
+        0.046761699952185154,
+        0.04944680002517998
+      ],
+      "predict_median_seconds": 0.04861430003074929,
+      "external_features_median_seconds": 0.048065600043628365,
+      "profile": "         25114 function calls (24966 primitive calls) in 0.059 seconds\n\n   Ordered by: cumulative time\n   List reduced from 80 to 18 due to restriction <18>\n\n   ncalls  tottime  percall  cumtime  percall filename:lineno(function)\n        1    0.000    0.000    0.059    0.059 foundation_airport_pair_ranker.py:448(predict)\n        1    0.000    0.000    0.058    0.058 foundation_airport_pair_ranker.py:454(<listcomp>)\n        2    0.000    0.000    0.058    0.029 foundation_airport_pair_ranker.py:165(action_features)\n       76    0.000    0.000    0.041    0.001 __init__.py:183(dumps)\n       76    0.000    0.000    0.040    0.001 encoder.py:183(encode)\n       76    0.040    0.001    0.040    0.001 encoder.py:205(iterencode)\n       10    0.000    0.000    0.029    0.003 foundation_airport_batch_patch.py:25(digest)\n        2    0.000    0.000    0.024    0.012 foundation_airport_learning_public.py:74(adapt_accounts)\n        2    0.002    0.001    0.021    0.011 foundation_airport_learning_public.py:84(_adapt_accounts)\n       66    0.000    0.000    0.015    0.000 foundation_airport_learning_public.py:31(digest)\n        2    0.000    0.000    0.015    0.007 foundation_airport_pair_ranker.py:80(_forecast)\n        4    0.002    0.001    0.005    0.001 foundation_airport_learning_public.py:40(validate_public)\n     3174    0.002    0.000    0.003    0.000 foundation_airport_learning_public.py:26(number)\n       76    0.002    0.000    0.002    0.000 {built-in method _hashlib.openssl_sha256}\n     2302    0.002    0.000    0.002    0.000 foundation_airport_learning_public.py:35(region)\n        2    0.001    0.000    0.001    0.001 analytic_control.py:53(__init__)\n       12    0.000    0.000    0.001    0.000 foundation_airport_pair_ranker.py:139(_mass)\n     7690    0.001    0.000    0.001    0.000 foundation_airport_learning_public.py:21(require)\n\n\n"
+    }
+  ],
+  "clocks": [
+    {
+      "pair_id": "d67e1d729b47c33eeba0e80f475a6efcb20c38ff1c66dda50b16784e2c97b321",
+      "parent": {
+        "parent_seed": 701,
+        "split": "train",
+        "parent_group": "conditional_timing_parent_701",
+        "synthetic": true,
+        "common_historical_template_sha256": "a9611267471a269cc34f5646a4ebb409c61a08fa77dcef4c02266b346c86890c",
+        "sampling": "sha256(seed:business_identity), uniform[-120,120], clip_zero",
+        "calendar_start": "2026-09-02T00:00:00+08:00",
+        "calendar_start_epoch_seconds": 1788278400.0,
+        "fleet": 22,
+        "layout_seed": 1701,
+        "static_layout_order": [
+          92,
+          134,
+          49,
+          57,
+          136,
+          0,
+          95,
+          138,
+          26,
+          149,
+          24
+        ],
+        "offered_count": 28506,
+        "jobs_digest": "017f0caff9a896a747439ad9d4e409c689f5ed1e4bebb0afd2451be2f478b8f8"
+      },
+      "observed_at": 28860.0,
+      "observed_at_epoch_seconds": 1788307260.0,
+      "label_closed_at_epoch_seconds": 1788309060.0,
+      "B1_model_available_at_epoch_seconds": 1788235200.0,
+      "actual_plan_received_at_epoch_seconds": 1788278400.0,
+      "advantage_bag_seconds": 1054.8770000003278,
+      "known_job_counts": {
+        "equal": 208,
+        "unknown_incomplete": 28279,
+        "harmed": 7,
+        "improved": 12
+      }
+    },
+    {
+      "pair_id": "99bbc8a89f462eefa384c665cb9807ed896fe55b3302127f5d8c62a0d1a83894",
+      "parent": {
+        "parent_seed": 702,
+        "split": "train",
+        "parent_group": "conditional_timing_parent_702",
+        "synthetic": true,
+        "common_historical_template_sha256": "a9611267471a269cc34f5646a4ebb409c61a08fa77dcef4c02266b346c86890c",
+        "sampling": "sha256(seed:business_identity), uniform[-120,120], clip_zero",
+        "calendar_start": "2026-09-03T00:00:00+08:00",
+        "calendar_start_epoch_seconds": 1788364800.0,
+        "fleet": 22,
+        "layout_seed": 1701,
+        "static_layout_order": [
+          92,
+          134,
+          49,
+          57,
+          136,
+          0,
+          95,
+          138,
+          26,
+          149,
+          24
+        ],
+        "offered_count": 28506,
+        "jobs_digest": "c26e3d4775eb31c63688f6bff371f3431d96efe912ecdbf3f2b63319975df252"
+      },
+      "observed_at": 28920.0,
+      "observed_at_epoch_seconds": 1788393720.0,
+      "label_closed_at_epoch_seconds": 1788395520.0,
+      "B1_model_available_at_epoch_seconds": 1788235200.0,
+      "actual_plan_received_at_epoch_seconds": 1788364800.0,
+      "advantage_bag_seconds": -6052.001000000164,
+      "known_job_counts": {
+        "equal": 195,
+        "unknown_incomplete": 28295,
+        "harmed": 11,
+        "improved": 5
+      }
+    },
+    {
+      "pair_id": "b7c271f565621fcdd16275e2103f1e81dbab4ff7dc514cd7d3454f8db6a2204c",
+      "parent": {
+        "parent_seed": 701,
+        "split": "train",
+        "parent_group": "conditional_timing_parent_701",
+        "synthetic": true,
+        "common_historical_template_sha256": "a9611267471a269cc34f5646a4ebb409c61a08fa77dcef4c02266b346c86890c",
+        "sampling": "sha256(seed:business_identity), uniform[-120,120], clip_zero",
+        "calendar_start": "2026-09-02T00:00:00+08:00",
+        "calendar_start_epoch_seconds": 1788278400.0,
+        "fleet": 22,
+        "layout_seed": 1701,
+        "static_layout_order": [
+          92,
+          134,
+          49,
+          57,
+          136,
+          0,
+          95,
+          138,
+          26,
+          149,
+          24
+        ],
+        "offered_count": 28506,
+        "jobs_digest": "017f0caff9a896a747439ad9d4e409c689f5ed1e4bebb0afd2451be2f478b8f8"
+      },
+      "observed_at": 7200.0,
+      "observed_at_epoch_seconds": 1788285600.0,
+      "label_closed_at_epoch_seconds": 1788287400.0,
+      "B1_model_available_at_epoch_seconds": 1788235200.0,
+      "actual_plan_received_at_epoch_seconds": 1788278400.0,
+      "advantage_bag_seconds": 0.0,
+      "known_job_counts": {
+        "unknown_incomplete": 28506
+      }
+    },
+    {
+      "pair_id": "8b7bac9895aa1570cb3b9b540639524e2b0032907d6c4229afce249e28b948a9",
+      "parent": {
+        "parent_seed": 702,
+        "split": "train",
+        "parent_group": "conditional_timing_parent_702",
+        "synthetic": true,
+        "common_historical_template_sha256": "a9611267471a269cc34f5646a4ebb409c61a08fa77dcef4c02266b346c86890c",
+        "sampling": "sha256(seed:business_identity), uniform[-120,120], clip_zero",
+        "calendar_start": "2026-09-03T00:00:00+08:00",
+        "calendar_start_epoch_seconds": 1788364800.0,
+        "fleet": 22,
+        "layout_seed": 1701,
+        "static_layout_order": [
+          92,
+          134,
+          49,
+          57,
+          136,
+          0,
+          95,
+          138,
+          26,
+          149,
+          24
+        ],
+        "offered_count": 28506,
+        "jobs_digest": "c26e3d4775eb31c63688f6bff371f3431d96efe912ecdbf3f2b63319975df252"
+      },
+      "observed_at": 7200.0,
+      "observed_at_epoch_seconds": 1788372000.0,
+      "label_closed_at_epoch_seconds": 1788373800.0,
+      "B1_model_available_at_epoch_seconds": 1788235200.0,
+      "actual_plan_received_at_epoch_seconds": 1788364800.0,
+      "advantage_bag_seconds": 0.0,
+      "known_job_counts": {
+        "unknown_incomplete": 28506
+      }
+    }
+  ]
+}

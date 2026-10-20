@@ -6,11 +6,14 @@ The old 43/52-dimensional checkpoints and feature definitions are untouched.
 from __future__ import annotations
 
 import copy
+from bisect import bisect_right
+from dataclasses import dataclass
 import hashlib
 import json
 import math
 from pathlib import Path
 import time
+from types import MappingProxyType
 
 import numpy as np
 
@@ -218,7 +221,7 @@ def wrap_observation(*, episode_id, owner, decision_id, now, base_observation, f
 def _mass(forecast, region, elapsed):
     values = forecast['new_demand_mean_by_region'].get(region)
     missing = forecast['missing_mask_by_region'].get(region, True)
-    if values is None or missing is True or (isinstance(missing, list) and any(missing)):
+    if values is None or missing is True or (isinstance(missing, (list, tuple)) and any(missing)):
         return 0., True
     edges = forecast['bin_edges_seconds']
     require(len(edges) == len(values) + 1 and number(edges[0]) == 0, 'relative_forecast_bin_edges')
@@ -251,16 +254,136 @@ def _account_counts(accounts, region, at, now, base_observation):
     return counts, complete, any(missing for _, missing, _ in waiting_rows)
 
 
-def features(observation, action):
+def _validated_observation(observation):
     require(observation['schema'] == OBSERVATION_SCHEMA, 'observation_schema')
     # Revalidate stored JSON as well as freshly wrapped observations.
-    wrap_observation(episode_id=observation['episode_id'],owner=observation['owner_id'],
+    return wrap_observation(episode_id=observation['episode_id'],owner=observation['owner_id'],
         decision_id=observation['decision_id'],now=observation['now'],base_observation=observation['base_observation'],
         forecast=observation['demand_forecast'],accounts=observation['circulation_accounts'],
         information_variant=observation['information_variant'],remaining_episode_seconds=observation['remaining_episode_seconds'],
         mapping_version=observation['mapping_version'],flight_context_sha256=observation['flight_context_sha256'])
-    now = number(observation['now'])
-    accounts = observation['circulation_accounts']  # Already validated by wrap_observation above.
+
+
+def _freeze(value):
+    if type(value) is dict:
+        return MappingProxyType({key: _freeze(item) for key, item in value.items()})
+    if type(value) is list:
+        return tuple(_freeze(item) for item in value)
+    return value
+
+
+def _readonly_array(values):
+    array = np.asarray(values, dtype=np.float64)
+    # A bytes-backed array cannot be made writable with setflags(write=True).
+    return np.frombuffer(array.tobytes(), dtype=np.float64).reshape(array.shape)
+
+
+def _thaw(value):
+    if isinstance(value, MappingProxyType):
+        return {key: _thaw(item) for key, item in value.items()}
+    if type(value) is tuple:
+        return [_thaw(item) for item in value]
+    return value
+
+
+@dataclass(frozen=True, init=False)
+class PreparedObservation:
+    """Callback-local validated snapshot; construction requires the factory."""
+    observation: object
+    account_index: object
+    observation_sha256: str
+
+    def __init__(self):
+        raise TypeError('use prepare_observation or prepare_wrapped_observation')
+
+    def to_observation(self):
+        return _thaw(self.observation)
+
+
+@dataclass(frozen=True, init=False)
+class PreparedFeatureMatrix:
+    context: PreparedObservation
+    names: tuple
+    rows: tuple
+    matrix: object
+    actions_sha256: str
+
+    def __init__(self):
+        raise TypeError('use prepare_feature_matrix')
+
+    def feature_rows(self):
+        return [dict(row) for row in self.rows]
+
+
+@dataclass(frozen=True, init=False)
+class PreparedModel:
+    information_variant: str
+    mapping_version: str
+    names: tuple
+    center: object
+    scale: object
+    layers: tuple
+    target_scale: float
+    target_center: float
+
+    def __init__(self):
+        raise TypeError('use prepare_model')
+
+
+def _new_prepared(cls, **fields):
+    result = object.__new__(cls)
+    for name, item in fields.items():
+        object.__setattr__(result, name, item)
+    return result
+
+
+def _prepare_validated(observation):
+    accounts = observation['circulation_accounts']
+    now = observation['now']
+    outbound = {_identity(row) for row in accounts['committed_outbound']}
+    index = {}
+    for region in observation['demand_forecast']['new_demand_mean_by_region']:
+        waiting = [_waiting_count(row, observation['base_observation'], now)
+                   for row in accounts['known_waiting_jobs'] if row['region'] == region]
+        counts = {
+            'current_free_trays': float(sum(row['region'] == region and _identity(row) not in outbound
+                for row in accounts['current_free_trays'])),
+            'known_waiting_jobs': float(sum(count for count, _, _ in waiting)),
+            'committed_outbound': float(sum(row['region'] == region for row in accounts['committed_outbound'])),
+            'unresolved_requests': float(sum(row['region'] == region for row in accounts['unresolved_requests']))}
+        complete = {name: accounts['coverage_by_account_region'][name][region]['complete'] for name in ACCOUNT_NAMES}
+        missing = any(flag for _, flag, _ in waiting)
+        complete['known_waiting_jobs'] &= not missing
+        arrivals = {name: sorted(row['available_at'] for row in accounts[name]
+            if row['region'] == region and _identity(row) not in outbound)
+            for name in ('loaded_release_forecast', 'committed_inbound')}
+        index[region] = {'counts': counts, 'complete': complete, 'waiting_missing': missing, **arrivals}
+    return _new_prepared(PreparedObservation, observation=_freeze(observation),
+        account_index=_freeze(index), observation_sha256=digest(observation))
+
+
+def prepare_observation(observation):
+    """Validate external JSON and detach once, with no cross-callback cache."""
+    return _prepare_validated(_validated_observation(observation))
+
+
+def prepare_wrapped_observation(**kwargs):
+    """Wrap and prepare an adapter's current input with one validation pass."""
+    return _prepare_validated(wrap_observation(**kwargs))
+
+
+def _prepared_counts(context, region, arrival):
+    entry = context.account_index[region]
+    counts = dict(entry['counts'])
+    for name in ('loaded_release_forecast', 'committed_inbound'):
+        counts[name] = float(bisect_right(entry[name], arrival))
+    return counts, entry['complete'], entry['waiting_missing']
+
+
+def _prepared_features(context, action):
+    observation = context.observation
+    now = observation['now']
+    accounts = observation['circulation_accounts']
     forecast = observation['demand_forecast']
     require(number(forecast['forecast_origin']) == now, 'stale_forecast_vector')
     require(action['kind'] in ('transfer', 'route', 'no_command'), 'action_kind')
@@ -278,7 +401,7 @@ def features(observation, action):
         'unresolved_request_total_missing': float(not all(status['complete']
             for status in accounts['coverage_by_account_region']['unresolved_requests'].values()))}
     for role, region in (('source', source), ('destination', destination)):
-        counts, complete, waiting_count_missing = _account_counts(accounts, region, arrival, now, observation['base_observation'])
+        counts, complete, waiting_count_missing = _prepared_counts(context, region, arrival)
         free, waiting, release, inbound = (counts[name] for name in ACCOUNT_NAMES[:4])
         for name in ACCOUNT_NAMES:
             status = accounts['coverage_by_account_region'][name][region]
@@ -313,6 +436,69 @@ def features(observation, action):
     result['transfer_x_source_scarcity'] = moved * result['source_scarcity_after_transfer']
     require(all(math.isfinite(value) for value in result.values()), 'nonfinite_features')
     return result
+
+
+def features(observation, action):
+    """External JSON API retains all validation, including current freshness."""
+    return _prepared_features(prepare_observation(observation), action)
+
+
+def prepare_feature_matrix(context, actions):
+    require(type(context) is PreparedObservation, 'prepared_current_context_required')
+    require(type(actions) in (list, tuple), 'action_list')
+    # Detach the ordered actions before extracting; callers cannot relabel the
+    # matrix by changing their original proposal dictionaries.
+    actions = detached(actions)
+    vectors = [_prepared_features(context, action) for action in actions]
+    names = tuple(sorted(vectors[0])) if vectors else ()
+    require(all(tuple(sorted(vector)) == names for vector in vectors), 'feature_names')
+    matrix = _readonly_array([[vector[name] for name in names] for vector in vectors])
+    return _new_prepared(PreparedFeatureMatrix, context=context, names=names,
+        rows=tuple(_freeze(vector) for vector in vectors), matrix=matrix,
+        actions_sha256=digest(actions))
+
+
+def prepare_model(model):
+    """Validate/freeze numerical parameters once; grants no model provenance."""
+    require(model['schema'] == MODEL_SCHEMA and model['feature_schema'] == FEATURE_SCHEMA, 'model_schema')
+    names = tuple(model['feature_names'])
+    require(names and list(names) == sorted(set(names)), 'feature_names')
+    p = model['parameters']
+    center, scale = _readonly_array(p['center']), _readonly_array(p['scale'])
+    require(center.shape == scale.shape == (len(names),) and np.isfinite(center).all()
+            and np.isfinite(scale).all() and (scale > 0).all(), 'normalization')
+    width = len(names)
+    layers = []
+    for layer in p['layers']:
+        weight, bias = _readonly_array(layer['weight']), _readonly_array(layer['bias'])
+        require(weight.ndim == 2 and weight.shape[1] == width and bias.shape == (weight.shape[0],)
+                and np.isfinite(weight).all() and np.isfinite(bias).all(), 'layer_shape')
+        layers.append((weight, bias))
+        width = weight.shape[0]
+    require(layers and width == 1, 'scalar_value_output')
+    return _new_prepared(PreparedModel, information_variant=model['information_variant'],
+        mapping_version=model['mapping_version'], names=names, center=center, scale=scale,
+        layers=tuple(layers), target_scale=number(p['target_scale']), target_center=number(p['target_center']))
+
+
+def predict_prepared(model, matrix, *, context):
+    """Pure forward on the exact callback snapshot that produced the matrix."""
+    require(type(model) is PreparedModel, 'prepared_model_required')
+    require(type(matrix) is PreparedFeatureMatrix and type(context) is PreparedObservation
+        and matrix.context is context, 'feature_matrix_current_binding')
+    require(context.observation['information_variant'] == model.information_variant, 'model_information_variant')
+    require(context.observation['mapping_version'] == model.mapping_version, 'model_mapping_version')
+    if not matrix.rows:
+        return []
+    require(matrix.names == model.names, 'feature_names')
+    x = (matrix.matrix - model.center) / model.scale
+    for index, (weight, bias) in enumerate(model.layers):
+        x = x @ weight.T + bias
+        if index < len(model.layers) - 1:
+            x = np.tanh(x)
+    result = x[:, 0] * model.target_scale + model.target_center
+    require(np.isfinite(result).all(), 'finite_values')
+    return result.tolist()
 
 
 def predict(model, observations, actions):

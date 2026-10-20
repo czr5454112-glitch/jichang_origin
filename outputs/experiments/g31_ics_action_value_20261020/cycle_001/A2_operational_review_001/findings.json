@@ -1,0 +1,25 @@
+{
+  "schema": "g31.airport.operational_findings.v1",
+  "preferred_detail": "diagnosis_v2.json",
+  "supersedes_interpretation_note": "diagnosis.json measured submit-delivery-to-receipt latency. v2 explicitly separates pregrant wait for forecast release from actual empty occupation; never interpret all protocol latency as congestion.",
+  "facts": {
+    "at": 59400.0,
+    "arrived": 20924,
+    "completed": 986,
+    "arrived_completion_fraction": 0.04712292104760084,
+    "late_1800s_new_arrivals": 729,
+    "late_1800s_new_completions": 46,
+    "late_1800s_waiting_fraction_of_bag_integral": 0.9992961544442448,
+    "late_1800s_empty_return_fraction_of_fleet_time": 0.3203055555555533,
+    "late_1800s_idle_empty_fraction_of_fleet_time": 0.05240181818183052,
+    "late_1800s_loaded_fraction_of_fleet_time": 0.6261145707070614,
+    "endpoint_current_actual_spares": 0
+  },
+  "interpretation": [
+    "Late waiting dominates business cost, while fleet carriers are primarily loaded or returning. Earlier prepositioning has to improve where the next completed carrier goes and its following service cycle.",
+    "Observed arrival rate1458/h exceeds completion92/h. This is a load/resource/path bottleneck diagnostic; extrapolation does not identify a required fleet size.",
+    "Current three-tray cycle has only22.576-23.326s latest wait age, capacity4 nodes and other mobile holders; it does not justify claiming permanent deadlock."
+  ],
+  "rl_gain_established": false,
+  "native_runs_added": 0
+}

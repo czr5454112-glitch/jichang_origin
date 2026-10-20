@@ -1,0 +1,108 @@
+"""Execute the preregistered paired grid; each child fully replays warm-up."""
+from __future__ import annotations
+
+import argparse
+import gzip
+import json
+from pathlib import Path
+
+from . import foundation_airport_action_campaign as campaign
+from .foundation_airport_pair_dataset import dataset_rows
+
+WINDOWS = [(7200., 14400.), (28800., 36000.), (54000., 57600.)]
+B = [dict(pair_id=f"B_{seed}_{index}", parent_seed=seed, fleet=22,
+          window=window, anchor_rank=0, batch="B")
+     for seed in (701, 702) for index, window in enumerate(WINDOWS)]
+C = ([dict(pair_id=f"C_{seed}_extra", parent_seed=seed, fleet=22,
+           window=WINDOWS[0], anchor_rank=1, batch="C") for seed in (701, 702)]
+     + [dict(pair_id=f"C_{seed}_{index}", parent_seed=seed, fleet=22,
+             window=window, anchor_rank=0, batch="C")
+        for seed in (801, 802) for index, window in enumerate((WINDOWS[0], WINDOWS[2]))])
+F = [dict(pair_id=f"F_{fleet}_{seed}", parent_seed=seed, fleet=fleet,
+          window=WINDOWS[1], anchor_rank=0, batch="F")
+     for fleet, seeds in ((18, (701, 801)), (26, (702, 802))) for seed in seeds]
+BEHAVIOR_SOURCES = (
+    "analytic_control.py", "protocol_control.py", "foundation_airport_protocol_v2.py",
+    "foundation_airport_opportunities.py", "foundation_airport_batch_patch.py",
+    "foundation_airport_paired_continuation.py", "foundation_airport_pair_dataset.py",
+    "foundation_airport_action_campaign.py", "native_host.py",
+)
+
+
+def load_gz(path):
+    return json.loads(gzip.decompress(Path(path).read_bytes()))
+
+
+def register():
+    path = campaign.CYCLE / "paired_grid.json"
+    registry = dict(schema="g31.airport.registered_pairs.v1", B=B, C=C, F=F,
+        selection="first eligible in each window; extra train anchors use eligible rank1",
+        test_access=False, parent_assignment_frozen_before_any_pair=True)
+    if path.exists():
+        if campaign.read(path) != json.loads(json.dumps(registry)):
+            raise ValueError("action_pairs:registered_grid_changed")
+    else:
+        campaign.write(path, registry)
+    return registry
+
+
+def run_pair(spec, binary):
+    directories = []
+    for branch in ("a_ref", "a_patch"):
+        name = spec["pair_id"] + "_" + branch + "_001"
+        path = campaign.CYCLE / name
+        if not path.exists():
+            campaign.prepare(name, binary, seed=spec["parent_seed"], fleet=spec["fleet"],
+                branch=branch, batch=spec["batch"], window=spec["window"],
+                anchor_rank=spec["anchor_rank"])
+        directories.append(path)
+    plans = [campaign.read(path / "plan.json") for path in directories]
+    for name in BEHAVIOR_SOURCES:
+        values = [{Path(k).name: v for k, v in plan["sources"].items()}[name] for plan in plans]
+        if values[0] != values[1]:
+            raise ValueError("action_pairs:paired_behavior_source_changed:" + name)
+    if plans[0]["binary"] != plans[1]["binary"] or plans[0]["input"]["semantic_sha256"] != plans[1]["input"]["semantic_sha256"]:
+        raise ValueError("action_pairs:paired_binary_or_input_changed")
+    for path in directories:
+        if not (path / "receipt.json").exists():
+            print(json.dumps(campaign.launch(path)), flush=True)
+    output = campaign.CYCLE / (spec["pair_id"] + "_dataset_001.json.gz")
+    if output.exists():
+        return load_gz(output)["pair"]
+    paths = [path / "branch_evidence.json.gz" for path in directories]
+    if all(path.exists() for path in paths):
+        evidence = [load_gz(path) for path in paths]
+        data = dataset_rows(*evidence)
+    else:
+        data = dict(schema="g31.airport.failed_pair.v1", rows=[],
+            pair={"status": "failed_branch_no_evidence", "pair_id": spec["pair_id"],
+                  "advantage_bag_seconds": None,
+                  "branches": [campaign.read(path / "receipt.json")["status"] for path in directories]})
+    campaign.gz(output, data)
+    campaign.event(campaign.CYCLE, "paired_review", pair=spec["pair_id"],
+        status=data["pair"]["status"], advantage_bag_seconds=data["pair"].get("advantage_bag_seconds"))
+    return data["pair"]
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--binary", type=Path, required=True)
+    parser.add_argument("--pair")
+    parser.add_argument("--batch", choices=("B", "C", "F"))
+    parser.add_argument("--register-only", action="store_true")
+    args = parser.parse_args()
+    register()
+    if args.register_only:
+        return
+    selected = [row for row in B+C+F if row["pair_id"] == args.pair] if args.pair else {
+        "B": B, "C": C, "F": F}.get(args.batch, [])
+    if not selected:
+        parser.error("registered --pair or --batch required")
+    for row in selected:
+        result = run_pair(row, args.binary)
+        print(json.dumps({k: result.get(k) for k in
+            ("pair_id", "status", "advantage_bag_seconds", "action_difference", "mechanism_direction")}), flush=True)
+
+
+if __name__ == "__main__":
+    main()

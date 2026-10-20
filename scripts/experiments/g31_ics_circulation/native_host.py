@@ -190,7 +190,15 @@ def audit_result(data: dict[str, Any], result: dict[str, Any]) -> dict[str, Any]
         elif event == "EXPORT_GRANTED":
             spec = transfer_specs[r["reason"]]
             assert phases[tray_id] == "empty" and physical[tray_id] == spec["source"]
-            assert node_contracts[spec["source"]]["zone"] != node_contracts[spec["destination"]]["zone"]
+            source, destination = node_contracts[spec["source"]], node_contracts[spec["destination"]]
+            scope = spec.get("transfer_scope", "cross_zone_transfer")
+            if scope == "local_empty_return":
+                roles = data.get("static_role_contract", {})
+                assert spec["source"] != spec["destination"] and source["zone"] == destination["zone"]
+                assert (source.get("resource_owner") or source["zone"]) == (destination.get("resource_owner") or destination["zone"])
+                assert roles.get("schema") == "g31.static_node_roles.v1" and spec["destination"] in roles["loader_nodes"]
+            else:
+                assert scope == "cross_zone_transfer" and source["zone"] != destination["zone"]
             assert node_contracts[spec["source"]].get("allow_export", True)
             assert node_contracts[spec["destination"]].get("allow_receive", True)
             available = sum(phases[t] == "empty" and physical[t] == spec["source"] for t in expected_trays)

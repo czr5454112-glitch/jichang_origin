@@ -1,0 +1,89 @@
+{
+  "schema": "g31.foundation.airport_C10_rule_freeze.v1",
+  "frozen_at_utc": "2026-10-20T03:36:42.702316+00:00",
+  "rule_contract": {
+    "schema": "g31.foundation.airport_C10_strong_rule.v1",
+    "parameters": {
+      "windows_seconds": [
+        300.0,
+        900.0,
+        1800.0
+      ],
+      "window_weights": [
+        0.3333333333333333,
+        0.3333333333333333,
+        0.3333333333333333
+      ],
+      "empty_tray_unavailable_second_cost": 1.0,
+      "visible_resource_pressure_second_cost": 1.0,
+      "forecast_weight": 1.0,
+      "observed_waiting_weight": 1.0,
+      "conditional_supply_weight": 1.0,
+      "positive_advantage_required": 0.0,
+      "tie_break": "a_ref"
+    },
+    "information": "exact same actual current forecast_evidence as C11",
+    "candidate_contract": "same plan-independent a_ref versus one patch; other baseline allocations retained",
+    "objective": "mean over 300/900/1800 of integral positive(visible_waiting + cumulative_B1_mean - planning_available_trays), plus candidate tray-unavailable seconds and observed path resource pressure seconds",
+    "action_effect": "transfer removes source tray at current commitment; adds destination tray only at earliest_departure plus public static travel; hold keeps it at source",
+    "existing_commitment_eta": "remaining time conservatively starts a full public trip at max(now, earliest_departure), since original physical progress is not attested by an ACK-only ledger; unreachable commitments are retained as unknown without predicted supply",
+    "resource_proxy": "candidate unavailable seconds capped at 1800, plus observed node occupancy/capacity times service and visible edge occupancy/capacity times travel; absent capacity or pressure is explicitly unknown",
+    "supply_terms": [
+      "observed uncommitted empty trays",
+      "conditional current local unloading/hold releases",
+      "own immutable request payloads with actually delivered committed ACK",
+      "same retained uncommitted baseline batch allocations"
+    ],
+    "missing_scope": "unknown accounts stay flagged; objective is an observed-account conditional proxy, not total actual deficit; no private stock or future-arrival oracle",
+    "strong_rule_basis": "existing analytic FIFO/min-stock matching and service-aware notified-fault paths, augmented by source/destination B1 demand and commitment-aware marginal cost",
+    "parameters_fit_or_selected_from_targets": false,
+    "calibration": "fixed engineering units before test; no outcome-based tuning",
+    "native_execution_authority": false,
+    "strict_nonharm_certified": false,
+    "limitations": [
+      "finite one-use empty-inventory approximation",
+      "conditional supplies and static arrival estimates may fail or be delayed",
+      "remote account and occupancy coverage may be incomplete",
+      "shared-resource per-job protection remains the external native/guard responsibility"
+    ]
+  },
+  "rule_contract_sha256": "d70e73a2da016fd36b291e1e1f348beef13ee1c5447044e0aedad3b834874bb6",
+  "scorer_module": "scripts.experiments.g31_ics_circulation.foundation_airport_strong_rule",
+  "scorer_api": "prepare_scorer({path, sha256})(reference_row, patch_row) -> finite float; score_pair and explain_pair also available",
+  "scorer_source_path": "scripts/experiments/g31_ics_circulation/foundation_airport_strong_rule.py",
+  "scorer_source_sha256": "09cd26269f9135a670c9b33a4b8e9a5ff0cbd08351834319ed07d0d5fea119e2",
+  "tests_path": "tests/test_g31_foundation_airport_strong_rule.py",
+  "tests_sha256": "bfd41c70154e81fec8cb8a12a98a89e4cc067e0c84f51c823e4280e2d546b3e6",
+  "test_evidence": {
+    "native_constructors_started": 0,
+    "training_jobs_started": 0,
+    "passed_tests": 58,
+    "new_C10_tests": 25,
+    "junit_xml": "C10_strong_rule_tests_001.xml",
+    "temporary_directory_failure": "Default pytest tmp root permission denied before freeze-fixture setup; rerun used fresh workspace temp and all passed."
+  },
+  "outcome_based_parameter_selection": false,
+  "heldout_test_outcomes_read": false,
+  "train_dev_target_values_used": false,
+  "native_launches_by_this_task": 0,
+  "applies_to": [
+    "E_dev_resource_rules",
+    "D_22_four_cells",
+    "G_resource_curve"
+  ],
+  "information_contract": "The identical actual controller-preload forecast receipt supplied to C11. Offline reconstructed retrospective evidence is rejected.",
+  "frozen_rationale": [
+    "Use the existing analytic rule for FIFO/min-stock/R1, shared static opportunity catalog, recovery and mandatory retained batch.",
+    "All three prespecified service horizons are equally weighted; unit shortage and tray-occupation seconds avoid target-selected scaling.",
+    "Future B1 source demand is an opportunity cost; destination cumulative demand may justify arrival-before-demand transfers.",
+    "Known own delivered-ACK commitments, current local unload/hold releases and retained baseline allocations reduce duplicate predicted supply need.",
+    "This conditional observed-account rule is a strong bounded heuristic, not a claim of optimal control or complete accounts."
+  ],
+  "limitations": [
+    "Current dataset does not attest remote complete inventories or arrivals; unknowns remain reported.",
+    "One-use inventory approximation omits repeated future tray cycles.",
+    "Existing ACK-only committed transfer ETA conservatively restarts a full static trip from now because exact progress is unavailable.",
+    "Shared-resource per-job nonharm is not certified.",
+    "Runtime must separately bind all imported controller and forecast source bytes to its prepared run."
+  ]
+}

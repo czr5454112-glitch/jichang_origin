@@ -162,6 +162,10 @@ class NativeSession {
     for(const auto& n:s.input.nodes) exists=exists||observation_owner(n.node)==owner;
     if(!exists) throw py::value_error("circulation:unknown_observation_owner");
     py::dict out;out["schema"]="g31.regional_observation.v1";out["now"]=physical_time();out["owner_id"]=owner;
+    if(!s.input.static_role_contract.schema.empty()) {
+      py::dict roles;roles["schema"]=s.input.static_role_contract.schema;
+      roles["loader_nodes"]=s.input.static_role_contract.loader_nodes;out["static_role_contract"]=roles;
+    }
     // Protocol callers never receive the legacy truth-derived version.
     // Do not scan historical receipts to construct a field then discard it.
     if(!protocol) out["version"]=owner_version(owner);
@@ -260,7 +264,7 @@ class NativeSession {
       py::dict d;
 #define TFIELD(name) d[#name]=request.name
       TFIELD(request_id);TFIELD(tray_id);TFIELD(source);TFIELD(destination);TFIELD(issued_at);
-      TFIELD(earliest_departure);TFIELD(expiry);
+      TFIELD(earliest_departure);TFIELD(expiry);TFIELD(transfer_scope);
 #undef TFIELD
       d["status"]=state.status;d["reason"]=state.reason;
       d["delivered_at"]=state.delivered_at;d["departed_at"]=state.departed_at;d["received_at"]=state.received_at;
@@ -340,6 +344,7 @@ class NativeSession {
     request.message_delay=field<double>(d,"message_delay",0);
     request.earliest_departure=field<double>(d,"earliest_departure",physical_time());
     request.expiry=required<double>(d,"expiry");
+    request.transfer_scope=field<std::string>(d,"transfer_scope","cross_zone_transfer");
     return reply(runtime_->submit_circulation_transfer(request,owner));
   }
   py::dict submit_route(const py::dict& d) {
@@ -386,6 +391,7 @@ class NativeSession {
     request.tray_id=required<std::string>(d,"tray_id");request.source=required<int>(d,"source");
     request.destination=required<int>(d,"destination");request.message_delay=field<double>(d,"message_delay",0);
     request.earliest_departure=required<double>(d,"earliest_departure");request.expiry=required<double>(d,"expiry");
+    request.transfer_scope=field<std::string>(d,"transfer_scope","cross_zone_transfer");
     return reply(runtime_->submit_circulation_protocol_transfer(request,required<std::string>(d,"owner_id")));
   }
   py::dict submit_protocol_command(const py::dict& d) {
@@ -515,7 +521,7 @@ class NativeSession {
       py::dict row;
 #define PFIELD(name) row[#name]=input.name
       PFIELD(request_id);PFIELD(tray_id);PFIELD(source);PFIELD(destination);PFIELD(issued_at);
-      PFIELD(earliest_departure);PFIELD(expiry);PFIELD(message_delay);
+      PFIELD(earliest_departure);PFIELD(expiry);PFIELD(message_delay);PFIELD(transfer_scope);
 #undef PFIELD
       row["status"]="pending";row["received_at"]=-1.;row["reason"]="awaiting_delivered_resolution";
       row["status_scope"]="own_payload_and_last_delivered_ack_only";
@@ -799,6 +805,7 @@ class NativeSession {
   py::dict render_protocol_request(const CirculationProtocolRequest& client) const {
     const auto& s=runtime_->circulation_state();
     py::dict row;row["request_id"]=s.input.transfers[client.transfer].request_id;
+    row["transfer_scope"]=s.input.transfers[client.transfer].transfer_scope;
     row["status"]=client.client_status;row["attempt"]=client.attempt;
     row["physical_resolution"]="unknown_without_a_delivered_ack";
     if(client.latest_ack>=0) {

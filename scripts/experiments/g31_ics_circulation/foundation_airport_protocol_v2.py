@@ -24,7 +24,7 @@ def run_airport_bounded_protocol_control(session: Any, owners: list[str], *, hor
                          event_budget: int = 100000, _use_policy_view: bool = True,
                          _use_recent_forecasts: bool = True, planner=None,
                          planner_identity: str | None = None, soft_deadline: float | None = None,
-                         soft_clock=time.monotonic) -> dict:
+                         soft_clock=time.monotonic, precommit_observer=None) -> dict:
     """Advance common public ticks, including retries and both real control layers.
 
     Each call preserves the next unexecuted tick. Native + JSON client/controller
@@ -140,6 +140,16 @@ def run_airport_bounded_protocol_control(session: Any, owners: list[str], *, hor
             decision = choose_transfers(observation, predictive=predictive, message_delay=command_delay,
                 respect_service_forecasts=forecasts, request_prefix=f"protocol:{current['next_tick']}")
             initial = decision
+            # Evaluator-only instrumentation, never an input to the actor.
+            # Called before any optional batch commitment; it may archive the
+            # full replay prefix, but cannot replace the planner's decision.
+            evaluator_ms = 0.
+            if precommit_observer is not None:
+                evaluator_started = time.perf_counter()
+                precommit_observer(session=session, controller_state=current,
+                    client_state=client.state, observation=observation,
+                    decision=initial)
+                evaluator_ms = 1000*(time.perf_counter()-evaluator_started)
             attempts = []
             for _ in range(len(initial["intents"])):
                 if not decision["intents"]:
@@ -151,8 +161,12 @@ def run_airport_bounded_protocol_control(session: Any, owners: list[str], *, hor
                 observation = client._policy_view(owner, compact=compact)
                 decision = choose_transfers(observation, predictive=predictive, message_delay=command_delay,
                     respect_service_forecasts=forecasts, request_prefix=f"protocol:{current['next_tick']}:residual")
-            decisions.append({"owner_id": owner, "decision": initial, "attempts": attempts,
-                              "compute_ms": 1000*(time.perf_counter()-started)})
+            decision_record = {"owner_id": owner, "decision": initial, "attempts": attempts,
+                               "compute_ms": 1000*(time.perf_counter()-started) - evaluator_ms}
+            if precommit_observer is not None:
+                decision_record["offline_evaluator_ms"] = evaluator_ms
+                decision_record["timing_scope"] = "owner_planning_and_submit_excluding_offline_prefix_archive"
+            decisions.append(decision_record)
         records.append({"tick": current["next_tick"], "at": target, "refreshed": refreshed, "trace_sequence": trace_sequence,
                         "publications": publications, "service_actions": service_actions,
                         "preparation_compute_ms": preparation_ms, "owner_decisions": decisions})

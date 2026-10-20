@@ -1,0 +1,688 @@
+"""Exact event rewards and supported same-owner transitions for the new domain.
+
+Offline rewards may inspect the complete result. Actor features may not. A
+successful export is not RL eligibility: paired early-action evidence, a frozen
+collection contract, and disjoint development/evaluation plans are also needed.
+"""
+from __future__ import annotations
+
+import copy
+import gzip
+import hashlib
+import json
+import math
+from pathlib import Path
+import time
+
+SCHEMA = 'g31.foundation.multistep_transition.v1'
+GATE_SCHEMA = 'g31.foundation.multistep_gate.v1'
+REWARD_SCHEMA = 'g31.foundation.exact_arrived_unfinished_integral.v1'
+
+
+def airport_paired_transition_gate(datasets):
+    """Audit new airport successors without relabeling closed MC as FQI.
+
+    The old small-domain transition/checkpoint schemas remain unchanged.
+    Observing a legal successor does not provide an action-value target there.
+    """
+    counts = dict(actual_rows=0, natural_successors=0, unknown_successors=0,
+                  singleton_supported_successors=0, closed_pairs=0)
+    for dataset in datasets:
+        require(dataset.get('schema') == 'g31.foundation.airport_pair_dataset.v1',
+                'explicit_airport_pair_schema')
+        pair = dataset['pair']
+        if pair['status'] != 'closed_actual_pair':
+            require(not dataset['rows'], 'unclosed_pair_has_no_fabricated_training_rows')
+            continue
+        require(len(dataset['rows']) == 2, 'two_actual_paired_rows')
+        counts['closed_pairs'] += 1
+        for row in dataset['rows']:
+            counts['actual_rows'] += 1
+            require(row['unexecuted_candidate_label'] is None, 'no_unexecuted_candidate_target')
+            transition = row['transition']
+            if transition is None:
+                counts['unknown_successors'] += 1
+                continue
+            current, successor = row['observation'], transition['next_state']
+            elapsed = number(transition['elapsed_seconds'])
+            require(elapsed > 0 and successor['now']-current['now'] == elapsed
+                    and successor['owner_id'] == current['owner_id'],
+                    'natural_same_owner_successor_not_residual')
+            require(transition['reward_unit'] == 'negative_bag_seconds'
+                    and number(transition['reward']) <= 0
+                    and transition['unexecuted_candidates_have_labels'] is False
+                    and transition['candidate_labels'] is None,
+                    'actual_interval_reward_without_fabricated_action_labels')
+            supported = transition['supported_next_action_ids']
+            require(len(supported) == len(set(supported)) and bool(supported),
+                    'observed_supported_successor_actions')
+            counts['natural_successors'] += 1
+            counts['singleton_supported_successors'] += len(supported) == 1
+    return dict(schema='g31.foundation.airport_paired_transition_gate.v1', **counts,
+        mc_pair_targets_available=counts['closed_pairs'] > 0,
+        bootstrap_authorized=False, optimal_multistep_Q_established=False,
+        reason='Real successor identity and interval reward are retained; no closed supported successor value graph is supplied.')
+
+
+def require(ok, reason):
+    if not ok:
+        raise ValueError('multistep:' + reason)
+
+
+def number(value):
+    require(type(value) in (int, float) and math.isfinite(value), 'finite_number')
+    return float(value)
+
+
+def digest(value):
+    return hashlib.sha256(json.dumps(value, sort_keys=True, separators=(',', ':'), allow_nan=False).encode()).hexdigest()
+
+
+def sha(path):
+    return hashlib.sha256(Path(path).read_bytes()).hexdigest()
+
+
+def audit_business_events(data, result):
+    """Bind every offered job to native arrivals/completions; retain censoring."""
+    clock = number(result['physical_clock'])
+    jobs = {row['business_bag_id']: row for row in data['jobs']}
+    outcomes = {row['business_bag_id']: row for row in result['jobs']}
+    require(len(jobs) == len(data['jobs']) == len(outcomes) == len(result['jobs'])
+            and set(jobs) == set(outcomes), 'complete_unique_business_population')
+    receipts = result['receipts']
+    require(all(0 <= number(row['time']) <= clock for row in receipts), 'receipt_clock')
+    intervals = []
+    for identity, job in jobs.items():
+        arrival = number(job['arrival'])
+        require(arrival >= 0, 'negative_arrival')
+        arrivals = [row for row in receipts if row['business_bag_id'] == identity and row['event'] == 'BAG_ARRIVAL']
+        completions = [row for row in receipts if row['business_bag_id'] == identity and row['event'] == 'UNLOAD_COMPLETE']
+        require((len(arrivals) == 1 and arrivals[0]['time'] == arrival) if arrival <= clock else not arrivals,
+                'actual_arrival_receipt')
+        outcome = outcomes[identity]
+        completed = outcome['status'] == 'completed'
+        completion = number(outcome['completed_at']) if completed else None
+        require((len(completions) == 1 and completions[0]['time'] == completion and arrival <= completion <= clock)
+                if completed else not completions, 'actual_completion_receipt')
+        intervals.append({'business_bag_id': identity, 'arrival': arrival, 'completion': completion})
+    return {'clock': clock, 'intervals': intervals, 'all_business_complete': all(r['completion'] is not None for r in intervals),
+            'business_count': len(jobs), 'reward_schema': REWARD_SCHEMA}
+
+
+def interval_reward(audit, start, end):
+    """Exact integral over changing N(t), including arrivals within the interval."""
+    start, end = number(start), number(end)
+    require(0 <= start <= end <= audit['clock'], 'reward_interval_outside_observed_clock')
+    contributions = [{**row, 'flow_seconds': max(0., min(end, row['completion'] if row['completion'] is not None else end)
+                      - max(start, row['arrival']))} for row in audit['intervals']]
+    value = -math.fsum(row['flow_seconds'] for row in contributions)
+    return {'schema': REWARD_SCHEMA, 'start': start, 'end': end, 'delta_t': end-start,
+            'value': value, 'per_job': contributions,
+            'centralized_training_only': True, 'actor_received_global_reward_truth': False}
+
+
+def bind_effect(raw, decision):
+    """Bind commands to their own ACK and cycle, never a later arbitrary tray edge.
+
+    Protocol generation/traversal and receipt traversal have different native
+    namespaces. Their explicit bridge is the same job/tray LOAD_COMPLETE and
+    its unique transport leg, with command ACK before that leg's first edge.
+    Receipt traversal allocation is global: other trays may allocate intervening
+    IDs, so the first edge is not necessarily LOAD_COMPLETE.traversal_id + 1.
+    """
+    identity = decision['command_id']
+    target = decision['opportunity']['target']; at = number(decision['selected_at'])
+    if identity is None:
+        require(decision['selected_action_id'] == 'native_default' and decision.get('actual_ack') is None,
+                'missing_command')
+        job = target['business_bag_id']; events = raw['result']['receipts']
+        loads = [e for e in events if e['event'] == 'LOAD_COMPLETE' and e['business_bag_id'] == job
+                 and e['tray_id'] == target['tray_id'] and e['time'] <= at]
+        edges = [e for e in events if e['event'] == 'EDGE_ENTER' and e['business_bag_id'] == job
+                 and e['tray_id'] == target['tray_id']]
+        require(len(loads) == 1 and bool(edges), 'default_business_cycle')
+        edge = min(edges, key=lambda e:e['time'])
+        starts=[e for e in events if e['event']=='LEG_START' and e['business_bag_id']==job
+                and e['tray_id']==target['tray_id'] and loads[0]['time']<=e['time']<edge['time']
+                and e['transport_leg_id']==edge['transport_leg_id'] and e['from']==target['node']]
+        require(edge['from'] == target['node'] and edge['time'] > at and len(starts)==1
+                and edge['traversal_id'] > loads[0]['traversal_id'], 'default_actual_business_edge')
+        fresh = [c for c in raw['calls'] if c['kind'] == 'route' and c['request'].get('business_bag_id') == job
+                 and at <= c['at'] < edge['time']]
+        require(not fresh, 'default_has_new_route_command')
+        return {'kind':'no_command','request_id':None,'ack_required':False,'load':loads[0],'leg_start':starts[0],'edge':edge,
+                'protocol_generation':target['generation'],'protocol_traversal':target['traversal_id'],
+                'namespace_bridge':'unique_business_load_first_edge; unchanged native continuation'}
+    require(identity in raw['outbox'], 'missing_command')
+    row = raw['outbox'][identity]; request = row['request']; ack = row.get('ack')
+    require(request['request_id'] == identity and request['owner_id'] == decision['owner']
+            and request['tray_id'] == target['tray_id'], 'command_owner_entity')
+    require(row['terminal'] and isinstance(ack, dict) and ack == decision.get('actual_ack'), 'actual_terminal_ack')
+    require(at <= number(ack['observed_at']) <= number(ack['delivered_at']) <= raw['result']['physical_clock'], 'ack_order')
+    events = raw['result']['receipts']
+    if row['kind'] == 'transfer':
+        require(ack['status'] == 'received', 'transfer_not_received')
+        received = [e for e in events if e['event'] == 'EMPTY_RECEIVED' and e['reason'] == identity
+                    and e['tray_id'] == request['tray_id']]
+        require(len(received) == 1 and received[0]['time'] == ack['received_at'], 'transfer_receipt_identity')
+        leg = received[0]['transport_leg_id']
+        require(leg.startswith(identity + ':empty_return:'), 'transfer_leg_identity')
+        edges = [e for e in events if e['event'] == 'EDGE_ENTER' and e['transport_leg_id'] == leg
+                 and e['tray_id'] == request['tray_id']]
+        require(bool(edges) and edges[0]['from'] == request['source'] and received[0]['to'] == request['destination']
+                and at <= edges[0]['time'] <= received[0]['time'], 'transfer_effect_chain')
+        return {'kind': 'transfer', 'request_id': identity, 'protocol_generation': target['generation'],
+                'protocol_traversal': target['traversal_id'], 'transport_leg_id': leg,
+                'edge': edges[0], 'received': received[0], 'namespace_bridge': 'request_id_exact_empty_return_leg'}
+    require(row['kind'] == 'route' and ack['status'] == 'updated', 'route_not_updated')
+    job = request['business_bag_id']
+    require(job == target['business_bag_id'] and request['expected_generation'] == target['generation']
+            and request['expected_traversal'] == target['traversal_id'], 'route_expected_generation_traversal')
+    updated = [e for e in events if e['event'] == 'ROUTE_INTENT_updated' and e['business_bag_id'] == job
+               and e['tray_id'] == target['tray_id'] and e['time'] == ack['executed_at']
+               and e['from'] == request['from'] and e['to'] == request['next']]
+    require(len(updated) == 1, 'route_intent_receipt')
+    loads = [e for e in events if e['event'] == 'LOAD_COMPLETE' and e['business_bag_id'] == job
+             and e['tray_id'] == target['tray_id'] and e['time'] <= at]
+    require(len(loads) == 1, 'unique_business_load_cycle')
+    edges = [e for e in events if e['event'] == 'EDGE_ENTER' and e['business_bag_id'] == job
+             and e['tray_id'] == target['tray_id'] and e['time'] >= loads[0]['time']]
+    require(bool(edges), 'route_no_physical_edge')
+    edge = min(edges, key=lambda e: e['time'])
+    starts=[e for e in events if e['event']=='LEG_START' and e['business_bag_id']==job
+            and e['tray_id']==target['tray_id'] and loads[0]['time']<=e['time']<edge['time']
+            and e['transport_leg_id']==edge['transport_leg_id'] and e['from']==request['from']]
+    require(edge['from'] == request['from'] and edge['to'] == request['next']
+            and ack['executed_at'] < edge['time'] and len(starts)==1
+            and edge['traversal_id'] > loads[0]['traversal_id'],
+            'route_ack_to_first_business_edge')
+    superseding = [e for e in events if e['event'] == 'ROUTE_INTENT_updated' and e['business_bag_id'] == job
+                   and e['tray_id'] == target['tray_id'] and ack['executed_at'] < e['time'] < edge['time']]
+    require(not superseding, 'route_superseded_before_effect')
+    return {'kind': 'route', 'request_id': identity, 'protocol_generation': target['generation'],
+            'protocol_traversal': target['traversal_id'], 'load': loads[0], 'leg_start':starts[0], 'updated': updated[0], 'edge': edge,
+            'transport_leg_id': edge['transport_leg_id'], 'namespace_bridge': 'unique_business_load_first_edge'}
+
+
+def admissible(decision):
+    rows = decision['candidate_mask']
+    require(len({r['action_id'] for r in rows}) == len(rows), 'duplicate_candidate_identity')
+    return [r for r in rows if r['enabled'] and (r['guard_status'] == 'original_fixed_rule'
+            or (r['guard_status'] == 'passed' and isinstance(r.get('per_job_delta'), dict)
+                and bool(r['per_job_delta']) and all(number(v) <= 0 for v in r['per_job_delta'].values())))]
+
+
+def validate_selected_semantic(raw, decision, selected, effect):
+    action=selected['semantic'];target=decision['opportunity']['target'];kind=action['operation_kind']
+    require(action['tray_id']==target['tray_id'] and action['source']==target['node'], 'semantic_source_entity')
+    if effect['kind']=='no_command':
+        require(kind=='no_command' and action['destination'] is None and decision['command_id'] is None,
+                'default_semantic_bound_to_no_command')
+    else:
+        request=raw['outbox'][decision['command_id']]['request']
+        require(kind==effect['kind'],'semantic_command_kind')
+        if kind=='route':
+            require(action['source']==request['from'] and action['destination']==request['next']==effect['edge']['to'],
+                    'semantic_route_destination')
+        else:
+            require(action['source']==request['source'] and action['destination']==request['destination']
+                    and action['earliest_departure']==request['earliest_departure'],'semantic_transfer_destination_time')
+    mode=decision['current_admission']['execution_mode']
+    if mode=='protected_current':
+        from . import foundation_repeated_domain as domain
+        evidence_sha=decision['current_admission']['evidence_sha256']
+        attempts=[a for a in raw['repeated_attempts'][decision['owner']] if digest(a['evidence'])==evidence_sha]
+        require(len(attempts)==1,'current_evidence_binding')
+        evidence=attempts[0]['evidence'];reference=raw['specification']['reference']
+        require(evidence['owner']==decision['owner'] and evidence['at']==decision['selected_at']
+                and digest(reference)==decision['current_admission']['reference_sha256'],'current_reference_binding')
+        recomputed=domain.evaluate(evidence,domain.ACTIONS[evidence['phase']])
+        require(recomputed['status']=='conditional_current_seed','current_domain_reverification')
+        prediction=recomputed['candidate_results'][selected['action_id']]
+        require(prediction['completion']==attempts[0]['model_report']['candidate_results'][selected['action_id']]['completion'],
+                'conditional_prediction_recomputed')
+        business={j['business_bag_id'] for j in raw['input']['jobs']}
+        require(set(prediction['completion'])==set(reference['completion'])==set(selected['per_job_delta'])==business,
+                'full_business_protection_domain')
+        delta={j:prediction['completion'][j]-reference['completion'][j] for j in business}
+        require(delta==selected['per_job_delta'] and all(v<=0 for v in delta.values()),'recomputed_per_job_protection')
+        require(all(j['status']=='completed' and j['completed_at']<=reference['completion'][j['business_bag_id']]
+                    for j in raw['result']['jobs']),'actual_native_per_job_protection')
+        if kind == 'no_command':
+            # New descriptors make no arrival promise. Archived v1 descriptors
+            # used the default path lower bound; neither creates a command.
+            service=evidence['information']['bundle']['trays'][target['tray_id']]['service_ready_at']
+            require(action['earliest_legal_arrival'] in (None, service+1.), 'default_arrival_descriptor')
+        else:
+            service=evidence['information']['bundle']['trays'][target['tray_id']]['service_ready_at']
+            require(kind == 'route' and action['earliest_legal_arrival']==service+(2.8 if action['destination']==8 else 1.), 'semantic_arrival_bound')
+    else:
+        require(mode=='original_fixed_rule' and selected['guard_status']=='original_fixed_rule','no_unknown_guard_as_choice')
+        require((kind=='transfer' and decision['selected_action_id']=='return_now' and action['destination']==7
+                 and action['earliest_departure']==decision['selected_at'])
+                or (kind=='route' and decision['selected_action_id']=='prefer_3' and action['destination']==3)
+                or (kind=='no_command' and decision['selected_action_id']=='native_default'),'registered_original_semantic')
+
+
+def export_episode(raw, *, origin, parent_group, split, peer_policy_id):
+    require(raw['schema'] == 'g31.foundation.repeated_native.v1', 'new_domain_raw_required')
+    require(split in ('train', 'development', 'test') and parent_group and peer_policy_id, 'frozen_split_peer')
+    require(origin['raw_content_sha256'] == digest(raw), 'raw_content_binding')
+    audit = audit_business_events(raw['input'], raw['result'])
+    closed_requests = all(row['terminal'] and row.get('ack') is not None for row in raw['outbox'].values())
+    closed = audit['all_business_complete'] and closed_requests
+    decisions = raw['repeated_decisions']
+    require(len({r['decision_id'] for r in decisions}) == len(decisions), 'duplicate_decision')
+    transitions, rejected = [], []
+    for owner in sorted({r['owner'] for r in decisions}):
+        owned = sorted([r for r in decisions if r['owner'] == owner], key=lambda r: r['selected_at'])
+        require(all(a['selected_at'] < b['selected_at'] for a,b in zip(owned,owned[1:])), 'nonpositive_same_owner_delta')
+        for index, decision in enumerate(owned):
+            nxt = owned[index+1] if index+1 < len(owned) else None
+            end = nxt['selected_at'] if nxt else audit['clock']
+            row = {'schema': SCHEMA, 'decision_id': decision['decision_id'], 'owner': owner,
+                   'parent_group': parent_group, 'split': split, 'peer_policy_id': peer_policy_id,
+                   'source': copy.deepcopy(origin), 'observation': copy.deepcopy(decision['observation']),
+                   'selected_action_id': decision['selected_action_id'], 'candidate_mask': copy.deepcopy(decision['candidate_mask']),
+                   'next_decision_id': nxt['decision_id'] if nxt else None,
+                   'next_observation': copy.deepcopy(nxt['observation']) if nxt else None,
+                   'next_candidate_mask': copy.deepcopy(nxt['candidate_mask']) if nxt else [],
+                   'terminated': bool(nxt is None and closed), 'truncated': bool(nxt is None and not closed),
+                   'censor_reason': None if nxt or closed else 'administrative_boundary_or_unresolved_business_requests',
+                   'reward': interval_reward(audit, decision['selected_at'], end), 'gamma': 1.,
+                   'training_eligible': False, 'current_admission': copy.deepcopy(decision['current_admission'])}
+            try:
+                obs = row['observation']; at = decision['selected_at']
+                require(obs['owner'] == owner and obs['at'] == at, 'observation_owner_time')
+                require(not obs['privileged_evaluator_state_included'] and not obs['reference_included'], 'private_actor_input')
+                require(all(j['arrival'] <= at and j['status'] != 'unreleased' for j in obs['local_view']['jobs']), 'future_actor_job')
+                require(all(j['arrival'] <= at for j in obs['known_contracts']['contracts'].values()), 'future_retained_contract')
+                targets = [t for t in obs['local_view']['trays'] if t['tray_id'] == decision['opportunity']['tray_id']]
+                require(len(targets) == 1 and targets[0] == decision['opportunity']['target'], 'actual_observed_target_identity')
+                choices = admissible(decision)
+                selected = [r for r in choices if r['action_id'] == decision['selected_action_id']]
+                require(len(selected) == 1, 'selected_action_not_admissible')
+                row['action'] = copy.deepcopy(selected[0]['semantic'])
+                row['effect'] = bind_effect(raw, decision)
+                validate_selected_semantic(raw,decision,selected[0],row['effect'])
+                row['training_eligible'] = bool(nxt or closed)
+            except (ValueError, KeyError, TypeError) as error:
+                row['censor_reason'] = str(error)
+                rejected.append({'decision_id': decision['decision_id'], 'reason': str(error)})
+            transitions.append(row)
+    return {'schema': 'g31.foundation.multistep_episode.v1', 'origin': origin, 'input_sha256': digest(raw['input']),
+            'parent_group': parent_group, 'split': split, 'peer_policy_id': peer_policy_id,
+            'business_audit': audit, 'business_and_requests_closed': closed, 'transitions': transitions,
+            'rejected_transitions': rejected, 'all_decisions_preserved': len(transitions) == len(decisions),
+            'status': 'exported_closed' if closed else 'exported_censored', 'native_origin_verified': origin.get('native_origin_verified') is True}
+
+
+def load_episode(directory, **metadata):
+    directory = Path(directory)
+    report = json.loads((directory / 'worker_report.json').read_bytes())
+    receipt = json.loads((directory / 'receipt.json').read_bytes())
+    plan_path=directory/'plan.json';plan=json.loads(plan_path.read_bytes())
+    acceptance_path = directory / 'acceptance.json'
+    acceptance = json.loads(acceptance_path.read_bytes())
+    require(report['status'] == 'completed_native_branch' and report['source_exit_pins_passed']
+            and report['run_acceptance_status'] == acceptance['status'] == 'closed_run_acceptance_passed', 'native_acceptance')
+    require(receipt['status']=='completed_native_branch' and receipt['process']['status']=='exited'
+            and receipt['process']['exitcode']==0 and receipt['process']['windows_job_kill_on_close']
+            and receipt['process']['child_released_only_after_job_assignment']
+            and receipt['worker_report']=={'path':str((directory/'worker_report.json').resolve()),'sha256':sha(directory/'worker_report.json')},
+            'native_launcher_chain')
+    require(not acceptance['active'] and acceptance['invalid']==[]
+            and acceptance['run_reference']=={'path':str(plan_path.resolve()),'sha256':sha(plan_path)}
+            and acceptance['branch_keys']==plan['branch_order'] and len(plan['branch_order'])==1, 'closed_plan_chain')
+    path = Path(report['raw']['path'])
+    require(path.resolve() == (directory / 'raw.json.gz').resolve() and sha(path) == report['raw']['sha256'], 'native_raw_file_binding')
+    raw = json.loads(gzip.decompress(path.read_bytes()))
+    key=plan['branch_order'][0];input_path=directory/'inputs'/(key+'.json')
+    require(raw['specification']==plan['rows'][key] and raw['input']==json.loads(input_path.read_bytes())
+            and sha(input_path)==plan['input_file_sha256'][key] and report['summary']==raw['summary'], 'raw_declared_input_and_specification')
+    for source,relative in plan['source_archive'].items():
+        archived=(directory/relative).resolve()
+        require(archived.is_relative_to(directory.resolve()) and sha(archived)==plan['source_sha256'][source]
+                and acceptance['evidence_sha256'].get(source)==plan['source_sha256'][source], 'historical_execution_source_archive')
+    origin = {'path': str(path.resolve()), 'sha256': sha(path), 'raw_content_sha256': digest(raw),
+              'acceptance_sha256': sha(acceptance_path), 'native_origin_verified': True,
+              'plan_sha256':sha(plan_path),'source_sha256':plan['source_sha256']}
+    cycle_path=directory.parent/'manifest.json'
+    if cycle_path.is_file():
+        cycle=json.loads(cycle_path.read_bytes())
+        tasks=[t for t in cycle['tasks'].values() if str(directory.resolve()) in t['args']]
+        require(len(tasks)==1 and tasks[0]['status']=='completed','unique_completed_collection_registration')
+        registration=Path(tasks[0]['attempt']['output'])/'registration.json'
+        registered=json.loads(registration.read_bytes())
+        require(registered['attempt']['attempt_id']==tasks[0]['attempt']['attempt_id']
+                and registered['source_pins']==tasks[0]['source_pins'] and registered['native_branches']==1,
+                'immutable_collection_registration')
+        origin['collection_registration']={'path':str(registration.resolve()),'sha256':sha(registration)}
+    return export_episode(raw, origin=origin, **metadata)
+
+
+def supported_next(row, training_rows):
+    """Exact legal observation support: no global semantic-name extrapolation."""
+    if row['terminated']:
+        return []
+    if row['next_observation'] is None:
+        return []
+    # IDs identify episodes, not the physical information available to actor.
+    def state_key(obs):
+        return digest({k:v for k,v in obs.items() if k not in ('episode_id', 'decision_id', 'opportunity')})
+    key = state_key(row['next_observation'])
+    allowed = admissible({'candidate_mask': row['next_candidate_mask']})
+    visited = {digest(r['action']) for r in training_rows if r['training_eligible']
+               and r['owner'] == row['owner'] and r['peer_policy_id'] == row['peer_policy_id']
+               and state_key(r['observation']) == key}
+    return [c['semantic'] for c in allowed if digest(c['semantic']) in visited]
+
+
+def bellman_targets(rows, model=None, *, scorer=None):
+    require(rows and all(r['split'] == 'train' and r['training_eligible'] for r in rows), 'eligible_training_rows_only')
+    result = []
+    for row in rows:
+        actions = supported_next(row, rows)
+        require(row['terminated'] or (not row['truncated'] and bool(actions)), 'unsupported_or_censored_bootstrap')
+        continuation = 0. if row['terminated'] or model is None else max(scorer(model, [row['next_observation']]*len(actions), actions))
+        result.append({'observation': row['observation'], 'action': row['action'], 'split': 'train',
+                       'parent_group': row['parent_group'], 'target_value': row['reward']['value'] + row['gamma']*continuation,
+                       'source_decision_id': row['decision_id'], 'supported_next_action_count': len(actions)})
+    return result
+
+
+def physical_signature(effect):
+    edge=effect['edge']
+    # Allocation counters prove identity in bind_effect, but a different
+    # counter alone is not a different physical consequence.
+    result={k:edge[k] for k in ('event','time','business_bag_id','tray_id','from','to')}
+    if 'received' in effect:
+        result['received_at']=effect['received']['time']
+    return result
+
+
+def paired_early_witness(left, right, *, features):
+    """Find physical early-choice differences followed by a changed own state.
+
+    This deliberately requires a common input and common pre-action receipt
+    prefix. Different request labels or isolated final actions cannot pass.
+    """
+    require(left['input_sha256']==right['input_sha256'] and left['parent_group']==right['parent_group'], 'paired_same_input')
+    require(left['native_origin_verified'] and right['native_origin_verified'], 'paired_native_origin')
+    require(left['business_and_requests_closed'] and right['business_and_requests_closed'], 'paired_complete_episodes')
+    raw=[]
+    for episode in (left,right):
+        path=Path(episode['origin']['path'])
+        require(sha(path)==episode['origin']['sha256'], 'paired_raw_changed')
+        raw.append(json.loads(gzip.decompress(path.read_bytes())))
+    witnesses=[]
+    for owner in sorted({r['owner'] for r in left['transitions']}):
+        a=[r for r in left['transitions'] if r['owner']==owner]
+        b=[r for r in right['transitions'] if r['owner']==owner]
+        for index,(x,y) in enumerate(zip(a,b)):
+            if not all(r['training_eligible'] and r['current_admission']['execution_mode']=='protected_current'
+                       and r['next_decision_id'] is not None for r in (x,y)):
+                continue
+            if x['reward']['start']!=y['reward']['start'] or x['action']==y['action']:
+                continue
+            if len(admissible({'candidate_mask':x['candidate_mask']}))<2 or len(admissible({'candidate_mask':y['candidate_mask']}))<2:
+                continue
+            at=x['reward']['start']
+            prefix=[[e for e in r['result']['receipts'] if e['time']<at] for r in raw]
+            if prefix[0]!=prefix[1] or physical_signature(x['effect'])==physical_signature(y['effect']):
+                continue
+            # Use the same dummy action to compare legitimate next-state
+            # numerical features; opaque request/episode IDs cannot count.
+            def neutral(obs):
+                target=obs['opportunity']['target'];returning=obs['opportunity']['phase']=='cycle_return'
+                result={'operation_kind':'transfer' if returning else 'no_command','source':target['node'],
+                        'destination':7 if returning else None,'tray_id':target['tray_id'],
+                        'earliest_legal_arrival':obs['at']+2.21 if returning else None}
+                if returning:
+                    result['earliest_departure']=obs['at']
+                else:
+                    result['native_default_does_not_clear_preference']=True
+                return result
+            next_changed=features(x['next_observation'],neutral(x['next_observation']))!=features(y['next_observation'],neutral(y['next_observation']))
+            reward_changed=x['reward']['value']!=y['reward']['value']
+            if not (next_changed or reward_changed):
+                continue
+            witnesses.append({'owner':owner,'early_index':index,'left_decision':x['decision_id'],
+                'right_decision':y['decision_id'],'left_source':left['origin'],'right_source':right['origin'],
+                'same_pre_action_receipt_prefix_sha256':digest(prefix[0]),
+                'left_effect':physical_signature(x['effect']),'right_effect':physical_signature(y['effect']),
+                'later_own_observation_changed':next_changed,'interval_reward_changed':reward_changed,
+                'left_next_decision':x['next_decision_id'],'right_next_decision':y['next_decision_id']})
+            break
+    return witnesses
+
+
+def validate_training_partitions(contract, episodes, *, inspect_registered_plans=False):
+    """Reject evaluation data before opening raw episodes or constructing targets."""
+    train=contract['train_parent_groups'];dev=contract['development_parent_groups']
+    evaluation=contract['evaluation_plan']
+    held=evaluation.get('held_out_parent_groups', [evaluation['held_out_parent_group']]
+                        if 'held_out_parent_group' in evaluation else [])
+    require(all(isinstance(group,list) and group and len(set(group))==len(group)
+                and all(isinstance(x,str) and x for x in group) for group in (train,dev,held)),
+            'explicit_unique_training_development_heldout_groups')
+    require(not (set(train)&set(dev) or set(train)&set(held) or set(dev)&set(held)), 'heldout_partition_overlap')
+    allowed={'train':set(train),'development':set(dev)}
+    for row in episodes:
+        require(row['split'] in allowed and row['parent_group'] in allowed[row['split']],
+                'formal_test_or_wrong_partition_before_raw_read')
+        if inspect_registered_plans:
+            # Only the preregistered public branch descriptor is read here.
+            # A mislabeled episode cannot cause held-out raw data to be loaded.
+            plan=json.loads((Path(row['directory'])/'plan.json').read_bytes())
+            require(len(plan['rows'])==1 and next(iter(plan['rows'].values()))['case']==row['parent_group'],
+                    'registered_case_partition_before_raw_read')
+
+
+def training_gate(episodes, contract, witnesses):
+    required={'owner','peer_policy_id','reward_schema','gamma','training_seeds','iterations','epochs',
+              'checkpoint_selection','train_parent_groups','development_parent_groups','evaluation_plan',
+              'decision_contract_sha256','behavior_policy','candidate_budget','frozen_before_collection'}
+    require(required<=set(contract) and contract['reward_schema']==REWARD_SCHEMA and contract['gamma']==1., 'frozen_training_contract')
+    validate_training_partitions(contract, episodes)
+    reasons=[]
+    train=set(contract['train_parent_groups']); dev=set(contract['development_parent_groups'])
+    if not train or not dev or train&dev:
+        reasons.append('train_development_groups_not_disjoint')
+    if not contract['evaluation_plan'] or not contract['frozen_before_collection']:
+        reasons.append('missing_untouched_evaluation_or_preregistration')
+    from . import foundation_repeated_value as value
+    from . import foundation_repeated_domain as domain
+    rebuilt=[]
+    try:
+        require(sha(domain.__file__)==contract['decision_contract_sha256'], 'current_projection_contract_changed')
+        for episode in episodes:
+            directory=Path(episode['origin']['path']).parent
+            verified=load_episode(directory,parent_group=episode['parent_group'],split=episode['split'],peer_policy_id=episode['peer_policy_id'])
+            require(digest(verified)==digest(episode),'export_recomputed_from_native_origin')
+            registration_ref=episode['origin']['collection_registration']
+            require(sha(registration_ref['path'])==registration_ref['sha256'],'registration_changed')
+            registration=json.loads(Path(registration_ref['path']).read_bytes())
+            contracts=[Path(p) for p in registration['source_pins'] if Path(p).name.startswith('A_learning_contract_')]
+            require(len(contracts)==1 and sha(contracts[0])==registration['source_pins'][str(contracts[0])]
+                    and json.loads(contracts[0].read_bytes())==contract
+                    and contract['created_utc_epoch']<=registration['registered_at'],'contract_not_frozen_before_collection')
+            raw=json.loads(gzip.decompress(Path(episode['origin']['path']).read_bytes()))
+            require(raw['specification']['case']==episode['parent_group']
+                    and raw['specification']['mode'] in ('guarded','async')
+                    and raw['specification']['selection'] in contract['behavior_policy']['protected_preferences']
+                    and all(len(r['candidate_mask'])<=contract['candidate_budget'] for r in raw['repeated_decisions']),
+                    'actual_behavior_candidate_contract')
+            domain_sources=[v for p,v in registration['source_pins'].items() if Path(p).name=='foundation_repeated_domain.py']
+            inner_sources=[v for p,v in episode['origin']['source_sha256'].items() if Path(p).name=='foundation_repeated_domain.py']
+            require(domain_sources==inner_sources==[contract['decision_contract_sha256']],'actual_decision_contract_changed')
+            require(all(r['selected_delay']==0. for r in raw['continuation']['returns']),'peer_fixed_returns_changed')
+        peer_sources={v for e in episodes for p,v in e['origin']['source_sha256'].items() if Path(p).name=='foundation_repeated_native.py'}
+        require(len(peer_sources)==1,'collection_controller_revision_mixed')
+        for i,left in enumerate(episodes):
+            for right in episodes[i+1:]:
+                if left['input_sha256']==right['input_sha256'] and left['parent_group']==right['parent_group']:
+                    rebuilt.extend(paired_early_witness(left,right,features=value.features))
+        require(digest(rebuilt)==digest(witnesses),'witness_not_recomputed_from_this_dataset')
+    except (ValueError,KeyError,OSError) as error:
+        reasons.append('provenance:'+str(error))
+    training_origins={e['origin']['sha256'] for e in episodes if e['split']=='train'}
+    train_witnesses=[w for w in rebuilt if w['left_source']['sha256'] in training_origins
+                     and w['right_source']['sha256'] in training_origins and w['owner']==contract['owner']]
+    if not train_witnesses:
+        reasons.append('no_independent_paired_early_choice_effect_in_training')
+    rows=[r for e in episodes for r in e['transitions'] if r['owner']==contract['owner']]
+    if not episodes or any(not e['native_origin_verified'] or not e['all_decisions_preserved'] for e in episodes):
+        reasons.append('native_origin_or_complete_decision_sequence')
+    if any(r['peer_policy_id']!=contract['peer_policy_id'] for r in rows):
+        reasons.append('mixed_peer_policy')
+    if any(not r['training_eligible'] for r in rows if r['split']=='train'):
+        reasons.append('training_sequence_contains_censored_or_unbound_steps')
+    train_rows=[r for r in rows if r['split']=='train' and r['training_eligible']]
+    if {r['parent_group'] for r in train_rows}!=train or {r['parent_group'] for r in rows if r['split']=='development'}!=dev:
+        reasons.append('declared_split_coverage')
+    supported=0
+    try:
+        supported=sum(r['supported_next_action_count'] for r in bellman_targets(train_rows))
+    except ValueError as error:
+        reasons.append(str(error))
+    two_choices=False;choice_moments=[]
+    for episode in episodes:
+        own=[r for r in episode['transitions'] if r['owner']==contract['owner'] and r['training_eligible']]
+        # Route-command aliases are not another control choice merely because
+        # one sends a command and one retains the same native preference.
+        varying=[r for r in own if len({digest(c['per_job_delta']) for c in admissible({'candidate_mask':r['candidate_mask']})
+                 if c.get('per_job_delta') is not None})>=2]
+        choice_moments.append({'source_sha256':episode['origin'].get('sha256'),
+                              'split':episode['split'],
+                              'different_conditional_consequence_choice_count':len(varying)})
+        two_choices |= episode['split']=='train' and len(varying)>=2
+    if not two_choices:
+        reasons.append('no_trajectory_with_two_actual_choice_moments')
+    result={'schema':GATE_SCHEMA,'status':'passed' if not reasons else 'not_ready','reasons':reasons,
+        'contract_sha256':digest(contract),'episodes_sha256':digest(episodes),'witnesses_sha256':digest(witnesses),
+        'training_rows':len(train_rows),'same_owner_nonterminal_rows':sum(not r['terminated'] for r in train_rows),
+        'supported_next_action_total':supported,'paired_early_effect_count':len(rebuilt),
+        'training_paired_early_effect_count':len(train_witnesses),
+        'next_support_counts':[len(supported_next(r,train_rows)) for r in train_rows if not r['terminated']],
+        'multi_action_supported_successors':sum(len(supported_next(r,train_rows))>1 for r in train_rows if not r['terminated']),
+        'choice_moments':choice_moments,
+        'failed_or_censored_episode_count':sum(not e['business_and_requests_closed'] for e in episodes),
+        'statistical_generalization_claim':False}
+    return result
+
+
+def monte_carlo_labels(rows):
+    """Observed behavior returns for initialization/development, no oracle actions."""
+    def key(row,identity=None):
+        return row['source']['sha256'],row['decision_id'] if identity is None else identity
+    byid={key(r):r for r in rows}
+    require(len(byid)==len(rows),'duplicate_decision_in_same_episode')
+    def total(row,seen):
+        require(key(row) not in seen and row['training_eligible'], 'invalid_return_chain')
+        if row['terminated']:
+            return row['reward']['value']
+        require(not row['truncated'] and key(row,row['next_decision_id']) in byid, 'missing_return_successor')
+        nxt=byid[key(row,row['next_decision_id'])]
+        require(nxt['owner']==row['owner'] and nxt['parent_group']==row['parent_group'], 'cross_owner_return_chain')
+        return row['reward']['value']+row['gamma']*total(nxt,seen|{key(row)})
+    return [{ 'observation':r['observation'],'action':r['action'],'target_value':total(r,set()),
+             'parent_group':r['parent_group'],'split':r['split'],'source_decision_id':r['decision_id']} for r in rows]
+
+
+def train_fqi(episodes, contract, witnesses, *, deadline, checkpoint_sink=None):
+    """Real 64x64 CPU fits with fixed-target iterations after the native gate."""
+    from . import foundation_repeated_value as value
+    validate_training_partitions(contract, episodes)
+    gate=training_gate(episodes,contract,witnesses)
+    require(gate['status']=='passed', 'training_gate_not_passed:'+','.join(gate['reasons']))
+    require(contract['checkpoint_selection']=='minimum_development_behavior_return_mse_then_earliest_iteration', 'checkpoint_selection')
+    owner=contract['owner']; allrows=[r for e in episodes for r in e['transitions'] if r['owner']==owner]
+    train=[r for r in allrows if r['split']=='train'];dev=[r for r in allrows if r['split']=='development']
+    initialization=monte_carlo_labels(train);devlabels=monte_carlo_labels(dev)
+    require(all(r['split']!='test' for r in allrows), 'formal_test_not_loaded_for_training')
+    models=[];history=[]
+    for seed in contract['training_seeds']:
+        initial=value.fit(initialization,seed=seed,epochs=contract['epochs'],deadline=deadline,
+                          objective='observed behavior undiscounted return supervised initialization')
+        candidates=[];model=initial
+        for iteration in range(contract['iterations']+1):
+            require(time.monotonic()<=deadline,'fqi_wall_budget')
+            if iteration:
+                targets=bellman_targets(train,model,scorer=value.predict)
+                model=value.fit(targets,seed=seed,epochs=contract['epochs'],deadline=deadline,
+                                objective='supported same-owner fixed-target FQI iteration '+str(iteration))
+            prediction=value.predict(model,[r['observation'] for r in devlabels],[r['action'] for r in devlabels])
+            mse=math.fsum((p-r['target_value'])**2 for p,r in zip(prediction,devlabels,strict=True))/len(devlabels)
+            candidates.append((mse,iteration,model))
+            checkpoint_reference=checkpoint_sink(seed,iteration,model,initialization if iteration==0 else targets) if checkpoint_sink else None
+            history.append({'seed':seed,'iteration':iteration,'development_behavior_return_mse':mse,
+                            'training_curve':model['training_curve'],'model_sha256':digest(model),
+                            'targets_sha256':digest(initialization if iteration==0 else targets),
+                            'saved_intermediate':checkpoint_reference})
+        best=min(candidates,key=lambda x:(x[0],x[1]))
+        models.append({'seed':seed,'selected_iteration':best[1],'development_mse':best[0],'checkpoint':best[2]})
+    return {'schema':'g31.foundation.supported_fqi_training.v1','status':'completed_actual_fqi_training',
+            'gate':gate,'contract':contract,'models':models,'history':history,
+            'native_policy_evaluation_completed':False,'native_improvement_established':False}
+
+
+def main():
+    import argparse
+    import sys
+    from . import run_sustained_learning as ledger
+    parser=argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--plan',type=Path,required=True)
+    parser.add_argument('--output',type=Path,required=True)
+    args=parser.parse_args()
+    require(sys.stdin.readline().strip()=='g31_multistep_training_v1','bounded_parent_admission_required')
+    plan=ledger.read(args.plan);out=args.output.resolve()
+    require(out.is_relative_to(ledger.ROOT) and not out.exists(),'fresh_workspace_training_output')
+    require(plan['schema']=='g31.foundation.multistep_training_plan.v1'
+            and 0<plan['training_wall_seconds']<=600,'finite_training_plan')
+    require(all(sha(p)==s for p,s in plan['sources'].items()),'training_source_pins')
+    require(all(sha(r['path'])==r['sha256'] for r in plan['references']),'training_input_pins')
+    out.mkdir(parents=True)
+    ledger.write_new(out/'preregistered_plan.json',plan)
+    from . import foundation_repeated_value as value
+    contract=ledger.read(plan['contract']['path'])
+    require(sha(plan['contract']['path'])==plan['contract']['sha256'],'contract_binding')
+    validate_training_partitions(contract, plan['episodes'], inspect_registered_plans=True)
+    episodes=[load_episode(row['directory'],parent_group=row['parent_group'],split=row['split'],
+                           peer_policy_id=contract['peer_policy_id']) for row in plan['episodes']]
+    witnesses=[]
+    for i,left in enumerate(episodes):
+        for right in episodes[i+1:]:
+            if left['input_sha256']==right['input_sha256'] and left['parent_group']==right['parent_group']:
+                witnesses.extend(paired_early_witness(left,right,features=value.features))
+    ledger.write_new(out/'transitions.json',episodes)
+    ledger.write_new(out/'paired_early_witnesses.json',witnesses)
+    gate=training_gate(episodes,contract,witnesses)
+    ledger.write_new(out/'training_gate.json',gate)
+    if gate['status']!='passed':
+        report={'status':'completed_readiness_not_ready','training_performed':False,'gate':gate,
+                'excluded_prior_attempts':plan.get('excluded_prior_attempts',[]),'native_executed':False}
+    else:
+        started=time.monotonic()
+        def save_intermediate(seed,iteration,model,targets):
+            checkpoint=out/'iterations'/f'seed_{seed}_iteration_{iteration}_checkpoint.json'
+            labels=out/'iterations'/f'seed_{seed}_iteration_{iteration}_targets.json'
+            ledger.write_new(checkpoint,model)
+            ledger.write_new(labels,targets)
+            return {'checkpoint':{'path':str(checkpoint),'sha256':sha(checkpoint)},
+                    'targets':{'path':str(labels),'sha256':sha(labels)}}
+        report=train_fqi(episodes,contract,witnesses,deadline=started+plan['training_wall_seconds'],checkpoint_sink=save_intermediate)
+        for row in report['models']:
+            checkpoint=out/f"checkpoint_seed_{row['seed']}.json"
+            ledger.write_new(checkpoint,row.pop('checkpoint'))
+            row['checkpoint']={'path':str(checkpoint),'sha256':sha(checkpoint)}
+        report.update(training_performed=True,native_executed=False,training_wall_seconds=time.monotonic()-started,
+                      excluded_prior_attempts=plan.get('excluded_prior_attempts',[]))
+    require(all(sha(p)==s for p,s in plan['sources'].items()),'training_exit_source_pins')
+    require(all(sha(r['path'])==r['sha256'] for r in plan['references']),'training_exit_input_pins')
+    ledger.write_new(out/'receipt.json',report)
+    print(json.dumps({'status':report['status'],'training_performed':report['training_performed']}))
+
+
+if __name__=='__main__':
+    main()

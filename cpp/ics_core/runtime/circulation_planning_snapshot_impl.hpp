@@ -46,6 +46,11 @@ inline std::string EventDrivenJunctionRuntime::publish_circulation_planning_snap
       contract.i64(n.node);contract.i64(n.empty_receive_transit_reserve);
     }
   }
+  if(!circulation_.input.static_role_contract.schema.empty()) {
+    contract.string(circulation_.input.static_role_contract.schema);
+    contract.u64(circulation_.input.static_role_contract.loader_nodes.size());
+    for(int node:circulation_.input.static_role_contract.loader_nodes) contract.i64(node);
+  }
   contract.u64(circulation_.input.edges.size());
   for(const auto& e:circulation_.input.edges) {
     const auto& physical=graph_.edge(e.from,e.to);

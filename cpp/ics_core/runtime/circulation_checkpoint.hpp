@@ -135,6 +135,20 @@ void fingerprint_circulation_state(Writer& w, const CirculationState& s) {
     w.floating(t.issued_at); w.floating(t.message_delay); w.floating(t.earliest_departure);
     w.floating(t.expiry);
   }
+  // Opt-in versioned extension: old default-only checkpoints retain their seal.
+  // StateCheckpoint copies the typed input, so restore never reparses or drops it.
+  const auto scope_count=std::count_if(s.input.transfers.begin(),s.input.transfers.end(),
+      [](const auto& t){return t.transfer_scope!="cross_zone_transfer";});
+  if(!s.input.static_role_contract.schema.empty() || scope_count) {
+    w.string("g31.local_empty_return_checkpoint.v1");
+    w.string(s.input.static_role_contract.schema);
+    w.u64(s.input.static_role_contract.loader_nodes.size());
+    for(int node:s.input.static_role_contract.loader_nodes) w.i64(node);
+    w.u64(scope_count);
+    for(const auto& t:s.input.transfers) if(t.transfer_scope!="cross_zone_transfer") {
+      w.string(t.request_id);w.string(t.transfer_scope);
+    }
+  }
   w.u64(s.trays.size());
   for (const auto& t : s.trays) {
     w.string(t.tray_id); w.i64(t.node); w.string(t.mode); w.i64(t.job);
