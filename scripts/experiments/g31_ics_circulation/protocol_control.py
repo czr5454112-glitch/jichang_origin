@@ -16,7 +16,7 @@ from .analytic_control import transfer_candidates
 from .regional_control import decode_route, encode_route, make_route_packet, public_astar, _ObservationRouting
 
 
-TERMINAL = {"received", "rejected", "cancelled", "failed", "expired", "updated", "delivered", "withdrawn"}
+TERMINAL = {"received", "rejected", "cancelled", "failed", "expired", "updated", "delivered", "withdrawn", "recovered"}
 
 
 class ProtocolClient:
@@ -25,7 +25,8 @@ class ProtocolClient:
     def __init__(self, session: Any, *, retry_period: float = 1., rejection_cooldown: float = .2,
                  forecast_validity: float = 120., state: dict | None = None,
                  _use_active_request_index: bool = True, _use_policy_view: bool = True,
-                 _use_recent_forecasts: bool = True, _consume_state: bool = False):
+                 _use_recent_forecasts: bool = True, _consume_state: bool = False,
+                 inventory_snapshots: bool = False):
         if not math.isfinite(retry_period) or retry_period <= 0:
             raise ValueError("protocol_client:invalid_retry_period")
         if not all(math.isfinite(v) and v > 0 for v in (rejection_cooldown, forecast_validity)):
@@ -45,6 +46,14 @@ class ProtocolClient:
         self.calls: list[dict] = []
         self._use_policy_view = _use_policy_view
         self._use_recent_forecasts = _use_recent_forecasts
+        if type(inventory_snapshots) is not bool:
+            raise ValueError("protocol_client:invalid_inventory_snapshot_flag")
+        if state is not None and bool(self.state.get("inventory_snapshots", False)) != inventory_snapshots:
+            raise ValueError("protocol_client:inventory_snapshot_configuration_mismatch")
+        self.inventory_snapshots = inventory_snapshots
+        self.inventory_snapshot_reads: list[dict] = []
+        if inventory_snapshots:
+            self.state["inventory_snapshots"] = True
         # Derived iteration indexes only: the full insertion-ordered outbox is
         # still the checkpoint and audit history. Rebuild after JSON/native
         # restore, and never include this runtime optimization in policy state.
@@ -174,6 +183,23 @@ class ProtocolClient:
                 message["valid_until"] = message["observed_at"] + self.state["forecast_validity"]
                 if result["now"] >= message["valid_until"]:
                     message["status"] = "expired"
+        if self.inventory_snapshots:
+            endpoint = getattr(self.session, "protocol_planning_snapshots", None)
+            if not callable(endpoint):
+                raise ValueError("protocol_client:delivered_inventory_endpoint_required")
+            started = time.perf_counter()
+            snapshots = endpoint(result["owner_id"])
+            read_ms = 1000 * (time.perf_counter() - started)
+            started = time.perf_counter()
+            encoded = json.dumps(snapshots, ensure_ascii=False, separators=(",", ":"), allow_nan=False).encode("utf8")
+            measure_ms = 1000 * (time.perf_counter() - started)
+            # Timing is recorded outside the actor observation. Each call reads
+            # new delivered state; no inventory/current cache crosses callbacks.
+            self.inventory_snapshot_reads.append({"owner_id": result["owner_id"],
+                "observed_at": result["now"], "snapshot_count": len(snapshots),
+                "encoded_utf8_bytes": len(encoded), "endpoint_read_ms": read_ms,
+                "byte_measurement_ms": measure_ms})
+            result["planning_snapshots"] = snapshots
         return result
 
 
@@ -196,6 +222,131 @@ def _request_status(row: dict | None) -> str:
 
 def _cooldown_ready(row: dict | None, now: float) -> bool:
     return row is None or now >= row.get("cooldown_until", -math.inf)
+
+
+def _publish_inventory(client: ProtocolClient, owner: str, recipients: list[str], state: dict, *,
+                       now: float, command_delay: float, publication_delay: float,
+                       validity: float, refresh_period: float) -> list[dict]:
+    """One active native capture command per directed owner channel."""
+    channels = state.setdefault("inventory_publications", {}).setdefault(owner, {})
+    records = []
+    for recipient in recipients:
+        if recipient == owner:
+            continue
+        old = channels.get(recipient)
+        previous = client.state["outbox"].get((old or {}).get("request_id"))
+        if previous:
+            if not previous["terminal"] or not _cooldown_ready(previous, now):
+                continue
+            ack = previous.get("client_view", {}).get("last_delivered_ack", {})
+            if ack.get("status") == "delivered":
+                envelope = ack.get("planning_snapshot")
+                if not isinstance(envelope, dict):
+                    raise ValueError("protocol_control:inventory_capture_ack_required")
+                captured = envelope["capture"]
+                if (captured["source_owner"] != owner or captured["target_owner"] != recipient):
+                    raise ValueError("protocol_control:inventory_capture_ack_channel")
+                if now < min(captured["captured_at"] + refresh_period, captured["valid_until"]):
+                    continue
+        # The command contains no caller-authored inventory or capture body.
+        request_id, reply = client.submit(owner, "planning_snapshot", {
+            "target_owner": recipient, "message_delay": command_delay,
+            "publication_delay": publication_delay, "expiry": now + validity})
+        channels[recipient] = {"request_id": request_id, "submitted_at": now}
+        records.append({"kind": "planning_snapshot", "request_id": request_id,
+            "source_owner": owner, "target_owner": recipient, "reply": reply})
+    return records
+
+
+def _recover_failed_empty(client: ProtocolClient, owner: str, state: dict, *,
+                          now: float, command_delay: float, lease_seconds: float) -> list[dict]:
+    """Submit a public failed-entity capability once; retry the saved generation."""
+    observation = client._policy_view(owner)
+    recovery_state = state.setdefault("failed_empty_recoveries", {})
+    active_trays = {row["payload"].get("tray_id")
+        for _, row in client._active_rows(owner)
+        if row["kind"] == "recover_failed_empty" and not row["terminal"]}
+    records = []
+    for tray in observation.get("trays", []):
+        capability = tray.get("failed_empty_recovery")
+        if not capability or tray["tray_id"] in active_trays:
+            continue
+        if (capability.get("schema") != "g31.recover_failed_empty.v1"
+                or capability.get("owner_id") != owner or capability.get("tray_id") != tray["tray_id"]
+                or capability.get("failure_reason") != "departure_lease_expired_before_physical_entry"
+                or tray.get("mode") != "quarantined"
+                or tray.get("edge_to", -1) >= 0
+                or capability.get("from") != tray.get("node")
+                or capability.get("expected_generation") != tray.get("generation")):
+            raise ValueError("protocol_control:invalid_public_failed_empty_recovery")
+        key = json.dumps([owner, tray["tray_id"], capability["failed_transfer_request_id"],
+            capability["failed_transport_leg_id"]], separators=(",", ":"))
+        # Even after a rejected/expired command, do not manufacture a new
+        # generation or repeatedly request recovery of the same failed entity.
+        if key in recovery_state:
+            continue
+        payload = {field: copy.deepcopy(capability[field]) for field in (
+            "schema", "owner_id", "tray_id", "from", "expected_generation",
+            "failed_transfer_request_id", "failed_transport_leg_id")}
+        payload.update(expiry=now + lease_seconds, message_delay=command_delay)
+        request_id, reply = client.submit(owner, "recover_failed_empty", payload)
+        recovery_state[key] = {"request_id": request_id, "capability": copy.deepcopy(capability)}
+        active_trays.add(tray["tray_id"])
+        records.append({"kind": "recover_failed_empty", "request_id": request_id,
+            "capability": copy.deepcopy(capability), "reply": reply})
+    return records
+
+
+def _post_inventory_return(client: ProtocolClient, owner: str, state: dict, *,
+                           compact: bool, command_delay: float, priority_error: bool,
+                           precommit_observer=None) -> dict:
+    """After priority submits, refresh independently and spend at most one quota."""
+    from .foundation_airport_inventory_rule import r0_priority_planner, select_stock_return
+    tick = state["next_tick"]
+    slots = state.setdefault("inventory_return_quota", {})
+    slot = slots.get(owner)
+    if slot is None or slot["tick"] < tick:
+        slot = slots[owner] = {"tick": tick, "new_submissions": 0, "priority_error": False}
+    elif slot["tick"] != tick:
+        raise ValueError("protocol_control:inventory_quota_tick_regression")
+    slot["priority_error"] = slot["priority_error"] or priority_error
+    result = {"owner_id": owner, "tick": tick, "attempts": [], "decision": None,
+        "new_submissions": slot["new_submissions"]}
+    if slot["priority_error"]:
+        result["reason"] = "priority_submit_error"
+        return result
+    if slot["new_submissions"] >= 1:
+        result["reason"] = "owner_tick_return_quota_spent"
+        return result
+    observation = client._policy_view(owner, compact=compact)
+    baseline = r0_priority_planner(observation, message_delay=command_delay,
+        request_prefix=f"protocol:{tick}:post_return:priority_check")
+    if baseline["intents"]:
+        result.update(reason="fresh_priority_intents_remain", decision=baseline)
+        return result
+    decision = select_stock_return(observation, baseline, message_delay=command_delay,
+        request_prefix=f"protocol:{tick}:post_return")
+    result["decision"] = decision
+    if not decision["intents"]:
+        result["reason"] = decision["inventory_return"]["reason"]
+        return result
+    if len(decision["intents"]) != 1:
+        raise ValueError("protocol_control:inventory_return_single_addition_required")
+    if precommit_observer is not None:
+        started = time.perf_counter()
+        precommit_observer(session=client.session, controller_state=state,
+            client_state=client.state, observation=observation, decision=decision)
+        result["offline_evaluator_ms"] = 1000 * (time.perf_counter() - started)
+    # Consume before submission; errors cannot grant a second quota.
+    slot["new_submissions"] += 1
+    request_id, reply = client.submit(owner, "transfer", decision["intents"][0])
+    result.update(reason="inventory_return_submitted", new_submissions=slot["new_submissions"])
+    result["attempts"].append({"request_id": request_id, "reply": reply})
+    # Even the last addition is followed by a fresh public observation. It
+    # cannot silently authorize a second addition or reuse a pre-submit view.
+    fresh = client._policy_view(owner, compact=compact)
+    result["post_submit_observed_at"] = fresh["now"]
+    return result
 
 
 def _publish_services(client: ProtocolClient, owner: str, state: dict, *, command_delay: float,

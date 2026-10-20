@@ -18101,6 +18101,8 @@ class EventDrivenJunctionRuntime {
       const EventDecisionTraceRow* trace = nullptr, int preferred = -1);
   void circulation_notify_ranking_state(int node, double time);
   void circulation_forget_resource_wait(int runtime_id);
+  void circulation_remove_failed_from_queues(int runtime_id, double time);
+  std::string circulation_recover_failed_empty(const CirculationProtocolCommandInput& input, double time);
   void circulation_wake_resource_wait(int runtime_id, std::uint64_t generation,
                                       double time, const std::string& reason);
   void circulation_notify_resource(bool receiving, int resource, double time,

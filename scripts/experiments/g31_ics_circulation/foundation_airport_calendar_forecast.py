@@ -57,6 +57,9 @@ def _epoch(value):
 
 def _target_parent(parent):
     require(type(parent) is dict and parent.get("synthetic") is True, "registered_synthetic_parent_required")
+    if parent.get("plan_family_id") == "synthetic_group_shift_plan_v1":
+        from .foundation_airport_spi_parents import validate_public_parent
+        return validate_public_parent(parent)
     seed = parent.get("parent_seed")
     require(type(seed) is int and seed in PARENT_SEEDS, "registered_parent_seed")
     day = datetime.fromisoformat(SOURCE_CALENDAR_START) + timedelta(days=PARENT_SEEDS.index(seed) + 1)
@@ -140,6 +143,25 @@ def load_calendar_binding(parent, mapping=None, *, source_directory=SOURCE):
         entry["scheduled_event_at"] += target_start
         if entry.get("estimated_event_at") is not None:
             entry["estimated_event_at"] += target_start
+    inference_domain = None
+    if parent.get("plan_family_id") == "synthetic_group_shift_plan_v1":
+        from .foundation_airport_spi_parents import group_shifts
+        shifts = group_shifts(parent["parent_seed"], [e["flight_ref"] for e in plan["entries"]])
+        require(public_digest(shifts) == parent["plan_group_shifts_sha256"], "registered_plan_group_shifts")
+        for entry in plan["entries"]:
+            entry["scheduled_event_at"] += shifts[entry["flight_ref"]]
+            if entry.get("estimated_event_at") is not None:
+                entry["estimated_event_at"] += shifts[entry["flight_ref"]]
+        inference_domain = {
+            "schema": "g31.forecast_whole_group_plan_inference.v1",
+            "plan_family_id": parent["plan_family_id"],
+            "group_shifts_sha256": parent["plan_group_shifts_sha256"],
+            "unchanged_training_plan_sha256": source_model["static_plan_sha256"],
+            "target_plan_is_new_inference_schedule": True,
+            "training_parameters_unchanged": True,
+            "new_fit_performed": False,
+            "availability": "explicit static schedule preload at physical zero",
+        }
     manifest = {
         "schema": MANIFEST_SCHEMA, "version": VERSION, "time_basis": "absolute_epoch_seconds",
         "model_id": checkpoint["model_sha256"], "source_model_id": SOURCE_MODEL_ID,
@@ -168,6 +190,8 @@ def load_calendar_binding(parent, mapping=None, *, source_directory=SOURCE):
     }
     bundle = {"schema": VERSION, "checkpoint": checkpoint, "absolute_plan_template": plan,
               "mapping": mapping, "producer_manifest": manifest}
+    if inference_domain is not None:
+        manifest["inference_plan_domain"] = inference_domain
     bundle["binding_sha256"] = digest(bundle)
     return bundle
 
@@ -216,6 +240,24 @@ def _validate_binding(binding):
         entry["scheduled_event_at"] -= target_start
         if entry.get("estimated_event_at") is not None:
             entry["estimated_event_at"] -= target_start
+    if manifest["target_parent"].get("plan_family_id") == "synthetic_group_shift_plan_v1":
+        from .foundation_airport_spi_parents import group_shifts
+        domain = manifest.get("inference_plan_domain", {})
+        shifts = group_shifts(manifest["target_parent"]["parent_seed"],
+                              [e["flight_ref"] for e in source_plan["entries"]])
+        require(domain.get("schema") == "g31.forecast_whole_group_plan_inference.v1"
+                and domain.get("group_shifts_sha256") == public_digest(shifts)
+                and domain.get("unchanged_training_plan_sha256") == reconstructed["static_plan_sha256"]
+                and domain.get("target_plan_is_new_inference_schedule") is True,
+                "explicit_new_plan_inference_domain")
+        for entry in source_plan["entries"]:
+            entry["scheduled_event_at"] -= shifts[entry["flight_ref"]]
+            if entry.get("estimated_event_at") is not None:
+                entry["estimated_event_at"] -= shifts[entry["flight_ref"]]
+            # Epoch conversion can introduce sub-microsecond subtraction noise.
+            entry["scheduled_event_at"] = round(entry["scheduled_event_at"], 6)
+            if entry.get("estimated_event_at") is not None:
+                entry["estimated_event_at"] = round(entry["estimated_event_at"], 6)
     require(digest(source_plan) == reconstructed["static_plan_sha256"],
             "inverse_binding_must_recover_frozen_public_plan")
     return checkpoint, manifest

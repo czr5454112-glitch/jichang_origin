@@ -1,0 +1,32 @@
+{
+  "schema": "g31.inventory_spi.delivery_parts_source_review.v1",
+  "status": "source_only_review_no_required_findings",
+  "created_at_utc": "2026-10-20T22:39:48.927904+00:00",
+  "sources": [
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\report_support\\split_partial_delivery_001.py",
+      "sha256": "89541b45668cc37f33e4701c984e541b1392722ac43cbdba33c43a3881047312"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\report_support\\reassemble_partial_delivery_001.py",
+      "sha256": "349d8823e71c0c037a43b939ffbe30244eeb349960e49f2b5c6bf3eff7846714"
+    }
+  ],
+  "checks": [
+    "Original ZIP is opened read-only and never deleted; splitter requires caller expected complete SHA and verifies size/stat stability and full streamed bytes before successful manifest.",
+    "Fresh parts subdirectory resolves below the fixed delivery_parts root; exclusive xb writes and existing-directory refusal preserve prior files.",
+    "Each generated data part is at most 64MiB and all ordered parts are listed by exact bytes/hash.",
+    "Reassembler requires caller trusted manifest SHA plus exact pinned companion bytes. Part names are fixed archive.partNNNN with strict integer indices/count/sizes and resolved paths remain directly under manifest parent.",
+    "Reassembled output is explicitly caller supplied, not derived from untrusted archive.name; existing destination rejected and xb prevents overwrite. Its parent must already exist.",
+    "Each part is checked before output creation and again during copying; saved complete ZIP length/SHA is read back. Failed new partial outputs are retained and not declared verified."
+  ],
+  "limits": [
+    "Source-only review; no ZIP or parts read, no split/reassembly execution, no extraction, no scientific audit.",
+    "Output may intentionally be in any caller-explicit existing directory; only part resolution is confined to manifest directory.",
+    "A concurrently changed input may leave an incomplete fresh output before hash rejection; no claim of atomic artifact creation or adversarial filesystem-race resistance."
+  ],
+  "native_operations": 0,
+  "fit_operations": 0,
+  "package_operations": 0,
+  "source_changes": 0
+}

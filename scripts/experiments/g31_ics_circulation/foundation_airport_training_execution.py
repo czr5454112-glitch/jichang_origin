@@ -55,5 +55,33 @@ def run():
     print(json.dumps(dict(status=frozen["status"], models=len(frozen["models"]), path=str(output))), flush=True)
 
 
+def run_spi(campaign_reference, *, output, event_sink=None):
+    """Explicit new-cycle entry point; the caller owns the frozen global budget."""
+    campaign = training.read_bound(campaign_reference)
+    if campaign["schema"] != training.SPI_CAMPAIGN_SCHEMA:
+        raise ValueError("training_execution:explicit_SPI_registration_required")
+    for reference in campaign["chain_plans"]:
+        plan = training.read_bound(reference)
+        receipt_path = Path(plan["output"])/"receipt.json"
+        if receipt_path.exists():
+            receipt_ref = training.file_ref(receipt_path)
+        else:
+            if event_sink:
+                event_sink({"event": "spi_training_chain_launch", "plan": reference,
+                    "fit_calls_planned": plan["fit_calls_planned"]})
+            receipt_ref = training.run_spi_chain(reference)
+        if event_sink:
+            receipt = training.read_bound(receipt_ref)
+            event_sink({"event": "spi_training_chain_closed", "receipt": receipt_ref,
+                "fit_calls_started": receipt["fit_calls_started"],
+                "fit_calls_completed": receipt["fit_calls_completed"],
+                "reference_champion": receipt["reference_champion"]})
+    frozen_ref = training.freeze_spi(campaign_reference, output=output)
+    training.validate_spi_freeze(frozen_ref)
+    if event_sink:
+        event_sink({"event": "spi_champions_frozen", "manifest": frozen_ref})
+    return frozen_ref
+
+
 if __name__ == "__main__":
     run()

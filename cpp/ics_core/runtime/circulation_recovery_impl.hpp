@@ -2,6 +2,113 @@
 
 namespace czr005::ics {
 
+inline void EventDrivenJunctionRuntime::circulation_remove_failed_from_queues(int id, double time) {
+  // An asynchronous terminal dequeue is itself an arbitration trigger. The
+  // successor has never necessarily been selected, so it may have no resource
+  // subscription to wake when a downstream berth later becomes free.
+  for (auto& pair : junctions_) {
+    const int node = pair.first;
+    auto& controller = pair.second;
+    const auto q_before = controller.queue.size(), s_before = controller.source_queue.size();
+    auto& q = controller.queue;
+    auto& sq = controller.source_queue;
+    q.erase(std::remove(q.begin(), q.end(), id), q.end());
+    sq.erase(std::remove(sq.begin(), sq.end(), id), sq.end());
+    const bool junction_changed = q.size() != q_before, source_changed = sq.size() != s_before;
+    if (!junction_changed && !source_changed) continue;
+    if (junction_changed && uses_destination_merge_grants())
+      ++destination_merge_bag_state(id).junction_queue_generation;
+    if (controller.escape_token_task == id) controller.escape_token_task = -1;
+    if (controller.source_natural_hold_runtime_bag_id == id) {
+      controller.source_natural_hold_runtime_bag_id = -1;
+      controller.source_natural_hold_until = 0.;
+    }
+    controller.observe_local_state();
+    schedule_passive(JunctionEventType::kLocalQueueUpdate, time, id, node, node, -1,
+                     "expired_empty_terminal_dequeue");
+    const auto& local = g4irsf14_local_state(node);
+    if (junction_changed && !q.empty()) {
+      double ready = time;
+      if (local.has_last_junction_arbitration &&
+          event_runtime_detail::same_timestamp(local.last_junction_arbitration_time, time))
+        ready += std::max(config_.minimum_service_seconds, config_.dispatch_headway_seconds);
+      schedule_junction_wakeup(node, ready);
+    }
+    if (source_changed && !sq.empty()) {
+      double ready = time;
+      if (local.has_last_source_arbitration &&
+          event_runtime_detail::same_timestamp(local.last_source_arbitration_time, time))
+        ready += std::max(config_.minimum_service_seconds, config_.dispatch_headway_seconds);
+      schedule_source_wakeup(node, ready);
+    }
+    circulation_receipt(time, "TERMINAL_DEQUEUE_REARBITRATION", circulation_.legs.at(id).tray,
+                        id, node, -1, "departure_lease_expired_before_physical_entry");
+  }
+}
+
+inline std::string EventDrivenJunctionRuntime::circulation_recover_failed_empty(
+    const CirculationProtocolCommandInput& input, double time) {
+  auto found = std::find_if(circulation_.trays.begin(), circulation_.trays.end(),
+                           [&](const auto& tray) { return tray.tray_id == input.tray_id; });
+  std::string reason;
+  if (time >= input.expiry) reason = "recovery_expired";
+  else if (found == circulation_.trays.end()) reason = "unknown_recovery_tray";
+  else if (circulation_.owner(found->node) != input.owner) reason = "resource_owner_mismatch";
+  else if (found->node != input.from) reason = "recovery_node_mismatch";
+  else if (found->generation != input.expected_generation) reason = "stale_recovery_generation";
+  else if (found->job >= 0) reason = "loaded_recovery_not_allowed";
+  else if (found->edge_to >= 0 || found->edge_from >= 0 || found->reception_node >= 0)
+    reason = "inflight_or_receiving_obligation";
+  else if (found->mode != "quarantined") reason = "not_quarantined";
+  else if (found->active_leg < 0 || found->transfer < 0) reason = "missing_failed_empty_binding";
+  else {
+    const auto& leg = circulation_.legs.at(found->active_leg);
+    const auto& failed = circulation_.transfers.at(found->transfer);
+    const auto& request = circulation_.input.transfers.at(found->transfer);
+    if (leg.transport_leg_id != input.reference_request_id || request.request_id != input.reference_id ||
+        leg.tray != static_cast<int>(found - circulation_.trays.begin()) || leg.job >= 0)
+      reason = "failed_empty_binding_mismatch";
+    else if (failed.status != "failed" || bags_.at(found->active_leg).status != BagStatus::kFailed ||
+             failed.reason != "departure_lease_expired_before_physical_entry")
+      reason = "failure_not_recoverable";
+    else if (failed.departed_at >= 0 || failed.received_at >= 0 || request.source != found->node)
+      reason = "prior_physical_entry_or_node_mismatch";
+    else {
+      // No outstanding transport may be silently superseded by this recovery.
+      for (std::size_t i = 0; i < circulation_.transfers.size(); ++i) {
+        const auto& other = circulation_.transfers[i];
+        if (static_cast<int>(i) != found->transfer && other.tray == failed.tray &&
+            (other.status == "dispatching" || other.status == "departed"))
+          reason = "other_transport_obligation";
+      }
+      for (const auto& other : circulation_.legs)
+        if (other.tray == failed.tray && other.runtime_id != found->active_leg &&
+            bags_.at(other.runtime_id).status != BagStatus::kCompleted &&
+            bags_.at(other.runtime_id).status != BagStatus::kFailed)
+          reason = "other_transport_obligation";
+      for (const auto& pair : junctions_)
+        if (std::find(pair.second.queue.begin(), pair.second.queue.end(), found->active_leg) != pair.second.queue.end() ||
+            std::find(pair.second.source_queue.begin(), pair.second.source_queue.end(), found->active_leg) != pair.second.source_queue.end())
+          reason = "failed_leg_still_queued";
+    }
+  }
+  const int tray_index = found == circulation_.trays.end() ? -1 : static_cast<int>(found - circulation_.trays.begin());
+  const int leg_index = tray_index < 0 ? -1 : found->active_leg;
+  if (reason.empty()) {
+    circulation_forget_resource_wait(leg_index);
+    found->active_leg = -1; found->transfer = -1; found->mode = "empty";
+    found->available_at = time; ++found->generation;
+    circulation_receipt(time, "EMPTY_RECOVERY_GRANTED", tray_index, leg_index, input.from, input.from,
+                        input.request_id + ":owner_failed_empty_recovery");
+    circulation_.notify_node(input.from, time, 1);
+    circulation_progress(time);
+    return "recovered";
+  }
+  circulation_receipt(time, "RECOVERY_REJECTED", tray_index, leg_index, input.from, input.from,
+                      input.request_id + ":" + reason);
+  return "rejected:" + reason;
+}
+
 inline void EventDrivenJunctionRuntime::circulation_forget_resource_wait(int id) {
   const auto found = circulation_.resource_waits.find(id);
   if (found == circulation_.resource_waits.end()) return;

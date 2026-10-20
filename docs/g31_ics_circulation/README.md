@@ -1,5 +1,24 @@
 # G31 × ICS：实现与研发证据入口
 
+## 2026-10-21 当前库存回流与有限策略改进
+
+[本轮冻结科学报告](../../outputs/experiments/g31_ics_inventory_spi_20261020/cycle_001/report_support/INVENTORY_SPI_STAGE_REPORT_001.md)保留全部36对真实训练/开发标签与6次拟合：C01、C11和C10最终均为reference，未建立RL净增益。6次最小范数/正则拟合的scaler、秩和数值解已复核；支持不足与完整开发J未知仍是实质限制。15个J改善点中14个有已知完成方向伤害，不能只报告成本改善或吞吐增加。旧R0规则的提前放盘、积压节点定位/复用，以及共同wake-up/recovery修复，分别保留机制与反例，不算RL贡献。
+
+原native调度已按原预算停止，最终ledger为118次long+24次short；正式36个owned complete、4个P1308槽未启动，离线56-job终账已封口：44成功（36cache、8机制）、3census失败、9未启动。partial范围保留固定40正式槽，**所有40槽primary_J均为null**；已完成槽有完整原件时可展示独立重算的描述性成本，但不进入正式主效应、均值或排名。三次census因global资源floor实际exit1223且owned闭合、output=null；旧首P1301 child退出仍unknown，完整8父T06 aggregate不可用。完整100ms和严格逐件保护仍未证明。
+
+运行源为`1d895da0`加冻结runtime005，当前本轮原生为native030；后续发布提交不能回填为运行时身份。actual assembly003及CAS build/preflight已执行成功，2542个内容对象以7010个原路径映射保留；仓库外五卷重组验证整包SHA一致。Git读者使用[五卷交付及重组说明](../../outputs/experiments/g31_ics_inventory_spi_20261020/cycle_001/report_support/delivery_parts/G31_INVENTORY_SPI_PARTIAL_DELIVERY_20261021/README.txt)，完整314,360,446字节ZIP只在本地保留，不作为Git下载链接。仓库外Windows Python3.11的[冻结审计](../../outputs/experiments/g31_ics_inventory_spi_20261020/cycle_001/report_support/partial_portable_audit_blocked_001.json)实际返回**blocked_invalid_evidence**，exit0不代表通过：全包字节、36个正式单格、72个配对分支和36对成本/七方向标签均已核验；9个完成的旧P901/P902诊断因原plan保留split=test而触发冻结guard的泛化拒绝，plan/name身份未见异常。1个历史terminal_failed不取成本。包外[精确9项旧诊断补充审计](../../outputs/experiments/g31_ics_inventory_spi_20261020/cycle_001/report_support/old_parent_diagnostic_supplement_actual_001.json)已实际9/9通过，全人口保存成本重算一致，进程16.086秒、exit0；不含物理/控制历史重放或模型数值重算。冻结整体失败继续保留，科学报告和ZIP不改，必须同时阅读原报告与补审结果。训练部分仅核权重/依赖冻结hash，未重训或重做dev选择；原6fit数值复核另按其报告范围保留。隔离复核限定Windows Python3.11，不作无条件跨OS声明。包、两项审计及发布状态以[外部delivery凭证](../../outputs/experiments/g31_ics_inventory_spi_20261020/cycle_001/report_support/partial_delivery_receipt_001.json)为准；当前材料尚未提交/推送，不预写成功。
+
+补审复现使用[固定源码](../../outputs/experiments/g31_ics_inventory_spi_20261020/cycle_001/report_support/audit_old_parent_diagnostic_supplement_001.py)、[精确9项admission](../../outputs/experiments/g31_ics_inventory_spi_20261020/cycle_001/report_support/old_parent_diagnostic_supplement_admission_001.json)及[运行说明](../../outputs/experiments/g31_ics_inventory_spi_20261020/cycle_001/report_support/old_parent_diagnostic_supplement_reproduce_001.txt)，对重组后原ZIP操作，不替换包内validator。原audit仍会返回blocked；补审的scope-limited成功不开放正式排名、选模、工程晋级或保护接管。
+
+001/002两次组装失败原件保留，003通过；5份文件名含dummy的纯测试XML受冻结路径guard限制未入科学CAS，原字节另行Git保留，不通过改名绕过guard。
+
+本轮包内证据按PACKAGE_MANIFEST的原路径映射定位；RESULT_INDEX也保留历史与excluded范围，索引存在不表示对应原件已随本包附带。
+
+当前精确状态见[RESEARCH_STATE.json](RESEARCH_STATE.json)，稳定证据见[RESULT_INDEX.jsonl](RESULT_INDEX.jsonl)，贡献边界见[NOVELTY_LEDGER.md](NOVELTY_LEDGER.md)。
+
+## 2026-10-13—19历史记录（保留原阶段表述）
+
+
 2026-10-19 本轮见 [冻结模型实际提交与异步建议验证](LEARNING_EXECUTION_MULTIRATE_STAGE_20261019.md)：新原生配对中冻结模型实际选择 B12，receiver 改善 0.119 秒、其他四件不变；独立进程预测期间底层持续推进，晚到建议被当前检查拒绝。另修同 owner 转移语义并加入可选航班计划适配器，943 项回归通过。R2 改按有效期/动作截止期验收，R1 100 ms 仍待专门验证；历史超时记录保留，多步 RL 尚未成立。
 
 2026-10-17 本轮实施见 [真实双观察与增量优化](SERVICE_REFRESH_EXECUTION_20261017.md) 和 [GPT Pro 审阅请求](GPTPRO_REVIEW_REQUEST_20261017.md)：844 项回归通过；默认原生完整一致；同一 B owner 的真实 9.69→9.73s 两次成功观察触发保守全域刷新。对上一轮优化方法的 ABBA 中位增量为 1.086–1.146 倍；完整100ms、跨事件缓存、局部修复和多步RL仍未完成。

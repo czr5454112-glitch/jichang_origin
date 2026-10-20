@@ -198,6 +198,19 @@ class NativeSession {
       d["edge_from"]=t.edge_from;d["edge_to"]=t.edge_to;d["available_at"]=t.available_at;
       d["reception_node"]=t.reception_node;d["generation"]=t.generation;d["traversal_id"]=t.public_traversal_version;
       d["business_bag_id"]=t.job>=0 ? s.input.jobs[t.job].business_bag_id : "";
+      if(t.mode=="quarantined" && t.job<0 && t.edge_to<0 && t.edge_from<0 && t.reception_node<0 &&
+         t.active_leg>=0 && t.transfer>=0) {
+        const auto& failed=s.transfers.at(t.transfer);
+        const auto& request=s.input.transfers.at(t.transfer);
+        if(failed.status=="failed" && failed.departed_at<0 &&
+           failed.reason=="departure_lease_expired_before_physical_entry") {
+          py::dict binding;binding["schema"]="g31.recover_failed_empty.v1";binding["owner_id"]=owner;
+          binding["tray_id"]=t.tray_id;binding["from"]=t.node;binding["expected_generation"]=t.generation;
+          binding["failed_transfer_request_id"]=request.request_id;
+          binding["failed_transport_leg_id"]=s.legs.at(t.active_leg).transport_leg_id;
+          binding["failure_reason"]=failed.reason;d["failed_empty_recovery"]=binding;
+        }
+      }
       py::list prefix;
       if(t.active_leg>=0) {
         const auto& leg=s.legs[t.active_leg];
@@ -415,6 +428,19 @@ class NativeSession {
     p.expected_traversal=field<std::uint64_t>(d,"expected_traversal",0);
     p.reference_id=field<std::string>(d,p.kind=="cancel_transfer" ? "transfer_request_id" : "original_message_id","");
     p.reference_request_id=field<std::string>(d,"forecast_request_id","");
+    if(p.kind=="recover_failed_empty") {
+      const std::set<std::string> allowed={"request_id","owner_id","kind","schema","tray_id","from",
+          "expected_generation","failed_transfer_request_id","failed_transport_leg_id","message_delay","expiry"};
+      for(const auto item:d) if(!allowed.count(py::cast<std::string>(item.first)))
+        throw py::value_error("circulation:unexpected_failed_empty_recovery_field");
+      if(required<std::string>(d,"schema")!="g31.recover_failed_empty.v1")
+        throw py::value_error("circulation:unsupported_failed_empty_recovery_schema");
+      p.expiry=required<double>(d,"expiry");p.from=required<int>(d,"from");
+      p.tray_id=required<std::string>(d,"tray_id");
+      p.expected_generation=required<std::uint64_t>(d,"expected_generation");
+      p.reference_id=required<std::string>(d,"failed_transfer_request_id");
+      p.reference_request_id=required<std::string>(d,"failed_transport_leg_id");
+    }
     return reply(runtime_->submit_circulation_protocol_command(std::move(p)));
   }
   py::dict protocol_command(const std::string& owner,const std::string& id) const {

@@ -484,3 +484,222 @@ def validate_frozen_manifest(reference, *, required_domains, validate_runtime_so
         and frozen["primary_fit_calls_started"] == frozen["primary_fit_calls_completed"] == 12*len(required_domains),
         "all_six_models_and_fit_counts_per_domain")
     return frozen
+
+
+SPI_CAMPAIGN_SCHEMA = "g31.foundation.airport_spi_training_campaign.v1"
+
+
+def _load_spi_inputs(inputs, *, split):
+    """Caller must declare parent metadata before any artifact is opened."""
+    require(split in ("train", "dev"), "spi_never_loads_test")
+    datasets = []
+    for item in inputs:
+        parent = item["parent"]
+        require(parent["split"] == split, "spi_declared_split_before_open")
+        dataset = read_bound(item["dataset"])
+        require(dataset["pair"]["parent"] == parent, "spi_declared_actual_parent_binding")
+        for arm in ("reference_plan", "patched_plan"):
+            if arm in item:
+                plan = read_bound(item[arm])
+                require(plan["parent"] == parent, "spi_actual_collection_plan_parent")
+        datasets.append(dataset)
+    return datasets
+
+
+def _spi_sources():
+    from . import foundation_airport_spi as spi
+    from . import foundation_airport_pair_dataset as dataset
+    from . import foundation_airport_service_metrics as metrics
+    return spi.spi_source_pins() | {
+        "scripts/experiments/g31_ics_circulation/"+Path(module.__file__).name:
+            hashlib.sha256(Path(module.__file__).read_bytes()).hexdigest()
+        for module in (dataset, metrics)} | {
+        "scripts/experiments/g31_ics_circulation/"+Path(__file__).name:
+            hashlib.sha256(Path(__file__).read_bytes()).hexdigest()}
+
+
+def prepare_spi_manifest(*, output, train_inputs, dev_inputs, contract,
+                         model_available_at_epoch_seconds):
+    """Register two deterministic variant chains, including real rule champions."""
+    from . import foundation_airport_spi as spi
+    train = _load_spi_inputs(train_inputs, split="train")
+    dev = _load_spi_inputs(dev_inputs, split="dev")
+    train_groups = {ranker._parent_group(d["pair"]["parent"]) for d in train}
+    dev_groups = {ranker._parent_group(d["pair"]["parent"]) for d in dev}
+    require(train_groups and dev_groups and not train_groups.intersection(dev_groups),
+        "spi_disjoint_train_dev_parents")
+    label_clocks = [d["pair"]["parent"]["calendar_start_epoch_seconds"]
+        + d["pair"]["reference_cost"]["label_end"] for d in train
+        if d["pair"]["status"] == "closed_actual_pair"]
+    require(label_clocks and max(label_clocks) <= model_available_at_epoch_seconds,
+        "spi_train_closed_before_weights_available")
+    dev_clocks = [d["pair"]["parent"]["calendar_start_epoch_seconds"]
+        + d["pair"]["reference_cost"]["label_end"] for d in dev
+        if d["pair"]["status"] == "closed_actual_pair"]
+    require(dev_clocks, "spi_at_least_one_closed_dev_pair")
+    directory = Path(output).resolve()
+    require(not directory.exists(), "spi_new_output_directory")
+    directory.mkdir(parents=True)
+    source_archive = _source_archive(directory)
+    chains = []
+    for variant in ranker.VARIANTS:
+        pairs, unavailable = spi.prepare_spi_pairs(train, information_variant=variant,
+            split="train", contract=contract)
+        spi.prepare_spi_pairs(dev, information_variant=variant, split="dev", contract=contract)
+        eligible = (len({ranker._parent_group(p["parent"]) for p in pairs}) >= contract["minimum_train_parents"]
+            and sum(abs(p["advantage"]) > 1e-9 for p in pairs) >= contract["minimum_nonzero_contrasts"])
+        registrations = [spi.make_spi_registration(train, information_variant=variant,
+            solver=solver["solver"], ridge_lambda=solver["ridge_lambda"], contract=contract,
+            model_available_at_epoch_seconds=model_available_at_epoch_seconds,
+            registration_id=f"{directory.name}:{variant}:{index}")
+            for index, solver in enumerate(contract["solver_candidates"])] if eligible else []
+        for registration in registrations:
+            registration["development_labels_closed_at_epoch_seconds"] = max(dev_clocks)
+        chain_dir = directory/variant
+        chain_dir.mkdir()
+        plan = {"schema": SPI_CAMPAIGN_SCHEMA+".chain", "output": str(chain_dir),
+            "information_variant": variant, "contract": copy.deepcopy(contract),
+            "train_inputs": copy.deepcopy(train_inputs), "dev_inputs": copy.deepcopy(dev_inputs),
+            "training_dataset_sha256": digest(train), "development_dataset_sha256": digest(dev),
+            "model_available_at_epoch_seconds": model_available_at_epoch_seconds,
+            "champion_selection_available_at_epoch_seconds": max(dev_clocks),
+            "registrations": registrations, "reference_always_candidate": True,
+            "source_sha256": _spi_sources(), "test_opened": False,
+            "fit_calls_planned": len(registrations), "wall_seconds_limit": WALL_SECONDS,
+            "sufficiency": {"eligible_to_fit": eligible, "unavailable_pairs": unavailable,
+                "closed_pairs": len(pairs), "rule_only_if_insufficient": True}}
+        chains.append(_write_new(chain_dir/"plan.json", plan))
+    manifest = {"schema": SPI_CAMPAIGN_SCHEMA, "status": "registered_not_run",
+        "output": str(directory), "contract": copy.deepcopy(contract),
+        "train_inputs": copy.deepcopy(train_inputs), "dev_inputs": copy.deepcopy(dev_inputs),
+        "train_parent_groups": sorted(train_groups), "dev_parent_groups": sorted(dev_groups),
+        "source_sha256": _spi_sources(), "source_archive": source_archive,
+        "chain_plans": chains, "variants": list(ranker.VARIANTS), "test_opened": False,
+        "random_seed_replicas": 0, "native_runs_requested": 0}
+    return _write_new(directory/"manifest.json", manifest)
+
+
+def run_spi_chain(reference):
+    """Execute only explicit registrations; failed solves are never silently retried."""
+    from . import foundation_airport_spi as spi
+    plan = read_bound(reference)
+    require(plan["schema"] == SPI_CAMPAIGN_SCHEMA+".chain"
+        and plan["source_sha256"] == _spi_sources() and plan["test_opened"] is False,
+        "bound_spi_chain_sources")
+    directory = Path(plan["output"])
+    require(not (directory/"fit_events.jsonl").exists() and not (directory/"receipt.json").exists(),
+        "spi_no_unregistered_retry")
+    train = _load_spi_inputs(plan["train_inputs"], split="train")
+    dev = _load_spi_inputs(plan["dev_inputs"], split="dev")
+    require(digest(train) == plan["training_dataset_sha256"]
+        and digest(dev) == plan["development_dataset_sha256"], "spi_dataset_content_freeze")
+    reference_model = spi.make_reference_champion(information_variant=plan["information_variant"],
+        contract=plan["contract"], model_available_at_epoch_seconds=plan["model_available_at_epoch_seconds"],
+        champion_selection_available_at_epoch_seconds=plan["champion_selection_available_at_epoch_seconds"])
+    models = [reference_model]
+    model_refs = [ranker.save_model(directory/"reference_model.json", reference_model)]
+    deadline = time.monotonic()+plan["wall_seconds_limit"]
+    started, completed, errors = 0, 0, []
+    for index, registration in enumerate(plan["registrations"]):
+        started += 1
+        _event(directory/"fit_events.jsonl", {"event": "fit_started", "registration": registration})
+        try:
+            model = spi.fit_difference_ranker(train, registration=registration, deadline=deadline)
+            model_ref = ranker.save_model(directory/f"solver_{index}_model.json", model)
+            models.append(model)
+            model_refs.append(model_ref)
+            completed += 1
+            _event(directory/"fit_events.jsonl", {"event": "fit_completed", "model": model_ref})
+        except Exception as exc:
+            errors.append({"registration_id": registration["registration_id"], "error": repr(exc)})
+            _event(directory/"fit_events.jsonl", {"event": "fit_failed", "error": repr(exc)})
+            break
+    # A failed registered chain cannot promote a partially attempted search.
+    selection = spi.select_spi_on_dev([reference_model] if errors else models, dev)
+    selection["registered_fit_failures"] = errors
+    selection_ref = _write_new(directory/"selection.json", selection)
+    selected_ref = next(r for r in model_refs if r["model_id"] == selection["selected_model_id"])
+    receipt = {"schema": SPI_CAMPAIGN_SCHEMA+".receipt", "status": "closed",
+        "chain_plan": reference, "model_candidates": model_refs, "selection": selection_ref,
+        "selected_model": selected_ref, "reference_champion": selection["reference_champion"],
+        "fit_calls_started": started, "fit_calls_completed": completed, "fit_failures": errors,
+        "test_opened": False, "native_runs_started": 0}
+    return _write_new(directory/"receipt.json", receipt)
+
+
+def freeze_spi(campaign_reference, *, output):
+    campaign = read_bound(campaign_reference)
+    require(campaign["schema"] == SPI_CAMPAIGN_SCHEMA
+        and campaign["source_sha256"] == _spi_sources(), "spi_campaign_source_freeze")
+    models, started, completed = [], 0, 0
+    for chain_ref in campaign["chain_plans"]:
+        plan = read_bound(chain_ref)
+        receipt_ref = file_ref(Path(plan["output"])/"receipt.json")
+        receipt = read_bound(receipt_ref)
+        require(receipt["status"] == "closed" and receipt["chain_plan"] == chain_ref, "closed_spi_chain")
+        selection = read_bound(receipt["selection"])
+        model = read_bound(receipt["selected_model"])
+        require(selection["selected_model_id"] == model["model_id"], "spi_selected_model_binding")
+        models.append({"information_variant": plan["information_variant"],
+            "checkpoint": receipt["selected_model"], "model_id": model["model_id"],
+            "reference_champion": model["reference_champion"], "chain_receipt": receipt_ref,
+            "selection": receipt["selection"]})
+        started += receipt["fit_calls_started"]
+        completed += receipt["fit_calls_completed"]
+    require({m["information_variant"] for m in models} == set(ranker.VARIANTS)
+        and len(models) == 2, "spi_two_independently_selected_variants")
+    return _write_new(output, {"schema": SPI_CAMPAIGN_SCHEMA+".freeze",
+        "status": "all_requested_champions_frozen_before_test", "campaign": campaign_reference,
+        "models": models, "source_sha256": campaign["source_sha256"],
+        "fit_calls_started": started, "fit_calls_completed": completed,
+        "contract": campaign["contract"], "test_opened": False,
+        "frozen_epoch_seconds": time.time(), "protected_takeover_eligible": False})
+
+
+def validate_spi_freeze(reference, *, validate_runtime_sources=True):
+    from . import foundation_airport_spi as spi
+    frozen = read_bound(reference)
+    require(frozen["schema"] == SPI_CAMPAIGN_SCHEMA+".freeze"
+        and frozen["status"] == "all_requested_champions_frozen_before_test"
+        and frozen["test_opened"] is False, "spi_pretest_champions_required")
+    campaign = read_bound(frozen["campaign"])
+    require(campaign["contract"] == frozen["contract"]
+        and campaign["source_sha256"] == frozen["source_sha256"], "spi_frozen_campaign_binding")
+    for logical, expected in frozen["source_sha256"].items():
+        archive = campaign["source_archive"][logical]
+        require(archive["sha256"] == expected
+            and archive["archive"]["sha256"] == expected
+            and hashlib.sha256(Path(archive["archive"]["path"]).read_bytes()).hexdigest() == expected,
+            "spi_archived_training_source_bytes")
+    if validate_runtime_sources:
+        require(frozen["source_sha256"] == _spi_sources(), "spi_current_source_freeze")
+    require({m["information_variant"] for m in frozen["models"]} == set(ranker.VARIANTS)
+        and len(frozen["models"]) == 2, "spi_complete_two_variant_freeze")
+    started, completed = 0, 0
+    registered_plans = {(r["path"], r["sha256"]) for r in campaign["chain_plans"]}
+    for row in frozen["models"]:
+        model = read_bound(row["checkpoint"])
+        receipt, selection = read_bound(row["chain_receipt"]), read_bound(row["selection"])
+        require((receipt["chain_plan"]["path"], receipt["chain_plan"]["sha256"]) in registered_plans,
+            "spi_chain_in_registered_campaign")
+        plan = read_bound(receipt["chain_plan"])
+        require(model["model_id"] == row["model_id"] == digest({k: v for k, v in model.items() if k != "model_id"})
+            and model["information_variant"] == row["information_variant"]
+            and selection["selected_model_id"] == row["model_id"]
+            and receipt["selected_model"] == row["checkpoint"]
+            and model["schema"] == spi.SCHEMA
+            and model["contract"] == frozen["contract"]
+            and plan["information_variant"] == row["information_variant"]
+            and receipt["selection"] == row["selection"]
+            and receipt["status"] == "closed"
+            and selection["test_used_for_selection"] is False
+            and selection["frozen_before_test"] is True
+            and selection["reference_champion"] == row["reference_champion"] == model["reference_champion"],
+            "spi_weights_selection_receipt_binding")
+        require(receipt["fit_calls_started"] <= plan["fit_calls_planned"]
+            and receipt["fit_calls_completed"] <= receipt["fit_calls_started"], "spi_finite_registered_fit_counts")
+        started += receipt["fit_calls_started"]
+        completed += receipt["fit_calls_completed"]
+    require(started == frozen["fit_calls_started"] and completed == frozen["fit_calls_completed"],
+        "spi_frozen_fit_denominators")
+    return frozen

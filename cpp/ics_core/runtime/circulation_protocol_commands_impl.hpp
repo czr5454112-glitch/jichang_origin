@@ -17,7 +17,8 @@ inline std::string EventDrivenJunctionRuntime::submit_circulation_protocol_comma
   }
   if(!known) return "rejected:unknown_owner";
   const bool publication=input.kind=="demand" || input.kind=="service_forecast" || input.kind=="planning_snapshot" || input.kind=="planning_snapshot_v2" || input.kind=="planning_snapshot_v3";
-  if(input.kind!="route" && !publication && input.kind!="withdraw_service_forecast" && input.kind!="cancel_transfer")
+  if(input.kind!="route" && !publication && input.kind!="withdraw_service_forecast" && input.kind!="cancel_transfer" &&
+     input.kind!="recover_failed_empty")
     return "rejected:unknown_command_kind";
   if(publication && !target_known) return "rejected:unknown_target_owner";
   if(!std::isfinite(input.message_delay) || input.message_delay<0 || !std::isfinite(input.publication_delay) ||
@@ -28,6 +29,11 @@ inline std::string EventDrivenJunctionRuntime::submit_circulation_protocol_comma
     return "rejected:withdraw_requires_one_exact_reference";
   if(input.kind=="cancel_transfer" && input.reference_id.empty()) return "rejected:missing_transfer_reference";
   if(input.kind=="cancel_transfer" && input.reference_id.rfind(prefix,0)!=0)
+    return "rejected:reference_not_owned";
+  if(input.kind=="recover_failed_empty" &&
+     (input.tray_id.empty() || input.reference_id.empty() || input.reference_request_id.empty() || input.from<0))
+    return "rejected:missing_failed_empty_binding";
+  if(input.kind=="recover_failed_empty" && input.reference_id.rfind(prefix,0)!=0)
     return "rejected:reference_not_owned";
   for(const auto& transfer:circulation_.protocol_requests)
     if(circulation_.input.transfers[transfer.transfer].request_id==input.request_id)
@@ -196,6 +202,8 @@ inline bool EventDrivenJunctionRuntime::process_circulation_protocol_command_eve
   } else if(input.kind=="cancel_transfer") {
     response=cancel_circulation_transfer(input.reference_id,input.owner,true);command.result_id=input.reference_id;
     if(response=="duplicate:cancelled") response="cancelled";
+  } else if(input.kind=="recover_failed_empty") {
+    response=circulation_recover_failed_empty(input,time);command.result_id=input.reference_id;
   }
   if(response=="pending") {
     command.result_status=input.kind=="route" ? "pending_execution" : "pending_delivery";

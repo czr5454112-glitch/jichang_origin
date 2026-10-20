@@ -435,6 +435,9 @@ def prepare_predictor(model):
     This factory has no current cache. A registration, when present, binds the
     runtime feature sources at preparation; callbacks perform no filesystem IO.
     """
+    if model.get("schema") == "g31.foundation.airport_supported_difference_ranker.v1":
+        from .foundation_airport_spi import prepare_supported_predictor
+        return prepare_supported_predictor(model)
     model = copy.deepcopy(model)
     require(model["schema"] == SCHEMA and model["feature_schema"] == FEATURE_SCHEMA
         and model["model_id"] == digest({key: item for key, item in model.items() if key != "model_id"}),
@@ -567,3 +570,19 @@ def save_model(path, model):
         stream.write("\n")
     return {"path": str(path.resolve()), "sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
         "model_id": model["model_id"]}
+
+
+# Explicit opt-in entry points keep all archived v1 model semantics unchanged.
+def make_spi_contract(**options):
+    from .foundation_airport_spi import make_spi_contract as implementation
+    return implementation(**options)
+
+
+def fit_difference_ranker(datasets, **options):
+    from .foundation_airport_spi import fit_difference_ranker as implementation
+    return implementation(datasets, **options)
+
+
+def prepare_supported_predictor(model):
+    from .foundation_airport_spi import prepare_supported_predictor as implementation
+    return implementation(model)

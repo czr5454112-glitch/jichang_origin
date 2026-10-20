@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="13" time="2.514" timestamp="2026-10-20T23:26:50.556001+08:00" hostname="LAPTOP-M3GASC4G"><testcase classname="outputs.experiments.g31_ics_inventory_spi_20261020.cycle_001.report_support.test_offline_owned_resource_001" name="test_normal_child_actual_job_and_identity" time="0.301" /><testcase classname="outputs.experiments.g31_ics_inventory_spi_20261020.cycle_001.report_support.test_offline_owned_resource_001" name="test_timeout_closes_only_owned_child" time="0.215" /><testcase classname="outputs.experiments.g31_ics_inventory_spi_20261020.cycle_001.report_support.test_offline_owned_resource_001" name="test_administrative_cancel_has_actual_exit" time="0.035" /><testcase classname="outputs.experiments.g31_ics_inventory_spi_20261020.cycle_001.report_support.test_offline_owned_resource_001" name="test_global_floor_two_samples" time="0.082" /><testcase classname="outputs.experiments.g31_ics_inventory_spi_20261020.cycle_001.report_support.test_offline_owned_resource_001" name="test_low_entry_never_creates_child" time="0.011" /><testcase classname="outputs.experiments.g31_ics_inventory_spi_20261020.cycle_001.report_support.test_offline_owned_resource_001" name="test_actual_small_OS_commit_cap_denies_large_allocation" time="0.132"><failure message="assert 275972096 &lt;= (64 * (1024 ** 2))">tmp_path = WindowsPath('C:/Users/38908/AppData/Local/Packages/sandbox.{72f6ce93-8369-45a2-8b7e-c7cbfd0b3eda}/AC/Temp/pytest-of-38908/pytest-0/test_actual_small_OS_commit_ca0')
+
+    def test_actual_small_OS_commit_cap_denies_large_allocation(tmp_path):
+        chosen = policy()
+        chosen["job_commit_limit_bytes"] = 64*1024**2
+        result = launch(tmp_path, "try:\n x=bytearray(256*1024*1024)\nexcept MemoryError:\n"
+            " print('allocation-denied')\n sys.exit(73)\nraise RuntimeError('cap did not apply')\n", chosen=chosen)
+        assert_closed(result)
+        assert result["status"] == "exited" and result["exitcode"] == 73
+        assert (tmp_path/"stdout").read_text().strip() == "allocation-denied"
+        assert result["final_job"]["job_commit_limit_bytes_readback"] == 64*1024**2
+&gt;       assert result["peak_measurements"]["job_peak_commit_bytes"] &lt;= 64*1024**2
+E       assert 275972096 &lt;= (64 * (1024 ** 2))
+
+outputs\experiments\g31_ics_inventory_spi_20261020\cycle_001\report_support\test_offline_owned_resource_001.py:99: AssertionError</failure></testcase><testcase classname="outputs.experiments.g31_ics_inventory_spi_20261020.cycle_001.report_support.test_offline_owned_resource_001" name="test_remaining_descendant_terminated_then_job_zero" time="0.190"><failure message="assert 3 == 2">tmp_path = WindowsPath('C:/Users/38908/AppData/Local/Packages/sandbox.{72f6ce93-8369-45a2-8b7e-c7cbfd0b3eda}/AC/Temp/pytest-of-38908/pytest-0/test_remaining_descendant_term0')
+
+    def test_remaining_descendant_terminated_then_job_zero(tmp_path):
+        result = launch(tmp_path, "import subprocess\n"
+            "subprocess.Popen([sys.executable,'-B','-c','import time;time.sleep(30)'])\n")
+        assert_closed(result)
+        assert result["exitcode"] == 0
+        assert result["termination_reason"] == "remaining_owned_descendants_after_direct_exit"
+&gt;       assert result["final_job"]["total_processes"] == 2
+E       assert 3 == 2
+
+outputs\experiments\g31_ics_inventory_spi_20261020\cycle_001\report_support\test_offline_owned_resource_001.py:108: AssertionError</failure></testcase><testcase classname="outputs.experiments.g31_ics_inventory_spi_20261020.cycle_001.report_support.test_offline_owned_resource_001" name="test_invalid_timeout[0]" time="0.015" /><testcase classname="outputs.experiments.g31_ics_inventory_spi_20261020.cycle_001.report_support.test_offline_owned_resource_001" name="test_invalid_timeout[-1]" time="0.011" /><testcase classname="outputs.experiments.g31_ics_inventory_spi_20261020.cycle_001.report_support.test_offline_owned_resource_001" name="test_invalid_timeout[inf]" time="0.014" /><testcase classname="outputs.experiments.g31_ics_inventory_spi_20261020.cycle_001.report_support.test_offline_owned_resource_001" name="test_invalid_timeout[nan]" time="0.013" /><testcase classname="outputs.experiments.g31_ics_inventory_spi_20261020.cycle_001.report_support.test_offline_owned_resource_001" name="test_invalid_timeout[True]" time="0.012" /><testcase classname="outputs.experiments.g31_ics_inventory_spi_20261020.cycle_001.report_support.test_offline_owned_resource_001" name="test_policy_inverted_floor" time="0.001" /></testsuite></testsuites>

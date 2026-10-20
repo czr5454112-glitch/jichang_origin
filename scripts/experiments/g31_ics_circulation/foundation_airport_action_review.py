@@ -13,6 +13,8 @@ from pathlib import Path
 
 from .foundation_airport_action_campaign import digest, read, sha
 from .foundation_airport_pair_dataset import window_cost
+from .foundation_airport_service_metrics import (
+    compare_completion_outcomes, backlog_relief, physical_progress_intervals)
 
 
 def load_gz(path):
@@ -55,6 +57,8 @@ def read_run(cycle, spec):
     if abs(independent-row["full_window_cost"]["backlog_integral_bag_seconds"]) > 1e-6:
         raise ValueError("review:cost_recalculation_mismatch")
     row["independent_cost_recalculation"] = independent
+    row["backlog_relief"] = backlog_relief(data["jobs"], completions, start=7200., end=59400.)
+    row["physical_progress"] = physical_progress_intervals(result, start=7200., end=59400.)
     row["jobs_digest"] = digest(data["jobs"])
     row["initial_trays_digest"] = digest(data["trays"])
     execution_path = directory/"execution_evidence.json.gz"
@@ -155,6 +159,9 @@ def compare_runs(cycle, reference, candidate):
         raise ValueError("review:per_job_comparison_population")
     result.update(per_job_comparison=dict(counts), incomplete_comparison_breakdown=dict(incomplete_counts),
         maximum_known_delay_seconds=maximum_harm)
+    specifications = read(Path(cycle)/reference["name"]/"input.json")["jobs"]
+    result["completion_direction"] = compare_completion_outcomes(
+        specifications, indices[0]["completions"], indices[1]["completions"], cutoff=59400.)
     return result
 
 

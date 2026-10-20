@@ -1,0 +1,1167 @@
+{
+  "scope": "saved-data recomputation only; no retraining or native runs; projection is a diagnostic, not a newly evaluated policy",
+  "fixed_commit": "1d895da00644c9486568fe74b835e057aa93f8c8",
+  "fit_calls": 0,
+  "native_jobs": 0,
+  "source_pins": {
+    "scripts/experiments/g31_ics_circulation/foundation_airport_pair_ranker.py": "57902869fb079577eca7d2cd3cc6225f976035836ab4d1ec83702442420f46d8",
+    "scripts/experiments/g31_ics_circulation/foundation_airport_learning_public.py": "b1a4f31bf9456ef193cbbccd4795e00f170a1b5f858cd9d25283cecbac43cc8c",
+    "scripts/experiments/g31_ics_circulation/analytic_control.py": "e4829bef8b733c2b85ba79c16f087ec5732190f518aaa6c91b94e82435c23b56",
+    "scripts/experiments/g31_ics_circulation/foundation_airport_batch_patch.py": "c326a1a036e52eeec7070cf71602b2e142c5c9853c8e65be0794a77db5104c71",
+    "scripts/experiments/g31_ics_circulation/foundation_airport_paired_continuation.py": "0c882f36953b6001fb3a8b3e8e8d0fee43973d3c44b72292048d714e1660c226"
+  },
+  "linear_models": [
+    {
+      "domain": "primary_22",
+      "variant": "C01",
+      "seed": 17,
+      "model_id": "c31cec17b516c43ca0cb948dcb141bc8d728b0eda2dfc251ecd8ca855b359daa",
+      "model_path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/training_primary_001/primary_22_C01_seed17/linear_model.json",
+      "feature_dimension": 29,
+      "training_pair_count": 4,
+      "matrix_rank": 3,
+      "singular_values": [
+        9.831021648449676,
+        3.1927873132181848,
+        1.8340265395448982,
+        1.0691438173435362e-16
+      ],
+      "rank_tolerance": 6.330483422024371e-14,
+      "nullity": 26,
+      "zero_difference_features": [
+        "current_mandatory_batch_size",
+        "current_optional_batch_size",
+        "decision_time_seconds",
+        "destination_capacity",
+        "destination_export_min_stock",
+        "destination_waiting_age_seconds",
+        "destination_waiting_missing",
+        "local_empty_return",
+        "source_capacity",
+        "source_export_min_stock",
+        "source_free_missing",
+        "source_local_owner",
+        "source_observed_free",
+        "source_observed_waiting",
+        "source_waiting_age_seconds",
+        "source_waiting_missing",
+        "source_waiting_visible"
+      ],
+      "null_space_weight_norm_fraction": 0.752080613758598,
+      "max_training_prediction_change_after_weight_projection": 3.675286277887289e-12,
+      "dev_projection_diagnostics": [
+        {
+          "observed_at": 7200.0,
+          "owner": "owner:system_domestic",
+          "actual_advantage": 0.0,
+          "full_prediction": -1511.746859298969,
+          "row_space_weight_prediction": -158.91160005594372,
+          "null_space_weight_prediction": -1352.8352592430251,
+          "out_of_row_space_norm_fraction": 0.7228477321897208,
+          "action_would_change_after_projection": false
+        },
+        {
+          "observed_at": 54060.0,
+          "owner": "owner:system_domestic",
+          "actual_advantage": -966.3680000007153,
+          "full_prediction": 3710.595713130878,
+          "row_space_weight_prediction": 4099.461756047265,
+          "null_space_weight_prediction": -388.8660429163874,
+          "out_of_row_space_norm_fraction": 0.1711732096460627,
+          "action_would_change_after_projection": false
+        },
+        {
+          "observed_at": 7200.0,
+          "owner": "owner:system_domestic",
+          "actual_advantage": 0.0,
+          "full_prediction": -1511.746859298969,
+          "row_space_weight_prediction": -158.91160005594372,
+          "null_space_weight_prediction": -1352.8352592430251,
+          "out_of_row_space_norm_fraction": 0.7228477321897208,
+          "action_would_change_after_projection": false
+        },
+        {
+          "observed_at": 54180.0,
+          "owner": "owner:system_domestic",
+          "actual_advantage": 1514.4809999987483,
+          "full_prediction": -19386.7436114745,
+          "row_space_weight_prediction": -18019.055869650776,
+          "null_space_weight_prediction": -1367.6877418237236,
+          "out_of_row_space_norm_fraction": 0.2486479773045137,
+          "action_would_change_after_projection": false
+        }
+      ],
+      "first_G26_7200_diagnostic": {
+        "observed_at": 7200.0,
+        "owner": "owner:system_domestic",
+        "actual_advantage": null,
+        "full_prediction": -1138.834838913051,
+        "row_space_weight_prediction": -121.72350198758126,
+        "null_space_weight_prediction": -1017.1113369254698,
+        "out_of_row_space_norm_fraction": 0.6862399255188416,
+        "action_would_change_after_projection": false
+      },
+      "first_G26_same_training_predictions_opposite_action_counterexample": {
+        "original_prediction": -1138.834838913051,
+        "alternative_prediction": 1138.8348389130513,
+        "max_change_in_all_train_predictions": 3.894238660493198e-13,
+        "weight_change_norm": 0.2225134622025392,
+        "scope": "data-term identifiability only; regularization penalties may differ; no alternative model has been trained or deployed"
+      }
+    },
+    {
+      "domain": "primary_22",
+      "variant": "C01",
+      "seed": 29,
+      "model_id": "2c250c55205d34a48ee23d769ddea07871c1aa6c61f1ab9fb3d55ee5029cfd0d",
+      "model_path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/training_primary_001/primary_22_C01_seed29/linear_model.json",
+      "feature_dimension": 29,
+      "training_pair_count": 4,
+      "matrix_rank": 3,
+      "singular_values": [
+        9.831021648449676,
+        3.1927873132181848,
+        1.8340265395448982,
+        1.0691438173435362e-16
+      ],
+      "rank_tolerance": 6.330483422024371e-14,
+      "nullity": 26,
+      "zero_difference_features": [
+        "current_mandatory_batch_size",
+        "current_optional_batch_size",
+        "decision_time_seconds",
+        "destination_capacity",
+        "destination_export_min_stock",
+        "destination_waiting_age_seconds",
+        "destination_waiting_missing",
+        "local_empty_return",
+        "source_capacity",
+        "source_export_min_stock",
+        "source_free_missing",
+        "source_local_owner",
+        "source_observed_free",
+        "source_observed_waiting",
+        "source_waiting_age_seconds",
+        "source_waiting_missing",
+        "source_waiting_visible"
+      ],
+      "null_space_weight_norm_fraction": 0.700994405186528,
+      "max_training_prediction_change_after_weight_projection": 4.563219721448461e-12,
+      "dev_projection_diagnostics": [
+        {
+          "observed_at": 7200.0,
+          "owner": "owner:system_domestic",
+          "actual_advantage": 0.0,
+          "full_prediction": -4039.4283931122145,
+          "row_space_weight_prediction": 626.376177805235,
+          "null_space_weight_prediction": -4665.804570917449,
+          "out_of_row_space_norm_fraction": 0.7228477321897208,
+          "action_would_change_after_projection": true
+        },
+        {
+          "observed_at": 54060.0,
+          "owner": "owner:system_domestic",
+          "actual_advantage": -966.3680000007153,
+          "full_prediction": 7084.917783378735,
+          "row_space_weight_prediction": 6151.395499608424,
+          "null_space_weight_prediction": 933.5222837703113,
+          "out_of_row_space_norm_fraction": 0.1711732096460627,
+          "action_would_change_after_projection": false
+        },
+        {
+          "observed_at": 7200.0,
+          "owner": "owner:system_domestic",
+          "actual_advantage": 0.0,
+          "full_prediction": -4039.4283931122145,
+          "row_space_weight_prediction": 626.376177805235,
+          "null_space_weight_prediction": -4665.804570917449,
+          "out_of_row_space_norm_fraction": 0.7228477321897208,
+          "action_would_change_after_projection": true
+        },
+        {
+          "observed_at": 54180.0,
+          "owner": "owner:system_domestic",
+          "actual_advantage": 1514.4809999987483,
+          "full_prediction": -22157.309034584097,
+          "row_space_weight_prediction": -20730.509266727513,
+          "null_space_weight_prediction": -1426.7997678565844,
+          "out_of_row_space_norm_fraction": 0.2486479773045137,
+          "action_would_change_after_projection": false
+        }
+      ],
+      "first_G26_7200_diagnostic": {
+        "observed_at": 7200.0,
+        "owner": "owner:system_domestic",
+        "actual_advantage": null,
+        "full_prediction": -3498.806481470553,
+        "row_space_weight_prediction": 580.4121703039982,
+        "null_space_weight_prediction": -4079.2186517745513,
+        "out_of_row_space_norm_fraction": 0.6862399255188416,
+        "action_would_change_after_projection": true
+      },
+      "first_G26_same_training_predictions_opposite_action_counterexample": {
+        "original_prediction": -3498.806481470553,
+        "alternative_prediction": 3498.806481470553,
+        "max_change_in_all_train_predictions": 6.914354374305165e-13,
+        "weight_change_norm": 0.6836211162206437,
+        "scope": "data-term identifiability only; regularization penalties may differ; no alternative model has been trained or deployed"
+      }
+    },
+    {
+      "domain": "primary_22",
+      "variant": "C01",
+      "seed": 43,
+      "model_id": "926cc1a7645aa532e3d8bb7d06055e4a18f240a60714204bdfad6462eeb13272",
+      "model_path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/training_primary_001/primary_22_C01_seed43/linear_model.json",
+      "feature_dimension": 29,
+      "training_pair_count": 4,
+      "matrix_rank": 3,
+      "singular_values": [
+        9.831021648449676,
+        3.1927873132181848,
+        1.8340265395448982,
+        1.0691438173435362e-16
+      ],
+      "rank_tolerance": 6.330483422024371e-14,
+      "nullity": 26,
+      "zero_difference_features": [
+        "current_mandatory_batch_size",
+        "current_optional_batch_size",
+        "decision_time_seconds",
+        "destination_capacity",
+        "destination_export_min_stock",
+        "destination_waiting_age_seconds",
+        "destination_waiting_missing",
+        "local_empty_return",
+        "source_capacity",
+        "source_export_min_stock",
+        "source_free_missing",
+        "source_local_owner",
+        "source_observed_free",
+        "source_observed_waiting",
+        "source_waiting_age_seconds",
+        "source_waiting_missing",
+        "source_waiting_visible"
+      ],
+      "null_space_weight_norm_fraction": 0.46311508728248124,
+      "max_training_prediction_change_after_weight_projection": 5.1933813784362575e-12,
+      "dev_projection_diagnostics": [
+        {
+          "observed_at": 7200.0,
+          "owner": "owner:system_domestic",
+          "actual_advantage": 0.0,
+          "full_prediction": 3148.5905786123076,
+          "row_space_weight_prediction": 649.4259471816607,
+          "null_space_weight_prediction": 2499.1646314306468,
+          "out_of_row_space_norm_fraction": 0.7228477321897208,
+          "action_would_change_after_projection": false
+        },
+        {
+          "observed_at": 54060.0,
+          "owner": "owner:system_domestic",
+          "actual_advantage": -966.3680000007153,
+          "full_prediction": 5719.014718324906,
+          "row_space_weight_prediction": 6202.6088482524065,
+          "null_space_weight_prediction": -483.59412992750003,
+          "out_of_row_space_norm_fraction": 0.1711732096460627,
+          "action_would_change_after_projection": false
+        },
+        {
+          "observed_at": 7200.0,
+          "owner": "owner:system_domestic",
+          "actual_advantage": 0.0,
+          "full_prediction": 3148.5905786123076,
+          "row_space_weight_prediction": 649.4259471816607,
+          "null_space_weight_prediction": 2499.1646314306468,
+          "out_of_row_space_norm_fraction": 0.7228477321897208,
+          "action_would_change_after_projection": false
+        },
+        {
+          "observed_at": 54180.0,
+          "owner": "owner:system_domestic",
+          "actual_advantage": 1514.4809999987483,
+          "full_prediction": -21093.352245943912,
+          "row_space_weight_prediction": -20793.08358488924,
+          "null_space_weight_prediction": -300.26866105467343,
+          "out_of_row_space_norm_fraction": 0.2486479773045137,
+          "action_would_change_after_projection": false
+        }
+      ],
+      "first_G26_7200_diagnostic": {
+        "observed_at": 7200.0,
+        "owner": "owner:system_domestic",
+        "actual_advantage": null,
+        "full_prediction": 2087.425531899046,
+        "row_space_weight_prediction": 601.7796643986659,
+        "null_space_weight_prediction": 1485.64586750038,
+        "out_of_row_space_norm_fraction": 0.6862399255188416,
+        "action_would_change_after_projection": false
+      },
+      "first_G26_same_training_predictions_opposite_action_counterexample": {
+        "original_prediction": 2087.425531899046,
+        "alternative_prediction": -2087.4255318990463,
+        "max_change_in_all_train_predictions": 4.474657989817822e-13,
+        "weight_change_norm": 0.40785570156613044,
+        "scope": "data-term identifiability only; regularization penalties may differ; no alternative model has been trained or deployed"
+      }
+    },
+    {
+      "domain": "primary_22",
+      "variant": "C11",
+      "seed": 17,
+      "model_id": "c18f5693b9e9e718ae375f84324b3a74421848aa85329412e089642b972b0d4e",
+      "model_path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/training_primary_001/primary_22_C11_seed17/linear_model.json",
+      "feature_dimension": 43,
+      "training_pair_count": 4,
+      "matrix_rank": 3,
+      "singular_values": [
+        9.832035196161572,
+        3.6952994604176546,
+        2.1870792723932935,
+        8.324390574222303e-16
+      ],
+      "rank_tolerance": 9.387546594185005e-14,
+      "nullity": 40,
+      "zero_difference_features": [
+        "current_mandatory_batch_size",
+        "current_optional_batch_size",
+        "decision_time_seconds",
+        "destination_capacity",
+        "destination_export_min_stock",
+        "destination_forecast_1800_missing",
+        "destination_forecast_300_missing",
+        "destination_forecast_900_missing",
+        "destination_waiting_age_seconds",
+        "destination_waiting_missing",
+        "local_empty_return",
+        "source_capacity",
+        "source_export_min_stock",
+        "source_forecast_1800",
+        "source_forecast_1800_missing",
+        "source_forecast_300",
+        "source_forecast_300_missing",
+        "source_forecast_900",
+        "source_forecast_900_missing",
+        "source_free_missing",
+        "source_local_owner",
+        "source_observed_free",
+        "source_observed_waiting",
+        "source_waiting_age_seconds",
+        "source_waiting_missing",
+        "source_waiting_visible"
+      ],
+      "null_space_weight_norm_fraction": 0.7147426454396362,
+      "max_training_prediction_change_after_weight_projection": 7.788477320986396e-13,
+      "dev_projection_diagnostics": [
+        {
+          "observed_at": 7200.0,
+          "owner": "owner:system_domestic",
+          "actual_advantage": 0.0,
+          "full_prediction": -720.8576539116808,
+          "row_space_weight_prediction": 213.28000510669867,
+          "null_space_weight_prediction": -934.1376590183795,
+          "out_of_row_space_norm_fraction": 0.7302827372842253,
+          "action_would_change_after_projection": true
+        },
+        {
+          "observed_at": 54060.0,
+          "owner": "owner:system_domestic",
+          "actual_advantage": -966.3680000007153,
+          "full_prediction": 4181.148807743635,
+          "row_space_weight_prediction": 4036.0361042137265,
+          "null_space_weight_prediction": 145.11270352990869,
+          "out_of_row_space_norm_fraction": 0.38929566426307494,
+          "action_would_change_after_projection": false
+        },
+        {
+          "observed_at": 7200.0,
+          "owner": "owner:system_domestic",
+          "actual_advantage": 0.0,
+          "full_prediction": -720.8576539116808,
+          "row_space_weight_prediction": 213.28000510669867,
+          "null_space_weight_prediction": -934.1376590183795,
+          "out_of_row_space_norm_fraction": 0.7302827372842253,
+          "action_would_change_after_projection": true
+        },
+        {
+          "observed_at": 54180.0,
+          "owner": "owner:system_domestic",
+          "actual_advantage": 1514.4809999987483,
+          "full_prediction": -20419.94438798195,
+          "row_space_weight_prediction": -18028.342389317888,
+          "null_space_weight_prediction": -2391.6019986640604,
+          "out_of_row_space_norm_fraction": 0.28743246118734134,
+          "action_would_change_after_projection": false
+        }
+      ],
+      "first_G26_7200_diagnostic": {
+        "observed_at": 7200.0,
+        "owner": "owner:system_domestic",
+        "actual_advantage": null,
+        "full_prediction": -658.4293034675146,
+        "row_space_weight_prediction": 202.08308786243597,
+        "null_space_weight_prediction": -860.5123913299506,
+        "out_of_row_space_norm_fraction": 0.6923943240067701,
+        "action_would_change_after_projection": true
+      },
+      "first_G26_same_training_predictions_opposite_action_counterexample": {
+        "original_prediction": -658.4293034675146,
+        "alternative_prediction": 658.429303467515,
+        "max_change_in_all_train_predictions": 5.451934124690477e-13,
+        "weight_change_norm": 0.12750498966481688,
+        "scope": "data-term identifiability only; regularization penalties may differ; no alternative model has been trained or deployed"
+      }
+    },
+    {
+      "domain": "primary_22",
+      "variant": "C11",
+      "seed": 29,
+      "model_id": "6f8bb129a3b5720ef9ee1b45df80218ac95d5bf0e8eafb827910aa268bd6393b",
+      "model_path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/training_primary_001/primary_22_C11_seed29/linear_model.json",
+      "feature_dimension": 43,
+      "training_pair_count": 4,
+      "matrix_rank": 3,
+      "singular_values": [
+        9.832035196161572,
+        3.6952994604176546,
+        2.1870792723932935,
+        8.324390574222303e-16
+      ],
+      "rank_tolerance": 9.387546594185005e-14,
+      "nullity": 40,
+      "zero_difference_features": [
+        "current_mandatory_batch_size",
+        "current_optional_batch_size",
+        "decision_time_seconds",
+        "destination_capacity",
+        "destination_export_min_stock",
+        "destination_forecast_1800_missing",
+        "destination_forecast_300_missing",
+        "destination_forecast_900_missing",
+        "destination_waiting_age_seconds",
+        "destination_waiting_missing",
+        "local_empty_return",
+        "source_capacity",
+        "source_export_min_stock",
+        "source_forecast_1800",
+        "source_forecast_1800_missing",
+        "source_forecast_300",
+        "source_forecast_300_missing",
+        "source_forecast_900",
+        "source_forecast_900_missing",
+        "source_free_missing",
+        "source_local_owner",
+        "source_observed_free",
+        "source_observed_waiting",
+        "source_waiting_age_seconds",
+        "source_waiting_missing",
+        "source_waiting_visible"
+      ],
+      "null_space_weight_norm_fraction": 0.690536494502909,
+      "max_training_prediction_change_after_weight_projection": 9.346172785183675e-13,
+      "dev_projection_diagnostics": [
+        {
+          "observed_at": 7200.0,
+          "owner": "owner:system_domestic",
+          "actual_advantage": 0.0,
+          "full_prediction": 2323.932258160552,
+          "row_space_weight_prediction": 217.7591577881745,
+          "null_space_weight_prediction": 2106.1731003723776,
+          "out_of_row_space_norm_fraction": 0.7302827372842253,
+          "action_would_change_after_projection": false
+        },
+        {
+          "observed_at": 54060.0,
+          "owner": "owner:system_domestic",
+          "actual_advantage": -966.3680000007153,
+          "full_prediction": 2427.3285096207524,
+          "row_space_weight_prediction": 4035.949144691089,
+          "null_space_weight_prediction": -1608.6206350703364,
+          "out_of_row_space_norm_fraction": 0.38929566426307494,
+          "action_would_change_after_projection": false
+        },
+        {
+          "observed_at": 7200.0,
+          "owner": "owner:system_domestic",
+          "actual_advantage": 0.0,
+          "full_prediction": 2323.932258160552,
+          "row_space_weight_prediction": 217.7591577881745,
+          "null_space_weight_prediction": 2106.1731003723776,
+          "out_of_row_space_norm_fraction": 0.7302827372842253,
+          "action_would_change_after_projection": false
+        },
+        {
+          "observed_at": 54180.0,
+          "owner": "owner:system_domestic",
+          "actual_advantage": 1514.4809999987483,
+          "full_prediction": -16764.25740384958,
+          "row_space_weight_prediction": -18003.76802389748,
+          "null_space_weight_prediction": 1239.5106200478986,
+          "out_of_row_space_norm_fraction": 0.28743246118734134,
+          "action_would_change_after_projection": false
+        }
+      ],
+      "first_G26_7200_diagnostic": {
+        "observed_at": 7200.0,
+        "owner": "owner:system_domestic",
+        "actual_advantage": null,
+        "full_prediction": 2774.195932091352,
+        "row_space_weight_prediction": 206.58548531730025,
+        "null_space_weight_prediction": 2567.6104467740515,
+        "out_of_row_space_norm_fraction": 0.6923943240067701,
+        "action_would_change_after_projection": false
+      },
+      "first_G26_same_training_predictions_opposite_action_counterexample": {
+        "original_prediction": 2774.195932091352,
+        "alternative_prediction": -2774.195932091351,
+        "max_change_in_all_train_predictions": 1.635580237407143e-12,
+        "weight_change_norm": 0.5372236955230483,
+        "scope": "data-term identifiability only; regularization penalties may differ; no alternative model has been trained or deployed"
+      }
+    },
+    {
+      "domain": "primary_22",
+      "variant": "C11",
+      "seed": 43,
+      "model_id": "238039a7b6792ee14de30405969d17c95d651a022e7dc24d92bab26cea2b0b70",
+      "model_path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/training_primary_001/primary_22_C11_seed43/linear_model.json",
+      "feature_dimension": 43,
+      "training_pair_count": 4,
+      "matrix_rank": 3,
+      "singular_values": [
+        9.832035196161572,
+        3.6952994604176546,
+        2.1870792723932935,
+        8.324390574222303e-16
+      ],
+      "rank_tolerance": 9.387546594185005e-14,
+      "nullity": 40,
+      "zero_difference_features": [
+        "current_mandatory_batch_size",
+        "current_optional_batch_size",
+        "decision_time_seconds",
+        "destination_capacity",
+        "destination_export_min_stock",
+        "destination_forecast_1800_missing",
+        "destination_forecast_300_missing",
+        "destination_forecast_900_missing",
+        "destination_waiting_age_seconds",
+        "destination_waiting_missing",
+        "local_empty_return",
+        "source_capacity",
+        "source_export_min_stock",
+        "source_forecast_1800",
+        "source_forecast_1800_missing",
+        "source_forecast_300",
+        "source_forecast_300_missing",
+        "source_forecast_900",
+        "source_forecast_900_missing",
+        "source_free_missing",
+        "source_local_owner",
+        "source_observed_free",
+        "source_observed_waiting",
+        "source_waiting_age_seconds",
+        "source_waiting_missing",
+        "source_waiting_visible"
+      ],
+      "null_space_weight_norm_fraction": 0.5437199219312463,
+      "max_training_prediction_change_after_weight_projection": 8.567325053085035e-13,
+      "dev_projection_diagnostics": [
+        {
+          "observed_at": 7200.0,
+          "owner": "owner:system_domestic",
+          "actual_advantage": 0.0,
+          "full_prediction": -621.0062964668429,
+          "row_space_weight_prediction": 214.62858563146378,
+          "null_space_weight_prediction": -835.6348820983067,
+          "out_of_row_space_norm_fraction": 0.7302827372842253,
+          "action_would_change_after_projection": true
+        },
+        {
+          "observed_at": 54060.0,
+          "owner": "owner:system_domestic",
+          "actual_advantage": -966.3680000007153,
+          "full_prediction": 3708.5725219870883,
+          "row_space_weight_prediction": 4043.9252553477745,
+          "null_space_weight_prediction": -335.3527333606862,
+          "out_of_row_space_norm_fraction": 0.38929566426307494,
+          "action_would_change_after_projection": false
+        },
+        {
+          "observed_at": 7200.0,
+          "owner": "owner:system_domestic",
+          "actual_advantage": 0.0,
+          "full_prediction": -621.0062964668429,
+          "row_space_weight_prediction": 214.62858563146378,
+          "null_space_weight_prediction": -835.6348820983067,
+          "out_of_row_space_norm_fraction": 0.7302827372842253,
+          "action_would_change_after_projection": true
+        },
+        {
+          "observed_at": 54180.0,
+          "owner": "owner:system_domestic",
+          "actual_advantage": 1514.4809999987483,
+          "full_prediction": -16939.914664371096,
+          "row_space_weight_prediction": -18034.067054789255,
+          "null_space_weight_prediction": 1094.1523904181595,
+          "out_of_row_space_norm_fraction": 0.28743246118734134,
+          "action_would_change_after_projection": false
+        }
+      ],
+      "first_G26_7200_diagnostic": {
+        "observed_at": 7200.0,
+        "owner": "owner:system_domestic",
+        "actual_advantage": null,
+        "full_prediction": -656.7371145772613,
+        "row_space_weight_prediction": 202.6779380380842,
+        "null_space_weight_prediction": -859.4150526153455,
+        "out_of_row_space_norm_fraction": 0.6923943240067701,
+        "action_would_change_after_projection": true
+      },
+      "first_G26_same_training_predictions_opposite_action_counterexample": {
+        "original_prediction": -656.7371145772613,
+        "alternative_prediction": 656.7371145772612,
+        "max_change_in_all_train_predictions": 2.9206789953698983e-13,
+        "weight_change_norm": 0.12717729688773907,
+        "scope": "data-term identifiability only; regularization penalties may differ; no alternative model has been trained or deployed"
+      }
+    },
+    {
+      "domain": "mixed_18_22_26",
+      "variant": "C01",
+      "seed": 29,
+      "model_id": "1285cb32d8f6ce9cd250768561ebb7bf49a4fecb23010b817d2f844069c71316",
+      "model_path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/training_resource_001/mixed_18_22_26_C01_seed29/linear_model.json",
+      "feature_dimension": 29,
+      "training_pair_count": 6,
+      "matrix_rank": 5,
+      "singular_values": [
+        11.388565757529319,
+        5.091570062733418,
+        2.0314204420056057,
+        0.38603938633729273,
+        0.08600992668928469,
+        1.8435824075913562e-15
+      ],
+      "rank_tolerance": 7.333431794450678e-14,
+      "nullity": 24,
+      "zero_difference_features": [
+        "current_mandatory_batch_size",
+        "current_optional_batch_size",
+        "decision_time_seconds",
+        "destination_capacity",
+        "destination_export_min_stock",
+        "destination_waiting_age_seconds",
+        "destination_waiting_missing",
+        "local_empty_return",
+        "source_capacity",
+        "source_export_min_stock",
+        "source_free_missing",
+        "source_local_owner",
+        "source_observed_free",
+        "source_observed_waiting",
+        "source_waiting_age_seconds",
+        "source_waiting_missing",
+        "source_waiting_visible"
+      ],
+      "null_space_weight_norm_fraction": 0.5511333004093999,
+      "max_training_prediction_change_after_weight_projection": 5.373470574893196e-13,
+      "dev_projection_diagnostics": [
+        {
+          "observed_at": 7200.0,
+          "owner": "owner:system_domestic",
+          "actual_advantage": 0.0,
+          "full_prediction": -4023.420603862094,
+          "row_space_weight_prediction": -1869.6105978922326,
+          "null_space_weight_prediction": -2153.810005969862,
+          "out_of_row_space_norm_fraction": 0.6480183431526659,
+          "action_would_change_after_projection": false
+        },
+        {
+          "observed_at": 54060.0,
+          "owner": "owner:system_domestic",
+          "actual_advantage": -966.3680000007153,
+          "full_prediction": 2595.414585402565,
+          "row_space_weight_prediction": 2595.4145854025655,
+          "null_space_weight_prediction": -4.547473508864641e-13,
+          "out_of_row_space_norm_fraction": 1.7447654801384322e-15,
+          "action_would_change_after_projection": false
+        },
+        {
+          "observed_at": 7200.0,
+          "owner": "owner:system_domestic",
+          "actual_advantage": 0.0,
+          "full_prediction": -4023.420603862094,
+          "row_space_weight_prediction": -1869.6105978922326,
+          "null_space_weight_prediction": -2153.810005969862,
+          "out_of_row_space_norm_fraction": 0.6480183431526659,
+          "action_would_change_after_projection": false
+        },
+        {
+          "observed_at": 54180.0,
+          "owner": "owner:system_domestic",
+          "actual_advantage": 1514.4809999987483,
+          "full_prediction": -3256.0406288941235,
+          "row_space_weight_prediction": -3256.0406288941226,
+          "null_space_weight_prediction": -9.094947017729282e-13,
+          "out_of_row_space_norm_fraction": 6.608599316923428e-16,
+          "action_would_change_after_projection": false
+        },
+        {
+          "observed_at": 29160.0,
+          "owner": "owner:system_domestic",
+          "actual_advantage": -295.5580000001937,
+          "full_prediction": -1786.4111910969361,
+          "row_space_weight_prediction": -1786.4111910969355,
+          "null_space_weight_prediction": -6.821210263296962e-13,
+          "out_of_row_space_norm_fraction": 5.976921408748802e-16,
+          "action_would_change_after_projection": false
+        },
+        {
+          "observed_at": 28800.0,
+          "owner": "owner:system_international",
+          "actual_advantage": 6583.702000001445,
+          "full_prediction": -919.4629004262878,
+          "row_space_weight_prediction": 477.88731376251945,
+          "null_space_weight_prediction": -1397.3502141888073,
+          "out_of_row_space_norm_fraction": 0.9976752483207497,
+          "action_would_change_after_projection": true
+        }
+      ],
+      "first_G26_7200_diagnostic": {
+        "observed_at": 7200.0,
+        "owner": "owner:system_domestic",
+        "actual_advantage": null,
+        "full_prediction": -3475.2521713637443,
+        "row_space_weight_prediction": -1705.7502216695623,
+        "null_space_weight_prediction": -1769.501949694182,
+        "out_of_row_space_norm_fraction": 0.6209739468702187,
+        "action_would_change_after_projection": false
+      },
+      "first_G26_same_training_predictions_opposite_action_counterexample": {
+        "original_prediction": -3475.2521713637443,
+        "alternative_prediction": 3475.25217136374,
+        "max_change_in_all_train_predictions": 6.9855117473611545e-12,
+        "weight_change_norm": 0.7602701604536105,
+        "scope": "data-term identifiability only; regularization penalties may differ; no alternative model has been trained or deployed"
+      }
+    },
+    {
+      "domain": "mixed_18_22_26",
+      "variant": "C11",
+      "seed": 29,
+      "model_id": "24c7c6b1847834d2c4bec09f54d9ebcc80d5516cdef5e9475cb7f0c83fa80e18",
+      "model_path": "outputs/experiments/g31_ics_action_value_20261020/cycle_001/training_resource_001/mixed_18_22_26_C11_seed29/linear_model.json",
+      "feature_dimension": 43,
+      "training_pair_count": 6,
+      "matrix_rank": 5,
+      "singular_values": [
+        11.397059288074946,
+        6.6348835039119525,
+        2.394143636859489,
+        0.6410033930244697,
+        0.2212720849736353,
+        2.850237264312643e-16
+      ],
+      "rank_tolerance": 1.0881818765789368e-13,
+      "nullity": 38,
+      "zero_difference_features": [
+        "current_mandatory_batch_size",
+        "current_optional_batch_size",
+        "decision_time_seconds",
+        "destination_capacity",
+        "destination_export_min_stock",
+        "destination_forecast_1800_missing",
+        "destination_forecast_300_missing",
+        "destination_forecast_900_missing",
+        "destination_waiting_age_seconds",
+        "destination_waiting_missing",
+        "local_empty_return",
+        "source_capacity",
+        "source_export_min_stock",
+        "source_forecast_1800",
+        "source_forecast_1800_missing",
+        "source_forecast_300",
+        "source_forecast_300_missing",
+        "source_forecast_900",
+        "source_forecast_900_missing",
+        "source_free_missing",
+        "source_local_owner",
+        "source_observed_free",
+        "source_observed_waiting",
+        "source_waiting_age_seconds",
+        "source_waiting_missing",
+        "source_waiting_visible"
+      ],
+      "null_space_weight_norm_fraction": 0.6187169739704369,
+      "max_training_prediction_change_after_weight_projection": 8.228126817805206e-13,
+      "dev_projection_diagnostics": [
+        {
+          "observed_at": 7200.0,
+          "owner": "owner:system_domestic",
+          "actual_advantage": 0.0,
+          "full_prediction": 2314.8771885059714,
+          "row_space_weight_prediction": 1135.8547510194092,
+          "null_space_weight_prediction": 1179.0224374865622,
+          "out_of_row_space_norm_fraction": 0.6989817078466737,
+          "action_would_change_after_projection": false
+        },
+        {
+          "observed_at": 54060.0,
+          "owner": "owner:system_domestic",
+          "actual_advantage": -966.3680000007153,
+          "full_prediction": 937.23321105433,
+          "row_space_weight_prediction": 1011.5604371981102,
+          "null_space_weight_prediction": -74.3272261437802,
+          "out_of_row_space_norm_fraction": 0.11735897886488897,
+          "action_would_change_after_projection": false
+        },
+        {
+          "observed_at": 7200.0,
+          "owner": "owner:system_domestic",
+          "actual_advantage": 0.0,
+          "full_prediction": 2314.8771885059714,
+          "row_space_weight_prediction": 1135.8547510194092,
+          "null_space_weight_prediction": 1179.0224374865622,
+          "out_of_row_space_norm_fraction": 0.6989817078466737,
+          "action_would_change_after_projection": false
+        },
+        {
+          "observed_at": 54180.0,
+          "owner": "owner:system_domestic",
+          "actual_advantage": 1514.4809999987483,
+          "full_prediction": -2610.3678856490033,
+          "row_space_weight_prediction": -2020.6207741703536,
+          "null_space_weight_prediction": -589.7471114786497,
+          "out_of_row_space_norm_fraction": 0.1349995233677228,
+          "action_would_change_after_projection": false
+        },
+        {
+          "observed_at": 29160.0,
+          "owner": "owner:system_domestic",
+          "actual_advantage": -295.5580000001937,
+          "full_prediction": -1092.2279964149673,
+          "row_space_weight_prediction": -1102.4172983672945,
+          "null_space_weight_prediction": 10.189301952327241,
+          "out_of_row_space_norm_fraction": 0.005948616390709738,
+          "action_would_change_after_projection": false
+        },
+        {
+          "observed_at": 28800.0,
+          "owner": "owner:system_international",
+          "actual_advantage": 6583.702000001445,
+          "full_prediction": -1847.859672553213,
+          "row_space_weight_prediction": 60.777513539738116,
+          "null_space_weight_prediction": -1908.637186092951,
+          "out_of_row_space_norm_fraction": 0.9973583011710231,
+          "action_would_change_after_projection": true
+        }
+      ],
+      "first_G26_7200_diagnostic": {
+        "observed_at": 7200.0,
+        "owner": "owner:system_domestic",
+        "actual_advantage": null,
+        "full_prediction": 2775.5791650573437,
+        "row_space_weight_prediction": 1057.659436086422,
+        "null_space_weight_prediction": 1717.9197289709218,
+        "out_of_row_space_norm_fraction": 0.6637052841001226,
+        "action_would_change_after_projection": false
+      },
+      "first_G26_same_training_predictions_opposite_action_counterexample": {
+        "original_prediction": 2775.5791650573437,
+        "alternative_prediction": -2775.5791650573474,
+        "max_change_in_all_train_predictions": 8.060205862339793e-12,
+        "weight_change_norm": 0.5681111919893497,
+        "scope": "data-term identifiability only; regularization penalties may differ; no alternative model has been trained or deployed"
+      }
+    }
+  ],
+  "datasets": [
+    {
+      "domain": "primary_22",
+      "train_pairs": 4,
+      "dev_pairs": 4,
+      "train_rows": [
+        {
+          "pair_id": "d67e1d729b47c33eeba0e80f475a6efcb20c38ff1c66dda50b16784e2c97b321",
+          "parent_group": "conditional_timing_parent_701",
+          "fleet": 22,
+          "time": 28860.0,
+          "advantage": 1054.8770000003278,
+          "owner": "owner:system_domestic",
+          "reference": {
+            "destination": 57,
+            "earliest_departure": 28860.0,
+            "kind": "transfer",
+            "source": 122,
+            "transfer_scope": "local_empty_return",
+            "tray_id": "initial:95:1"
+          },
+          "patch": {
+            "destination": 149,
+            "earliest_departure": 28862.0,
+            "kind": "transfer",
+            "source": 122,
+            "transfer_scope": "local_empty_return",
+            "tray_id": "initial:95:1"
+          },
+          "complete_prefix_sha256": "a9b4dbf91d10d93f5a7c08c3513892e9071fa3e806436c0790c0336a7236fc86"
+        },
+        {
+          "pair_id": "99bbc8a89f462eefa384c665cb9807ed896fe55b3302127f5d8c62a0d1a83894",
+          "parent_group": "conditional_timing_parent_702",
+          "fleet": 22,
+          "time": 28920.0,
+          "advantage": -6052.001000000164,
+          "owner": "owner:system_domestic",
+          "reference": {
+            "destination": 149,
+            "earliest_departure": 28920.0,
+            "kind": "transfer",
+            "source": 60,
+            "transfer_scope": "local_empty_return",
+            "tray_id": "initial:57:1"
+          },
+          "patch": {
+            "destination": 138,
+            "earliest_departure": 28922.0,
+            "kind": "transfer",
+            "source": 60,
+            "transfer_scope": "local_empty_return",
+            "tray_id": "initial:57:1"
+          },
+          "complete_prefix_sha256": "bd9c9f0b1ddd42c9ae30da95e844ed7732f39c0fcf03a9041df80afa9a919c48"
+        },
+        {
+          "pair_id": "b7c271f565621fcdd16275e2103f1e81dbab4ff7dc514cd7d3454f8db6a2204c",
+          "parent_group": "conditional_timing_parent_701",
+          "fleet": 22,
+          "time": 7200.0,
+          "advantage": 0.0,
+          "owner": "owner:system_international",
+          "reference": {
+            "destination": null,
+            "earliest_departure": null,
+            "kind": "hold_optional",
+            "source": 0,
+            "transfer_scope": null,
+            "tray_id": "initial:0:0"
+          },
+          "patch": {
+            "destination": 138,
+            "earliest_departure": 7202.0,
+            "kind": "transfer",
+            "source": 0,
+            "transfer_scope": "cross_zone_transfer",
+            "tray_id": "initial:0:0"
+          },
+          "complete_prefix_sha256": "61899c51b9f42dd0fdfdc567281165ff0c34a64aba811974af9e1d782a1a5280"
+        },
+        {
+          "pair_id": "8b7bac9895aa1570cb3b9b540639524e2b0032907d6c4229afce249e28b948a9",
+          "parent_group": "conditional_timing_parent_702",
+          "fleet": 22,
+          "time": 7200.0,
+          "advantage": 0.0,
+          "owner": "owner:system_international",
+          "reference": {
+            "destination": null,
+            "earliest_departure": null,
+            "kind": "hold_optional",
+            "source": 0,
+            "transfer_scope": null,
+            "tray_id": "initial:0:0"
+          },
+          "patch": {
+            "destination": 138,
+            "earliest_departure": 7202.0,
+            "kind": "transfer",
+            "source": 0,
+            "transfer_scope": "cross_zone_transfer",
+            "tray_id": "initial:0:0"
+          },
+          "complete_prefix_sha256": "fc974086ce46d083fb681e8d1555f1ba8c2d4b4cc9a3b784a63c617d624f57f2"
+        }
+      ]
+    },
+    {
+      "domain": "mixed_18_22_26",
+      "train_pairs": 6,
+      "dev_pairs": 6,
+      "train_rows": [
+        {
+          "pair_id": "d67e1d729b47c33eeba0e80f475a6efcb20c38ff1c66dda50b16784e2c97b321",
+          "parent_group": "conditional_timing_parent_701",
+          "fleet": 22,
+          "time": 28860.0,
+          "advantage": 1054.8770000003278,
+          "owner": "owner:system_domestic",
+          "reference": {
+            "destination": 57,
+            "earliest_departure": 28860.0,
+            "kind": "transfer",
+            "source": 122,
+            "transfer_scope": "local_empty_return",
+            "tray_id": "initial:95:1"
+          },
+          "patch": {
+            "destination": 149,
+            "earliest_departure": 28862.0,
+            "kind": "transfer",
+            "source": 122,
+            "transfer_scope": "local_empty_return",
+            "tray_id": "initial:95:1"
+          },
+          "complete_prefix_sha256": "a9b4dbf91d10d93f5a7c08c3513892e9071fa3e806436c0790c0336a7236fc86"
+        },
+        {
+          "pair_id": "99bbc8a89f462eefa384c665cb9807ed896fe55b3302127f5d8c62a0d1a83894",
+          "parent_group": "conditional_timing_parent_702",
+          "fleet": 22,
+          "time": 28920.0,
+          "advantage": -6052.001000000164,
+          "owner": "owner:system_domestic",
+          "reference": {
+            "destination": 149,
+            "earliest_departure": 28920.0,
+            "kind": "transfer",
+            "source": 60,
+            "transfer_scope": "local_empty_return",
+            "tray_id": "initial:57:1"
+          },
+          "patch": {
+            "destination": 138,
+            "earliest_departure": 28922.0,
+            "kind": "transfer",
+            "source": 60,
+            "transfer_scope": "local_empty_return",
+            "tray_id": "initial:57:1"
+          },
+          "complete_prefix_sha256": "bd9c9f0b1ddd42c9ae30da95e844ed7732f39c0fcf03a9041df80afa9a919c48"
+        },
+        {
+          "pair_id": "b7c271f565621fcdd16275e2103f1e81dbab4ff7dc514cd7d3454f8db6a2204c",
+          "parent_group": "conditional_timing_parent_701",
+          "fleet": 22,
+          "time": 7200.0,
+          "advantage": 0.0,
+          "owner": "owner:system_international",
+          "reference": {
+            "destination": null,
+            "earliest_departure": null,
+            "kind": "hold_optional",
+            "source": 0,
+            "transfer_scope": null,
+            "tray_id": "initial:0:0"
+          },
+          "patch": {
+            "destination": 138,
+            "earliest_departure": 7202.0,
+            "kind": "transfer",
+            "source": 0,
+            "transfer_scope": "cross_zone_transfer",
+            "tray_id": "initial:0:0"
+          },
+          "complete_prefix_sha256": "61899c51b9f42dd0fdfdc567281165ff0c34a64aba811974af9e1d782a1a5280"
+        },
+        {
+          "pair_id": "8b7bac9895aa1570cb3b9b540639524e2b0032907d6c4229afce249e28b948a9",
+          "parent_group": "conditional_timing_parent_702",
+          "fleet": 22,
+          "time": 7200.0,
+          "advantage": 0.0,
+          "owner": "owner:system_international",
+          "reference": {
+            "destination": null,
+            "earliest_departure": null,
+            "kind": "hold_optional",
+            "source": 0,
+            "transfer_scope": null,
+            "tray_id": "initial:0:0"
+          },
+          "patch": {
+            "destination": 138,
+            "earliest_departure": 7202.0,
+            "kind": "transfer",
+            "source": 0,
+            "transfer_scope": "cross_zone_transfer",
+            "tray_id": "initial:0:0"
+          },
+          "complete_prefix_sha256": "fc974086ce46d083fb681e8d1555f1ba8c2d4b4cc9a3b784a63c617d624f57f2"
+        },
+        {
+          "pair_id": "26ae7137e28900ad01f99f57b3da046ef454a154755afca6c35f74ab7659dc66",
+          "parent_group": "conditional_timing_parent_701",
+          "fleet": 18,
+          "time": 28860.0,
+          "advantage": 104.68300000019372,
+          "owner": "owner:system_domestic",
+          "reference": {
+            "destination": 149,
+            "earliest_departure": 28860.0,
+            "kind": "transfer",
+            "source": 67,
+            "transfer_scope": "local_empty_return",
+            "tray_id": "initial:26:0"
+          },
+          "patch": {
+            "destination": 136,
+            "earliest_departure": 28862.0,
+            "kind": "transfer",
+            "source": 67,
+            "transfer_scope": "local_empty_return",
+            "tray_id": "initial:26:0"
+          },
+          "complete_prefix_sha256": "e1ae0f74e75a3ddcc27a9a98cee96e8208f40b689cf1166f0cf022e0ba10e0a7"
+        },
+        {
+          "pair_id": "aa348e5079d62f7860a7ed7bed758f1fc1e1e34a65a3cedc7db25474e5a3cf35",
+          "parent_group": "conditional_timing_parent_702",
+          "fleet": 26,
+          "time": 28800.0,
+          "advantage": 637.0759999994189,
+          "owner": "owner:system_domestic",
+          "reference": {
+            "destination": 95,
+            "earliest_departure": 28800.0,
+            "kind": "transfer",
+            "source": 81,
+            "transfer_scope": "local_empty_return",
+            "tray_id": "initial:26:0"
+          },
+          "patch": {
+            "destination": 57,
+            "earliest_departure": 28802.0,
+            "kind": "transfer",
+            "source": 81,
+            "transfer_scope": "local_empty_return",
+            "tray_id": "initial:26:0"
+          },
+          "complete_prefix_sha256": "8fe7b890d9ea4f444377d45b6006c54514314d5b33070c6cec45a4443577a80a"
+        }
+      ]
+    }
+  ],
+  "first_G26_callback": {
+    "sequence": 240,
+    "physical_time": 7200.0,
+    "record_sha256": "fc60dd171715baf3f9bc7996d4912d8b210d344b5a82227914be48e2e0968207",
+    "online_advantage": 2775.5791650573437,
+    "reference_action": {
+      "destination": null,
+      "earliest_departure": null,
+      "kind": "hold_optional",
+      "source": 57,
+      "transfer_scope": null,
+      "tray_id": "initial:57:0"
+    },
+    "patch_action": {
+      "destination": 149,
+      "earliest_departure": 7202.0,
+      "kind": "transfer",
+      "source": 57,
+      "transfer_scope": "local_empty_return",
+      "tray_id": "initial:57:0"
+    }
+  }
+}

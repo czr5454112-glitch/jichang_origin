@@ -13,18 +13,20 @@ from .foundation_airport_batch_patch import (
 
 SCHEMA = "g31.foundation.airport_opportunity.v1"
 CATALOG_VERSION = "static_loader_current_surplus_v1"
+FULL_CATALOG_VERSION = "static_all_loaders_current_surplus_v2"
 
 
 def build_opportunity(observation, baseline, *, continuation_version,
                       message_delay=2., respect_service_forecasts=True, k_max=3):
-    """Build ref, one destination change and optionally a single-tray hold.
+    """Build bounded complete-batch choices using only the public current.
 
     No flight plan or evaluator input is accepted here. Observed-source-queue
     assignments are optional R2 commitments of a locally surplus tray; terminal
     clearing is mandatory. Altering these assignments is an isolated experiment,
     not an assertion that currently waiting baggage cannot be harmed.
     """
-    require(type(k_max) is int and 1 <= k_max <= 3, "K_between_one_and_three")
+    require(type(k_max) is int and 1 <= k_max <= 13, "K_between_one_and_thirteen")
+    full_catalog = k_max > 3
     owner, now = observation["owner_id"], observation["now"]
     common = {"schema": PATCH_SCHEMA, "public_state_digest": digest(observation),
         "baseline_batch_digest": digest(baseline["intents"]),
@@ -66,6 +68,9 @@ def build_opportunity(observation, baseline, *, continuation_version,
             if scope is None or not contracts[destination].get("allow_receive", True):
                 mask_reasons["static_scope_or_receive_not_eligible"] += 1
                 continue
+            if full_catalog and contracts[destination].get("capacity", 1) <= 0:
+                mask_reasons["static_nonpositive_receive_capacity"] += 1
+                continue
             duration = travel.complete(source, destination)
             if not math.isfinite(duration):
                 mask_reasons["static_unreachable"] += 1
@@ -84,11 +89,16 @@ def build_opportunity(observation, baseline, *, continuation_version,
                 "service_window": window, "expected_version": observation.get("version", 0)}
             alternatives.append(((-pressure[destination] / (1. + duration), duration, destination), intent))
         if alternatives:
-            _, intent = min(alternatives, key=lambda row: row[0])
-            actions.append(dict(common, action_id="a_patch", kind="replace_optional" if old else "add_optional",
-                tray_id=chosen["tray_id"], intent=intent,
-                static_arrival_estimate=intent["earliest_departure"] + travel.complete(source, intent["destination"]),
-                estimate_semantics="public_static_capacity_relaxed_estimate"))
+            ordered = sorted(alternatives, key=lambda row: row[0])
+            available_slots = k_max - 1 - int(bool(old))
+            chosen_alternatives = ordered[:available_slots] if full_catalog else ordered[:1]
+            for rank, (_, intent) in enumerate(chosen_alternatives):
+                actions.append(dict(common,
+                    action_id="a_patch" if rank == 0 else f"a_patch:{intent['destination']}",
+                    kind="replace_optional" if old else "add_optional",
+                    tray_id=chosen["tray_id"], intent=intent,
+                    static_arrival_estimate=intent["earliest_departure"] + travel.complete(source, intent["destination"]),
+                    estimate_semantics="public_static_capacity_relaxed_estimate"))
         else:
             mask_reasons["no_different_static_destination"] += 1
         if old and len(actions) < k_max:
@@ -100,7 +110,13 @@ def build_opportunity(observation, baseline, *, continuation_version,
         "optional_intents": copy.deepcopy([row for row in baseline["intents"] if not mandatory(row)]),
         "actual_uncommitted_trays": actual,
         "received_peer_message_ids": [row.get("message_id") for row in observation.get("delivered_messages", [])],
-        "candidate_catalog_version": CATALOG_VERSION, "K": len(actions), "K_max": k_max,
+        "candidate_catalog_version": FULL_CATALOG_VERSION if full_catalog else CATALOG_VERSION,
+        "static_loader_count": len(roles.get("loader_nodes", [])),
+        "legal_destination_count": len(alternatives) if chosen is not None and k_max > 1
+            and roles.get("schema") == "g31.static_node_roles.v1" else 0,
+        "candidate_destination_nodes": [row["intent"]["destination"] for row in actions
+            if row.get("intent") is not None],
+        "K": len(actions), "K_max": k_max,
         "P": 2, "K_meaning": "candidate complete-batch choices including reference",
         "P_meaning": "two separately budgeted native continuations, no internal simulation",
         "peer_policy_version": continuation_version, "continuation_version": continuation_version,

@@ -323,13 +323,21 @@ def _score(action, prepared):
             "unknown_edge_capacity": unknown_edges}
 
 
-def explain_pair(reference, patch):
+def explain_pair(reference, patch, *, forecast_weight=1.):
     """Return auditable costs; positive advantage selects exactly one patch."""
     prepared = _prepare(reference, patch)
+    require(forecast_weight in (0., 1.), "preregistered_forecast_weight")
+    if forecast_weight != 1.:
+        values = list(prepared)
+        values[7] = {node: (edges, None if means is None else
+                           [forecast_weight * value for value in means])
+                     for node, (edges, means) in prepared[7].items()}
+        prepared = tuple(values)
     ref, candidate = _score(reference["semantic_action"], prepared), _score(patch["semantic_action"], prepared)
     advantage = ref["cost"] - candidate["cost"]
     require(math.isfinite(advantage), "finite_pair_advantage")
     return {"schema": SCHEMA, "rule_contract_sha256": digest(contract()),
+        "registered_forecast_weight": forecast_weight,
         "public_state_digest": prepared[12],
         "forecast_sha256": reference["forecast_evidence"]["forecast_sha256"],
         "reference": ref, "patch": candidate, "predicted_patch_advantage": advantage,

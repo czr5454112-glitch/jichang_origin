@@ -726,13 +726,8 @@ inline void EventDrivenJunctionRuntime::process_circulation_event(const RuntimeE
       const int id = tray.active_leg;
       if (id >= 0 && tray.edge_to < 0) {
         auto& bag = bags_.at(id);
-        for (auto& pair : junctions_) {
-          auto& q = pair.second.queue;
-          q.erase(std::remove(q.begin(), q.end(), id), q.end());
-          auto& sq = pair.second.source_queue;
-          sq.erase(std::remove(sq.begin(), sq.end(), id), sq.end());
-        }
         fail_bag(bag, "departure_lease_expired_before_physical_entry", time);
+        circulation_remove_failed_from_queues(id, time);
       }
     }
     circulation_progress(time);

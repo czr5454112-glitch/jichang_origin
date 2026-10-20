@@ -32,7 +32,7 @@ def current_candidate_rows(observation, baseline, opportunity, *, parent,
         and opportunity["owner_id"] == observation["owner_id"]
         and opportunity["observed_at"] == observation["now"], "prospective_current_binding")
     require(opportunity["catalog_uses_future_plan"] is False
-        and 1 <= patch_rank < opportunity["K"] <= 3, "common_plan_independent_bounded_catalog")
+        and 1 <= patch_rank < opportunity["K"] <= 13, "common_plan_independent_bounded_catalog")
     parent = validate_parent(parent)
     action = opportunity["candidates"][patch_rank]
     target = action["tray_id"]
@@ -72,15 +72,16 @@ class ProspectivePlanner:
     def __init__(self, base_planner=None, *, parent, policy_id, information_variant,
                  selector=None, forecast_at=None, activate_at=7200., patch_rank=1,
                  continuation_version="airport_local_return_analytic_v1", k_max=3,
-                 record_sink=None, retain_records=True, capture_all_callbacks=False):
+                 record_sink=None, retain_records=True, capture_all_callbacks=False,
+                 deployment_contract=None, score_all_candidates=False, reference_champion=False):
         require(information_variant in VARIANTS, "prospective_information_variant")
         require(isinstance(policy_id, str) and policy_id, "prospective_policy_identity")
         require(type(activate_at) in (float, int) and math.isfinite(activate_at) and activate_at >= 0,
             "prospective_activation_time")
-        require(information_variant == "C00" or callable(selector), "explicit_prospective_selector")
-        require(information_variant not in ("C10", "C11") or callable(forecast_at),
+        require(information_variant == "C00" or reference_champion or callable(selector), "explicit_prospective_selector")
+        require(information_variant not in ("C10", "C11") or reference_champion or callable(forecast_at),
             "actual_preloaded_forecast_provider")
-        require(type(patch_rank) is int and 1 <= patch_rank < k_max <= 3, "prospective_candidate_bound")
+        require(type(patch_rank) is int and 1 <= patch_rank < k_max <= 13, "prospective_candidate_bound")
         self.base_planner = base_planner or transfer_candidates
         self.parent = validate_parent(parent)
         self.policy_id, self.information_variant = policy_id, information_variant
@@ -90,6 +91,15 @@ class ProspectivePlanner:
         self.record_sink = record_sink
         self.retain_records = retain_records
         self.capture_all_callbacks = capture_all_callbacks
+        self.deployment_contract = copy.deepcopy(deployment_contract)
+        if deployment_contract is not None:
+            require(deployment_contract["max_policy_replacements"] == 1
+                and deployment_contract["continuation_policy_id"] == continuation_version
+                and deployment_contract["label_horizon_seconds"] == 1800.,
+                "prospective_one_replacement_matches_label_continuation")
+        self.score_all_candidates = bool(score_all_candidates)
+        self.reference_champion = bool(reference_champion)
+        self._policy_replacements = 0
         self.records = []
         self.counts = Counter()
         self._held = {}
@@ -142,7 +152,13 @@ class ProspectivePlanner:
                 message_delay=options.get("message_delay", 0.),
                 respect_service_forecasts=options.get("respect_service_forecasts", False))
             record["opportunity"] = opportunity
-            if self.information_variant == "C00":
+            if self.reference_champion:
+                self.counts["reference_champion_callbacks"] += 1
+                record["status"] = "reference_champion"
+            elif self.deployment_contract is not None and self._policy_replacements >= 1:
+                self.counts["fixed_continuation_after_one_replacement"] += 1
+                record["status"] = "fixed_continuation_after_one_replacement"
+            elif self.information_variant == "C00":
                 self.counts["reference_rule_callbacks"] += 1
                 record["status"] = "reference_rule"
             elif opportunity["K"] <= self.patch_rank:
@@ -151,21 +167,34 @@ class ProspectivePlanner:
             else:
                 forecast_evidence = (self.forecast_at(observation=observation, parent=self.parent)
                     if self.information_variant in ("C10", "C11") else None)
-                rows = current_candidate_rows(observation, baseline, opportunity,
-                    parent=self.parent, information_variant=self.information_variant,
-                    forecast_evidence=forecast_evidence, patch_rank=self.patch_rank,
-                    copy_inputs=False)
-                require(record["public_state_digest"] == digest(observation),
-                    "current_observation_mutated_during_forecast")
                 selector_started = time.perf_counter()
-                gain = self.selector(*rows)
+                ranked = []
+                best = None
+                ranks = range(1, opportunity["K"]) if self.score_all_candidates else (self.patch_rank,)
+                for patch_rank in ranks:
+                    rows = current_candidate_rows(observation, baseline, opportunity,
+                        parent=self.parent, information_variant=self.information_variant,
+                        forecast_evidence=forecast_evidence, patch_rank=patch_rank, copy_inputs=False)
+                    require(record["public_state_digest"] == digest(observation),
+                        "current_observation_mutated_during_forecast")
+                    score = self.selector(*rows)
+                    explanation = score if isinstance(score, dict) else None
+                    gain = score["advantage"] if explanation is not None else score
+                    require(type(gain) in (int, float) and math.isfinite(gain), "finite_prospective_advantage")
+                    if explanation is not None and explanation.get("supported") is not True:
+                        gain = 0.
+                    ranked.append({"patch_rank": patch_rank, "advantage": gain, "support": explanation})
+                    if best is None or gain > best[0]:
+                        best = gain, patch_rank, rows
+                gain, chosen_rank, rows = best
+                record["candidate_scores"] = ranked
                 record["selector_wall_ms"] = 1000.*(time.perf_counter()-selector_started)
                 record["selector_timing_scope"] = (
                     "current validation, feature construction and fixed selector inference; excludes native and audit")
                 require(type(gain) in (int, float) and math.isfinite(gain), "finite_prospective_advantage")
                 self.counts["actual_scored_callbacks"] += 1
                 choose_patch = gain > 0.
-                action = opportunity["candidates"][self.patch_rank if choose_patch else 0]
+                action = opportunity["candidates"][chosen_rank if choose_patch else 0]
                 result = apply_patch(observation, baseline, action)
                 record.update(status="isolated_current_patch_proposed" if choose_patch else "reference_selected",
                     predicted_patch_advantage=float(gain), selected_action_id=action["action_id"],
@@ -173,11 +202,14 @@ class ProspectivePlanner:
                     inference_rows=rows)
                 if choose_patch:
                     self.counts["proposed_patch_callbacks"] += 1
+                    self._policy_replacements += 1
                     if action["kind"] == "hold_optional":
                         self._held[owner] = now, action["tray_id"]
         except (ValueError, KeyError, TypeError) as exc:
             self.counts["invalid_current_or_model_reference_fallback"] += 1
             record.update(status="reference_fallback", reason=str(exc))
+        record["policy_replacements_proposed"] = self._policy_replacements
+        record["deployment_contract"] = self.deployment_contract
         self._emit(record, observation, baseline, result, began, options)
         return result
 
@@ -186,10 +218,15 @@ class ProspectivePlanner:
             "information_variant": self.information_variant, "activation_at": self.activate_at,
             "counts": dict(self.counts), "records": copy.deepcopy(self.records),
             "records_retained_in_memory": self.retain_records,
-            "state": {"held_optional": copy.deepcopy(self._held),
-                "last_evaluated_at_by_owner": copy.deepcopy(self._last_evaluated)},
+            "state": self.state_snapshot(),
+            "deployment_contract": copy.deepcopy(self.deployment_contract),
             "strict_nonharm_certified": False, "native_jobs_started_by_planner": 0,
             "scope": "prospective isolated one-patch controller; actual submit/ACK evidence is separate"}
+
+    def state_snapshot(self):
+        return {"held_optional": copy.deepcopy(self._held),
+            "last_evaluated_at_by_owner": copy.deepcopy(self._last_evaluated),
+            "policy_replacements_proposed": self._policy_replacements}
 
 
 def make_prospective_planner(base_planner=None, **options):
@@ -202,6 +239,12 @@ def make_ranker_planner(model, base_planner=None, **options):
     frozen = copy.deepcopy(model)
     variant = frozen["information_variant"]
     require(variant in ("C01", "C11"), "independently_fitted_C01_or_C11_required")
+    if frozen.get("schema") == "g31.foundation.airport_supported_difference_ranker.v1":
+        options.setdefault("deployment_contract", frozen["contract"]["policy_alignment"])
+        options.setdefault("continuation_version", frozen["contract"]["policy_alignment"]["continuation_policy_id"])
+        options.setdefault("score_all_candidates", True)
+        options.setdefault("k_max", 13)
+        options.setdefault("reference_champion", frozen["reference_champion"])
     return ProspectivePlanner(base_planner, information_variant=variant,
         policy_id=frozen["model_id"],
         selector=prepare_predictor(frozen), **options)

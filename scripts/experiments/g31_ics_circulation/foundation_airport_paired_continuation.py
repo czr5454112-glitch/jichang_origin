@@ -56,14 +56,23 @@ class PairedPlanner:
     """Change at most one opportunity, then continue the same fixed baseline."""
 
     def __init__(self, base_planner=None, *, branch, window, parent,
-                 continuation_version, anchor_rank=0, patch_rank=1, k_max=3):
+                 continuation_version, anchor_rank=0, patch_rank=1, k_max=3,
+                 policy_alignment=None, continuation_planner=None):
         require(branch in ("a_ref", "a_patch"), "branch_must_be_a_ref_or_a_patch")
         require(len(window) == 2 and all(type(v) in (int, float) and math.isfinite(v) for v in window)
             and 0 <= window[0] <= window[1], "registered_anchor_window")
         require(type(anchor_rank) is int and anchor_rank >= 0
-            and type(patch_rank) is int and 1 <= patch_rank < k_max <= 3, "bounded_fixed_ranks")
+            and type(patch_rank) is int and 1 <= patch_rank < k_max <= 13, "bounded_fixed_ranks")
         require(isinstance(continuation_version, str) and continuation_version, "fixed_continuation_version")
         self.base_planner = base_planner or transfer_candidates
+        self.continuation_planner = continuation_planner or self.base_planner
+        self.policy_alignment = copy.deepcopy(policy_alignment)
+        if policy_alignment is not None:
+            require(policy_alignment["continuation_policy_id"] == continuation_version
+                and policy_alignment["max_policy_replacements"] == 1
+                and policy_alignment["label_horizon_seconds"] == 1800.
+                and policy_alignment["improvement_round"] in (0, 1),
+                "registered_pair_policy_alignment")
         self.branch, self.window = branch, tuple(window)
         self.parent, self.continuation_version = validate_parent(parent), continuation_version
         self.anchor_rank, self.patch_rank, self.k_max = anchor_rank, patch_rank, k_max
@@ -104,17 +113,24 @@ class PairedPlanner:
     def _selector_state(self, *, selected):
         # This is controller memory, distinct from the chosen intervention.
         # The two branch modes may differ only after the common anchor state.
-        return {"window": list(self.window), "anchor_rank": self.anchor_rank,
+        state = {"window": list(self.window), "anchor_rank": self.anchor_rank,
             "patch_rank": self.patch_rank, "k_max": self.k_max, "parent": self.parent,
             "continuation_version": self.continuation_version,
+            "policy_alignment": self.policy_alignment,
             "eligible_opportunities_seen": self.counts["eligible_opportunities"],
             "intervention_already_applied": selected,
             "held_optional_tray": (self.selected["chosen_action"]["tray_id"]
                 if selected and self._held else None), "hold_owner_timestamp": self._held}
+        for key, planner in (("behavior", self.base_planner), ("continuation", self.continuation_planner)):
+            snapshot = getattr(planner, "state_snapshot", None)
+            if callable(snapshot):
+                state[key + "_planner_state"] = snapshot()
+        return state
 
     def __call__(self, observation, **options):
         # Planner has no session/native/evaluator interface.
-        baseline = self.base_planner(observation, **options)
+        planner = self.continuation_planner if self.selected is not None else self.base_planner
+        baseline = planner(observation, **options)
         now, owner = observation["now"], observation["owner_id"]
         residual = str(options.get("request_prefix", "")).endswith(":residual")
         self.counts["callbacks"] += 1
@@ -161,6 +177,7 @@ class PairedPlanner:
             "selector_state_before_action": self._selector_state(selected=False),
             "chosen_action": copy.deepcopy(chosen), "chosen_decision": copy.deepcopy(result),
             "continuation_version": self.continuation_version,
+            "policy_alignment": copy.deepcopy(self.policy_alignment),
             "registered_window": list(self.window), "eligible_rank": rank,
             "patch_rank": self.patch_rank, "candidate_labels": None,
             "label_start": now, "label_end": now + 1800.,
@@ -175,6 +192,7 @@ class PairedPlanner:
         return {"schema": SCHEMA, "branch": self.branch, "parent": self.parent,
             "window": list(self.window), "anchor_rank": self.anchor_rank, "patch_rank": self.patch_rank,
             "continuation_version": self.continuation_version, "counts": dict(self.counts),
+            "policy_alignment": copy.deepcopy(self.policy_alignment),
             "mask_reasons": dict(self.mask_reasons), "selected": copy.deepcopy(self.selected),
             "successor": copy.deepcopy(self.successor),
             "status": "anchor_selected" if self.selected is not None else "no_eligible_anchor",

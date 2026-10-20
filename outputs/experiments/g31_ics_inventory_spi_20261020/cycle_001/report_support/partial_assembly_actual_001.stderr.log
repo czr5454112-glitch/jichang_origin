@@ -1,0 +1,15 @@
+Traceback (most recent call last):
+  File "C:\PROGRAMING\czr005\.g31_ics_circulation_worktree\outputs\experiments\g31_ics_inventory_spi_20261020\cycle_001\report_support\assemble_partial_compact_request_001.py", line 530, in <module>
+    result = assemble({"path": str(Path(args.seeds).resolve()), "sha256": args.seeds_sha256},
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\PROGRAMING\czr005\.g31_ics_circulation_worktree\outputs\experiments\g31_ics_inventory_spi_20261020\cycle_001\report_support\assemble_partial_compact_request_001.py", line 406, in assemble
+    seeds = read(seeds_ref); validate_seeds(seeds)
+                             ^^^^^^^^^^^^^^^^^^^^^
+  File "C:\PROGRAMING\czr005\.g31_ics_circulation_worktree\outputs\experiments\g31_ics_inventory_spi_20261020\cycle_001\report_support\assemble_partial_compact_request_001.py", line 75, in validate_seeds
+    full.exact_ref(item); require(item.get("scope"), "excluded_scope")
+    ^^^^^^^^^^^^^^^^^^^^
+  File "C:\PROGRAMING\czr005\.g31_ics_circulation_worktree\outputs\experiments\g31_ics_inventory_spi_20261020\cycle_001\report_support\assemble_final_compact_request_002.py", line 78, in exact_ref
+    require(isinstance(ref, dict) and isinstance(ref.get("path"), str)
+  File "C:\PROGRAMING\czr005\.g31_ics_circulation_worktree\outputs\experiments\g31_ics_inventory_spi_20261020\cycle_001\report_support\assemble_final_compact_request_002.py", line 66, in require
+    raise ValueError("final_request_assembler:" + reason)
+ValueError: final_request_assembler:absolute_bound_reference

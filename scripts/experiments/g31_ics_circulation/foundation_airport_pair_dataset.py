@@ -7,6 +7,7 @@ import math
 from .foundation_airport_batch_patch import digest, require
 from .foundation_airport_behavior_evidence import snapshot_index
 from .foundation_airport_paired_continuation import validate_parent
+from .foundation_airport_service_metrics import compare_completion_outcomes
 
 
 SCHEMA = "g31.foundation.airport_pair_dataset.v1"
@@ -129,6 +130,7 @@ def branch_evidence(*, data, planner_report, result, client_calls, delivered_ack
     output = {"schema": SCHEMA, "branch": planner_report["branch"], "parent": parent,
         "input_sha256": input_sha256 or digest(data),
         "continuation_version": planner_report["continuation_version"],
+        "policy_alignment": copy.deepcopy(planner_report.get("policy_alignment")),
         "selected": copy.deepcopy(selected), "successor": copy.deepcopy(planner_report.get("successor")),
         "stop_reason": stop_reason, "status": "no_eligible_anchor" if selected is None else "censored",
         "cost": None, "execution": None, "transition": None,
@@ -195,11 +197,15 @@ def compare_pair(reference, patched):
     require(reference["parent"] == patched["parent"], "same_physical_parent_and_split")
     require(reference["input_sha256"] == patched["input_sha256"], "same_frozen_exogenous_input")
     require(reference["continuation_version"] == patched["continuation_version"], "same_continuation_policy")
+    require(reference.get("policy_alignment") == patched.get("policy_alignment"),
+        "same_registered_behavior_and_continuation_contract")
     output = {"schema": SCHEMA, "parent": copy.deepcopy(reference["parent"]),
         "reference_status": reference["status"], "patched_status": patched["status"],
         "advantage_bag_seconds": None, "status": "not_comparable",
         "strict_nonharm_certified": False, "rl_benefit_demonstrated": False,
         "attempts_or_failures_excluded": 0}
+    if reference.get("policy_alignment") is not None:
+        output["policy_alignment"] = copy.deepcopy(reference["policy_alignment"])
     a, b = reference["selected"], patched["selected"]
     if a is None or b is None:
         output["reason"] = "one_or_both_registered_cells_have_no_eligible_anchor"
@@ -241,6 +247,11 @@ def compare_pair(reference, patched):
         mechanism_direction="patch_better" if advantage > 0 else "reference_better" if advantage < 0 else "equal",
         per_job_comparison_counts=comparison_counts, per_job_comparisons=job_rows,
         learning_claim="isolated_action_contrast_only_not_trained_RL_control")
+    output["censored_direction_summary"] = compare_completion_outcomes(
+        [{"business_bag_id": identity, "arrival": row["arrival"]} for identity, row in old_jobs.items()],
+        {identity: row["completed_at"] for identity, row in old_jobs.items() if row["completed_at"] is not None},
+        {identity: row["completed_at"] for identity, row in new_jobs.items() if row["completed_at"] is not None},
+        cutoff=reference["cost"]["label_end"], include_rows=True)
     return output
 
 

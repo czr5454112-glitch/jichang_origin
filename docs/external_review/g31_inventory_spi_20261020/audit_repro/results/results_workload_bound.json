@@ -1,0 +1,165 @@
+{
+  "schema": "independent.g31.optimistic_workload_bound.v1",
+  "fixed_commit": "1d895da00644c9486568fe74b835e057aa93f8c8",
+  "formula": "p_j = shortest directed sum(length/speed) from origin to destination; N >= sum(p_j)/(H-min arrival), for every job in the specified cohort to finish by H.",
+  "assumptions": [
+    "one bag occupies one physical tray while traveling loaded",
+    "all jobs in the selected cohort are required to finish by the stated common horizon",
+    "deadline-prefix condition is an additional necessary condition for every job due by that prefix deadline to finish on time"
+  ],
+  "relaxations": [
+    "all 227 graph edges permitted even where actual capacity is zero",
+    "ignore empty return travel and initial tray position",
+    "ignore intermediate node service, loading, unloading and holding",
+    "ignore mandatory storage detours and storage-release holding",
+    "ignore edge/node contention, owner protocol, commitments and quarantines",
+    "ignore all job-specific arrival times after the earliest arrival when aggregating available work"
+  ],
+  "limitations": [
+    "necessary lower bound only; not a sufficient fleet sizing recommendation",
+    "all-arrived-by-H cohort can contain individually too-late arrivals, so no finite fleet necessarily closes it by H",
+    "does not prove observed throughput around 1000 is optimal or excuse avoidable stalls",
+    "does not modify the preregistered J or existing service acceptance target",
+    "the 77/68-style numbers concern this frozen synthetic demand/graph/time window only"
+  ],
+  "parents": {
+    "901": {
+      "input_path": "review_1d895da0_20261020/outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C00_P901_001/input.json",
+      "input_sha256": "94f55dbde869edb89683518cf16f19ee94307f1215b32d659e01865352f770de",
+      "physical_population": 28506,
+      "not_yet_arrived": 7585,
+      "physical_initial_fleet": 22,
+      "zero_capacity_edges_permitted_in_relaxation": [
+        [
+          97,
+          98
+        ]
+      ],
+      "cohorts": [
+        {
+          "name": "all_arrived_by_H",
+          "count": 20921,
+          "first_physical_arrival": 8311.640723,
+          "common_completion_horizon": 59400.0,
+          "optimistic_available_seconds_per_tray": 51088.359276999996,
+          "direct_loaded_travel_work_lower_bound_tray_seconds": 3893371.835,
+          "mean_direct_loaded_travel_seconds": 186.0987445628794,
+          "continuous_fleet_work_lower_bound": 76.20859017785678,
+          "integer_fleet_work_necessary_lower_bound": 77,
+          "jobs_individually_impossible_by_horizon_even_at_relaxed_speed": 101,
+          "jobs_individually_impossible_by_deadline_even_at_relaxed_speed": 0,
+          "initial_fleet": 22,
+          "initial_fleet_relaxed_work_budget": 1123943.9040939999
+        },
+        {
+          "name": "arrived_deadline_strictly_before_H",
+          "count": 18538,
+          "first_physical_arrival": 8311.640723,
+          "common_completion_horizon": 59400.0,
+          "optimistic_available_seconds_per_tray": 51088.359276999996,
+          "direct_loaded_travel_work_lower_bound_tray_seconds": 3459916.605,
+          "mean_direct_loaded_travel_seconds": 186.63915228179954,
+          "continuous_fleet_work_lower_bound": 67.72416757877085,
+          "integer_fleet_work_necessary_lower_bound": 68,
+          "jobs_individually_impossible_by_horizon_even_at_relaxed_speed": 0,
+          "jobs_individually_impossible_by_deadline_even_at_relaxed_speed": 0,
+          "initial_fleet": 22,
+          "initial_fleet_relaxed_work_budget": 1123943.9040939999
+        },
+        {
+          "name": "arrived_deadline_at_or_before_H",
+          "count": 18628,
+          "first_physical_arrival": 8311.640723,
+          "common_completion_horizon": 59400.0,
+          "optimistic_available_seconds_per_tray": 51088.359276999996,
+          "direct_loaded_travel_work_lower_bound_tray_seconds": 3492377.175,
+          "mean_direct_loaded_travel_seconds": 187.47998577410348,
+          "continuous_fleet_work_lower_bound": 68.3595485238507,
+          "integer_fleet_work_necessary_lower_bound": 69,
+          "jobs_individually_impossible_by_horizon_even_at_relaxed_speed": 0,
+          "jobs_individually_impossible_by_deadline_even_at_relaxed_speed": 0,
+          "initial_fleet": 22,
+          "initial_fleet_relaxed_work_budget": 1123943.9040939999
+        }
+      ],
+      "strongest_deadline_prefix_work_necessary_bound": {
+        "deadline": 57600.0,
+        "jobs": 18207,
+        "work": 3401678.275,
+        "span": 49288.359276999996,
+        "necessary_fleet": 69.01585536419681
+      },
+      "integer_strongest_deadline_prefix_necessary_fleet": 70
+    },
+    "902": {
+      "input_path": "review_1d895da0_20261020/outputs/experiments/g31_ics_action_value_20261020/cycle_001/D_N22_C00_P902_001/input.json",
+      "input_sha256": "9b17700c34fbb0b05fdf97c365366ab06539164d42b202f2f360c3114e7a5b30",
+      "physical_population": 28506,
+      "not_yet_arrived": 7587,
+      "physical_initial_fleet": 22,
+      "zero_capacity_edges_permitted_in_relaxation": [
+        [
+          97,
+          98
+        ]
+      ],
+      "cohorts": [
+        {
+          "name": "all_arrived_by_H",
+          "count": 20919,
+          "first_physical_arrival": 8168.38865,
+          "common_completion_horizon": 59400.0,
+          "optimistic_available_seconds_per_tray": 51231.61135,
+          "direct_loaded_travel_work_lower_bound_tray_seconds": 3893519.455,
+          "mean_direct_loaded_travel_seconds": 186.12359362302215,
+          "continuous_fleet_work_lower_bound": 75.99837975816469,
+          "integer_fleet_work_necessary_lower_bound": 76,
+          "jobs_individually_impossible_by_horizon_even_at_relaxed_speed": 101,
+          "jobs_individually_impossible_by_deadline_even_at_relaxed_speed": 0,
+          "initial_fleet": 22,
+          "initial_fleet_relaxed_work_budget": 1127095.4497
+        },
+        {
+          "name": "arrived_deadline_strictly_before_H",
+          "count": 18538,
+          "first_physical_arrival": 8168.38865,
+          "common_completion_horizon": 59400.0,
+          "optimistic_available_seconds_per_tray": 51231.61135,
+          "direct_loaded_travel_work_lower_bound_tray_seconds": 3459916.605,
+          "mean_direct_loaded_travel_seconds": 186.63915228179954,
+          "continuous_fleet_work_lower_bound": 67.53479958619337,
+          "integer_fleet_work_necessary_lower_bound": 68,
+          "jobs_individually_impossible_by_horizon_even_at_relaxed_speed": 0,
+          "jobs_individually_impossible_by_deadline_even_at_relaxed_speed": 0,
+          "initial_fleet": 22,
+          "initial_fleet_relaxed_work_budget": 1127095.4497
+        },
+        {
+          "name": "arrived_deadline_at_or_before_H",
+          "count": 18628,
+          "first_physical_arrival": 8168.38865,
+          "common_completion_horizon": 59400.0,
+          "optimistic_available_seconds_per_tray": 51231.61135,
+          "direct_loaded_travel_work_lower_bound_tray_seconds": 3492377.175,
+          "mean_direct_loaded_travel_seconds": 187.47998577410348,
+          "continuous_fleet_work_lower_bound": 68.16840390088569,
+          "integer_fleet_work_necessary_lower_bound": 69,
+          "jobs_individually_impossible_by_horizon_even_at_relaxed_speed": 0,
+          "jobs_individually_impossible_by_deadline_even_at_relaxed_speed": 0,
+          "initial_fleet": 22,
+          "initial_fleet_relaxed_work_budget": 1127095.4497
+        }
+      ],
+      "strongest_deadline_prefix_work_necessary_bound": {
+        "deadline": 57600.0,
+        "jobs": 18207,
+        "work": 3401678.275,
+        "span": 49431.61135,
+        "necessary_fleet": 68.8158484439128
+      },
+      "integer_strongest_deadline_prefix_necessary_fleet": 69
+    }
+  },
+  "native_starts": 0,
+  "fit_calls": 0
+}

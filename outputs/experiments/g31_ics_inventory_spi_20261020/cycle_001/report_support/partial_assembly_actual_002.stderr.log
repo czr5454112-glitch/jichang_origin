@@ -1,0 +1,20 @@
+Traceback (most recent call last):
+  File "C:\PROGRAMING\czr005\.g31_ics_circulation_worktree\outputs\experiments\g31_ics_inventory_spi_20261020\cycle_001\report_support\assemble_partial_compact_request_001.py", line 530, in <module>
+    result = assemble({"path": str(Path(args.seeds).resolve()), "sha256": args.seeds_sha256},
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\PROGRAMING\czr005\.g31_ics_circulation_worktree\outputs\experiments\g31_ics_inventory_spi_20261020\cycle_001\report_support\assemble_partial_compact_request_001.py", line 431, in assemble
+    admin = full.expand_support(graph, seeds)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\PROGRAMING\czr005\.g31_ics_circulation_worktree\outputs\experiments\g31_ics_inventory_spi_20261020\cycle_001\report_support\assemble_final_compact_request_002.py", line 664, in expand_support
+    graph.add(item["reference"], item["category"], structured=item.get("structured_audit"))
+  File "C:\PROGRAMING\czr005\.g31_ics_circulation_worktree\outputs\experiments\g31_ics_inventory_spi_20261020\cycle_001\report_support\assemble_partial_compact_request_001.py", line 248, in add
+    ref = full.exact_ref(ref); path = self.path(ref["path"]); self.guard(path)
+                                      ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\PROGRAMING\czr005\.g31_ics_circulation_worktree\outputs\experiments\g31_ics_inventory_spi_20261020\cycle_001\report_support\assemble_final_compact_request_002.py", line 144, in path
+    return self.builder.approved_path(value, self.selector)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\PROGRAMING\czr005\.g31_ics_circulation_worktree\outputs\experiments\g31_ics_inventory_spi_20261020\cycle_001\report_support\build_final_compact_publication_002.py", line 75, in approved_path
+    require(not any(part.lower().startswith("compact_actual_sample")
+  File "C:\PROGRAMING\czr005\.g31_ics_circulation_worktree\outputs\experiments\g31_ics_inventory_spi_20261020\cycle_001\report_support\build_final_compact_publication_002.py", line 34, in require
+    raise ValueError("final_compact_builder:" + reason)
+ValueError: final_compact_builder:no_sample_dummy_or_fixture_tree
