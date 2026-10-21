@@ -122,7 +122,16 @@ class ProtocolClient:
         row = {"kind": kind, "payload": request, "terminal": False,
                "created_at": self.session.physical_time}
         self.state["outbox"][request["request_id"]] = row
-        return request["request_id"], self._send(row, retry=False)
+        try:
+            return request["request_id"], self._send(row, retry=False)
+        except BaseException as error:
+            # A transport exception cannot prove that the immutable request
+            # was not accepted. Retain and index its original identity so a
+            # subsequent refresh can poll/retry it rather than invent an ID.
+            row.setdefault("next_retry", self.session.physical_time + self.state["retry_period"])
+            row["submission_exception_type"] = type(error).__name__
+            self._index_request(request["request_id"], row)
+            raise
 
     def refresh(self, *, retry: bool = True, owner_id: str | None = None) -> list[dict]:
         views = []
@@ -299,7 +308,9 @@ def _recover_failed_empty(client: ProtocolClient, owner: str, state: dict, *,
 
 def _post_inventory_return(client: ProtocolClient, owner: str, state: dict, *,
                            compact: bool, command_delay: float, priority_error: bool,
-                           precommit_observer=None) -> dict:
+                           precommit_observer=None, stock_return_selector=None,
+                           stock_return_selector_identity=None, post_decision_observer=None,
+                           pre_stock_return_observer=None) -> dict:
     """After priority submits, refresh independently and spend at most one quota."""
     from .foundation_airport_inventory_rule import r0_priority_planner, select_stock_return
     tick = state["next_tick"]
@@ -324,9 +335,42 @@ def _post_inventory_return(client: ProtocolClient, owner: str, state: dict, *,
     if baseline["intents"]:
         result.update(reason="fresh_priority_intents_remain", decision=baseline)
         return result
-    decision = select_stock_return(observation, baseline, message_delay=command_delay,
-        request_prefix=f"protocol:{tick}:post_return")
+    if pre_stock_return_observer is not None:
+        started = time.perf_counter()
+        pre_stock_return_observer(session=client.session, controller_state=state,
+            client_state=client.state, observation=observation, decision=baseline)
+        result["offline_evaluator_ms"] = 1000 * (time.perf_counter() - started)
+    if stock_return_selector is None:
+        decision = select_stock_return(observation, baseline, message_delay=command_delay,
+            request_prefix=f"protocol:{tick}:post_return")
+    else:
+        from .foundation_airport_batch_patch import digest
+        if not callable(stock_return_selector) or not stock_return_selector_identity:
+            raise ValueError("protocol_control:explicit_stock_return_selector_identity_required")
+        joint = state.setdefault("joint_post_priority", {"selector_identity":
+            stock_return_selector_identity, "policy_state": {}, "phase": "post_priority"})
+        if joint["selector_identity"] != stock_return_selector_identity:
+            raise ValueError("protocol_control:stock_return_selector_state_identity_mismatch")
+        context = {"owner_id": owner, "tick": tick, "phase": "post_priority",
+            "view_version": observation.get("version", 0), "observed_at": observation["now"],
+            "public_state_digest": digest(observation)}
+        context["decision_id"] = digest(context)
+        if slot.get("last_joint_decision_id") == context["decision_id"]:
+            result["reason"] = "same_post_priority_decision_already_recorded"
+            return result
+        joint["phase"] = "selecting"
+        decision = stock_return_selector(observation, baseline, message_delay=command_delay,
+            request_prefix=f"protocol:{tick}:post_return", policy_state=joint["policy_state"],
+            decision_context=context)
+        slot["last_joint_decision_id"] = context["decision_id"]
+        joint["phase"] = "selected"
+        joint["last_decision_context"] = context
     result["decision"] = decision
+    if post_decision_observer is not None:
+        started = time.perf_counter()
+        post_decision_observer(session=client.session, controller_state=state,
+            client_state=client.state, observation=observation, decision=decision)
+        result["offline_evaluator_ms"] = result.get("offline_evaluator_ms", 0.) + 1000 * (time.perf_counter() - started)
     if not decision["intents"]:
         result["reason"] = decision["inventory_return"]["reason"]
         return result
@@ -336,10 +380,16 @@ def _post_inventory_return(client: ProtocolClient, owner: str, state: dict, *,
         started = time.perf_counter()
         precommit_observer(session=client.session, controller_state=state,
             client_state=client.state, observation=observation, decision=decision)
-        result["offline_evaluator_ms"] = 1000 * (time.perf_counter() - started)
+        result["offline_evaluator_ms"] = result.get("offline_evaluator_ms", 0.) + 1000 * (time.perf_counter() - started)
     # Consume before submission; errors cannot grant a second quota.
     slot["new_submissions"] += 1
+    if stock_return_selector is not None:
+        joint["phase"] = "submission_attempted"
     request_id, reply = client.submit(owner, "transfer", decision["intents"][0])
+    if stock_return_selector is not None:
+        joint["last_submission"] = {"request_id": request_id, "reply": copy.deepcopy(reply),
+            "decision_id": context["decision_id"]}
+        joint["phase"] = "submitted"
     result.update(reason="inventory_return_submitted", new_submissions=slot["new_submissions"])
     result["attempts"].append({"request_id": request_id, "reply": reply})
     # Even the last addition is followed by a fresh public observation. It

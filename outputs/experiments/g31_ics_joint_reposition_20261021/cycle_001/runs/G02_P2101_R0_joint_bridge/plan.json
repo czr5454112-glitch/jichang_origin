@@ -1,0 +1,98 @@
+{
+  "schema": "g31.airport_joint_campaign.v1",
+  "task_id": "G02_P2101_R0_joint_bridge",
+  "method": "R0_joint_bridge",
+  "batch": "gates",
+  "cycle": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001",
+  "output": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\runs\\G02_P2101_R0_joint_bridge",
+  "parent": {
+    "parent_seed": 2101,
+    "split": "train",
+    "parent_group": "joint_reposition_group_plan_20261021:2101:r0",
+    "synthetic": true,
+    "rollout_round": 0,
+    "calendar_start": "2026-11-01T00:00:00+08:00",
+    "calendar_start_epoch_seconds": 1793462400.0,
+    "common_historical_template_sha256": "a9611267471a269cc34f5646a4ebb409c61a08fa77dcef4c02266b346c86890c",
+    "sampling": "sha256(namespace:parent:flight_ref); whole_group_uniform[-1800,1800] seconds; six_decimals",
+    "plan_family_id": "joint_group_shift_plan_v1",
+    "plan_group_shifts_sha256": "1eaa0fc4fd345c4e531ae006a91817cf024a4c0d3c218047569bfabdf078d5a1",
+    "plan_available_at": 0.0,
+    "fleet": 22,
+    "layout_seed": 1701,
+    "static_layout_order": [
+      92,
+      134,
+      49,
+      57,
+      136,
+      0,
+      95,
+      138,
+      26,
+      149,
+      24
+    ],
+    "offered_count": 28506,
+    "jobs_digest": "613929702d61c452799429062f8f8ee8da8ef84f631e16fbcd11a07d632fa77e",
+    "spi_domain": {
+      "fleet": 22,
+      "layout_id": "nested_1701_N22",
+      "plan_family_id": "joint_group_shift_plan_v1",
+      "physical_contract_id": "native030_joint_post_priority_v1"
+    }
+  },
+  "input": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\parents\\P2101_r0\\input.json",
+    "sha256": "95f1dd0c9332edd07225fff3d0b83159412d00e3d2c24bec6678b0091593474a"
+  },
+  "binary": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session_030_inventory_spi\\python\\czr005_circulation.cp311-win_amd64.pyd",
+    "sha256": "aa2f115d68f4f2c2a3d1df64192ebb33f8468ed6ce1248d14ebbc5955e4ddd82"
+  },
+  "source_bundle": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\sources\\runtime_002\\source_manifest.json",
+    "sha256": "2d60d78b1422ce513bcbd080f0c7916bf920ca1db0bdf1f3fcf0bb63019fa88e"
+  },
+  "forecast_binding": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\runs\\G02_P2101_R0_joint_bridge\\calendar_binding.json",
+    "sha256": "3cdee5a3cdad549981dc90a5f075c3fc4c2c0be2ac90eee23ee00d476ddcbfb2"
+  },
+  "mapping": null,
+  "model": null,
+  "root_branch": null,
+  "behavior_seed": 17,
+  "activation": 7200.0,
+  "horizon": 18000.0,
+  "soft_seconds": 2280.0,
+  "hard_seconds": 2400.0,
+  "event_budget": 100000,
+  "global_event_budget": 750000,
+  "projection_horizon_seconds": 600.0,
+  "transport_penalty": 0.01,
+  "minimum_gain": 0.0,
+  "supply_mode": "committed_only",
+  "controller": {
+    "control_period": 60.0,
+    "command_delay": 2.0,
+    "publication_delay": 0.5,
+    "retry_period": 60.0,
+    "compact": true,
+    "lease_seconds": 120.0,
+    "predictive": true,
+    "routes": false,
+    "forecasts": true,
+    "prebalance": true,
+    "inventory_snapshots": true,
+    "inventory_snapshot_validity": 120.0,
+    "inventory_snapshot_refresh_period": 60.0,
+    "recover_failed_empty": true,
+    "_consume_state": true,
+    "stock_return": true,
+    "stock_return_activate_at": 7200.0,
+    "actual_only_activate_at": 7200.0
+  },
+  "policy_version": "joint_v1:R0_joint_bridge:rule",
+  "cost_scope": "full_offered_population_integral_over_registered_window",
+  "strict_nonharm_certified": false
+}

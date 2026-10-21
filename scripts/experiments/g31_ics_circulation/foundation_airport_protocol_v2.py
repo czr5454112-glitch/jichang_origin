@@ -42,6 +42,8 @@ def run_airport_bounded_protocol_control(session: Any, owners: list[str], *, hor
                          inventory_snapshot_validity: float = 120.,
                          inventory_snapshot_refresh_period: float = 60.,
                          stock_return: bool = False, stock_return_activate_at: float = 0.,
+                         stock_return_selector=None, stock_return_selector_identity: str | None = None,
+                         post_decision_observer=None, pre_stock_return_observer=None,
                          actual_only_activate_at: float | None = None,
                          recover_failed_empty: bool = False, _consume_state: bool = False) -> dict:
     """Advance common public ticks, including retries and both real control layers.
@@ -62,6 +64,15 @@ def run_airport_bounded_protocol_control(session: Any, owners: list[str], *, hor
         raise ValueError("airport_bounded_protocol:invalid_soft_deadline")
     if tick_start_observer is not None and not callable(tick_start_observer):
         raise ValueError("airport_bounded_protocol:invalid_tick_start_observer")
+    if post_decision_observer is not None and not callable(post_decision_observer):
+        raise ValueError("airport_bounded_protocol:invalid_post_decision_observer")
+    if pre_stock_return_observer is not None and not callable(pre_stock_return_observer):
+        raise ValueError("airport_bounded_protocol:invalid_pre_stock_return_observer")
+    if ((stock_return_selector is None) != (stock_return_selector_identity is None)
+            or (stock_return_selector is not None and (not stock_return
+                or not callable(stock_return_selector) or type(stock_return_selector_identity) is not str
+                or not stock_return_selector_identity))):
+        raise ValueError("protocol_control:explicit_stock_return_selector_identity_required")
     if not owners or len(set(owners)) != len(owners):
         raise ValueError("protocol_control:invalid_owners")
     if not all(math.isfinite(v) and v >= 0 for v in (horizon, command_delay, publication_delay, lease_seconds)) or control_period <= 0 or not math.isfinite(control_period):
@@ -95,6 +106,9 @@ def run_airport_bounded_protocol_control(session: Any, owners: list[str], *, hor
     # sees only the same owner observation and never owns submit/ACK handling.
     if planner is not None:
         config["planner_identity"] = planner_identity
+    if stock_return_selector is not None:
+        config["stock_return_selector_identity"] = stock_return_selector_identity
+        config["post_priority_control_contract"] = "post_priority_continuous_one_new_attempt_per_owner_tick_v1"
     if inventory_snapshots:
         config.update(inventory_snapshots=True, inventory_snapshot_validity=inventory_snapshot_validity,
             inventory_snapshot_refresh_period=inventory_snapshot_refresh_period, stock_return=stock_return)
@@ -239,7 +253,13 @@ def run_airport_bounded_protocol_control(session: Any, owners: list[str], *, hor
                 if stock_return and target >= stock_return_activate_at:
                     inventory_return = _post_inventory_return(client, owner, current,
                         compact=compact, command_delay=command_delay, priority_error=priority_error,
-                        precommit_observer=precommit_observer)
+                        precommit_observer=precommit_observer,
+                        **({"stock_return_selector": stock_return_selector,
+                            "stock_return_selector_identity": stock_return_selector_identity,
+                            "post_decision_observer": post_decision_observer,
+                            "pre_stock_return_observer": pre_stock_return_observer}
+                            if stock_return_selector is not None or post_decision_observer is not None
+                                or pre_stock_return_observer is not None else {}))
                     evaluator_ms += inventory_return.get("offline_evaluator_ms", 0.)
                 decision_record = {"owner_id": owner, "decision": initial, "attempts": attempts,
                                    "compute_ms": 1000*(time.perf_counter()-started) - evaluator_ms}

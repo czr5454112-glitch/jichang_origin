@@ -1,0 +1,764 @@
+{
+  "schema": "g31.foundation.airport_joint_observed_mapping_labels.v1",
+  "input_domain": {
+    "split": "train",
+    "labels_kind": "observed_entry_labels",
+    "uses_future_crosswalk": false,
+    "source_kind": "historical_closed_native_TRAIN_prefixes",
+    "selection_rule": "longest_complete_r0_reference_export_per_registered_train_parent_then_lexical_run_id",
+    "single_template_synthetic": true,
+    "template_families": [
+      "a9611267471a269cc34f5646a4ebb409c61a08fa77dcef4c02266b346c86890c"
+    ],
+    "independent_real_airport_days": 0,
+    "loader_labels_are_synthetic_native_entry_nodes": true,
+    "uses_balanced_assignment_or_whole_day_counts": false,
+    "prefix_censoring_limitation": "Conditional entry frequencies reflect available training prefixes, not a complete-day loader assignment.",
+    "source_evidence_ids": [
+      "511ca533055cad176c2ccf7e81995d9807327706be386afb5afea5a75e2c5d68",
+      "debadb1d6f3ad0e921be1e2fe185ea392e4420d0b22d9b687643ebba4bf0ade8",
+      "9877d39f02163092013ca27e8698544f23cb4441ad6de4477b986142fc1dc699",
+      "c2c9e27b3a99b63bbaa9f82106cccf89097f4e5a0110bd4accc406f0fe27ee87",
+      "a78fae08d58b4b1d7234a84303ab010920c899b573c4ae6cda5b99fc27a7d3c9",
+      "e4a4d55828ea80755ec753cb1466cf4ef62699facaad04734384d246ea416877",
+      "627964b92503e9be7e3281b4627c404da6a71c31d5cfb33f8401613ebb5cc0bf",
+      "ab9b8e31a4e50a703bf79313a70cd902742c9ae062f66f171e6daf3fa4bae06c"
+    ],
+    "region_label_index": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_sustained_flight_20261019\\cycle_001\\B1_training_001\\private\\flight_label_index.jsonl",
+      "sha256": "2590fcbae13595f59b0204e477de58c789c3abe961a3cb3a51a8ce53b12ae059",
+      "bytes": 10993344
+    }
+  },
+  "source_provenance": [
+    {
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1101_root1_a_ref_001\\plan.json",
+        "sha256": "143888d127c989a03ddd9dd712ec6e885da9708e62a3b4c262abde8afe518feb",
+        "bytes": 4943
+      },
+      "native_input": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\parents\\P1101_r0_N22_E750000\\input.json",
+        "sha256": "4d37077b2dab9de04be0939ed4bb8446a063c5e0242d98cb36a9635505dc852e",
+        "bytes": 10811874
+      },
+      "native_result": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1101_root1_a_ref_001\\final_result.json.gz",
+        "sha256": "ea3dd52e167ce3c80226423b25de816534edec23a17097e9f490dea9d519315a",
+        "bytes": 1019141
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1101_root1_a_ref_001\\worker_report.json",
+        "sha256": "107350cfb77d0840d7737dd33824fd8ea5fd2596b1ce3e8d0b1bbd433643ba68",
+        "bytes": 3536
+      },
+      "process_receipt": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1101_root1_a_ref_001\\receipt.json",
+        "sha256": "8b6510187926ab1a89884319e21a9ffd3a5b2681e8fdea37fb71caf3edbf9d36",
+        "bytes": 4178
+      },
+      "parent": {
+        "parent_seed": 1101,
+        "split": "train",
+        "parent_group": "inventory_spi_group_plan_20261020:1101:r0",
+        "synthetic": true,
+        "rollout_round": 0,
+        "calendar_start": "2026-09-21T00:00:00+08:00",
+        "calendar_start_epoch_seconds": 1789920000.0,
+        "common_historical_template_sha256": "a9611267471a269cc34f5646a4ebb409c61a08fa77dcef4c02266b346c86890c",
+        "sampling": "sha256(namespace:parent:flight_ref); whole_group_uniform[-1800,1800] seconds; six_decimals",
+        "plan_family_id": "synthetic_group_shift_plan_v1",
+        "plan_group_shifts_sha256": "9a288f63b8d42814edd45411fc334a8fa5c00c962f4314df8a86f2f5af34b932",
+        "plan_available_at": 0.0,
+        "fleet": 22,
+        "layout_seed": 1701,
+        "static_layout_order": [
+          92,
+          134,
+          49,
+          57,
+          136,
+          0,
+          95,
+          138,
+          26,
+          149,
+          24
+        ],
+        "offered_count": 28506,
+        "jobs_digest": "ca8197a2d71fbd045cd76768e191ff5bebd60bed0996debf4420c12630db6736",
+        "spi_domain": {
+          "fleet": 22,
+          "layout_id": "nested_1701_N22",
+          "plan_family_id": "synthetic_group_shift_plan_v1",
+          "physical_contract_id": "native030_inventory_recovery_v1"
+        }
+      },
+      "physical_clock": 31920.0,
+      "arrival_label_count": 9751,
+      "execution_source_bundle": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\sources\\runtime_005\\source_manifest.json",
+        "sha256": "9f3a6f6b15807d1fc6406d46b223677d070bf64e2ae3ca000120cb7ed51807d6"
+      },
+      "native_binary": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session_030_inventory_spi\\python\\czr005_circulation.cp311-win_amd64.pyd",
+        "sha256": "aa2f115d68f4f2c2a3d1df64192ebb33f8468ed6ce1248d14ebbc5955e4ddd82"
+      },
+      "future_jobs_used_as_labels": false,
+      "branch_selection_uses_service_outcome": false,
+      "source_evidence_id": "511ca533055cad176c2ccf7e81995d9807327706be386afb5afea5a75e2c5d68"
+    },
+    {
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1102_root1_a_ref_001\\plan.json",
+        "sha256": "f59ee0dab1b0edd87a1fa9039080220b8415c650f7cbae7377308ca0ae0822ff",
+        "bytes": 4943
+      },
+      "native_input": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\parents\\P1102_r0_N22_E750000\\input.json",
+        "sha256": "947a1d8f6c9bfa27bee210391b4d76ebb32714eb0cfa9263ecce279872dd5c25",
+        "bytes": 10812632
+      },
+      "native_result": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1102_root1_a_ref_001\\final_result.json.gz",
+        "sha256": "eaa7cbe8b7d1f8467f8b7ad61afb5373ebe5df76c1dc998ac3fbf725d56526de",
+        "bytes": 2204875
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1102_root1_a_ref_001\\worker_report.json",
+        "sha256": "324814b4a7c33a5e42989ca904f9fa6c39a4d2956bbc22c9b950d6def2ef4979",
+        "bytes": 3530
+      },
+      "process_receipt": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1102_root1_a_ref_001\\receipt.json",
+        "sha256": "93853140b2ede631cd21f43fe9706c6539e3f53b7e6b090c04efaec4a3e1a7ea",
+        "bytes": 4171
+      },
+      "parent": {
+        "parent_seed": 1102,
+        "split": "train",
+        "parent_group": "inventory_spi_group_plan_20261020:1102:r0",
+        "synthetic": true,
+        "rollout_round": 0,
+        "calendar_start": "2026-09-22T00:00:00+08:00",
+        "calendar_start_epoch_seconds": 1790006400.0,
+        "common_historical_template_sha256": "a9611267471a269cc34f5646a4ebb409c61a08fa77dcef4c02266b346c86890c",
+        "sampling": "sha256(namespace:parent:flight_ref); whole_group_uniform[-1800,1800] seconds; six_decimals",
+        "plan_family_id": "synthetic_group_shift_plan_v1",
+        "plan_group_shifts_sha256": "cc7a0ef4bf7bdda4112d9d41762f986230855c49a17b94f383b0e259aa771682",
+        "plan_available_at": 0.0,
+        "fleet": 22,
+        "layout_seed": 1701,
+        "static_layout_order": [
+          92,
+          134,
+          49,
+          57,
+          136,
+          0,
+          95,
+          138,
+          26,
+          149,
+          24
+        ],
+        "offered_count": 28506,
+        "jobs_digest": "9bc8805f563463aaee084f61b37c4ecd0960db67575727a7a24a7492e2204eca",
+        "spi_domain": {
+          "fleet": 22,
+          "layout_id": "nested_1701_N22",
+          "plan_family_id": "synthetic_group_shift_plan_v1",
+          "physical_contract_id": "native030_inventory_recovery_v1"
+        }
+      },
+      "physical_clock": 46860.0,
+      "arrival_label_count": 15973,
+      "execution_source_bundle": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\sources\\runtime_005\\source_manifest.json",
+        "sha256": "9f3a6f6b15807d1fc6406d46b223677d070bf64e2ae3ca000120cb7ed51807d6"
+      },
+      "native_binary": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session_030_inventory_spi\\python\\czr005_circulation.cp311-win_amd64.pyd",
+        "sha256": "aa2f115d68f4f2c2a3d1df64192ebb33f8468ed6ce1248d14ebbc5955e4ddd82"
+      },
+      "future_jobs_used_as_labels": false,
+      "branch_selection_uses_service_outcome": false,
+      "source_evidence_id": "debadb1d6f3ad0e921be1e2fe185ea392e4420d0b22d9b687643ebba4bf0ade8"
+    },
+    {
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1103_root0_a_ref_001\\plan.json",
+        "sha256": "ababafca686d16f888dc79af4c1f2b799fb9880f067a05953ae57920dc549012",
+        "bytes": 4943
+      },
+      "native_input": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\parents\\P1103_r0_N22_E750000\\input.json",
+        "sha256": "74df55894314a9fa0d85b05b9f6eb373f433d29b176c4806341c41ce340c75c3",
+        "bytes": 10812642
+      },
+      "native_result": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1103_root0_a_ref_001\\final_result.json.gz",
+        "sha256": "d1cac55ccec0c3f33d91629042427dc22e4fa56341983bc31909cac82332ed07",
+        "bytes": 1108977
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1103_root0_a_ref_001\\worker_report.json",
+        "sha256": "81ad4191cf5bb1ff7a5cfcf13e558bdb92ad59838716add05e20d1270067c936",
+        "bytes": 3532
+      },
+      "process_receipt": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1103_root0_a_ref_001\\receipt.json",
+        "sha256": "faf9beed3abed85068f186aa55ecfa01deb0d3f9352a77812a446e4c81f4073d",
+        "bytes": 4174
+      },
+      "parent": {
+        "parent_seed": 1103,
+        "split": "train",
+        "parent_group": "inventory_spi_group_plan_20261020:1103:r0",
+        "synthetic": true,
+        "rollout_round": 0,
+        "calendar_start": "2026-09-23T00:00:00+08:00",
+        "calendar_start_epoch_seconds": 1790092800.0,
+        "common_historical_template_sha256": "a9611267471a269cc34f5646a4ebb409c61a08fa77dcef4c02266b346c86890c",
+        "sampling": "sha256(namespace:parent:flight_ref); whole_group_uniform[-1800,1800] seconds; six_decimals",
+        "plan_family_id": "synthetic_group_shift_plan_v1",
+        "plan_group_shifts_sha256": "419de7c682ef131a16e0cf5e62ca38f53e7b41f86b895a0d16d24ac59577d1a6",
+        "plan_available_at": 0.0,
+        "fleet": 22,
+        "layout_seed": 1701,
+        "static_layout_order": [
+          92,
+          134,
+          49,
+          57,
+          136,
+          0,
+          95,
+          138,
+          26,
+          149,
+          24
+        ],
+        "offered_count": 28506,
+        "jobs_digest": "cb436505e7ed34ab5058926a0216d3aacd474c9891d03710d51a44ce24108c40",
+        "spi_domain": {
+          "fleet": 22,
+          "layout_id": "nested_1701_N22",
+          "plan_family_id": "synthetic_group_shift_plan_v1",
+          "physical_contract_id": "native030_inventory_recovery_v1"
+        }
+      },
+      "physical_clock": 31800.0,
+      "arrival_label_count": 9723,
+      "execution_source_bundle": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\sources\\runtime_005\\source_manifest.json",
+        "sha256": "9f3a6f6b15807d1fc6406d46b223677d070bf64e2ae3ca000120cb7ed51807d6"
+      },
+      "native_binary": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session_030_inventory_spi\\python\\czr005_circulation.cp311-win_amd64.pyd",
+        "sha256": "aa2f115d68f4f2c2a3d1df64192ebb33f8468ed6ce1248d14ebbc5955e4ddd82"
+      },
+      "future_jobs_used_as_labels": false,
+      "branch_selection_uses_service_outcome": false,
+      "source_evidence_id": "9877d39f02163092013ca27e8698544f23cb4441ad6de4477b986142fc1dc699"
+    },
+    {
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1104_root0_a_ref_001\\plan.json",
+        "sha256": "5297c5478762034fb6fb90c979c47ff16961f4208ca77345337e4f348af63b8b",
+        "bytes": 4943
+      },
+      "native_input": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\parents\\P1104_r0_N22_E750000\\input.json",
+        "sha256": "dc09fdfb4d82757bc735ed30bce6eb3faefcd5ad6f67b510f02d7ac9cd83253a",
+        "bytes": 10807951
+      },
+      "native_result": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1104_root0_a_ref_001\\final_result.json.gz",
+        "sha256": "bbeed91547b35105822c5c93d2321ff564a70470f6a913949abc373b6197181c",
+        "bytes": 2232900
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1104_root0_a_ref_001\\worker_report.json",
+        "sha256": "00b3a78165130596c0c7d9e0faf1a5331b6709a84eeae0aa93246f7149cd0b81",
+        "bytes": 3544
+      },
+      "process_receipt": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1104_root0_a_ref_001\\receipt.json",
+        "sha256": "b7837772a66f51ef7e0fff7e7e0b40061d7cc70b455292493609d268fdd1d00d",
+        "bytes": 4184
+      },
+      "parent": {
+        "parent_seed": 1104,
+        "split": "train",
+        "parent_group": "inventory_spi_group_plan_20261020:1104:r0",
+        "synthetic": true,
+        "rollout_round": 0,
+        "calendar_start": "2026-09-24T00:00:00+08:00",
+        "calendar_start_epoch_seconds": 1790179200.0,
+        "common_historical_template_sha256": "a9611267471a269cc34f5646a4ebb409c61a08fa77dcef4c02266b346c86890c",
+        "sampling": "sha256(namespace:parent:flight_ref); whole_group_uniform[-1800,1800] seconds; six_decimals",
+        "plan_family_id": "synthetic_group_shift_plan_v1",
+        "plan_group_shifts_sha256": "5e5df3502ebdc6682b2a2296fab486a291769f49bb568bff900bd797933c8fb5",
+        "plan_available_at": 0.0,
+        "fleet": 22,
+        "layout_seed": 1701,
+        "static_layout_order": [
+          92,
+          134,
+          49,
+          57,
+          136,
+          0,
+          95,
+          138,
+          26,
+          149,
+          24
+        ],
+        "offered_count": 28506,
+        "jobs_digest": "264e22a036dab879a4d6b8bfb2c7431a3a6fb31efeaf843571e14b93b29d6439",
+        "spi_domain": {
+          "fleet": 22,
+          "layout_id": "nested_1701_N22",
+          "plan_family_id": "synthetic_group_shift_plan_v1",
+          "physical_contract_id": "native030_inventory_recovery_v1"
+        }
+      },
+      "physical_clock": 46920.0,
+      "arrival_label_count": 15879,
+      "execution_source_bundle": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\sources\\runtime_005\\source_manifest.json",
+        "sha256": "9f3a6f6b15807d1fc6406d46b223677d070bf64e2ae3ca000120cb7ed51807d6"
+      },
+      "native_binary": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session_030_inventory_spi\\python\\czr005_circulation.cp311-win_amd64.pyd",
+        "sha256": "aa2f115d68f4f2c2a3d1df64192ebb33f8468ed6ce1248d14ebbc5955e4ddd82"
+      },
+      "future_jobs_used_as_labels": false,
+      "branch_selection_uses_service_outcome": false,
+      "source_evidence_id": "c2c9e27b3a99b63bbaa9f82106cccf89097f4e5a0110bd4accc406f0fe27ee87"
+    },
+    {
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1105_root1_a_ref_001\\plan.json",
+        "sha256": "7a91e11b7a22fd7738874fdc78a2147580f4fc34a08004ecb9d50914a8880aa2",
+        "bytes": 4944
+      },
+      "native_input": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\parents\\P1105_r0_N22_E750000\\input.json",
+        "sha256": "a9d87b66107e7edbe28b9634580a1677ec93fe333cd486282d170460ffe92a8f",
+        "bytes": 10810819
+      },
+      "native_result": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1105_root1_a_ref_001\\final_result.json.gz",
+        "sha256": "c7721f6bc90a468cb5aa853ec9bcc65d6e19039a58321d0b67590bf072e1d1f9",
+        "bytes": 1041936
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1105_root1_a_ref_001\\worker_report.json",
+        "sha256": "b613feeb905396e0e782204f52d00824319a71e08c5f1a64c85a1711067dde4a",
+        "bytes": 3515
+      },
+      "process_receipt": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1105_root1_a_ref_001\\receipt.json",
+        "sha256": "d25432c1764bc10fab2e325299c81efeb4b39bae76bfd20305f2a19805b87309",
+        "bytes": 4155
+      },
+      "parent": {
+        "parent_seed": 1105,
+        "split": "train",
+        "parent_group": "inventory_spi_group_plan_20261020:1105:r0",
+        "synthetic": true,
+        "rollout_round": 0,
+        "calendar_start": "2026-09-25T00:00:00+08:00",
+        "calendar_start_epoch_seconds": 1790265600.0,
+        "common_historical_template_sha256": "a9611267471a269cc34f5646a4ebb409c61a08fa77dcef4c02266b346c86890c",
+        "sampling": "sha256(namespace:parent:flight_ref); whole_group_uniform[-1800,1800] seconds; six_decimals",
+        "plan_family_id": "synthetic_group_shift_plan_v1",
+        "plan_group_shifts_sha256": "9c37d99f4fdc9b78f0c30139a3777f7740a2a4ddf02780bba1f6b9680f2b6c69",
+        "plan_available_at": 0.0,
+        "fleet": 22,
+        "layout_seed": 1701,
+        "static_layout_order": [
+          92,
+          134,
+          49,
+          57,
+          136,
+          0,
+          95,
+          138,
+          26,
+          149,
+          24
+        ],
+        "offered_count": 28506,
+        "jobs_digest": "052483c605a68ea12e797b06d28348c8c895a92cb1745a7b4c1819a8a569157c",
+        "spi_domain": {
+          "fleet": 22,
+          "layout_id": "nested_1701_N22",
+          "plan_family_id": "synthetic_group_shift_plan_v1",
+          "physical_contract_id": "native030_inventory_recovery_v1"
+        }
+      },
+      "physical_clock": 31800.0,
+      "arrival_label_count": 9795,
+      "execution_source_bundle": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\sources\\runtime_005\\source_manifest.json",
+        "sha256": "9f3a6f6b15807d1fc6406d46b223677d070bf64e2ae3ca000120cb7ed51807d6"
+      },
+      "native_binary": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session_030_inventory_spi\\python\\czr005_circulation.cp311-win_amd64.pyd",
+        "sha256": "aa2f115d68f4f2c2a3d1df64192ebb33f8468ed6ce1248d14ebbc5955e4ddd82"
+      },
+      "future_jobs_used_as_labels": false,
+      "branch_selection_uses_service_outcome": false,
+      "source_evidence_id": "a78fae08d58b4b1d7234a84303ab010920c899b573c4ae6cda5b99fc27a7d3c9"
+    },
+    {
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1106_root1_a_ref_001\\plan.json",
+        "sha256": "06193abaff0aff25e385532bf90bd5628ad3d6d5c4ce7a0aba3ac4e8fe5a9929",
+        "bytes": 4943
+      },
+      "native_input": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\parents\\P1106_r0_N22_E750000\\input.json",
+        "sha256": "e470402897db0e005d4f33272c29134cd98bebe2abf1ee93b777a200f3c86c5d",
+        "bytes": 10812595
+      },
+      "native_result": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1106_root1_a_ref_001\\final_result.json.gz",
+        "sha256": "6d9ffd6db76ca5610ddf17cdb0bbcb8060956971c8531821f97585ed9c44ce7c",
+        "bytes": 2233843
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1106_root1_a_ref_001\\worker_report.json",
+        "sha256": "c522e8a0b14ef520924b52d282de327b876f62a8887cbe71eb4f9c7f4bf1dc95",
+        "bytes": 3532
+      },
+      "process_receipt": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1106_root1_a_ref_001\\receipt.json",
+        "sha256": "ce6142b22ea02579f744a35cd78de292ed425bd5f6db155c1557805f0ae06090",
+        "bytes": 4173
+      },
+      "parent": {
+        "parent_seed": 1106,
+        "split": "train",
+        "parent_group": "inventory_spi_group_plan_20261020:1106:r0",
+        "synthetic": true,
+        "rollout_round": 0,
+        "calendar_start": "2026-09-26T00:00:00+08:00",
+        "calendar_start_epoch_seconds": 1790352000.0,
+        "common_historical_template_sha256": "a9611267471a269cc34f5646a4ebb409c61a08fa77dcef4c02266b346c86890c",
+        "sampling": "sha256(namespace:parent:flight_ref); whole_group_uniform[-1800,1800] seconds; six_decimals",
+        "plan_family_id": "synthetic_group_shift_plan_v1",
+        "plan_group_shifts_sha256": "fd8bc10e023672cb5548641f064c1d8b2bd034cdaa1c5148fd578fe494a6e171",
+        "plan_available_at": 0.0,
+        "fleet": 22,
+        "layout_seed": 1701,
+        "static_layout_order": [
+          92,
+          134,
+          49,
+          57,
+          136,
+          0,
+          95,
+          138,
+          26,
+          149,
+          24
+        ],
+        "offered_count": 28506,
+        "jobs_digest": "d83151ed7d5044dd37e473379b042813b3245913e9088907d21a24611bb6d966",
+        "spi_domain": {
+          "fleet": 22,
+          "layout_id": "nested_1701_N22",
+          "plan_family_id": "synthetic_group_shift_plan_v1",
+          "physical_contract_id": "native030_inventory_recovery_v1"
+        }
+      },
+      "physical_clock": 46800.0,
+      "arrival_label_count": 15818,
+      "execution_source_bundle": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\sources\\runtime_005\\source_manifest.json",
+        "sha256": "9f3a6f6b15807d1fc6406d46b223677d070bf64e2ae3ca000120cb7ed51807d6"
+      },
+      "native_binary": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session_030_inventory_spi\\python\\czr005_circulation.cp311-win_amd64.pyd",
+        "sha256": "aa2f115d68f4f2c2a3d1df64192ebb33f8468ed6ce1248d14ebbc5955e4ddd82"
+      },
+      "future_jobs_used_as_labels": false,
+      "branch_selection_uses_service_outcome": false,
+      "source_evidence_id": "e4a4d55828ea80755ec753cb1466cf4ef62699facaad04734384d246ea416877"
+    },
+    {
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1107_root0_a_ref_001\\plan.json",
+        "sha256": "77f855c20379ca9b5485fd900e240007aaf0b343d0f6460079d171c18a030497",
+        "bytes": 4943
+      },
+      "native_input": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\parents\\P1107_r0_N22_E750000\\input.json",
+        "sha256": "deb41056dd2a2dbf9946ad05c216e6145eda750ad2319f66d080f7d051a4773b",
+        "bytes": 10809239
+      },
+      "native_result": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1107_root0_a_ref_001\\final_result.json.gz",
+        "sha256": "0bff980094b8258ca942aee9fba1d884b8875a98ff793770732f53fea408fb0d",
+        "bytes": 1092737
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1107_root0_a_ref_001\\worker_report.json",
+        "sha256": "ee0c376365695929fa8dd0b5865a76deac0eea76641b2aeda9a9abfcafd2150d",
+        "bytes": 3533
+      },
+      "process_receipt": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1107_root0_a_ref_001\\receipt.json",
+        "sha256": "5196212b3019443716282b3c1add1969725b19f56fa80bd4907fdb5332364ecc",
+        "bytes": 4174
+      },
+      "parent": {
+        "parent_seed": 1107,
+        "split": "train",
+        "parent_group": "inventory_spi_group_plan_20261020:1107:r0",
+        "synthetic": true,
+        "rollout_round": 0,
+        "calendar_start": "2026-09-27T00:00:00+08:00",
+        "calendar_start_epoch_seconds": 1790438400.0,
+        "common_historical_template_sha256": "a9611267471a269cc34f5646a4ebb409c61a08fa77dcef4c02266b346c86890c",
+        "sampling": "sha256(namespace:parent:flight_ref); whole_group_uniform[-1800,1800] seconds; six_decimals",
+        "plan_family_id": "synthetic_group_shift_plan_v1",
+        "plan_group_shifts_sha256": "22901b8b88ad40d3e831d0b0f9d4ffe6353f644ed256543e0abb213a4ed9672c",
+        "plan_available_at": 0.0,
+        "fleet": 22,
+        "layout_seed": 1701,
+        "static_layout_order": [
+          92,
+          134,
+          49,
+          57,
+          136,
+          0,
+          95,
+          138,
+          26,
+          149,
+          24
+        ],
+        "offered_count": 28506,
+        "jobs_digest": "cf41b26b18e7b031710325bf6e444b11f07058134721ca09f38c32f054269ece",
+        "spi_domain": {
+          "fleet": 22,
+          "layout_id": "nested_1701_N22",
+          "plan_family_id": "synthetic_group_shift_plan_v1",
+          "physical_contract_id": "native030_inventory_recovery_v1"
+        }
+      },
+      "physical_clock": 31800.0,
+      "arrival_label_count": 9804,
+      "execution_source_bundle": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\sources\\runtime_005\\source_manifest.json",
+        "sha256": "9f3a6f6b15807d1fc6406d46b223677d070bf64e2ae3ca000120cb7ed51807d6"
+      },
+      "native_binary": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session_030_inventory_spi\\python\\czr005_circulation.cp311-win_amd64.pyd",
+        "sha256": "aa2f115d68f4f2c2a3d1df64192ebb33f8468ed6ce1248d14ebbc5955e4ddd82"
+      },
+      "future_jobs_used_as_labels": false,
+      "branch_selection_uses_service_outcome": false,
+      "source_evidence_id": "627964b92503e9be7e3281b4627c404da6a71c31d5cfb33f8401613ebb5cc0bf"
+    },
+    {
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1108_root0_a_ref_001\\plan.json",
+        "sha256": "f460873bb3e67c061a67a7b9ee516a3f97bcddf0c12e4e7a02f147a11539e6b2",
+        "bytes": 4943
+      },
+      "native_input": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\parents\\P1108_r0_N22_E750000\\input.json",
+        "sha256": "58f82f4de788c16319da3694560b86a25c76b2e511647f3fa576c4c875d5a5f5",
+        "bytes": 10810187
+      },
+      "native_result": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1108_root0_a_ref_001\\final_result.json.gz",
+        "sha256": "5568a4878f63b2321aed3e5cdd7a3fe71405a64b8c0d0067de703f0631d2dfb8",
+        "bytes": 2233949
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1108_root0_a_ref_001\\worker_report.json",
+        "sha256": "8493a17472b4118d4af49cfaef7d4c1fce665dbcf24d4a9a542e1e379e6f5e0c",
+        "bytes": 3539
+      },
+      "process_receipt": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1108_root0_a_ref_001\\receipt.json",
+        "sha256": "978e5447e2476bd89e9783455b9736cb496a494da8eff23d16c38aaaa07173a2",
+        "bytes": 4180
+      },
+      "parent": {
+        "parent_seed": 1108,
+        "split": "train",
+        "parent_group": "inventory_spi_group_plan_20261020:1108:r0",
+        "synthetic": true,
+        "rollout_round": 0,
+        "calendar_start": "2026-09-28T00:00:00+08:00",
+        "calendar_start_epoch_seconds": 1790524800.0,
+        "common_historical_template_sha256": "a9611267471a269cc34f5646a4ebb409c61a08fa77dcef4c02266b346c86890c",
+        "sampling": "sha256(namespace:parent:flight_ref); whole_group_uniform[-1800,1800] seconds; six_decimals",
+        "plan_family_id": "synthetic_group_shift_plan_v1",
+        "plan_group_shifts_sha256": "76a608c0a21253510414e4e61802287ced5d6206d9487305280853343405b449",
+        "plan_available_at": 0.0,
+        "fleet": 22,
+        "layout_seed": 1701,
+        "static_layout_order": [
+          92,
+          134,
+          49,
+          57,
+          136,
+          0,
+          95,
+          138,
+          26,
+          149,
+          24
+        ],
+        "offered_count": 28506,
+        "jobs_digest": "56d56db1f37c2fddd06289d643aea6558019698b675ec69d45dd0cf8885b05be",
+        "spi_domain": {
+          "fleet": 22,
+          "layout_id": "nested_1701_N22",
+          "plan_family_id": "synthetic_group_shift_plan_v1",
+          "physical_contract_id": "native030_inventory_recovery_v1"
+        }
+      },
+      "physical_clock": 46800.0,
+      "arrival_label_count": 15998,
+      "execution_source_bundle": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\sources\\runtime_005\\source_manifest.json",
+        "sha256": "9f3a6f6b15807d1fc6406d46b223677d070bf64e2ae3ca000120cb7ed51807d6"
+      },
+      "native_binary": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session_030_inventory_spi\\python\\czr005_circulation.cp311-win_amd64.pyd",
+        "sha256": "aa2f115d68f4f2c2a3d1df64192ebb33f8468ed6ce1248d14ebbc5955e4ddd82"
+      },
+      "future_jobs_used_as_labels": false,
+      "branch_selection_uses_service_outcome": false,
+      "source_evidence_id": "ab9b8e31a4e50a703bf79313a70cd902742c9ae062f66f171e6daf3fa4bae06c"
+    }
+  ],
+  "selection_considered": [
+    {
+      "run": "SPI_R0V5_P1101_root0_a_ref_001",
+      "status": "complete",
+      "physical_clock": 9000.0
+    },
+    {
+      "run": "SPI_R0V5_P1101_root1_a_ref_001",
+      "status": "complete",
+      "physical_clock": 31920.0
+    },
+    {
+      "run": "SPI_R0V5_P1102_root0_a_ref_001",
+      "status": "complete",
+      "physical_clock": 21660.0
+    },
+    {
+      "run": "SPI_R0V5_P1102_root1_a_ref_001",
+      "status": "complete",
+      "physical_clock": 46860.0
+    },
+    {
+      "run": "SPI_R0V5_P1103_root0_a_ref_001",
+      "status": "complete",
+      "physical_clock": 31800.0
+    },
+    {
+      "run": "SPI_R0V5_P1103_root1_a_ref_001",
+      "status": "complete",
+      "physical_clock": 9000.0
+    },
+    {
+      "run": "SPI_R0V5_P1104_root0_a_ref_001",
+      "status": "complete",
+      "physical_clock": 46920.0
+    },
+    {
+      "run": "SPI_R0V5_P1104_root1_a_ref_001",
+      "status": "complete",
+      "physical_clock": 21300.0
+    },
+    {
+      "run": "SPI_R0V5_P1105_root0_a_ref_001",
+      "status": "complete",
+      "physical_clock": 9000.0
+    },
+    {
+      "run": "SPI_R0V5_P1105_root1_a_ref_001",
+      "status": "complete",
+      "physical_clock": 31800.0
+    },
+    {
+      "run": "SPI_R0V5_P1106_root0_a_ref_001",
+      "status": "complete",
+      "physical_clock": 21360.0
+    },
+    {
+      "run": "SPI_R0V5_P1106_root1_a_ref_001",
+      "status": "complete",
+      "physical_clock": 46800.0
+    },
+    {
+      "run": "SPI_R0V5_P1107_root0_a_ref_001",
+      "status": "complete",
+      "physical_clock": 31800.0
+    },
+    {
+      "run": "SPI_R0V5_P1107_root1_a_ref_001",
+      "status": "complete",
+      "physical_clock": 9000.0
+    },
+    {
+      "run": "SPI_R0V5_P1108_root0_a_ref_001",
+      "status": "complete",
+      "physical_clock": 46800.0
+    },
+    {
+      "run": "SPI_R0V5_P1108_root1_a_ref_001",
+      "status": "complete",
+      "physical_clock": 21240.0
+    }
+  ],
+  "train_parent_ids": [
+    "inventory_spi_group_plan_20261020:1101:r0",
+    "inventory_spi_group_plan_20261020:1102:r0",
+    "inventory_spi_group_plan_20261020:1103:r0",
+    "inventory_spi_group_plan_20261020:1104:r0",
+    "inventory_spi_group_plan_20261020:1105:r0",
+    "inventory_spi_group_plan_20261020:1106:r0",
+    "inventory_spi_group_plan_20261020:1107:r0",
+    "inventory_spi_group_plan_20261020:1108:r0"
+  ],
+  "training_labels_closed_at_epoch_seconds": 1790571600.0,
+  "training_label_count": 102741,
+  "labels_sha256": "fa50d1fe23aa5e0ef4053fd742571e124f54001d21a196cdd4684551d09de91b",
+  "region_counts": {
+    "legacy_start_0": 13075,
+    "legacy_start_1": 12991,
+    "legacy_start_2": 13054,
+    "legacy_start_3": 15993,
+    "legacy_start_4": 15965,
+    "legacy_start_5": 15987,
+    "legacy_start_53": 15676
+  },
+  "source_files_read_outside_train": "historical region label index only; selected observed IDs retained",
+  "future_entries_or_dev_or_test_used": false,
+  "native_starts": 0,
+  "model_fits": 0,
+  "labels_file": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\datasets\\mapping_observed_train_001\\labels.json.gz",
+    "sha256": "0afe22e8246e7ad4e921f090bfed820babad6810b7846915597eecdd1e846e25",
+    "bytes": 9848848
+  }
+}

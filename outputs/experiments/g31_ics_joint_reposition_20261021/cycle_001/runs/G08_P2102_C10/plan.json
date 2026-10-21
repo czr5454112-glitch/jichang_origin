@@ -1,0 +1,111 @@
+{
+  "schema": "g31.airport_joint_campaign.v1",
+  "task_id": "G08_P2102_C10",
+  "method": "C10",
+  "batch": "gates",
+  "cycle": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001",
+  "output": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\runs\\G08_P2102_C10",
+  "parent": {
+    "parent_seed": 2102,
+    "split": "train",
+    "parent_group": "joint_reposition_group_plan_20261021:2102:r0",
+    "synthetic": true,
+    "rollout_round": 0,
+    "calendar_start": "2026-11-02T00:00:00+08:00",
+    "calendar_start_epoch_seconds": 1793548800.0,
+    "common_historical_template_sha256": "a9611267471a269cc34f5646a4ebb409c61a08fa77dcef4c02266b346c86890c",
+    "sampling": "sha256(namespace:parent:flight_ref); whole_group_uniform[-1800,1800] seconds; six_decimals",
+    "plan_family_id": "joint_group_shift_plan_v1",
+    "plan_group_shifts_sha256": "b02a9cafc787d2b9b12167ffc43588efc9c46a789ce45a71eb81568ff1d42a65",
+    "plan_available_at": 0.0,
+    "fleet": 22,
+    "layout_seed": 1701,
+    "static_layout_order": [
+      92,
+      134,
+      49,
+      57,
+      136,
+      0,
+      95,
+      138,
+      26,
+      149,
+      24
+    ],
+    "offered_count": 28506,
+    "jobs_digest": "8580e5d6d3788a2bfe886ecca941e2fcb913061ad46aaf5ab76a886a1bab76a5",
+    "spi_domain": {
+      "fleet": 22,
+      "layout_id": "nested_1701_N22",
+      "plan_family_id": "joint_group_shift_plan_v1",
+      "physical_contract_id": "native030_joint_post_priority_v1"
+    }
+  },
+  "input": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\parents\\P2102_r0\\input.json",
+    "sha256": "84f781cc7dc6e549386ca62df164044ec2f3e567ed0adac231969038b0f58271"
+  },
+  "binary": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build_lt_session_030_inventory_spi\\python\\czr005_circulation.cp311-win_amd64.pyd",
+    "sha256": "aa2f115d68f4f2c2a3d1df64192ebb33f8468ed6ce1248d14ebbc5955e4ddd82"
+  },
+  "source_bundle": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\sources\\runtime_003\\source_manifest.json",
+    "sha256": "8ce542264593106570fa745f8c9326eef8b356ac2801b903ffbed74c15ae2870"
+  },
+  "forecast_binding": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\runs\\G08_P2102_C10\\calendar_binding.json",
+    "sha256": "cb0be34eae41df02d032cbd4bfcbf64d06c39f3f0bb3c0bac50fc63b668cad22"
+  },
+  "mapping": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\training\\mapping_fit_001\\mapping.json",
+    "sha256": "83e36e1da7737d4f5dad2b02e5e82f0d592de4cca012ad486de03132db1ced44"
+  },
+  "model": null,
+  "arrival_support_contract": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\runs\\G08_P2102_C10\\arrival_support_contract.json",
+    "sha256": "fa013392db06502784a535d001ab658343c54407a298121d5f6855f0d4da222b"
+  },
+  "origin_support_audit": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\runs\\G08_P2102_C10\\offline_origin_support_audit.json",
+    "sha256": "6238eb37202eae1bec06965eaddc22588d2359a0640bab63228b668795a82bd1"
+  },
+  "root_branch": null,
+  "behavior_seed": 17,
+  "activation": 7200.0,
+  "horizon": 18000.0,
+  "soft_seconds": 2280.0,
+  "hard_seconds": 2400.0,
+  "event_budget": 100000,
+  "global_event_budget": 750000,
+  "estimated_evidence_bytes": 104857600,
+  "calibration": null,
+  "projection_horizon_seconds": 600.0,
+  "transport_penalty": 0.01,
+  "minimum_gain": 0.0,
+  "supply_mode": "committed_only",
+  "controller": {
+    "control_period": 60.0,
+    "command_delay": 2.0,
+    "publication_delay": 0.5,
+    "retry_period": 60.0,
+    "compact": true,
+    "lease_seconds": 120.0,
+    "predictive": true,
+    "routes": false,
+    "forecasts": true,
+    "prebalance": true,
+    "inventory_snapshots": true,
+    "inventory_snapshot_validity": 120.0,
+    "inventory_snapshot_refresh_period": 60.0,
+    "recover_failed_empty": true,
+    "_consume_state": true,
+    "stock_return": true,
+    "stock_return_activate_at": 7200.0,
+    "actual_only_activate_at": 7200.0
+  },
+  "policy_version": "joint_v1:C10:rule",
+  "cost_scope": "full_offered_population_integral_over_registered_window",
+  "strict_nonharm_certified": false
+}

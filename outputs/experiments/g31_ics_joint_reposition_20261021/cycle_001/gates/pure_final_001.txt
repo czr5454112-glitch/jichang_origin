@@ -1,0 +1,558 @@
+........................................................................ [ 41%]
+........................................................................ [ 82%]
+....................FFFF.FFFFFF                                          [100%]
+================================== FAILURES ===================================
+_ test_reconstruction_conserves_public_digest_unknown_values_unicode_and_metadata _
+
+tmp_path = WindowsPath('C:/Users/38908/AppData/Local/Packages/sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}/AC/Temp/pytest-of-38908/pytest-0/test_reconstruction_conserves_0')
+
+    def test_reconstruction_conserves_public_digest_unknown_values_unicode_and_metadata(tmp_path):
+        path = tmp_path/'observations.sqlite'
+        obs = fixture(); row = {'digest':digest(obs), 'observation':obs, 'optional_metadata':None}
+>       with evidence.ObservationStore(path, page_size=16) as writer:
+
+tests\test_g31_airport_joint_evidence.py:32: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\foundation_airport_joint_evidence.py:283: in __exit__
+    self.close(complete=kind is None)
+scripts\experiments\g31_ics_circulation\foundation_airport_joint_evidence.py:276: in close
+    _atomic_json(self.path.with_suffix(self.path.suffix + ".receipt.json"), self.receipt)
+scripts\experiments\g31_ics_circulation\foundation_airport_joint_evidence.py:71: in _atomic_json
+    temporary.replace(path)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/38908/AppData/Local/Packages/sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}/AC/Temp/pytest-of-38908/pytest-0/test_reconstruction_conserves_0/observations.sqlite.receipt.json.partial')
+target = WindowsPath('C:/Users/38908/AppData/Local/Packages/sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}/AC/Temp/pytest-of-38908/pytest-0/test_reconstruction_conserves_0/observations.sqlite.receipt.json')
+
+    def replace(self, target):
+        """
+        Rename this path to the target path, overwriting if that path exists.
+    
+        The target path may be absolute or relative. Relative paths are
+        interpreted relative to the current working directory, *not* the
+        directory of the Path object.
+    
+        Returns the new Path instance pointing to the target path.
+        """
+>       os.replace(self, target)
+E       PermissionError: [WinError 5] ¾Ü¾ø·ÃÎÊ¡£: 'C:\\Users\\38908\\AppData\\Local\\Packages\\sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}\\AC\\Temp\\pytest-of-38908\\pytest-0\\test_reconstruction_conserves_0\\observations.sqlite.receipt.json.partial' -> 'C:\\Users\\38908\\AppData\\Local\\Packages\\sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}\\AC\\Temp\\pytest-of-38908\\pytest-0\\test_reconstruction_conserves_0\\observations.sqlite.receipt.json'
+
+..\..\python3.11.9\Lib\pathlib.py:1188: PermissionError
+__________ test_one_changed_job_only_adds_its_row_and_ancestor_pages __________
+
+tmp_path = WindowsPath('C:/Users/38908/AppData/Local/Packages/sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}/AC/Temp/pytest-of-38908/pytest-0/test_one_changed_job_only_adds0')
+
+    def test_one_changed_job_only_adds_its_row_and_ancestor_pages(tmp_path):
+>       with evidence.ObservationStore(tmp_path/'observations.sqlite', page_size=16) as writer:
+
+tests\test_g31_airport_joint_evidence.py:47: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\foundation_airport_joint_evidence.py:283: in __exit__
+    self.close(complete=kind is None)
+scripts\experiments\g31_ics_circulation\foundation_airport_joint_evidence.py:276: in close
+    _atomic_json(self.path.with_suffix(self.path.suffix + ".receipt.json"), self.receipt)
+scripts\experiments\g31_ics_circulation\foundation_airport_joint_evidence.py:71: in _atomic_json
+    temporary.replace(path)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/38908/AppData/Local/Packages/sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}/AC/Temp/pytest-of-38908/pytest-0/test_one_changed_job_only_adds0/observations.sqlite.receipt.json.partial')
+target = WindowsPath('C:/Users/38908/AppData/Local/Packages/sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}/AC/Temp/pytest-of-38908/pytest-0/test_one_changed_job_only_adds0/observations.sqlite.receipt.json')
+
+    def replace(self, target):
+        """
+        Rename this path to the target path, overwriting if that path exists.
+    
+        The target path may be absolute or relative. Relative paths are
+        interpreted relative to the current working directory, *not* the
+        directory of the Path object.
+    
+        Returns the new Path instance pointing to the target path.
+        """
+>       os.replace(self, target)
+E       PermissionError: [WinError 5] ¾Ü¾ø·ÃÎÊ¡£: 'C:\\Users\\38908\\AppData\\Local\\Packages\\sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}\\AC\\Temp\\pytest-of-38908\\pytest-0\\test_one_changed_job_only_adds0\\observations.sqlite.receipt.json.partial' -> 'C:\\Users\\38908\\AppData\\Local\\Packages\\sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}\\AC\\Temp\\pytest-of-38908\\pytest-0\\test_one_changed_job_only_adds0\\observations.sqlite.receipt.json'
+
+..\..\python3.11.9\Lib\pathlib.py:1188: PermissionError
+__________ test_index_and_reader_caches_are_bounded_not_all_history ___________
+
+tmp_path = WindowsPath('C:/Users/38908/AppData/Local/Packages/sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}/AC/Temp/pytest-of-38908/pytest-0/test_index_and_reader_caches_a0')
+
+    def test_index_and_reader_caches_are_bounded_not_all_history(tmp_path):
+        path = tmp_path/'observations.sqlite'
+>       with evidence.ObservationStore(path, index_cache_entries=2, page_size=8) as writer:
+
+tests\test_g31_airport_joint_evidence.py:59: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\foundation_airport_joint_evidence.py:283: in __exit__
+    self.close(complete=kind is None)
+scripts\experiments\g31_ics_circulation\foundation_airport_joint_evidence.py:276: in close
+    _atomic_json(self.path.with_suffix(self.path.suffix + ".receipt.json"), self.receipt)
+scripts\experiments\g31_ics_circulation\foundation_airport_joint_evidence.py:71: in _atomic_json
+    temporary.replace(path)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/38908/AppData/Local/Packages/sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}/AC/Temp/pytest-of-38908/pytest-0/test_index_and_reader_caches_a0/observations.sqlite.receipt.json.partial')
+target = WindowsPath('C:/Users/38908/AppData/Local/Packages/sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}/AC/Temp/pytest-of-38908/pytest-0/test_index_and_reader_caches_a0/observations.sqlite.receipt.json')
+
+    def replace(self, target):
+        """
+        Rename this path to the target path, overwriting if that path exists.
+    
+        The target path may be absolute or relative. Relative paths are
+        interpreted relative to the current working directory, *not* the
+        directory of the Path object.
+    
+        Returns the new Path instance pointing to the target path.
+        """
+>       os.replace(self, target)
+E       PermissionError: [WinError 5] ¾Ü¾ø·ÃÎÊ¡£: 'C:\\Users\\38908\\AppData\\Local\\Packages\\sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}\\AC\\Temp\\pytest-of-38908\\pytest-0\\test_index_and_reader_caches_a0\\observations.sqlite.receipt.json.partial' -> 'C:\\Users\\38908\\AppData\\Local\\Packages\\sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}\\AC\\Temp\\pytest-of-38908\\pytest-0\\test_index_and_reader_caches_a0\\observations.sqlite.receipt.json'
+
+..\..\python3.11.9\Lib\pathlib.py:1188: PermissionError
+____ test_wrong_original_digest_rolls_back_and_poisoned_writer_cannot_seal ____
+
+tmp_path = WindowsPath('C:/Users/38908/AppData/Local/Packages/sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}/AC/Temp/pytest-of-38908/pytest-0/test_wrong_original_digest_rol0')
+
+    def test_wrong_original_digest_rolls_back_and_poisoned_writer_cannot_seal(tmp_path):
+        path = tmp_path/'observations.sqlite'; writer = evidence.ObservationStore(path)
+        with pytest.raises(ValueError, match='original_public_digest_mismatch'):
+            writer.write(fixture(3), expected_digest='0'*64)
+        with pytest.raises(ValueError, match='writer_not_open'):
+            writer.write(fixture(3))
+>       receipt = writer.close()
+                  ^^^^^^^^^^^^^^
+
+tests\test_g31_airport_joint_evidence.py:75: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\foundation_airport_joint_evidence.py:276: in close
+    _atomic_json(self.path.with_suffix(self.path.suffix + ".receipt.json"), self.receipt)
+scripts\experiments\g31_ics_circulation\foundation_airport_joint_evidence.py:71: in _atomic_json
+    temporary.replace(path)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/38908/AppData/Local/Packages/sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}/AC/Temp/pytest-of-38908/pytest-0/test_wrong_original_digest_rol0/observations.sqlite.receipt.json.partial')
+target = WindowsPath('C:/Users/38908/AppData/Local/Packages/sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}/AC/Temp/pytest-of-38908/pytest-0/test_wrong_original_digest_rol0/observations.sqlite.receipt.json')
+
+    def replace(self, target):
+        """
+        Rename this path to the target path, overwriting if that path exists.
+    
+        The target path may be absolute or relative. Relative paths are
+        interpreted relative to the current working directory, *not* the
+        directory of the Path object.
+    
+        Returns the new Path instance pointing to the target path.
+        """
+>       os.replace(self, target)
+E       PermissionError: [WinError 5] ¾Ü¾ø·ÃÎÊ¡£: 'C:\\Users\\38908\\AppData\\Local\\Packages\\sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}\\AC\\Temp\\pytest-of-38908\\pytest-0\\test_wrong_original_digest_rol0\\observations.sqlite.receipt.json.partial' -> 'C:\\Users\\38908\\AppData\\Local\\Packages\\sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}\\AC\\Temp\\pytest-of-38908\\pytest-0\\test_wrong_original_digest_rol0\\observations.sqlite.receipt.json'
+
+..\..\python3.11.9\Lib\pathlib.py:1188: PermissionError
+____ test_changed_chunk_rejected_even_if_outer_file_binding_is_recomputed _____
+
+tmp_path = WindowsPath('C:/Users/38908/AppData/Local/Packages/sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}/AC/Temp/pytest-of-38908/pytest-0/test_changed_chunk_rejected_ev0')
+
+    def test_changed_chunk_rejected_even_if_outer_file_binding_is_recomputed(tmp_path):
+        path = tmp_path/'observations.sqlite'
+>       with evidence.ObservationStore(path) as writer:
+
+tests\test_g31_airport_joint_evidence.py:95: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\foundation_airport_joint_evidence.py:283: in __exit__
+    self.close(complete=kind is None)
+scripts\experiments\g31_ics_circulation\foundation_airport_joint_evidence.py:276: in close
+    _atomic_json(self.path.with_suffix(self.path.suffix + ".receipt.json"), self.receipt)
+scripts\experiments\g31_ics_circulation\foundation_airport_joint_evidence.py:71: in _atomic_json
+    temporary.replace(path)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/38908/AppData/Local/Packages/sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}/AC/Temp/pytest-of-38908/pytest-0/test_changed_chunk_rejected_ev0/observations.sqlite.receipt.json.partial')
+target = WindowsPath('C:/Users/38908/AppData/Local/Packages/sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}/AC/Temp/pytest-of-38908/pytest-0/test_changed_chunk_rejected_ev0/observations.sqlite.receipt.json')
+
+    def replace(self, target):
+        """
+        Rename this path to the target path, overwriting if that path exists.
+    
+        The target path may be absolute or relative. Relative paths are
+        interpreted relative to the current working directory, *not* the
+        directory of the Path object.
+    
+        Returns the new Path instance pointing to the target path.
+        """
+>       os.replace(self, target)
+E       PermissionError: [WinError 5] ¾Ü¾ø·ÃÎÊ¡£: 'C:\\Users\\38908\\AppData\\Local\\Packages\\sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}\\AC\\Temp\\pytest-of-38908\\pytest-0\\test_changed_chunk_rejected_ev0\\observations.sqlite.receipt.json.partial' -> 'C:\\Users\\38908\\AppData\\Local\\Packages\\sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}\\AC\\Temp\\pytest-of-38908\\pytest-0\\test_changed_chunk_rejected_ev0\\observations.sqlite.receipt.json'
+
+..\..\python3.11.9\Lib\pathlib.py:1188: PermissionError
+_ test_missing_chunk_rejects_reconstruction_even_if_outer_binding_recomputed __
+
+tmp_path = WindowsPath('C:/Users/38908/AppData/Local/Packages/sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}/AC/Temp/pytest-of-38908/pytest-0/test_missing_chunk_rejects_rec0')
+
+    def test_missing_chunk_rejects_reconstruction_even_if_outer_binding_recomputed(tmp_path):
+        path = tmp_path/'observations.sqlite'
+>       with evidence.ObservationStore(path) as writer:
+
+tests\test_g31_airport_joint_evidence.py:106: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\foundation_airport_joint_evidence.py:283: in __exit__
+    self.close(complete=kind is None)
+scripts\experiments\g31_ics_circulation\foundation_airport_joint_evidence.py:276: in close
+    _atomic_json(self.path.with_suffix(self.path.suffix + ".receipt.json"), self.receipt)
+scripts\experiments\g31_ics_circulation\foundation_airport_joint_evidence.py:71: in _atomic_json
+    temporary.replace(path)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/38908/AppData/Local/Packages/sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}/AC/Temp/pytest-of-38908/pytest-0/test_missing_chunk_rejects_rec0/observations.sqlite.receipt.json.partial')
+target = WindowsPath('C:/Users/38908/AppData/Local/Packages/sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}/AC/Temp/pytest-of-38908/pytest-0/test_missing_chunk_rejects_rec0/observations.sqlite.receipt.json')
+
+    def replace(self, target):
+        """
+        Rename this path to the target path, overwriting if that path exists.
+    
+        The target path may be absolute or relative. Relative paths are
+        interpreted relative to the current working directory, *not* the
+        directory of the Path object.
+    
+        Returns the new Path instance pointing to the target path.
+        """
+>       os.replace(self, target)
+E       PermissionError: [WinError 5] ¾Ü¾ø·ÃÎÊ¡£: 'C:\\Users\\38908\\AppData\\Local\\Packages\\sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}\\AC\\Temp\\pytest-of-38908\\pytest-0\\test_missing_chunk_rejects_rec0\\observations.sqlite.receipt.json.partial' -> 'C:\\Users\\38908\\AppData\\Local\\Packages\\sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}\\AC\\Temp\\pytest-of-38908\\pytest-0\\test_missing_chunk_rejects_rec0\\observations.sqlite.receipt.json'
+
+..\..\python3.11.9\Lib\pathlib.py:1188: PermissionError
+_______ test_removed_frame_or_changed_frame_metadata_cannot_pass_chain ________
+
+tmp_path = WindowsPath('C:/Users/38908/AppData/Local/Packages/sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}/AC/Temp/pytest-of-38908/pytest-0/test_removed_frame_or_changed_0')
+
+    def test_removed_frame_or_changed_frame_metadata_cannot_pass_chain(tmp_path):
+        path = tmp_path/'observations.sqlite'
+>       with evidence.ObservationStore(path) as writer:
+
+tests\test_g31_airport_joint_evidence.py:118: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\foundation_airport_joint_evidence.py:283: in __exit__
+    self.close(complete=kind is None)
+scripts\experiments\g31_ics_circulation\foundation_airport_joint_evidence.py:276: in close
+    _atomic_json(self.path.with_suffix(self.path.suffix + ".receipt.json"), self.receipt)
+scripts\experiments\g31_ics_circulation\foundation_airport_joint_evidence.py:71: in _atomic_json
+    temporary.replace(path)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/38908/AppData/Local/Packages/sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}/AC/Temp/pytest-of-38908/pytest-0/test_removed_frame_or_changed_0/observations.sqlite.receipt.json.partial')
+target = WindowsPath('C:/Users/38908/AppData/Local/Packages/sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}/AC/Temp/pytest-of-38908/pytest-0/test_removed_frame_or_changed_0/observations.sqlite.receipt.json')
+
+    def replace(self, target):
+        """
+        Rename this path to the target path, overwriting if that path exists.
+    
+        The target path may be absolute or relative. Relative paths are
+        interpreted relative to the current working directory, *not* the
+        directory of the Path object.
+    
+        Returns the new Path instance pointing to the target path.
+        """
+>       os.replace(self, target)
+E       PermissionError: [WinError 5] ¾Ü¾ø·ÃÎÊ¡£: 'C:\\Users\\38908\\AppData\\Local\\Packages\\sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}\\AC\\Temp\\pytest-of-38908\\pytest-0\\test_removed_frame_or_changed_0\\observations.sqlite.receipt.json.partial' -> 'C:\\Users\\38908\\AppData\\Local\\Packages\\sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}\\AC\\Temp\\pytest-of-38908\\pytest-0\\test_removed_frame_or_changed_0\\observations.sqlite.receipt.json'
+
+..\..\python3.11.9\Lib\pathlib.py:1188: PermissionError
+_____ test_empty_closed_stream_and_existing_path_are_distinct_from_crash ______
+
+tmp_path = WindowsPath('C:/Users/38908/AppData/Local/Packages/sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}/AC/Temp/pytest-of-38908/pytest-0/test_empty_closed_stream_and_e0')
+
+    def test_empty_closed_stream_and_existing_path_are_distinct_from_crash(tmp_path):
+        path = tmp_path/'observations.sqlite'
+>       with evidence.ObservationStore(path):
+
+tests\test_g31_airport_joint_evidence.py:128: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\foundation_airport_joint_evidence.py:283: in __exit__
+    self.close(complete=kind is None)
+scripts\experiments\g31_ics_circulation\foundation_airport_joint_evidence.py:276: in close
+    _atomic_json(self.path.with_suffix(self.path.suffix + ".receipt.json"), self.receipt)
+scripts\experiments\g31_ics_circulation\foundation_airport_joint_evidence.py:71: in _atomic_json
+    temporary.replace(path)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/38908/AppData/Local/Packages/sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}/AC/Temp/pytest-of-38908/pytest-0/test_empty_closed_stream_and_e0/observations.sqlite.receipt.json.partial')
+target = WindowsPath('C:/Users/38908/AppData/Local/Packages/sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}/AC/Temp/pytest-of-38908/pytest-0/test_empty_closed_stream_and_e0/observations.sqlite.receipt.json')
+
+    def replace(self, target):
+        """
+        Rename this path to the target path, overwriting if that path exists.
+    
+        The target path may be absolute or relative. Relative paths are
+        interpreted relative to the current working directory, *not* the
+        directory of the Path object.
+    
+        Returns the new Path instance pointing to the target path.
+        """
+>       os.replace(self, target)
+E       PermissionError: [WinError 5] ¾Ü¾ø·ÃÎÊ¡£: 'C:\\Users\\38908\\AppData\\Local\\Packages\\sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}\\AC\\Temp\\pytest-of-38908\\pytest-0\\test_empty_closed_stream_and_e0\\observations.sqlite.receipt.json.partial' -> 'C:\\Users\\38908\\AppData\\Local\\Packages\\sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}\\AC\\Temp\\pytest-of-38908\\pytest-0\\test_empty_closed_stream_and_e0\\observations.sqlite.receipt.json'
+
+..\..\python3.11.9\Lib\pathlib.py:1188: PermissionError
+________ test_nonfinite_values_cannot_become_valid_json_evidence[nan] _________
+
+tmp_path = WindowsPath('C:/Users/38908/AppData/Local/Packages/sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}/AC/Temp/pytest-of-38908/pytest-0/test_nonfinite_values_cannot_b0')
+bad = nan
+
+    @pytest.mark.parametrize('bad', [float('nan'), float('inf')])
+    def test_nonfinite_values_cannot_become_valid_json_evidence(tmp_path, bad):
+        path = tmp_path/'observations.sqlite'
+        with pytest.raises(ValueError):
+            with evidence.ObservationStore(path) as writer:
+>               writer.write({'value':bad})
+
+tests\test_g31_airport_joint_evidence.py:140: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\foundation_airport_joint_evidence.py:226: in write
+    reference, raw = self._encode(observation)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts\experiments\g31_ics_circulation\foundation_airport_joint_evidence.py:190: in _encode
+    raw = canonical(value)
+          ^^^^^^^^^^^^^^^^
+scripts\experiments\g31_ics_circulation\foundation_airport_joint_evidence.py:31: in canonical
+    return json.dumps(value, sort_keys=True, separators=(",", ":"),
+..\..\python3.11.9\Lib\json\__init__.py:238: in dumps
+    **kw).encode(obj)
+          ^^^^^^^^^^^
+..\..\python3.11.9\Lib\json\encoder.py:200: in encode
+    chunks = self.iterencode(o, _one_shot=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <json.encoder.JSONEncoder object at 0x0000012DFFBF9110>
+o = {'value': nan}, _one_shot = True
+
+    def iterencode(self, o, _one_shot=False):
+        """Encode the given object and yield each string
+        representation as available.
+    
+        For example::
+    
+            for chunk in JSONEncoder().iterencode(bigobject):
+                mysocket.write(chunk)
+    
+        """
+        if self.check_circular:
+            markers = {}
+        else:
+            markers = None
+        if self.ensure_ascii:
+            _encoder = encode_basestring_ascii
+        else:
+            _encoder = encode_basestring
+    
+        def floatstr(o, allow_nan=self.allow_nan,
+                _repr=float.__repr__, _inf=INFINITY, _neginf=-INFINITY):
+            # Check for specials.  Note that this type of test is processor
+            # and/or platform-specific, so do tests which don't depend on the
+            # internals.
+    
+            if o != o:
+                text = 'NaN'
+            elif o == _inf:
+                text = 'Infinity'
+            elif o == _neginf:
+                text = '-Infinity'
+            else:
+                return _repr(o)
+    
+            if not allow_nan:
+                raise ValueError(
+                    "Out of range float values are not JSON compliant: " +
+                    repr(o))
+    
+            return text
+    
+    
+        if (_one_shot and c_make_encoder is not None
+                and self.indent is None):
+            _iterencode = c_make_encoder(
+                markers, self.default, _encoder, self.indent,
+                self.key_separator, self.item_separator, self.sort_keys,
+                self.skipkeys, self.allow_nan)
+        else:
+            _iterencode = _make_iterencode(
+                markers, self.default, _encoder, self.indent, floatstr,
+                self.key_separator, self.item_separator, self.sort_keys,
+                self.skipkeys, _one_shot)
+>       return _iterencode(o, 0)
+               ^^^^^^^^^^^^^^^^^
+E       ValueError: Out of range float values are not JSON compliant
+
+..\..\python3.11.9\Lib\json\encoder.py:258: ValueError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = WindowsPath('C:/Users/38908/AppData/Local/Packages/sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}/AC/Temp/pytest-of-38908/pytest-0/test_nonfinite_values_cannot_b0')
+bad = nan
+
+    @pytest.mark.parametrize('bad', [float('nan'), float('inf')])
+    def test_nonfinite_values_cannot_become_valid_json_evidence(tmp_path, bad):
+        path = tmp_path/'observations.sqlite'
+        with pytest.raises(ValueError):
+>           with evidence.ObservationStore(path) as writer:
+
+tests\test_g31_airport_joint_evidence.py:139: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\foundation_airport_joint_evidence.py:283: in __exit__
+    self.close(complete=kind is None)
+scripts\experiments\g31_ics_circulation\foundation_airport_joint_evidence.py:276: in close
+    _atomic_json(self.path.with_suffix(self.path.suffix + ".receipt.json"), self.receipt)
+scripts\experiments\g31_ics_circulation\foundation_airport_joint_evidence.py:71: in _atomic_json
+    temporary.replace(path)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/38908/AppData/Local/Packages/sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}/AC/Temp/pytest-of-38908/pytest-0/test_nonfinite_values_cannot_b0/observations.sqlite.receipt.json.partial')
+target = WindowsPath('C:/Users/38908/AppData/Local/Packages/sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}/AC/Temp/pytest-of-38908/pytest-0/test_nonfinite_values_cannot_b0/observations.sqlite.receipt.json')
+
+    def replace(self, target):
+        """
+        Rename this path to the target path, overwriting if that path exists.
+    
+        The target path may be absolute or relative. Relative paths are
+        interpreted relative to the current working directory, *not* the
+        directory of the Path object.
+    
+        Returns the new Path instance pointing to the target path.
+        """
+>       os.replace(self, target)
+E       PermissionError: [WinError 5] ¾Ü¾ø·ÃÎÊ¡£: 'C:\\Users\\38908\\AppData\\Local\\Packages\\sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}\\AC\\Temp\\pytest-of-38908\\pytest-0\\test_nonfinite_values_cannot_b0\\observations.sqlite.receipt.json.partial' -> 'C:\\Users\\38908\\AppData\\Local\\Packages\\sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}\\AC\\Temp\\pytest-of-38908\\pytest-0\\test_nonfinite_values_cannot_b0\\observations.sqlite.receipt.json'
+
+..\..\python3.11.9\Lib\pathlib.py:1188: PermissionError
+________ test_nonfinite_values_cannot_become_valid_json_evidence[inf] _________
+
+tmp_path = WindowsPath('C:/Users/38908/AppData/Local/Packages/sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}/AC/Temp/pytest-of-38908/pytest-0/test_nonfinite_values_cannot_b1')
+bad = inf
+
+    @pytest.mark.parametrize('bad', [float('nan'), float('inf')])
+    def test_nonfinite_values_cannot_become_valid_json_evidence(tmp_path, bad):
+        path = tmp_path/'observations.sqlite'
+        with pytest.raises(ValueError):
+            with evidence.ObservationStore(path) as writer:
+>               writer.write({'value':bad})
+
+tests\test_g31_airport_joint_evidence.py:140: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\foundation_airport_joint_evidence.py:226: in write
+    reference, raw = self._encode(observation)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts\experiments\g31_ics_circulation\foundation_airport_joint_evidence.py:190: in _encode
+    raw = canonical(value)
+          ^^^^^^^^^^^^^^^^
+scripts\experiments\g31_ics_circulation\foundation_airport_joint_evidence.py:31: in canonical
+    return json.dumps(value, sort_keys=True, separators=(",", ":"),
+..\..\python3.11.9\Lib\json\__init__.py:238: in dumps
+    **kw).encode(obj)
+          ^^^^^^^^^^^
+..\..\python3.11.9\Lib\json\encoder.py:200: in encode
+    chunks = self.iterencode(o, _one_shot=True)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = <json.encoder.JSONEncoder object at 0x0000012DD2D85D50>
+o = {'value': inf}, _one_shot = True
+
+    def iterencode(self, o, _one_shot=False):
+        """Encode the given object and yield each string
+        representation as available.
+    
+        For example::
+    
+            for chunk in JSONEncoder().iterencode(bigobject):
+                mysocket.write(chunk)
+    
+        """
+        if self.check_circular:
+            markers = {}
+        else:
+            markers = None
+        if self.ensure_ascii:
+            _encoder = encode_basestring_ascii
+        else:
+            _encoder = encode_basestring
+    
+        def floatstr(o, allow_nan=self.allow_nan,
+                _repr=float.__repr__, _inf=INFINITY, _neginf=-INFINITY):
+            # Check for specials.  Note that this type of test is processor
+            # and/or platform-specific, so do tests which don't depend on the
+            # internals.
+    
+            if o != o:
+                text = 'NaN'
+            elif o == _inf:
+                text = 'Infinity'
+            elif o == _neginf:
+                text = '-Infinity'
+            else:
+                return _repr(o)
+    
+            if not allow_nan:
+                raise ValueError(
+                    "Out of range float values are not JSON compliant: " +
+                    repr(o))
+    
+            return text
+    
+    
+        if (_one_shot and c_make_encoder is not None
+                and self.indent is None):
+            _iterencode = c_make_encoder(
+                markers, self.default, _encoder, self.indent,
+                self.key_separator, self.item_separator, self.sort_keys,
+                self.skipkeys, self.allow_nan)
+        else:
+            _iterencode = _make_iterencode(
+                markers, self.default, _encoder, self.indent, floatstr,
+                self.key_separator, self.item_separator, self.sort_keys,
+                self.skipkeys, _one_shot)
+>       return _iterencode(o, 0)
+               ^^^^^^^^^^^^^^^^^
+E       ValueError: Out of range float values are not JSON compliant
+
+..\..\python3.11.9\Lib\json\encoder.py:258: ValueError
+
+During handling of the above exception, another exception occurred:
+
+tmp_path = WindowsPath('C:/Users/38908/AppData/Local/Packages/sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}/AC/Temp/pytest-of-38908/pytest-0/test_nonfinite_values_cannot_b1')
+bad = inf
+
+    @pytest.mark.parametrize('bad', [float('nan'), float('inf')])
+    def test_nonfinite_values_cannot_become_valid_json_evidence(tmp_path, bad):
+        path = tmp_path/'observations.sqlite'
+        with pytest.raises(ValueError):
+>           with evidence.ObservationStore(path) as writer:
+
+tests\test_g31_airport_joint_evidence.py:139: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\foundation_airport_joint_evidence.py:283: in __exit__
+    self.close(complete=kind is None)
+scripts\experiments\g31_ics_circulation\foundation_airport_joint_evidence.py:276: in close
+    _atomic_json(self.path.with_suffix(self.path.suffix + ".receipt.json"), self.receipt)
+scripts\experiments\g31_ics_circulation\foundation_airport_joint_evidence.py:71: in _atomic_json
+    temporary.replace(path)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/38908/AppData/Local/Packages/sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}/AC/Temp/pytest-of-38908/pytest-0/test_nonfinite_values_cannot_b1/observations.sqlite.receipt.json.partial')
+target = WindowsPath('C:/Users/38908/AppData/Local/Packages/sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}/AC/Temp/pytest-of-38908/pytest-0/test_nonfinite_values_cannot_b1/observations.sqlite.receipt.json')
+
+    def replace(self, target):
+        """
+        Rename this path to the target path, overwriting if that path exists.
+    
+        The target path may be absolute or relative. Relative paths are
+        interpreted relative to the current working directory, *not* the
+        directory of the Path object.
+    
+        Returns the new Path instance pointing to the target path.
+        """
+>       os.replace(self, target)
+E       PermissionError: [WinError 5] ¾Ü¾ø·ÃÎÊ¡£: 'C:\\Users\\38908\\AppData\\Local\\Packages\\sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}\\AC\\Temp\\pytest-of-38908\\pytest-0\\test_nonfinite_values_cannot_b1\\observations.sqlite.receipt.json.partial' -> 'C:\\Users\\38908\\AppData\\Local\\Packages\\sandbox.{5b01d2fd-da49-488a-8d95-654373708d03}\\AC\\Temp\\pytest-of-38908\\pytest-0\\test_nonfinite_values_cannot_b1\\observations.sqlite.receipt.json'
+
+..\..\python3.11.9\Lib\pathlib.py:1188: PermissionError
+=========================== short test summary info ===========================
+FAILED tests/test_g31_airport_joint_evidence.py::test_reconstruction_conserves_public_digest_unknown_values_unicode_and_metadata
+FAILED tests/test_g31_airport_joint_evidence.py::test_one_changed_job_only_adds_its_row_and_ancestor_pages
+FAILED tests/test_g31_airport_joint_evidence.py::test_index_and_reader_caches_are_bounded_not_all_history
+FAILED tests/test_g31_airport_joint_evidence.py::test_wrong_original_digest_rolls_back_and_poisoned_writer_cannot_seal
+FAILED tests/test_g31_airport_joint_evidence.py::test_changed_chunk_rejected_even_if_outer_file_binding_is_recomputed
+FAILED tests/test_g31_airport_joint_evidence.py::test_missing_chunk_rejects_reconstruction_even_if_outer_binding_recomputed
+FAILED tests/test_g31_airport_joint_evidence.py::test_removed_frame_or_changed_frame_metadata_cannot_pass_chain
+FAILED tests/test_g31_airport_joint_evidence.py::test_empty_closed_stream_and_existing_path_are_distinct_from_crash
+FAILED tests/test_g31_airport_joint_evidence.py::test_nonfinite_values_cannot_become_valid_json_evidence[nan]
+FAILED tests/test_g31_airport_joint_evidence.py::test_nonfinite_values_cannot_become_valid_json_evidence[inf]

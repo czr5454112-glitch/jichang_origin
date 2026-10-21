@@ -1,0 +1,44 @@
+{
+  "schema": "g31.joint_parent_registration.v1",
+  "namespace": "joint_reposition_group_plan_20261021",
+  "splits": {
+    "2101": "train",
+    "2102": "train",
+    "2103": "train",
+    "2104": "train",
+    "2105": "train",
+    "2106": "train",
+    "2107": "train",
+    "2108": "train",
+    "2201": "dev",
+    "2202": "dev",
+    "2203": "dev",
+    "2204": "dev",
+    "2301": "test",
+    "2302": "test",
+    "2303": "test",
+    "2304": "test",
+    "2305": "test",
+    "2306": "test",
+    "2307": "test",
+    "2308": "test"
+  },
+  "sampling": "sha256(namespace:parent:flight_ref); whole_group_uniform[-1800,1800] seconds; six_decimals",
+  "domain": {
+    "fleet": 22,
+    "layout_id": "nested_1701_N22",
+    "plan_family_id": "joint_group_shift_plan_v1",
+    "physical_contract_id": "native030_joint_post_priority_v1"
+  },
+  "source_private_labels_sha256": "2590fcbae13595f59b0204e477de58c789c3abe961a3cb3a51a8ce53b12ae059",
+  "test_materialization_requires_frozen_champions": true,
+  "physical_and_service_contract_unchanged_across_same_parent": true,
+  "new_plan_is_explicit_b1_inference_domain_not_training_plan_relabel": true,
+  "round1_is_replay_of_same_train_dev_parent_plan_at_later_declared_calendar": true,
+  "calendar_offsets_from_source_day": {
+    "round0_train_dev": "train: index; dev: 40 + index",
+    "round1_train_dev": "train: 20 + index; dev: 40 + index",
+    "formal_test": "60 + test_index"
+  },
+  "independent_real_airport_days": 0
+}
