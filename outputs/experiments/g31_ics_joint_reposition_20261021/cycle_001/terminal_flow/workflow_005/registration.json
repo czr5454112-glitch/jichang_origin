@@ -1,0 +1,153 @@
+{
+  "R1_enabled": false,
+  "TEST_unlocked": false,
+  "campaign_budget": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\campaign_budget.json",
+    "sha256": "6c8714103fbf2e85a7ad951cb4f6d1fe88104ef199645864047d91e613b1b719"
+  },
+  "changed_source_files_from_runtime004": [
+    "scripts/experiments/g31_ics_circulation/foundation_airport_inventory_projection.py",
+    "scripts/experiments/g31_ics_circulation/foundation_airport_transport_orders.py"
+  ],
+  "current_budget_snapshot": {
+    "active_seconds": 7837.853751,
+    "by_batch": {
+      "bridge": 2,
+      "development": 4,
+      "formal": 0,
+      "gates": 8,
+      "initial": 0,
+      "recollect": 0,
+      "reserve": 8
+    },
+    "calendar_seconds": 32147.159413,
+    "evidence_bytes": 2959089722,
+    "free_bytes": 153436540928,
+    "native_starts": 22,
+    "open_runners": [
+      "terminal-flow-9bf04950ddd2b89f3213256d"
+    ],
+    "unfinished_native_tasks": [
+      "TF_bridge_P2201_003_TF-B1-60_P2201"
+    ]
+  },
+  "driver": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\terminal_flow_workflow004.py",
+    "sha256": "112e6e0729ec7477f7be0d5acb2e5beb34f71dce8fdb9362e1a1ae02804daa1b"
+  },
+  "driver_pure_tests": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\terminal_flow_pytest_runtime005_001.xml",
+    "sha256": "267f031517f2bc67209ce53753faf88728376a2a1d1a3db35372f69875568cdc"
+  },
+  "driver_reused_without_changes": true,
+  "export_equivalence_references": {
+    "C00": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\runs\\TF_gate_002_C00_P2101",
+    "TF-B1-300": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\runs\\TF_confirm_003_TF-B1-300_P2101"
+  },
+  "fit_active_seconds_allowance": 300,
+  "fit_allowance_is_preflight_estimate_not_hard_timeout": true,
+  "fit_estimated_evidence_bytes": 268435456,
+  "model_output": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_terminal_flow_20261021\\forecast_full_train_001",
+  "new_native_starts": 32,
+  "new_native_starts_by_batch": {
+    "bridge": 2,
+    "development": 20,
+    "initial": 10
+  },
+  "no_budget_reset": true,
+  "no_parameter_search": true,
+  "partial_or_failed_native_tasks_require_explicit_audit": true,
+  "predecessor_block": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\terminal_flow\\bridge_P2201_003\\block.json",
+    "sha256": "bf53f06429e54d773fb21e56b50b0b8da34a92c23e1a9e220fa6e51c3a3e584a"
+  },
+  "predecessor_must_close_before_start": true,
+  "preparation": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\terminal_flow_prepare005.py",
+    "sha256": "8ffccb9658882e9d3e0e89da20d69714be22b8b03a637c2c1fc1f9fddadafce7"
+  },
+  "pure_gate": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\terminal_flow\\workflow_005\\pure_gate_001.json",
+    "sha256": "eea2a2e84e37144f9001b0808c60a7dd6e2004a7f71e56a4b05abcdd8b786cd7"
+  },
+  "registered_at_utc": "2026-10-21T12:10:16.086848+00:00",
+  "runtime_calibration": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\runtime_calibration_001.json",
+    "sha256": "9e999d014cbaeb8769b7bb050da582c0edb5c3ebbd506804e1361460886b2e3d"
+  },
+  "schema": "g31.terminal_flow.finite_development_workflow.v1",
+  "source_bundle": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\sources\\terminal_flow_runtime_005\\source_manifest.json",
+    "sha256": "22201c59569d2c2a67460ebff7be249432e25fc6a3f42941d4d15ddac8113bef"
+  },
+  "stages": [
+    {
+      "name": "export_gate_005",
+      "parents": [
+        2101
+      ],
+      "phase": "export_gate"
+    },
+    {
+      "name": "full_train_005",
+      "parents": [
+        2101,
+        2102
+      ],
+      "phase": "train_demand"
+    },
+    {
+      "name": "bridge_all_005",
+      "parents": [
+        2201,
+        2202,
+        2203,
+        2204
+      ],
+      "phase": "bridge"
+    },
+    {
+      "name": "bins_all_005",
+      "parents": [
+        2201,
+        2202,
+        2203,
+        2204
+      ],
+      "phase": "bins"
+    },
+    {
+      "name": "period_all_005",
+      "parents": [
+        2201,
+        2202,
+        2203,
+        2204
+      ],
+      "phase": "period"
+    },
+    {
+      "name": "predictor_all_005",
+      "parents": [
+        2201,
+        2202,
+        2203,
+        2204
+      ],
+      "phase": "predictor"
+    }
+  ],
+  "supersedes_unstarted_workflow": {
+    "dispatch": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\terminal_flow\\workflow_004\\dispatch_001.jsonl",
+      "sha256": "bf56d5540606d7de37e44547fdbf9a65abf6eceade4b64178f2c3664f3349658"
+    },
+    "native_starts": 0,
+    "reason": "Correct received/issued claim capture timestamp dominance before any successor dispatch.",
+    "registration": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\terminal_flow\\workflow_004\\registration.json",
+      "sha256": "0634c3680e6a830a6d2042a930efb4ae52be0d85c8515dcf1712187923fac783"
+    }
+  },
+  "supplemental_evidence_root": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_terminal_flow_20261021"
+}

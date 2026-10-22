@@ -1,0 +1,352 @@
+{"task_id": "TF_confirm_003_TF-current_P2101", "status": "closed"}
+{"task_id": "TF_confirm_003_TF-B1-60_P2101", "status": "closed"}
+{"task_id": "TF_confirm_003_TF-B1-300_P2101", "status": "closed"}
+{
+  "schema": "g31.terminal_flow.campaign.v1.evaluation",
+  "runs": [
+    {
+      "parent": 2101,
+      "method": "TF-current",
+      "task_id": "TF_confirm_003_TF-current_P2101",
+      "horizon": 18000.0,
+      "status": "closed",
+      "receipt": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\runs\\TF_confirm_003_TF-current_P2101\\receipt.json",
+        "sha256": "0c810328a1ac4bfa137e76de674401a426d39cc307274278f731af35eaea127d"
+      },
+      "comparison_contract": {
+        "input": "95f1dd0c9332edd07225fff3d0b83159412d00e3d2c24bec6678b0091593474a",
+        "binary": "aa2f115d68f4f2c2a3d1df64192ebb33f8468ed6ce1248d14ebbc5955e4ddd82",
+        "sources": "1b6e9f81b1e96c0607e1fac21b8b2e15cdd373bdce5e22eab121ba26611136c3",
+        "controller": {
+          "control_period": 60.0,
+          "command_delay": 2.0,
+          "publication_delay": 0.5,
+          "retry_period": 60.0,
+          "compact": true,
+          "lease_seconds": 120.0,
+          "predictive": true,
+          "routes": false,
+          "forecasts": true,
+          "prebalance": true,
+          "inventory_snapshots": true,
+          "inventory_snapshot_validity": 120.0,
+          "inventory_snapshot_refresh_period": 60.0,
+          "recover_failed_empty": true,
+          "_consume_state": true,
+          "stock_return": true,
+          "stock_return_activate_at": 7200.0,
+          "actual_only_activate_at": 7200.0
+        },
+        "mapping": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\training\\mapping_fit_001\\mapping.json",
+          "sha256": "83e36e1da7737d4f5dad2b02e5e82f0d592de4cca012ad486de03132db1ced44"
+        },
+        "projection_horizon": 600.0,
+        "supply_mode": "committed_only",
+        "activation": 7200.0,
+        "allocator": {
+          "marginal_reference_available_offset_seconds": 2.0,
+          "delay_cost_model": "linear_excess_over_reference",
+          "delay_penalty_weight": 0.01,
+          "transport_penalty_weight": 0.01,
+          "dispatch_slot_seconds": 60.0,
+          "command_delay_seconds": 2.0,
+          "first_action_verification_mode": "exact_eta_positive_net_gain",
+          "minimum_net_gain": 0.0,
+          "marginal_approximation": "conservative_monotone_v1"
+        }
+      },
+      "cost": {
+        "label_start": 7200.0,
+        "label_end": 18000.0,
+        "horizon_seconds": 10800.0,
+        "backlog_integral_bag_seconds": 2316050.326901,
+        "target_return": -2316050.326901,
+        "physical_population": 28506,
+        "arrived_by_end": 1071,
+        "not_yet_arrived_by_end": 27435,
+        "completed_by_end": 0,
+        "arrived_unfinished_by_end": 1071,
+        "on_time_by_end": 0,
+        "arrived_unfinished_past_deadline": 0,
+        "completion_times_unknown_for_arrived": 1071,
+        "completion_times_imputed": false,
+        "right_censored_for_integral_only": true,
+        "waiting_for_tray_integral_bag_seconds": 2158598.31546,
+        "loaded_or_processing_integral_bag_seconds": 157452.0114409998,
+        "wait_load_decomposition_status": "actual_LOAD_START_receipts",
+        "per_job_nonharm_certified": false,
+        "uncompleted_jobs_excluded": 0
+      },
+      "funnel": {
+        "legal_decisions": 362,
+        "multiple_source_nodes": 86,
+        "nonreference": 43,
+        "proposal_noop": 362,
+        "post_priority_visits": 362,
+        "post_reason:flow_has_no_valid_first_action": 362
+      },
+      "timing": {
+        "count": 362,
+        "total_seconds": 10.215078000095673,
+        "p50_seconds": 0.02562279999256134,
+        "p95_seconds": 0.043355299974791706,
+        "maximum_seconds": 0.09040200000163168,
+        "scope": "selector scoring plus evidence stream writes; excludes catalogue, protocol, native and final export",
+        "complete_request_100ms_certified": false
+      },
+      "wall_seconds": 35.07799999997951,
+      "peak_memory_bytes": 379142144,
+      "system_J": 2316050.326900999,
+      "proposed": 0,
+      "submitted": 0,
+      "accepted": 0,
+      "received": 0,
+      "physical_failure": 0,
+      "planned_quantity": 0,
+      "plan_quantity_denominator": "rolling_suggestions_including_replans; not_unique_orders",
+      "cache_hits": 0,
+      "policy_decisions": 360
+    },
+    {
+      "parent": 2101,
+      "method": "TF-B1-60",
+      "task_id": "TF_confirm_003_TF-B1-60_P2101",
+      "horizon": 18000.0,
+      "status": "closed",
+      "receipt": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\runs\\TF_confirm_003_TF-B1-60_P2101\\receipt.json",
+        "sha256": "ef1c9d1278b4ac6bbd2c9dcb6892d4dbb5c23ef2932b1bdba4a7e25667ffeb2b"
+      },
+      "comparison_contract": {
+        "input": "95f1dd0c9332edd07225fff3d0b83159412d00e3d2c24bec6678b0091593474a",
+        "binary": "aa2f115d68f4f2c2a3d1df64192ebb33f8468ed6ce1248d14ebbc5955e4ddd82",
+        "sources": "1b6e9f81b1e96c0607e1fac21b8b2e15cdd373bdce5e22eab121ba26611136c3",
+        "controller": {
+          "control_period": 60.0,
+          "command_delay": 2.0,
+          "publication_delay": 0.5,
+          "retry_period": 60.0,
+          "compact": true,
+          "lease_seconds": 120.0,
+          "predictive": true,
+          "routes": false,
+          "forecasts": true,
+          "prebalance": true,
+          "inventory_snapshots": true,
+          "inventory_snapshot_validity": 120.0,
+          "inventory_snapshot_refresh_period": 60.0,
+          "recover_failed_empty": true,
+          "_consume_state": true,
+          "stock_return": true,
+          "stock_return_activate_at": 7200.0,
+          "actual_only_activate_at": 7200.0
+        },
+        "mapping": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\training\\mapping_fit_001\\mapping.json",
+          "sha256": "83e36e1da7737d4f5dad2b02e5e82f0d592de4cca012ad486de03132db1ced44"
+        },
+        "projection_horizon": 600.0,
+        "supply_mode": "committed_only",
+        "activation": 7200.0,
+        "allocator": {
+          "marginal_reference_available_offset_seconds": 2.0,
+          "delay_cost_model": "linear_excess_over_reference",
+          "delay_penalty_weight": 0.01,
+          "transport_penalty_weight": 0.01,
+          "dispatch_slot_seconds": 60.0,
+          "command_delay_seconds": 2.0,
+          "first_action_verification_mode": "exact_eta_positive_net_gain",
+          "minimum_net_gain": 0.0,
+          "marginal_approximation": "conservative_monotone_v1"
+        }
+      },
+      "cost": {
+        "label_start": 7200.0,
+        "label_end": 18000.0,
+        "horizon_seconds": 10800.0,
+        "backlog_integral_bag_seconds": 2316050.326901,
+        "target_return": -2316050.326901,
+        "physical_population": 28506,
+        "arrived_by_end": 1071,
+        "not_yet_arrived_by_end": 27435,
+        "completed_by_end": 0,
+        "arrived_unfinished_by_end": 1071,
+        "on_time_by_end": 0,
+        "arrived_unfinished_past_deadline": 0,
+        "completion_times_unknown_for_arrived": 1071,
+        "completion_times_imputed": false,
+        "right_censored_for_integral_only": true,
+        "waiting_for_tray_integral_bag_seconds": 2165657.589058,
+        "loaded_or_processing_integral_bag_seconds": 150392.73784299986,
+        "wait_load_decomposition_status": "actual_LOAD_START_receipts",
+        "per_job_nonharm_certified": false,
+        "uncompleted_jobs_excluded": 0
+      },
+      "funnel": {
+        "legal_decisions": 362,
+        "multiple_source_nodes": 65,
+        "nonreference": 8,
+        "proposal_noop": 357,
+        "post_priority_visits": 362,
+        "post_reason:flow_has_no_valid_first_action": 357,
+        "proposal_transfer": 5,
+        "post_reason:inventory_return_submitted": 5
+      },
+      "timing": {
+        "count": 362,
+        "total_seconds": 54.9537506995257,
+        "p50_seconds": 0.14906930003780872,
+        "p95_seconds": 0.1951256999745965,
+        "maximum_seconds": 0.24480869993567467,
+        "scope": "selector scoring plus evidence stream writes; excludes catalogue, protocol, native and final export",
+        "complete_request_100ms_certified": false
+      },
+      "wall_seconds": 82.07799999997951,
+      "peak_memory_bytes": 379502592,
+      "system_J": 2316050.326900999,
+      "proposed": 5,
+      "submitted": 5,
+      "accepted": 5,
+      "received": 3,
+      "physical_failure": 0,
+      "planned_quantity": 5,
+      "plan_quantity_denominator": "rolling_suggestions_including_replans; not_unique_orders",
+      "cache_hits": 0,
+      "policy_decisions": 360
+    },
+    {
+      "parent": 2101,
+      "method": "TF-B1-300",
+      "task_id": "TF_confirm_003_TF-B1-300_P2101",
+      "horizon": 18000.0,
+      "status": "closed",
+      "receipt": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\runs\\TF_confirm_003_TF-B1-300_P2101\\receipt.json",
+        "sha256": "b68b0f9fb0cabe0c97c78f28222f0f080841b8d790f4beecc52a9c6655c282fe"
+      },
+      "comparison_contract": {
+        "input": "95f1dd0c9332edd07225fff3d0b83159412d00e3d2c24bec6678b0091593474a",
+        "binary": "aa2f115d68f4f2c2a3d1df64192ebb33f8468ed6ce1248d14ebbc5955e4ddd82",
+        "sources": "1b6e9f81b1e96c0607e1fac21b8b2e15cdd373bdce5e22eab121ba26611136c3",
+        "controller": {
+          "control_period": 60.0,
+          "command_delay": 2.0,
+          "publication_delay": 0.5,
+          "retry_period": 60.0,
+          "compact": true,
+          "lease_seconds": 120.0,
+          "predictive": true,
+          "routes": false,
+          "forecasts": true,
+          "prebalance": true,
+          "inventory_snapshots": true,
+          "inventory_snapshot_validity": 120.0,
+          "inventory_snapshot_refresh_period": 60.0,
+          "recover_failed_empty": true,
+          "_consume_state": true,
+          "stock_return": true,
+          "stock_return_activate_at": 7200.0,
+          "actual_only_activate_at": 7200.0
+        },
+        "mapping": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\training\\mapping_fit_001\\mapping.json",
+          "sha256": "83e36e1da7737d4f5dad2b02e5e82f0d592de4cca012ad486de03132db1ced44"
+        },
+        "projection_horizon": 600.0,
+        "supply_mode": "committed_only",
+        "activation": 7200.0,
+        "allocator": {
+          "marginal_reference_available_offset_seconds": 2.0,
+          "delay_cost_model": "linear_excess_over_reference",
+          "delay_penalty_weight": 0.01,
+          "transport_penalty_weight": 0.01,
+          "dispatch_slot_seconds": 60.0,
+          "command_delay_seconds": 2.0,
+          "first_action_verification_mode": "exact_eta_positive_net_gain",
+          "minimum_net_gain": 0.0,
+          "marginal_approximation": "conservative_monotone_v1"
+        }
+      },
+      "cost": {
+        "label_start": 7200.0,
+        "label_end": 18000.0,
+        "horizon_seconds": 10800.0,
+        "backlog_integral_bag_seconds": 2316050.326901,
+        "target_return": -2316050.326901,
+        "physical_population": 28506,
+        "arrived_by_end": 1071,
+        "not_yet_arrived_by_end": 27435,
+        "completed_by_end": 0,
+        "arrived_unfinished_by_end": 1071,
+        "on_time_by_end": 0,
+        "arrived_unfinished_past_deadline": 0,
+        "completion_times_unknown_for_arrived": 1071,
+        "completion_times_imputed": false,
+        "right_censored_for_integral_only": true,
+        "waiting_for_tray_integral_bag_seconds": 2165657.589058,
+        "loaded_or_processing_integral_bag_seconds": 150392.73784299986,
+        "wait_load_decomposition_status": "actual_LOAD_START_receipts",
+        "per_job_nonharm_certified": false,
+        "uncompleted_jobs_excluded": 0
+      },
+      "funnel": {
+        "legal_decisions": 362,
+        "multiple_source_nodes": 65,
+        "nonreference": 8,
+        "proposal_noop": 357,
+        "post_priority_visits": 362,
+        "post_reason:flow_has_no_valid_first_action": 357,
+        "proposal_transfer": 5,
+        "post_reason:inventory_return_submitted": 5
+      },
+      "timing": {
+        "count": 362,
+        "total_seconds": 54.659296400495805,
+        "p50_seconds": 0.14659739995840937,
+        "p95_seconds": 0.19795159995555878,
+        "maximum_seconds": 0.271088800043799,
+        "scope": "selector scoring plus evidence stream writes; excludes catalogue, protocol, native and final export",
+        "complete_request_100ms_certified": false
+      },
+      "wall_seconds": 79.85900000005495,
+      "peak_memory_bytes": 378589184,
+      "system_J": 2316050.326900999,
+      "proposed": 5,
+      "submitted": 5,
+      "accepted": 5,
+      "received": 3,
+      "physical_failure": 0,
+      "planned_quantity": 5,
+      "plan_quantity_denominator": "rolling_suggestions_including_replans; not_unique_orders",
+      "cache_hits": 0,
+      "policy_decisions": 360
+    }
+  ],
+  "paired": [
+    {
+      "parent": 2101,
+      "method": "TF-B1-300",
+      "reference": "TF-B1-60",
+      "backlog_gain_bag_seconds": 0.0,
+      "horizon": 18000.0
+    }
+  ],
+  "missing_pair_reasons": [
+    {
+      "task_id": "TF_confirm_003_TF-current_P2101",
+      "reference": "C00",
+      "reason": "missing_closed_paired_baseline_or_candidate"
+    },
+    {
+      "task_id": "TF_confirm_003_TF-B1-60_P2101",
+      "reference": "C10",
+      "reason": "missing_closed_paired_baseline_or_candidate"
+    }
+  ],
+  "all_registered_closed": true,
+  "formal_test_locked": true,
+  "strict_per_bag_nonharm_certified": false,
+  "conclusions": "mechanism and development evidence only; no TEST or R1 combination claim"
+}

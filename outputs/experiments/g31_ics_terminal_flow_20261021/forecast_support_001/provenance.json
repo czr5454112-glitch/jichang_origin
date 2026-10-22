@@ -1,0 +1,1580 @@
+{
+  "schema": "g31.terminal_demand_support_diagnostic.v1",
+  "source": {
+    "model.json": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_terminal_flow_20261021\\forecast_offline_001\\model.json",
+      "sha256": "3b3d6c3a7dd363530d520483585d6eefe63c3f7d2219f6b3386770de2c6ea0b0",
+      "bytes": 3334
+    },
+    "evaluation.json": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_terminal_flow_20261021\\forecast_offline_001\\evaluation.json",
+      "sha256": "f7c64377488102c4d9a7853c286bc9e1f0caf41fd7a9ad63d213681488736c92",
+      "bytes": 7648
+    },
+    "provenance.json": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_terminal_flow_20261021\\forecast_offline_001\\provenance.json",
+      "sha256": "e20e2a88db625264f13a17bdff6a9be0aaa374d91dc635c7ef774bc75ebddb4d",
+      "bytes": 12225
+    },
+    "training_rows.json.gz": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_terminal_flow_20261021\\forecast_offline_001\\training_rows.json.gz",
+      "sha256": "7a5becfc7c0ebe07a2c2f46ffd132a82ad265de4f10e32cf2337ad2d71f9dbd1",
+      "bytes": 8289
+    },
+    "evaluation_records.json.gz": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_terminal_flow_20261021\\forecast_offline_001\\evaluation_records.json.gz",
+      "sha256": "97b259c00a333542d4e03e3b4e55d8ca199e096265eebbaf8315f981f15afa62",
+      "bytes": 230562
+    }
+  },
+  "model": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_terminal_flow_20261021\\forecast_support_001\\model.json",
+    "sha256": "2d1f739e4d84be8b5d4ed54ef67d6b48e88895e16246713604aa7a69587ba1ca",
+    "bytes": 5500
+  },
+  "source_files": {
+    "foundation_airport_terminal_predictor_diagnostics.py": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_airport_terminal_predictor_diagnostics.py",
+      "sha256": "864ea2692530d3ee5adcd2c0551afd86e6bb5157bd3d11ec36c08f5664c3004a",
+      "bytes": 6982
+    },
+    "foundation_airport_terminal_support_predictor.py": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_ics_circulation\\foundation_airport_terminal_support_predictor.py",
+      "sha256": "a31675da9940a422ff6e80c3527a44e0f07b0629da2f092b3adffa539f657167",
+      "bytes": 7134
+    }
+  },
+  "training_source_inventory": [
+    {
+      "run": "outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\runs\\G01_P2101_R0_legacy",
+      "parent_id": "joint_reposition_group_plan_20261021:2101:r0",
+      "split": "train",
+      "physical_clock": 18000.0,
+      "status": "completed",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\runs\\G01_P2101_R0_legacy\\plan.json",
+        "sha256": "7711b11f14dd664944274d3234f828a4989c1aaa8bdaf08b759c17609efa12e5",
+        "bytes": 3904
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\runs\\G01_P2101_R0_legacy\\worker_report.json",
+        "sha256": "1cd8515db1585505d886f63862de7b4b474bdd546bcf6a1167e31c9052220b73",
+        "bytes": 1613
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\runs\\G02_P2101_R0_joint_bridge",
+      "parent_id": "joint_reposition_group_plan_20261021:2101:r0",
+      "split": "train",
+      "physical_clock": 18000.0,
+      "status": "completed",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\runs\\G02_P2101_R0_joint_bridge\\plan.json",
+        "sha256": "17e128686a62632630a8a581982ab30e874f00f2b44f82add714cd6416a51415",
+        "bytes": 3934
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\runs\\G02_P2101_R0_joint_bridge\\worker_report.json",
+        "sha256": "2d23cd34bdf58ddf4976b08cc83649fe94acabcec1656725ebc4efd7fb9f642d",
+        "bytes": 1886
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\runs\\G03_P2101_C00",
+      "parent_id": "joint_reposition_group_plan_20261021:2101:r0",
+      "split": "train",
+      "physical_clock": 18000.0,
+      "status": "completed",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\runs\\G03_P2101_C00\\plan.json",
+        "sha256": "592e19a49161aedca596c8b256c0e890f66b1836ca412c1567470ef93cae1ba7",
+        "bytes": 4562
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\runs\\G03_P2101_C00\\worker_report.json",
+        "sha256": "80c5e7ab5ea4c1f184bba5078a19456c24418e11e878bed8aaae57269af6c9c0",
+        "bytes": 1883
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\runs\\G04_P2101_R_forecast_prior",
+      "parent_id": "joint_reposition_group_plan_20261021:2101:r0",
+      "split": "train",
+      "physical_clock": 18000.0,
+      "status": "completed",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\runs\\G04_P2101_R_forecast_prior\\plan.json",
+        "sha256": "cf477756958b58a8e2b838163a5fd7f104e4968093feccaef833483ba0009bd9",
+        "bytes": 4653
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\runs\\G04_P2101_R_forecast_prior\\worker_report.json",
+        "sha256": "a8ec5cb95ef3d1edf19322c7a1bff41697aa0d91184a0bda85ae922bb4b8cbd4",
+        "bytes": 1908
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\runs\\G05_P2101_C10",
+      "parent_id": "joint_reposition_group_plan_20261021:2101:r0",
+      "split": "train",
+      "physical_clock": 18000.0,
+      "status": "completed",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\runs\\G05_P2101_C10\\plan.json",
+        "sha256": "052d0e4688d0ef1ca9dbbc95628afdfc7856b7ff86fff57b0c727e9a5044485d",
+        "bytes": 4825
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\runs\\G05_P2101_C10\\worker_report.json",
+        "sha256": "f32a525255d39c88e4323a78b4f521bb3651de230b51f790cf035d6c46aa0803",
+        "bytes": 1896
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\training\\mapping_fit_001\\mapping.json",
+        "sha256": "83e36e1da7737d4f5dad2b02e5e82f0d592de4cca012ad486de03132db1ced44"
+      }
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\runs\\G06_P2102_C00",
+      "parent_id": "joint_reposition_group_plan_20261021:2102:r0",
+      "split": "train",
+      "physical_clock": 18000.0,
+      "status": "completed",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\runs\\G06_P2102_C00\\plan.json",
+        "sha256": "b18a5dfa3f895931d34b36bdc77b61f81077fbb7ba0d99f2a0a93304289746d2",
+        "bytes": 4562
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\runs\\G06_P2102_C00\\worker_report.json",
+        "sha256": "f0891ea8b2015439106c50f021333a3380693a630b1cd32446cdd7a29aaf793c",
+        "bytes": 1885
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\runs\\G07_P2102_R_forecast_prior",
+      "parent_id": "joint_reposition_group_plan_20261021:2102:r0",
+      "split": "train",
+      "physical_clock": 18000.0,
+      "status": "completed",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\runs\\G07_P2102_R_forecast_prior\\plan.json",
+        "sha256": "80f506e4ffbd406d1b7d47aebd416ec582dd7eb741fca75b37c4bfcdae070251",
+        "bytes": 4653
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\runs\\G07_P2102_R_forecast_prior\\worker_report.json",
+        "sha256": "7cefdbc3bc493cfa52c4a49b131709582b2652e9b3a63378595570d1e6ff3286",
+        "bytes": 1908
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\runs\\G08_P2102_C10",
+      "parent_id": "joint_reposition_group_plan_20261021:2102:r0",
+      "split": "train",
+      "physical_clock": 18000.0,
+      "status": "completed",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\runs\\G08_P2102_C10\\plan.json",
+        "sha256": "9aad0c86de6bd3241946cc408ebc8c749a54d85a604243957700bc2104b7508d",
+        "bytes": 4825
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\runs\\G08_P2102_C10\\worker_report.json",
+        "sha256": "8df30ba41cbcff452c78a5bea1b899025900f5692fb667bb4cbbe25ef338dd48",
+        "bytes": 1897
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\training\\mapping_fit_001\\mapping.json",
+        "sha256": "83e36e1da7737d4f5dad2b02e5e82f0d592de4cca012ad486de03132db1ced44"
+      }
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1101_root0_a_patch_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1101:r0",
+      "split": "train",
+      "physical_clock": 9000.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1101_root0_a_patch_001\\plan.json",
+        "sha256": "67d3ab65c97d92e24c20d7c0ffb0de41437ff3ef02a1aa587ac90a7684ea9431",
+        "bytes": 4949
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1101_root0_a_patch_001\\worker_report.json",
+        "sha256": "96cbec4add1c1771f34ca4ba0e68f8191b4b8c408ca358099d14cc8607d20de2",
+        "bytes": 3478
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1101_root0_a_ref_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1101:r0",
+      "split": "train",
+      "physical_clock": 9000.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1101_root0_a_ref_001\\plan.json",
+        "sha256": "c2004d2c277124c98ef42c78631edabbcd7bff167bb4c48f917ae645967cb7fa",
+        "bytes": 4941
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1101_root0_a_ref_001\\worker_report.json",
+        "sha256": "afcc273b393f79de280aa6376bf74b55293ca67d79166ee5a5c70eb080ef85c0",
+        "bytes": 3469
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1101_root1_a_patch_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1101:r0",
+      "split": "train",
+      "physical_clock": 31920.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1101_root1_a_patch_001\\plan.json",
+        "sha256": "71d460718ddb48cffbbcf7b8e40c307e608fed0f746b8e0ffa9ad32c2bc33bb7",
+        "bytes": 4951
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1101_root1_a_patch_001\\worker_report.json",
+        "sha256": "4585ca3e65b194e77ad7662a78aa8333b7572f7e87564a0d3982a992eb7c4e09",
+        "bytes": 3511
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1101_root1_a_ref_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1101:r0",
+      "split": "train",
+      "physical_clock": 31920.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1101_root1_a_ref_001\\plan.json",
+        "sha256": "143888d127c989a03ddd9dd712ec6e885da9708e62a3b4c262abde8afe518feb",
+        "bytes": 4943
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1101_root1_a_ref_001\\worker_report.json",
+        "sha256": "107350cfb77d0840d7737dd33824fd8ea5fd2596b1ce3e8d0b1bbd433643ba68",
+        "bytes": 3536
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1102_root0_a_patch_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1102:r0",
+      "split": "train",
+      "physical_clock": 21660.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1102_root0_a_patch_001\\plan.json",
+        "sha256": "1743e78947030bf48079368f627112838ab269500fa4ae4d6799d17e69488095",
+        "bytes": 4951
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1102_root0_a_patch_001\\worker_report.json",
+        "sha256": "b73c81b092743a46e795be72fa591bb84c05a05ad98e741a855a337f75cf58eb",
+        "bytes": 3544
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1102_root0_a_ref_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1102:r0",
+      "split": "train",
+      "physical_clock": 21660.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1102_root0_a_ref_001\\plan.json",
+        "sha256": "4d5b444b66fce410e184c0a5fc76a0819a2b1856d3e2f8c3f1463d688bfbe21a",
+        "bytes": 4943
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1102_root0_a_ref_001\\worker_report.json",
+        "sha256": "a15a28d684ff8a8f763306cacbfc95d9979ff5fc7a67e003a0214ce7ba0f9376",
+        "bytes": 3543
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1102_root1_a_patch_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1102:r0",
+      "split": "train",
+      "physical_clock": 46860.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1102_root1_a_patch_001\\plan.json",
+        "sha256": "693f62ecb986ea9be6d6e2033ecc7427e6bc10525cbdf5a42de805694b5bd5c1",
+        "bytes": 4951
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1102_root1_a_patch_001\\worker_report.json",
+        "sha256": "ef3430b114d4332a5a994defd09252e32979145930f550bfb67d3c84d93b608b",
+        "bytes": 3542
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1102_root1_a_ref_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1102:r0",
+      "split": "train",
+      "physical_clock": 46860.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1102_root1_a_ref_001\\plan.json",
+        "sha256": "f59ee0dab1b0edd87a1fa9039080220b8415c650f7cbae7377308ca0ae0822ff",
+        "bytes": 4943
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1102_root1_a_ref_001\\worker_report.json",
+        "sha256": "324814b4a7c33a5e42989ca904f9fa6c39a4d2956bbc22c9b950d6def2ef4979",
+        "bytes": 3530
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1103_root0_a_patch_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1103:r0",
+      "split": "train",
+      "physical_clock": 31800.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1103_root0_a_patch_001\\plan.json",
+        "sha256": "cc8056939006aeda972bd96e80a2c78790fd3832ac3fa8cbab21f42667b014b1",
+        "bytes": 4951
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1103_root0_a_patch_001\\worker_report.json",
+        "sha256": "7f74ec7fc0c6e39b46ef0b59038d6ce9e65ebe144211926803dec3da725440da",
+        "bytes": 3533
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1103_root0_a_ref_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1103:r0",
+      "split": "train",
+      "physical_clock": 31800.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1103_root0_a_ref_001\\plan.json",
+        "sha256": "ababafca686d16f888dc79af4c1f2b799fb9880f067a05953ae57920dc549012",
+        "bytes": 4943
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1103_root0_a_ref_001\\worker_report.json",
+        "sha256": "81ad4191cf5bb1ff7a5cfcf13e558bdb92ad59838716add05e20d1270067c936",
+        "bytes": 3532
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1103_root1_a_patch_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1103:r0",
+      "split": "train",
+      "physical_clock": 9000.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1103_root1_a_patch_001\\plan.json",
+        "sha256": "a5abb27275384c8be9bd5aaae75194ff5df916946c707b1726e4ed555741bc5a",
+        "bytes": 4949
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1103_root1_a_patch_001\\worker_report.json",
+        "sha256": "81ce5fef8e91030ef3796b7a22276ec6c5fb638ddf2982c18d57f54b0f82fe70",
+        "bytes": 3452
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1103_root1_a_ref_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1103:r0",
+      "split": "train",
+      "physical_clock": 9000.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1103_root1_a_ref_001\\plan.json",
+        "sha256": "d3b5ae3efc9751e4871b98ce81550fcae259e5e2c5e92895c13142804d227e4e",
+        "bytes": 4941
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1103_root1_a_ref_001\\worker_report.json",
+        "sha256": "0636eb2e44dcb1a5601fba42e03cd6e91897ca65f95b0161c217feb26ad908da",
+        "bytes": 3451
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1104_root0_a_patch_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1104:r0",
+      "split": "train",
+      "physical_clock": 46920.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1104_root0_a_patch_001\\plan.json",
+        "sha256": "2c8473827c8e0d2ac34890be488831096d6441cd2a5d16f06d8677d5a796b5ee",
+        "bytes": 4951
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1104_root0_a_patch_001\\worker_report.json",
+        "sha256": "20cd41ae4891f4910d2bbdcb4b74fa3d33ba2473cbb85f371f55f70ee2e23a6b",
+        "bytes": 3537
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1104_root0_a_ref_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1104:r0",
+      "split": "train",
+      "physical_clock": 46920.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1104_root0_a_ref_001\\plan.json",
+        "sha256": "5297c5478762034fb6fb90c979c47ff16961f4208ca77345337e4f348af63b8b",
+        "bytes": 4943
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1104_root0_a_ref_001\\worker_report.json",
+        "sha256": "00b3a78165130596c0c7d9e0faf1a5331b6709a84eeae0aa93246f7149cd0b81",
+        "bytes": 3544
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1104_root1_a_patch_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1104:r0",
+      "split": "train",
+      "physical_clock": 21300.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1104_root1_a_patch_001\\plan.json",
+        "sha256": "8ac14d1cb560f24c5ab9179b6d8b6b948ea8891a1acc8174265e0f58b831867d",
+        "bytes": 4951
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1104_root1_a_patch_001\\worker_report.json",
+        "sha256": "62bf3078ae6754e603216b509afdef419241657bc8c6dc86d217ee23502f62c5",
+        "bytes": 3562
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1104_root1_a_ref_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1104:r0",
+      "split": "train",
+      "physical_clock": 21300.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1104_root1_a_ref_001\\plan.json",
+        "sha256": "9517a1ad08879aa284e8908b64b5b102d3a63995886b1aac4228e8223d72e94f",
+        "bytes": 4943
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1104_root1_a_ref_001\\worker_report.json",
+        "sha256": "0a0d9adce85c8e48fbdb9028adc077a53f5915fdc6bf7e6dabd85bf6c35f4041",
+        "bytes": 3542
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1105_root0_a_patch_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1105:r0",
+      "split": "train",
+      "physical_clock": 9000.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1105_root0_a_patch_001\\plan.json",
+        "sha256": "d7f877f9af2df7ff56bc438a3c66d1f7a81d8a7a1b9befe1d93b7f6dcfc36f26",
+        "bytes": 4949
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1105_root0_a_patch_001\\worker_report.json",
+        "sha256": "ed232b3bde8d6d6afba9eff39860289c1baa72d6d93bda79e16c4a91a643e016",
+        "bytes": 3465
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1105_root0_a_ref_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1105:r0",
+      "split": "train",
+      "physical_clock": 9000.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1105_root0_a_ref_001\\plan.json",
+        "sha256": "b592ff984fe7ab9b63d1cabbc81a51c10b37aa17cf8ed6284af35349c717174d",
+        "bytes": 4941
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1105_root0_a_ref_001\\worker_report.json",
+        "sha256": "ddc76f938626660edffb80b936e5b14c77b987eaa50271ce20d9b5fd9d32a523",
+        "bytes": 3463
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1105_root1_a_patch_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1105:r0",
+      "split": "train",
+      "physical_clock": 31800.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1105_root1_a_patch_001\\plan.json",
+        "sha256": "200d64ba2197570a1b373f14a21f43aa01700d19903fecf138f7405b942de4b5",
+        "bytes": 4952
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1105_root1_a_patch_001\\worker_report.json",
+        "sha256": "54c1b0e22d56b9b13a33ae3fa8ed41341c383d97d01e3381a6fc54d36ddbec29",
+        "bytes": 3517
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1105_root1_a_ref_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1105:r0",
+      "split": "train",
+      "physical_clock": 31800.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1105_root1_a_ref_001\\plan.json",
+        "sha256": "7a91e11b7a22fd7738874fdc78a2147580f4fc34a08004ecb9d50914a8880aa2",
+        "bytes": 4944
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1105_root1_a_ref_001\\worker_report.json",
+        "sha256": "b613feeb905396e0e782204f52d00824319a71e08c5f1a64c85a1711067dde4a",
+        "bytes": 3515
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1106_root0_a_patch_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1106:r0",
+      "split": "train",
+      "physical_clock": 21360.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1106_root0_a_patch_001\\plan.json",
+        "sha256": "057bdf2d4f833ddee5c7eba255247c9f90d953ca107fc25d3780b1ed39d7320e",
+        "bytes": 4951
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1106_root0_a_patch_001\\worker_report.json",
+        "sha256": "b005e95f927d1e789dff3ecb8c980d8df03dcb4ebead627ddd6a8bd3aae4f6d3",
+        "bytes": 3563
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1106_root0_a_ref_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1106:r0",
+      "split": "train",
+      "physical_clock": 21360.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1106_root0_a_ref_001\\plan.json",
+        "sha256": "ddc13364073fd5931f1856661cef611075a6eae63ee0e0eb4c7cec881cb09318",
+        "bytes": 4943
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1106_root0_a_ref_001\\worker_report.json",
+        "sha256": "222d6b43b040914727dde9966a1222bf5066975c94dea8051be1f117c842ca67",
+        "bytes": 3561
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1106_root1_a_patch_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1106:r0",
+      "split": "train",
+      "physical_clock": 46800.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1106_root1_a_patch_001\\plan.json",
+        "sha256": "01b9df8a4cddeb2adb36b6eca2b9ee15e4db921e342a345a247d89419d20d98f",
+        "bytes": 4951
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1106_root1_a_patch_001\\worker_report.json",
+        "sha256": "aa178c53465bc2a00f608e840c28962de51cb08a93078a87d0c0f80f9cc25dd5",
+        "bytes": 3541
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1106_root1_a_ref_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1106:r0",
+      "split": "train",
+      "physical_clock": 46800.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1106_root1_a_ref_001\\plan.json",
+        "sha256": "06193abaff0aff25e385532bf90bd5628ad3d6d5c4ce7a0aba3ac4e8fe5a9929",
+        "bytes": 4943
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1106_root1_a_ref_001\\worker_report.json",
+        "sha256": "c522e8a0b14ef520924b52d282de327b876f62a8887cbe71eb4f9c7f4bf1dc95",
+        "bytes": 3532
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1107_root0_a_patch_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1107:r0",
+      "split": "train",
+      "physical_clock": 31800.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1107_root0_a_patch_001\\plan.json",
+        "sha256": "0ce87d0fa9f3fb70a6473621d1f9ad5cf01ee5f03f61b38f721fe64807b86217",
+        "bytes": 4951
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1107_root0_a_patch_001\\worker_report.json",
+        "sha256": "20250525f75da927f7b9b42c4bfdc554b8d7ee705b17e156616d7d5a7ee0be67",
+        "bytes": 3523
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1107_root0_a_ref_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1107:r0",
+      "split": "train",
+      "physical_clock": 31800.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1107_root0_a_ref_001\\plan.json",
+        "sha256": "77f855c20379ca9b5485fd900e240007aaf0b343d0f6460079d171c18a030497",
+        "bytes": 4943
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1107_root0_a_ref_001\\worker_report.json",
+        "sha256": "ee0c376365695929fa8dd0b5865a76deac0eea76641b2aeda9a9abfcafd2150d",
+        "bytes": 3533
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1107_root1_a_patch_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1107:r0",
+      "split": "train",
+      "physical_clock": 9000.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1107_root1_a_patch_001\\plan.json",
+        "sha256": "f10685ec4184bec7866ec8d0c2e49b80249f3e7510f23263bf6ec8d6fb2db88d",
+        "bytes": 4949
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1107_root1_a_patch_001\\worker_report.json",
+        "sha256": "58e730bae6e271016d7b475ef2f0db9a38d7fdfa8a76e3481ffc8033a7d9e949",
+        "bytes": 3436
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1107_root1_a_ref_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1107:r0",
+      "split": "train",
+      "physical_clock": 9000.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1107_root1_a_ref_001\\plan.json",
+        "sha256": "e83f45daed963ecd4125baaaf7f4cb06dd08763586d71e74c56ddf1ecb53ea9d",
+        "bytes": 4941
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1107_root1_a_ref_001\\worker_report.json",
+        "sha256": "a449e0a25aa58f2f948a6db5c098e7384142cb87d0bfda6337c26ed5014c63d9",
+        "bytes": 3451
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1108_root0_a_patch_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1108:r0",
+      "split": "train",
+      "physical_clock": 46800.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1108_root0_a_patch_001\\plan.json",
+        "sha256": "0bd69af0ed31b93d7391e39c3d5e4a46fb121abaa1f5af480a27792bfa36e446",
+        "bytes": 4951
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1108_root0_a_patch_001\\worker_report.json",
+        "sha256": "31e79db87b07cc9b3e96b6a74ed2204516e7e2e63b2d55d72f72a8d2d2bc28d3",
+        "bytes": 3522
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1108_root0_a_ref_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1108:r0",
+      "split": "train",
+      "physical_clock": 46800.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1108_root0_a_ref_001\\plan.json",
+        "sha256": "f460873bb3e67c061a67a7b9ee516a3f97bcddf0c12e4e7a02f147a11539e6b2",
+        "bytes": 4943
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1108_root0_a_ref_001\\worker_report.json",
+        "sha256": "8493a17472b4118d4af49cfaef7d4c1fce665dbcf24d4a9a542e1e379e6f5e0c",
+        "bytes": 3539
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1108_root1_a_patch_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1108:r0",
+      "split": "train",
+      "physical_clock": 21240.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1108_root1_a_patch_001\\plan.json",
+        "sha256": "abc78914aac0c69977c9d531cdfc8dbffe3257a6235f12395eec39dcc09489d9",
+        "bytes": 4951
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1108_root1_a_patch_001\\worker_report.json",
+        "sha256": "87caad393d564abc94120a3dfdee3a917539a5ca1bdb988107c8441e2a46db5e",
+        "bytes": 3542
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1108_root1_a_ref_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1108:r0",
+      "split": "train",
+      "physical_clock": 21240.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1108_root1_a_ref_001\\plan.json",
+        "sha256": "64be42a94effc3958f30650a6cb68623b891ba70c31d7e10f0ef9045efec2c62",
+        "bytes": 4943
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R0V5_P1108_root1_a_ref_001\\worker_report.json",
+        "sha256": "005f4ac048b07962481edcdf4758db243aef0bf145216347ee6b3497a51cdd00",
+        "bytes": 3561
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1101_root0_a_patch_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1101:r1",
+      "split": "train",
+      "physical_clock": 20760.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1101_root0_a_patch_001\\plan.json",
+        "sha256": "5064d3e9d62d96c795eab8289b991844944dd8b558bde236746802adb68bc438",
+        "bytes": 5313
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1101_root0_a_patch_001\\worker_report.json",
+        "sha256": "15f0970fa9627596eb029765171c7c8869aec2eb7bdb3fa480cf1f9ca6ffe502",
+        "bytes": 3563
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1101_root0_a_ref_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1101:r1",
+      "split": "train",
+      "physical_clock": 20760.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1101_root0_a_ref_001\\plan.json",
+        "sha256": "3519048798a479ee718adc4c6a2c45354b1738965afd06219c91f1a750f7c695",
+        "bytes": 5305
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1101_root0_a_ref_001\\worker_report.json",
+        "sha256": "30b5b494ab9483b3afb22f429de88b018fde89c2e99b5d4282b8e57e8d383dd2",
+        "bytes": 3565
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1102_root0_a_patch_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1102:r1",
+      "split": "train",
+      "physical_clock": 32100.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1102_root0_a_patch_001\\plan.json",
+        "sha256": "cce6f1c1a277afb4578a11dda2b26b5d5cf494e3d7a18c436962c5a74db0a3e7",
+        "bytes": 5313
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1102_root0_a_patch_001\\worker_report.json",
+        "sha256": "c72d526b6c0768684875b61d69d2d37a1298b0c143926a46644829b095a57ac9",
+        "bytes": 3525
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1102_root0_a_ref_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1102:r1",
+      "split": "train",
+      "physical_clock": 32100.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1102_root0_a_ref_001\\plan.json",
+        "sha256": "c26a1c94f5a27e29522fcc3ec47c511748b1cef2ae351e8388aabcadf82c7387",
+        "bytes": 5305
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1102_root0_a_ref_001\\worker_report.json",
+        "sha256": "f92e9ff4c0f056b8ee26fcbdcd4d7089be71a1f69a81a97aa844857ea503fc9b",
+        "bytes": 3551
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1103_root0_a_patch_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1103:r1",
+      "split": "train",
+      "physical_clock": 46860.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1103_root0_a_patch_001\\plan.json",
+        "sha256": "989bf009544a19fe94e3ec88c6baf1211552a14b6f64ad0e48a6379242fd98bc",
+        "bytes": 5313
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1103_root0_a_patch_001\\worker_report.json",
+        "sha256": "8df0b35e5e20ca7213251b9c14fa45392305dc530448e496c6eb8b17fa75b0af",
+        "bytes": 3564
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1103_root0_a_ref_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1103:r1",
+      "split": "train",
+      "physical_clock": 46860.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1103_root0_a_ref_001\\plan.json",
+        "sha256": "56066e27c59c6335c835b0dfa4e0d7bc588ca2866378bfa8eb388563e256d732",
+        "bytes": 5305
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1103_root0_a_ref_001\\worker_report.json",
+        "sha256": "5b137eec8831630e1a86900f8638e9f478679cfef3794bc017d6da71b5e89bcf",
+        "bytes": 3560
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1104_root0_a_patch_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1104:r1",
+      "split": "train",
+      "physical_clock": 9000.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1104_root0_a_patch_001\\plan.json",
+        "sha256": "4be5bae4fc64838fce63b5651d526c6428993d7a4face67b709af80a3542d40b",
+        "bytes": 5311
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1104_root0_a_patch_001\\worker_report.json",
+        "sha256": "19187a22f66f9d3342b0e2ffaf103eaac3cfecc58f9dd1a92901f103fc931035",
+        "bytes": 3476
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1104_root0_a_ref_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1104:r1",
+      "split": "train",
+      "physical_clock": 9000.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1104_root0_a_ref_001\\plan.json",
+        "sha256": "4dbf837d4a0af450609abe86bba4f8278e0ae0a2c7525ee0a6d511955b85f0f9",
+        "bytes": 5303
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1104_root0_a_ref_001\\worker_report.json",
+        "sha256": "286c1e3f58264d7e3270cfdf4b9917d7ce9591f9b19def49a1ec8055351c0414",
+        "bytes": 3472
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1105_root0_a_patch_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1105:r1",
+      "split": "train",
+      "physical_clock": 21720.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1105_root0_a_patch_001\\plan.json",
+        "sha256": "b70eec61a54ef4c944559ca2d097d9825bd02b6932286be87200cbf6b3f5111c",
+        "bytes": 5313
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1105_root0_a_patch_001\\worker_report.json",
+        "sha256": "e98b323e6e6d22efcf6de33d54895c22ea24977877eff59158a992af15b69035",
+        "bytes": 3584
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1105_root0_a_ref_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1105:r1",
+      "split": "train",
+      "physical_clock": 21720.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1105_root0_a_ref_001\\plan.json",
+        "sha256": "e067fb9e4856d52b5be7df83a889851b30e74b45719e32873e8128e93c4bb2b1",
+        "bytes": 5305
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1105_root0_a_ref_001\\worker_report.json",
+        "sha256": "b3a4ffc99808e1004dab13f2d038e594cd8d7795ed6bd1089b3346fef4a8b82e",
+        "bytes": 3581
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1106_root0_a_patch_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1106:r1",
+      "split": "train",
+      "physical_clock": 32520.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1106_root0_a_patch_001\\plan.json",
+        "sha256": "8dd089c22201a8327343e488f7482f9165706413df573f8b676a68672152713e",
+        "bytes": 5313
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1106_root0_a_patch_001\\worker_report.json",
+        "sha256": "fa1ede65f61df854028025b2239f027e19f45c051f227175454a59e943634ff9",
+        "bytes": 3572
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1106_root0_a_ref_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1106:r1",
+      "split": "train",
+      "physical_clock": 32520.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1106_root0_a_ref_001\\plan.json",
+        "sha256": "072ea8104df1fcfdefc6f3542471998f630cf994b8842295b15fa55bbd9c99a6",
+        "bytes": 5305
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1106_root0_a_ref_001\\worker_report.json",
+        "sha256": "b32fad2fc4bfd5b7e893acf511285be712f0e569d110b63fd55f75dda8e0b00d",
+        "bytes": 3553
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1107_root0_a_patch_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1107:r1",
+      "split": "train",
+      "physical_clock": 46860.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1107_root0_a_patch_001\\plan.json",
+        "sha256": "e7239802af4910502669590d3edcc21b3a9f9443bbbcee6e664d571324d869e7",
+        "bytes": 5313
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1107_root0_a_patch_001\\worker_report.json",
+        "sha256": "3d422ea4adaa571a8e24aa83246e9f086b0b67a15e17e3bfe51f2bb7d750a079",
+        "bytes": 3582
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1107_root0_a_ref_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1107:r1",
+      "split": "train",
+      "physical_clock": 46860.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1107_root0_a_ref_001\\plan.json",
+        "sha256": "cf57968023732631a6dffc2bdd3ec7c8ef059fd567fc4295cecac783dcc73e0f",
+        "bytes": 5305
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1107_root0_a_ref_001\\worker_report.json",
+        "sha256": "63f13811134dc22d41693a4442fc050ebf376404be8f813baeaec2ff3908ba30",
+        "bytes": 3564
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1108_root0_a_patch_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1108:r1",
+      "split": "train",
+      "physical_clock": 9000.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1108_root0_a_patch_001\\plan.json",
+        "sha256": "60d2db0d6909a61e6b9e79e6a146e26a43622cf9273531b353dda321d5b76c80",
+        "bytes": 5311
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1108_root0_a_patch_001\\worker_report.json",
+        "sha256": "099da30755039c1cd05fcd32d1647a32b9943d34f964e3f45fc996a8fd9e27c7",
+        "bytes": 3477
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1108_root0_a_ref_001",
+      "parent_id": "inventory_spi_group_plan_20261020:1108:r1",
+      "split": "train",
+      "physical_clock": 9000.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1108_root0_a_ref_001\\plan.json",
+        "sha256": "618b170c22a4368b7135f422700bb5d7770bcc72c22b7460c64583913ec2d351",
+        "bytes": 5303
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_inventory_spi_20261020\\cycle_001\\runs\\SPI_R1V5_P1108_root0_a_ref_001\\worker_report.json",
+        "sha256": "537d4716692ad88214afbe8f3602869f804f9d10d8eb2eaea0c4d3ed2dfabd99",
+        "bytes": 3459
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\B_701_0_a_patch_001",
+      "parent_id": "conditional_timing_parent_701",
+      "split": "train",
+      "physical_clock": 9000.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\B_701_0_a_patch_001\\plan.json",
+        "sha256": "c7fc011da4efba0bd3a51f294cd8ef0f3afed88dcef9d955fc3701672fddee3b",
+        "bytes": 127774
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\B_701_0_a_patch_001\\worker_report.json",
+        "sha256": "1f8b4549f27c9fdf5fc3995168b84d1ec0dbee10db33c418ef5943b80f286638",
+        "bytes": 3666
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\B_701_0_a_ref_001",
+      "parent_id": "conditional_timing_parent_701",
+      "split": "train",
+      "physical_clock": 9000.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\B_701_0_a_ref_001\\plan.json",
+        "sha256": "8209d3c3b7182c2897b9a14f587c08dd5d5d13de885fab62877d0ed5a45a7b23",
+        "bytes": 127766
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\B_701_0_a_ref_001\\worker_report.json",
+        "sha256": "6e868f3efb13f0db0b490baf2faf44c659fa77dbc112c2a980fb9f3b2ecf8e7e",
+        "bytes": 3671
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\B_701_1_a_patch_001",
+      "parent_id": "conditional_timing_parent_701",
+      "split": "train",
+      "physical_clock": 30660.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\B_701_1_a_patch_001\\plan.json",
+        "sha256": "40763d17fa0d7eb1af12eef5bf4fe6fe3e85ccd6d92aae6de2bee607c66f84b4",
+        "bytes": 127775
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\B_701_1_a_patch_001\\worker_report.json",
+        "sha256": "2598014f02b32436c19f4e43c15eb57920abb33fac83806de7cf6bd8b3a6614b",
+        "bytes": 9216
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\B_701_1_a_ref_001",
+      "parent_id": "conditional_timing_parent_701",
+      "split": "train",
+      "physical_clock": 30660.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\B_701_1_a_ref_001\\plan.json",
+        "sha256": "679985c89a9fa1294d3aa504e1ce2eb9e504bcfbc82902a46fc38aa7624a6f21",
+        "bytes": 127767
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\B_701_1_a_ref_001\\worker_report.json",
+        "sha256": "b0729644538338442ded1dbe3bd01ba4bad0d5d9c09366ef2e5d81621543b23b",
+        "bytes": 9168
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\B_701_2_a_patch_001",
+      "parent_id": "conditional_timing_parent_701",
+      "split": "train",
+      "physical_clock": 55920.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\B_701_2_a_patch_001\\plan.json",
+        "sha256": "69884134f478cedb99a51147febcdb267ff5c4486b193d0768c2d01104f6d49d",
+        "bytes": 127775
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\B_701_2_a_patch_001\\worker_report.json",
+        "sha256": "32449dbc050abbb50d8089dfbcbe98c6310c30c0a0cae49f820fafb4a6526a22",
+        "bytes": 15043
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\B_701_2_a_ref_001",
+      "parent_id": "conditional_timing_parent_701",
+      "split": "train",
+      "physical_clock": 55920.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\B_701_2_a_ref_001\\plan.json",
+        "sha256": "f82d86a3663ba11ca7fd285839020061351b5b42a2c8656c7f6d086149b63479",
+        "bytes": 127767
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\B_701_2_a_ref_001\\worker_report.json",
+        "sha256": "2a05fd463ea4bb1d7413d7915ba42c1d688fcc7fb16995d3834a28bd47a90740",
+        "bytes": 15007
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\B_702_0_a_patch_001",
+      "parent_id": "conditional_timing_parent_702",
+      "split": "train",
+      "physical_clock": 9000.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\B_702_0_a_patch_001\\plan.json",
+        "sha256": "75769e66fe1ac7e0ce3a84f9d0858a5b2e50700354abe66291cd80ef831fd10e",
+        "bytes": 128261
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\B_702_0_a_patch_001\\worker_report.json",
+        "sha256": "f36203a523d8e3b48f98fd30ea223ba1c57a4b18f9bc599c62aa4285cb428043",
+        "bytes": 3683
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\B_702_0_a_ref_001",
+      "parent_id": "conditional_timing_parent_702",
+      "split": "train",
+      "physical_clock": 9000.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\B_702_0_a_ref_001\\plan.json",
+        "sha256": "49714a3e303c165fbebee9888b9ec71080f034ec3b3e0539d134df5c19559510",
+        "bytes": 128253
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\B_702_0_a_ref_001\\worker_report.json",
+        "sha256": "f8591c215038504f2fa2e88128c12ca39e12c8c0a39b7778cb88c5c4eee21a97",
+        "bytes": 3661
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\B_702_1_a_patch_001",
+      "parent_id": "conditional_timing_parent_702",
+      "split": "train",
+      "physical_clock": 30720.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\B_702_1_a_patch_001\\plan.json",
+        "sha256": "2bf4b0d36b99368fbbc142b1bf44d77d9d433e708dc7ed74a27fbbace56c5436",
+        "bytes": 128262
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\B_702_1_a_patch_001\\worker_report.json",
+        "sha256": "b51f4fa77eaf1b279afd2883377f066190809e8b3ca3bde272039be6084308b4",
+        "bytes": 9906
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\B_702_1_a_ref_001",
+      "parent_id": "conditional_timing_parent_702",
+      "split": "train",
+      "physical_clock": 30720.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\B_702_1_a_ref_001\\plan.json",
+        "sha256": "310249728f03081cd061cc9b38c74f520a22f2a529c3cf29774d5b6cc4328ffa",
+        "bytes": 128254
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\B_702_1_a_ref_001\\worker_report.json",
+        "sha256": "a3a5752e9174cf57ca2f7243a22dface87b2a93d44ffe0613a88bd81b72b6b28",
+        "bytes": 9944
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\B_702_2_a_patch_001",
+      "parent_id": "conditional_timing_parent_702",
+      "split": "train",
+      "physical_clock": 55800.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\B_702_2_a_patch_001\\plan.json",
+        "sha256": "f1e0f5a1489f4e9b23783c94100a36fb8e8fd183191f3266b43e8969d0f224d2",
+        "bytes": 128262
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\B_702_2_a_patch_001\\worker_report.json",
+        "sha256": "9db291e0bdcfe36c570289019e0b55ca214ce118f762e56d28b231f8ac603f9b",
+        "bytes": 13608
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\B_702_2_a_ref_001",
+      "parent_id": "conditional_timing_parent_702",
+      "split": "train",
+      "physical_clock": 55800.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\B_702_2_a_ref_001\\plan.json",
+        "sha256": "8dfc5699802d19122cd016ff508b95951ab6754f5bc68fd64cd37b7d5b66c5d3",
+        "bytes": 128254
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\B_702_2_a_ref_001\\worker_report.json",
+        "sha256": "7e6614976d9843966e63fa16105116795f3a32c562bcc937d7b994441219c74f",
+        "bytes": 13534
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\C_701_extra_a_patch_001",
+      "parent_id": "conditional_timing_parent_701",
+      "split": "train",
+      "physical_clock": 9000.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\C_701_extra_a_patch_001\\plan.json",
+        "sha256": "79854033227d5a0515d58164b81a165756bd8636befb5ffaa4a0ac5fde259e6a",
+        "bytes": 128995
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\C_701_extra_a_patch_001\\worker_report.json",
+        "sha256": "8d388db222625806ac8a7a7b9c61bb9828ed095e6a6fb29ce2a32a73ff498247",
+        "bytes": 3869
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\C_701_extra_a_ref_001",
+      "parent_id": "conditional_timing_parent_701",
+      "split": "train",
+      "physical_clock": 9000.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\C_701_extra_a_ref_001\\plan.json",
+        "sha256": "a924c081e7d2340f3bb8c439aaee7bac9b43fc6340c0cec972e15e276f6829db",
+        "bytes": 128985
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\C_701_extra_a_ref_001\\worker_report.json",
+        "sha256": "348be5c153fa9843df8ce5ffc398298a4af9df1d7e3d1675f05d30ed06b72947",
+        "bytes": 3897
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\C_702_extra_a_patch_001",
+      "parent_id": "conditional_timing_parent_702",
+      "split": "train",
+      "physical_clock": 9000.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\C_702_extra_a_patch_001\\plan.json",
+        "sha256": "f136c932d8fa3a435ce6aa9d0799b6f75249dcc6c038a0cab22e2dfb83dadf7c",
+        "bytes": 128995
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\C_702_extra_a_patch_001\\worker_report.json",
+        "sha256": "e9e5a4f947882c932b27367d149283ed6df2dbd8379364a58ee45a6c2c3b21da",
+        "bytes": 3871
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\C_702_extra_a_ref_001",
+      "parent_id": "conditional_timing_parent_702",
+      "split": "train",
+      "physical_clock": 9000.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\C_702_extra_a_ref_001\\plan.json",
+        "sha256": "5ee400c8c7ed5b3b39636276b8f8e52e8c9ecb1b9628c65c0612d9f17b3677b3",
+        "bytes": 128985
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\C_702_extra_a_ref_001\\worker_report.json",
+        "sha256": "cdfae7c8028d439873697db28a641f6c164cb2ab618cc5d7dc836039a7d8780a",
+        "bytes": 3892
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\F_18_701_a_patch_001",
+      "parent_id": "conditional_timing_parent_701",
+      "split": "train",
+      "physical_clock": 30660.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\F_18_701_a_patch_001\\plan.json",
+        "sha256": "7e83732166eb1053ee2a689295bd75d8c3479828e5cf20bb024f70aaafbaa0d8",
+        "bytes": 128984
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\F_18_701_a_patch_001\\worker_report.json",
+        "sha256": "5fba4ef9413fe9beb220876115fc5ba929359fb188f40367ab79dc83b979f3dd",
+        "bytes": 9337
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\F_18_701_a_ref_001",
+      "parent_id": "conditional_timing_parent_701",
+      "split": "train",
+      "physical_clock": 30660.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\F_18_701_a_ref_001\\plan.json",
+        "sha256": "ee9a45b9628acb9c21841dd529342a9d848baf06d625af572fdf4483746ba0e7",
+        "bytes": 128974
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\F_18_701_a_ref_001\\worker_report.json",
+        "sha256": "e2469c8a1ea1890690f8706ff79808c40f50290deb2246f86a61ab575bc8d80b",
+        "bytes": 9378
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\F_26_702_a_patch_001",
+      "parent_id": "conditional_timing_parent_702",
+      "split": "train",
+      "physical_clock": 30600.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\F_26_702_a_patch_001\\plan.json",
+        "sha256": "33189e03d558d81f43a4e7d31ef8730b21b3b3ab8ef03af40446285b41df08fa",
+        "bytes": 129454
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\F_26_702_a_patch_001\\worker_report.json",
+        "sha256": "211d28156e4b7484870052fa4db1e4a809d4a4548497e7bbb25be5bdc8113d1f",
+        "bytes": 8703
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\F_26_702_a_ref_001",
+      "parent_id": "conditional_timing_parent_702",
+      "split": "train",
+      "physical_clock": 30600.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\F_26_702_a_ref_001\\plan.json",
+        "sha256": "a35582265a5faddf47d5906737070af548d66290b6caad2e37d775e1bc17bcfc",
+        "bytes": 129444
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\F_26_702_a_ref_001\\worker_report.json",
+        "sha256": "e0bc0c1d2e1bb27c5eb19390fe58182ad265d54693fdd23ef8212c83380e2a85",
+        "bytes": 8694
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\H_701_calendar_a_patch_001",
+      "parent_id": "conditional_timing_parent_701",
+      "split": "train",
+      "physical_clock": 30660.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\H_701_calendar_a_patch_001\\plan.json",
+        "sha256": "d7f867de50bd5f5c857938591cd9fb9c563e53473a454acae5482b6827727649",
+        "bytes": 129008
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\H_701_calendar_a_patch_001\\worker_report.json",
+        "sha256": "a7f4ef49c64e04bd9cfefff3513112994ab5b8c2d9b947a53c794d16ea325818",
+        "bytes": 9510
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\H_701_calendar_a_ref_001",
+      "parent_id": "conditional_timing_parent_701",
+      "split": "train",
+      "physical_clock": 30660.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\H_701_calendar_a_ref_001\\plan.json",
+        "sha256": "9e40972fbc4e90cc389d05daaf2b7173ada939e8b45a89c17edbd54f9350b5e7",
+        "bytes": 128998
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\H_701_calendar_a_ref_001\\worker_report.json",
+        "sha256": "8d95eb114216d8334a3899cb79fe395f2346251a2d44fe15fba71a134d7067e2",
+        "bytes": 9453
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\H_702_calendar_a_patch_001",
+      "parent_id": "conditional_timing_parent_702",
+      "split": "train",
+      "physical_clock": 30720.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\H_702_calendar_a_patch_001\\plan.json",
+        "sha256": "3f1bbe7e1e693bcbf82a9a66c32e8dabd2c395d91be3e4a8fb7bacc0cf5c1a25",
+        "bytes": 129008
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\H_702_calendar_a_patch_001\\worker_report.json",
+        "sha256": "256bf34058c84e62ab5d0fc3df073d389bb461457b3377aac8e6448d6bcde5e6",
+        "bytes": 10195
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    },
+    {
+      "run": "outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\H_702_calendar_a_ref_001",
+      "parent_id": "conditional_timing_parent_702",
+      "split": "train",
+      "physical_clock": 30720.0,
+      "status": "complete",
+      "plan": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\H_702_calendar_a_ref_001\\plan.json",
+        "sha256": "91d8e329f0366e38a30f39917396267a044aa327f38e8dd7c5868f395d750870",
+        "bytes": 128998
+      },
+      "worker": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_action_value_20261020\\cycle_001\\H_702_calendar_a_ref_001\\worker_report.json",
+        "sha256": "c232fe7723642878ff1cf5733e663e927ed28165b64e9041106e91f56a573990",
+        "bytes": 10184
+      },
+      "has_native_terminal_export": true,
+      "loader_mapping_ref": null
+    }
+  ],
+  "full_59400_TRAIN_source_count": 0,
+  "TEST_runs_or_labels_opened": false,
+  "new_native_starts": 0,
+  "old_models_or_frozen_runtime_mutated": false,
+  "repeated_DEV_is_independent_new_holdout": false
+}

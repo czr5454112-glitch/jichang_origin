@@ -25,9 +25,51 @@ ROOT=Path(__file__).resolve().parents[3]
 CYCLE=ROOT/'outputs/experiments/g31_ics_joint_reposition_20261021/cycle_001'
 MODULE='scripts.experiments.g31_ics_circulation.foundation_airport_joint_campaign'
 SCHEMA='g31.airport_joint_campaign.v1'
+LEGACY_EVIDENCE_EXPORT='full_intermediate_results_and_full_owner_ack_views_v1'
+EVIDENCE_EXPORT='deferred_complete_intermediate_results_and_transfer_ack_subset_v1'
 BINARY=ROOT/'build_lt_session_030_inventory_spi/python/czr005_circulation.cp311-win_amd64.pyd'
 BINARY_SHA='aa2f115d68f4f2c2a3d1df64192ebb33f8468ed6ce1248d14ebbc5955e4ddd82'
 METHODS=('R0_legacy','R0_joint_bridge','C00','R_forecast_prior','C10','C01','C11','explore')
+TRANSPORT_METHODS=('TF-current','TF-B1-60','TF-B1-300','TF-B1-600','TF-B1-near-fine',
+                   'TF-B1-300-replan300','TF-predictor')
+METHODS += TRANSPORT_METHODS
+
+TERMINAL_EVIDENCE_FIELDS = ('schema','physical_clock','advance','population','jobs','trays','transfers',
+    'leg_identities','receipts','events_processed','status')
+TRANSFER_ACK_EVIDENCE_FIELDS = ('schema','now','owner_id','scope','delivered_transfer_acks','client_transfer_ledger')
+
+
+def terminal_evidence_subset(result):
+    """Reuse complete physical lists while dropping unrelated native histories."""
+    return {key: result[key] for key in TERMINAL_EVIDENCE_FIELDS if key in result}
+
+
+def transfer_ack_evidence_subset(view):
+    """Keep every transfer ACK and transfer ledger row, without command history.
+
+    The source view is not modified. Retained lists share references until the
+    caller releases the original view; no success/status/time filter is applied.
+    """
+    if any(key not in view for key in TRANSFER_ACK_EVIDENCE_FIELDS):
+        raise ValueError('joint_campaign:complete_owner_transfer_ack_evidence_required')
+    result = {key: view[key] for key in TRANSFER_ACK_EVIDENCE_FIELDS}
+    result['evidence_scope'] = dict(schema=SCHEMA+'.transfer_ack_subset.v1',
+        complete_owner_protocol_view=False, full_transfer_ack_history_preserved=True,
+        full_client_transfer_ledger_preserved=True, owner_protocol_fields_retained=list(TRANSFER_ACK_EVIDENCE_FIELDS),
+        owner_protocol_fields_omitted=sorted(set(view)-set(TRANSFER_ACK_EVIDENCE_FIELDS)),
+        original_owner_protocol_scope=view['scope'], online_actor_input=False)
+    return result
+
+
+def collect_transfer_ack_evidence(session, owners):
+    """Release each owner's bulky observation before observing the next owner."""
+    result = {}
+    for owner in owners:
+        subset = transfer_ack_evidence_subset(session.observe_protocol(owner))
+        if subset['owner_id'] != owner:
+            raise ValueError('joint_campaign:transfer_ack_owner_binding')
+        result[owner] = subset
+    return result
 
 def verify_calibration(plan):
     """A non-gate run must use exactly its pretraining registered limits."""
@@ -57,24 +99,28 @@ def freeze_sources(name):
         target.parent.mkdir(parents=True,exist_ok=True); shutil.copyfile(path,target)
         pins[relative.as_posix()]=common.sha(target)
     common.write(directory/'source_manifest.json',dict(schema=SCHEMA+'.sources',root=str(directory),
-        files=pins,source_manifest_sha256=common.digest(pins),historical_private_tapes_included=False))
+        files=pins,source_manifest_sha256=common.digest(pins),historical_private_tapes_included=False,
+        worker_evidence_contract=EVIDENCE_EXPORT))
     return bound(directory/'source_manifest.json')
 
 def prepare(task_id, *, method, seed, batch, source_bundle, horizon=59400., soft_seconds=2280.,
             hard_seconds=2400., rollout_round=0, mapping=None, model=None, root_branch=None,
-            estimated_evidence_bytes=0, calibration=None):
+            estimated_evidence_bytes=0, calibration=None, transport_config=None, demand_model=None):
     from .foundation_airport_joint_parents import make_parent, SPLITS
     from .foundation_airport_joint_calendar import load_calendar_binding
     if method not in METHODS or seed not in SPLITS: raise ValueError('joint_campaign:registered_method_parent')
     if SPLITS[seed]=='test': raise ValueError('joint_campaign:formal_locked_pending_freeze')
     if method in ('C01','C11') and model is None: raise ValueError('joint_campaign:model_required')
-    if method=='C10' and mapping is None: raise ValueError('joint_campaign:explicit_train_mapping_required')
+    if (method=='C10' or method in TRANSPORT_METHODS and method!='TF-current') and mapping is None:
+        raise ValueError('joint_campaign:explicit_train_mapping_required')
+    if method=='TF-predictor' and demand_model is None:
+        raise ValueError('joint_campaign:explicit_demand_model_required')
     if not 7200.<horizon<=59400. or not 0<soft_seconds<hard_seconds:
         raise ValueError('joint_campaign:finite_public_horizon_timeout')
     directory=CYCLE/'runs'/task_id
     if directory.exists(): raise ValueError('joint_campaign:fresh_task_id')
     if common.sha(BINARY)!=BINARY_SHA: raise ValueError('joint_campaign:accepted_native030_required')
-    read_bound(source_bundle)
+    frozen_source=read_bound(source_bundle)
     parent_dir=CYCLE/'parents'/f'P{seed}_r{rollout_round}'
     if not parent_dir.exists():
         data,parent,generation=make_parent(seed,rollout_round=rollout_round)
@@ -107,12 +153,23 @@ def prepare(task_id, *, method, seed, batch, source_bundle, horizon=59400., soft
         root_branch=root_branch,behavior_seed=17,activation=7200.,horizon=float(horizon),
         soft_seconds=soft_seconds,hard_seconds=hard_seconds,event_budget=100000,global_event_budget=750000,
         estimated_evidence_bytes=estimated_evidence_bytes,calibration=calibration,
+        worker_evidence_contract=frozen_source.get('worker_evidence_contract', LEGACY_EVIDENCE_EXPORT),
         projection_horizon_seconds=600.,transport_penalty=.01,minimum_gain=0.,supply_mode='committed_only',
         controller=dict(common.CONTROLLER,inventory_snapshots=True,inventory_snapshot_validity=120.,
             inventory_snapshot_refresh_period=60.,recover_failed_empty=True,_consume_state=True,
             stock_return=True,stock_return_activate_at=7200.,actual_only_activate_at=7200.),
         policy_version='joint_v1:'+method+':'+(read_bound(model)['model_id'] if model else 'rule'),
         cost_scope='full_offered_population_integral_over_registered_window',strict_nonharm_certified=False)
+    if method in TRANSPORT_METHODS:
+        from .foundation_airport_transport_allocation import DEFAULT_CONFIG
+        from .foundation_airport_terminal_forecast import bin_edges
+        mode=('near_fine' if method=='TF-B1-near-fine' else '600' if method=='TF-B1-600'
+              else '300' if '300' in method or method=='TF-predictor' else '60')
+        plan.update(transport_config={**DEFAULT_CONFIG, **(transport_config or {})},
+            forecast_bin_edges_seconds=bin_edges(mode=mode), forecast_horizon_seconds=1800.,
+            recompute_period_seconds=300. if method=='TF-B1-300-replan300' else 60.,
+            demand_model=demand_model, policy_version='terminal_flow_v1:'+method,
+            learning_role='demand_forecast_only', action_value_override=False)
     common.write(directory/'plan.json',plan)
     return directory
 
@@ -127,14 +184,24 @@ def verify(plan):
         raise ValueError('joint_campaign:registered_batch')
     if plan['method'] in ('C01','C11') and not plan.get('model'):
         raise ValueError('joint_campaign:explicit_model')
-    if plan['method']=='C10' and not plan.get('mapping'):
+    if (plan['method']=='C10' or plan['method'] in TRANSPORT_METHODS and plan['method']!='TF-current') and not plan.get('mapping'):
         raise ValueError('joint_campaign:explicit_mapping')
+    if plan['method'] in TRANSPORT_METHODS:
+        if plan.get('model') or plan.get('action_value_override') is not False:
+            raise ValueError('joint_campaign:transport_forbids_action_value_override')
+        if plan['method']=='TF-predictor' and not plan.get('demand_model'):
+            raise ValueError('joint_campaign:explicit_demand_model')
+        if (plan['forecast_horizon_seconds']!=1800. or plan['projection_horizon_seconds']!=600.
+                or plan['controller']['control_period']!=60. or plan['controller']['command_delay']!=2.
+                or plan['transport_config']['dispatch_slot_seconds']!=60.
+                or plan['transport_config']['command_delay_seconds']!=2.):
+            raise ValueError('joint_campaign:fixed_terminal_flow_time_contract')
     if not 7200.<plan['horizon']<=59400. or not 0<plan['soft_seconds']<plan['hard_seconds']:
         raise ValueError('joint_campaign:finite_physical_and_wall_limits')
     verify_calibration(plan)
     if common.sha(plan['binary']['path'])!=BINARY_SHA or plan['binary']['sha256']!=BINARY_SHA:
         raise ValueError('joint_campaign:native_changed')
-    for key in ('input','source_bundle','forecast_binding','mapping','model','arrival_support_contract','origin_support_audit','calibration'):
+    for key in ('input','source_bundle','forecast_binding','mapping','model','demand_model','arrival_support_contract','origin_support_audit','calibration'):
         if plan.get(key): read_bound(plan[key])
     data=read_bound(plan['input'])
     if common.digest(data['jobs'])!=parent['jobs_digest'] or data['options']['max_events']!=plan['global_event_budget']:
@@ -153,6 +220,8 @@ def verify(plan):
     if binding['producer_manifest']['target_parent']['parent_group']!=parent['parent_group']:
         raise ValueError('joint_campaign:forecast_parent_binding')
     source=read_bound(plan['source_bundle'])
+    if plan.get('worker_evidence_contract', LEGACY_EVIDENCE_EXPORT) != source.get('worker_evidence_contract', LEGACY_EVIDENCE_EXPORT):
+        raise ValueError('joint_campaign:evidence_export_source_binding')
     if source['source_manifest_sha256']!=common.digest(source['files']): raise ValueError('joint_campaign:source_manifest')
     for name,expected in source['files'].items():
         if common.sha(Path(source['root'])/name)!=expected: raise ValueError('joint_campaign:frozen_source_changed:'+name)
@@ -163,6 +232,12 @@ class RecordingPolicy:
         self.observation_stream=observation_stream; self.pending={}; self.counts=Counter(); self.rows=[]
         self.mapping=read_bound(plan['mapping']) if plan.get('mapping') else None
         self.model=read_bound(plan['model']) if plan.get('model') else None
+        self.demand_model=read_bound(plan['demand_model']) if plan.get('demand_model') else None
+        self.transport=None
+        if plan['method'] in TRANSPORT_METHODS:
+            from .foundation_airport_transport_control import TransportPolicy
+            self.transport=TransportPolicy(config=plan['transport_config'],
+                recompute_period_seconds=plan['recompute_period_seconds'])
         if self.model is not None:
             from .foundation_airport_joint_learning import prepare_predictor
             self.predictor=prepare_predictor(self.model)
@@ -171,9 +246,11 @@ class RecordingPolicy:
         self.arrival_support=read_bound(plan['arrival_support_contract']) if plan.get('arrival_support_contract') else None
         self.arrival_receipts=arrival_receipts or {}
         self.policy_seconds=[]
+        self.policy_stage_seconds=[]
 
     def __call__(self,prepared,catalog,*,policy_state,decision_context):
         policy_began=time.perf_counter()
+        stage_seconds={}
         from .foundation_airport_joint_control import select_joint_bridge
         from .foundation_airport_inventory_projection import prepare_inventory_projection
         from .foundation_airport_joint_rules import select_joint_action, joint_candidate_features
@@ -185,22 +262,72 @@ class RecordingPolicy:
         reference=select_joint_action(current,catalog,information_variant='C00',
             transport_penalty=self.plan['transport_penalty'],minimum_gain=self.plan['minimum_gain'])
         choice=select_joint_bridge(prepared,catalog) if method=='R0_joint_bridge' else reference
+        stage_seconds['current_projection_and_reference']=time.perf_counter()-policy_began
         # Selection of a C00 action above precedes all B1 evaluation below.
-        if method in ('C10','C11','R_forecast_prior','explore'):
+        if method in ('C10','C11','R_forecast_prior','explore') or self.transport is not None and method!='TF-current':
+            stage_began=time.perf_counter()
             forecast=self.forecast_at(observation=obs,parent=self.plan['parent'])
+            stage_seconds['B1_forecast']=time.perf_counter()-stage_began
+            stage_began=time.perf_counter()
+            if self.transport is not None:
+                from .foundation_airport_terminal_forecast import rebin_forecast
+                from .foundation_airport_batch_patch import digest as forecast_digest
+                forecast=copy.deepcopy(forecast)
+                source_forecast_sha256=forecast['forecast_sha256']
+                forecast['forecast']=rebin_forecast(forecast['forecast'],
+                    bin_edges_seconds=self.plan['forecast_bin_edges_seconds'])
+                if self.demand_model is not None:
+                    from .foundation_airport_terminal_forecast import predictor_transform
+                    if self.demand_model.get('schema')=='g31.terminal_demand_supported_calibration.v1':
+                        from .foundation_airport_terminal_support_predictor import transform as predictor_transform
+                    forecast['forecast']=predictor_transform(self.demand_model,forecast['forecast'],
+                        now=obs['now'],
+                        parent_id=self.plan['parent']['parent_group'])
+                # The provider identity belongs to the untransformed B1. Bind
+                # the exact representation/calibration consumed by this actor
+                # separately, without changing any demand values or actions.
+                forecast['source_forecast_sha256']=source_forecast_sha256
+                forecast['forecast_sha256']=forecast_digest(forecast['forecast'])
+                forecast['forecast_transform']={
+                    'schema':'g31.terminal_forecast_evidence_transform.v1',
+                    'source_forecast_sha256':source_forecast_sha256,
+                    'actor_forecast_sha256':forecast['forecast_sha256'],
+                    'bin_edges_seconds':list(self.plan['forecast_bin_edges_seconds']),
+                    'demand_model_sha256':(self.demand_model or {}).get('sha256'),
+                    'source_identity':'prepared_B1_before_representation_and_calibration',
+                    'actor_identity':'exact_final_inner_forecast_consumed_by_projection'}
+            stage_seconds['forecast_representation_and_calibration']=time.perf_counter()-stage_began
+            stage_began=time.perf_counter()
             projected=forecast['forecast']
             forecast_projection=prepare_inventory_projection(obs,forecast=projected,prepared_current=prepared,
                 horizon_seconds=self.plan['projection_horizon_seconds'],**support_options)
+            stage_seconds['forecast_inventory_projection']=time.perf_counter()-stage_began
             if method in ('C10','C11','R_forecast_prior'):
+                stage_began=time.perf_counter()
                 reference=select_joint_action(forecast_projection,catalog,information_variant='C10',
                     transport_penalty=self.plan['transport_penalty'],minimum_gain=self.plan['minimum_gain'])
                 choice=reference
+                stage_seconds['forecast_reference_scoring']=time.perf_counter()-stage_began
         else: forecast_projection=current
+        if self.transport is not None:
+            stage_began=time.perf_counter()
+            choice=self.transport.select(prepared,catalog,forecast_projection,
+                policy_state=policy_state,decision_context=decision_context)
+            stage_seconds['transport_allocation_verification_and_order']=time.perf_counter()-stage_began
+        stage_began=time.perf_counter()
         features=joint_candidate_features(forecast_projection,catalog)
         if forecast is not None:
+            demand_checkpoint=(self.demand_model or {}).get('base_calibration',self.demand_model or {})
+            availability={
+                'B1':forecast['model_available_at_epoch_seconds'],
+                'loader_mapping':(self.mapping or {}).get('model_available_at_epoch_seconds',0.),
+                'demand_calibration':demand_checkpoint.get('model_available_at_epoch_seconds',0.)}
+            if self.transport is not None:
+                forecast['forecast_pipeline_availability']=availability
+                forecast['forecast_pipeline_available_at_epoch_seconds']=max(availability.values())
             for feature in features.values():
-                feature['model_available_at']=max(forecast['model_available_at_epoch_seconds'],
-                    (self.mapping or {}).get('model_available_at_epoch_seconds',0.))
+                feature['model_available_at']=max(availability.values())
+        stage_seconds['candidate_features']=time.perf_counter()-stage_began
         mechanism='deterministic'; probability=1.
         if method=='explore':
             alternatives=[a for a in catalog['candidates'] if a['action_id']!=reference['action_id']]
@@ -247,16 +374,34 @@ class RecordingPolicy:
             execution_probability=None,selection_mechanism=mechanism,
             actual_submission=None,fallback_reason=choice.get('fallback_reason'),physical_failure=False,
             **chosen_features)
+        if self.transport is not None:
+            row.update(empty_transport_order=choice.get('empty_transport_order'),
+                flow_plan_id=choice['flow_plan']['plan_id'],
+                planned_quantity=len(choice['flow_plan'].get('chosen',[])),
+                flow_verification=choice['flow_verification'],flow_cache=choice['cache'])
+        row['policy_stage_seconds']=dict(stage_seconds)
         self.rows.append(row); self.pending[(obs['owner_id'],obs['now'])]=row
+        stage_began=time.perf_counter()
         self.decision_stream.extend([dict(row,candidate_features=features,catalog=catalog,
             reference=reference,selection=choice,forecast_binding=forecast)])
         # Observations are streamed separately once, not copied into every action.
         self.observation_stream.extend([dict(digest=prepared.public_state_digest,observation=obs)])
+        stage_seconds['decision_and_observation_stream_write']=time.perf_counter()-stage_began
+        self.policy_stage_seconds.append(stage_seconds)
         self.counts['legal_decisions']+=1; self.counts['multiple_source_nodes']+=catalog['candidate_source_node_count']>=2
         self.counts['nonreference']+=selected['action_id']!=reference['action_id']
         self.counts['proposal_'+selected['action_type']]+=1
         self.policy_seconds.append(time.perf_counter()-policy_began)
         return choice
+
+    def on_submission(self, **kwargs):
+        if self.transport is not None:
+            self.transport.on_submission(**kwargs)
+
+    def on_priority_submission(self, **kwargs):
+        if self.transport is not None:
+            from .foundation_airport_transport_orders import record_priority_submission
+            record_priority_submission(**kwargs)
 
     def before_choice(self,**kwargs):
         if self.root_prefix is not None: return
@@ -314,7 +459,8 @@ def worker(path,expected):
             while True:
                 run=run_airport_bounded_protocol_control(session,owners,horizon=target,state=state,
                     event_budget=plan['event_budget'],planner=make_r0_priority_planner(activate_at=7200.),
-                    planner_identity='joint_shared_actual_priority_v1',soft_deadline=began+plan['soft_seconds'],**options)
+                    planner_identity='joint_shared_actual_priority_v1',soft_deadline=began+plan['soft_seconds'],
+                    defer_intermediate_result=target<plan['horizon'],**options)
                 state=run['controller_state']; calls.extend(run['client_calls'])
                 streams['calls'].extend(run['client_calls'])
                 # Keep funnel/actual submit replies and timings; bulky original
@@ -337,12 +483,17 @@ def worker(path,expected):
                     streams['control_trace'].extend([compact])
                 if run['result'] is not None: final=run['result']
                 progress.write(json.dumps(dict(at=session.physical_time,target=target,status=run['status'],
-                    elapsed=time.monotonic()-began,decisions=len(recording.rows)))+'\n'); progress.flush()
+                    elapsed=time.monotonic()-began,decisions=len(recording.rows),
+                    boundary_advance=run.get('boundary_advance'),result_export=run.get('result_export',
+                        'exported_final' if run['result'] is not None else 'not_exported_incomplete')))+'\n'); progress.flush()
                 if run['status']!='reached':
                     report.update(process_status='completed',scientific_status='censored_'+run['status']); break
                 if session.physical_time>=plan['horizon']:
                     report.update(process_status='completed',scientific_status='closed'); break
                 target=min(target+3600.,plan['horizon'])
+                # Interim exports have already been streamed. Release their
+                # large native history copies before building the next export.
+                final=None; run=None
         for s in streams.values(): s.close()
         common.write(output/'controller_checkpoint_scope.json',dict(physical_time=session.physical_time,
             native_state_sha256=session.offline_state_sha256(),
@@ -353,9 +504,13 @@ def worker(path,expected):
         if final is not None:
             # Keep physical execution evidence, avoid duplicating enormous full
             # snapshots of protocol histories already captured by call streams.
-            terminal={k:final[k] for k in ('schema','physical_clock','advance','population','jobs','trays','transfers',
-                'leg_identities','receipts','events_processed','status') if k in final}
+            terminal=terminal_evidence_subset(final)
+            # Release the full native export before compression, diagnostics or
+            # another owner observation constructs more protocol-history copies.
+            final=terminal
             report['terminal_evidence']=write_gzip_json(output/'terminal_evidence.json.gz',terminal)
+            report['terminal_evidence_scope']=dict(complete_physical_history=True,
+                retained_fields=list(TERMINAL_EVIDENCE_FIELDS),full_native_export_retained=False)
             from .foundation_airport_service_metrics import physical_progress_intervals
             report['physical_progress']=physical_progress_intervals(final,start=7200.,end=session.physical_time)
             diagnostics=session.offline_diagnostics()
@@ -373,8 +528,9 @@ def worker(path,expected):
                     request=call['request']; key=(request['owner_id'],call['at'],request['tray_id'])
                     by_request[key]=call
             transfers={r['request_id']:r for r in final.get('transfers',[])}
-            ack_views={owner:session.observe_protocol(owner) for owner in owners}
-            write_gzip_json(output/'delivered_ack_evidence.json.gz',ack_views)
+            ack_views=collect_transfer_ack_evidence(session,owners)
+            report['delivered_ack_evidence']=write_gzip_json(output/'delivered_ack_evidence.json.gz',ack_views)
+            report['delivered_ack_evidence_scope']='complete transfer ACK history and transfer ledger; owner protocol subset'
             legs_by_request={}
             for leg in final.get('leg_identities',[]):
                 if leg.get('kind')=='empty_return':
@@ -437,6 +593,14 @@ def worker(path,expected):
             maximum_seconds=max(timings,default=None),
             scope='selector scoring plus evidence stream writes; excludes catalogue, protocol, native and final export',
             complete_request_100ms_certified=False)
+        stage_names=sorted({name for row in recording.policy_stage_seconds for name in row})
+        report['policy_timing']['stages']={}
+        for name in stage_names:
+            values=sorted(row[name] for row in recording.policy_stage_seconds if name in row)
+            report['policy_timing']['stages'][name]=dict(count=len(values),total_seconds=sum(values),
+                p50_seconds=values[len(values)//2],p95_seconds=values[min(len(values)-1,int(.95*len(values)))],
+                maximum_seconds=values[-1])
+        report['policy_timing']['stage_scope']='nonoverlapping measured callback sections; uninstrumented bookkeeping remains in callback total; catalogue, submission, native advance and final export are excluded'
         verify(plan)
     except Exception:
         report.update(process_status='failed',scientific_status='unknown_error',exception=traceback.format_exc())

@@ -1,8 +1,8 @@
 {
-  "plan_version": "joint_multisource_reposition_20261021_initial_execution",
-  "current_stage": "新多源联合提前调度：固定28506 jobs/22 trays；8实际短门闭合、175项最终回归通过。runtime004完整窗口串行bridge已启动，RL正式fit=0，test locked。首个C10预测规则案例少等约211秒，但短窗J无改善，不算RL收益。原阶段证据和失败保留。",
+  "plan_version": "terminal_flow_multirate_20261021_execution",
+  "current_stage": "User stopped further research on 2026-10-22. Source005 main and bins600 native/science closed; service gates failed. Horizon probe interrupted and all owned processes closed; source006 never activated. Preparing evidence and GPT Pro handoff; TEST/R1 locked.",
   "pre_review_stage_20261016": "完整18仍0/18低于100ms；prelude36纯门通过，实际新18未跑。v3静态依赖42通过，接线30门29通过1条Windows路径断言失败；修订30源码已备未运行，真实v3/full96未跑。bcdm2环境修正后仍600.0507775秒超时，最后行检查点20224/37270，无完整policy/C出口证书。online比较56纯门通过并根审，但实际online21与滚动重估未执行。四篇用户论文已逐篇评估并记录可迁移机制和边界。",
-  "working_tree_identity": "codex/g31-ics-v3-circulation; new-stage anchor f3567943e31bbbfa6ac40887547603d397ce25d6 plus exact frozen runtime004; publication identity separate from execution identity.",
+  "working_tree_identity": "codex/g31-ics-v3-circulation; task anchor c7121c12b3d59a1d6fcd4919bb13bb86aa2ff91f; terminal_flow_runtime_005 source manifest 22201c59569d2c2a67460ebff7be249432e25fc6a3f42941d4d15ddac8113bef; closed predecessor keeps its own runtime003 identity; publication commit is separate.",
   "review_followup_20261017": {
     "report": "docs/g31_ics_circulation/REVIEW_FOLLOWUP_20261017.md",
     "saved_96_endpoint_matches": 480,
@@ -41,62 +41,214 @@
     "P0"
   ],
   "active_experiment": {
-    "status": "joint_pretest_chain_running_initial_bridge",
-    "root": "outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001",
-    "report": "docs/g31_ics_circulation/JOINT_STAGE_PROGRESS_20261021.md",
-    "snapshot": {
-      "report": "docs/g31_ics_circulation/JOINT_STAGE_PROGRESS_20261021.md",
-      "source_bundle": {
-        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\sources\\runtime_004\\source_manifest.json",
-        "sha256": "be6fa782ad78963d092c55d55711bf7c3334f5e0ede80ee77b3493d4fa343cd4"
+    "status": "stopped_by_user_no_active_runner",
+    "root": "outputs/experiments/g31_ics_joint_reposition_20261021/cycle_001",
+    "report": "docs/g31_ics_circulation/TERMINAL_FLOW_IMPLEMENTATION_20261021.md",
+    "block": null,
+    "source_manifest_sha256": "22201c59569d2c2a67460ebff7be249432e25fc6a3f42941d4d15ddac8113bef",
+    "new_budget": false,
+    "test_locked": true,
+    "RL_demand_forecast": "not_implemented",
+    "demand_learning": "TRAIN-only supervised Poisson calibration",
+    "full_source003_report": "docs/g31_ics_circulation/TERMINAL_FLOW_FULL_SOURCE003_COMPARISON.md",
+    "completion_or_service_benefit_claimed": false,
+    "superseded_successor_004": {
+      "successor_workflow": "outputs/experiments/g31_ics_joint_reposition_20261021/cycle_001/terminal_flow/workflow_004/registration.json",
+      "successor_registration_sha256": "0634c3680e6a830a6d2042a930efb4ae52be0d85c8515dcf1712187923fac783",
+      "successor_source_manifest_sha256": "38ffa7273fedc8998662142ebd82bd1e9b309bab32c5a151f739152f2fc9f00f",
+      "successor_native_starts_registered": 32,
+      "successor_native_starts_at_registration": 0,
+      "native_starts": 0,
+      "dispatch": "outputs/experiments/g31_ics_joint_reposition_20261021/cycle_001/terminal_flow/workflow_004/dispatch_001.jsonl",
+      "reason": "Capture timestamps must dominate the receipt or issuance they supersede; pure reachable prepared-state counterexample."
+    },
+    "successor_workflow": "outputs/experiments/g31_ics_joint_reposition_20261021/cycle_001/terminal_flow/workflow_005/registration.json",
+    "successor_registration_sha256": "1509684b0eaa8433795343d508142654f90927ef70553783c272f343205aa30d",
+    "successor_source_manifest_sha256": "22201c59569d2c2a67460ebff7be249432e25fc6a3f42941d4d15ddac8113bef",
+    "successor_native_starts_registered": 32,
+    "successor_native_starts_at_registration": 0,
+    "successor_pure_tests": 462,
+    "capture_repair_diagnosis": "outputs/experiments/g31_ics_terminal_flow_20261021/claim_capture_fix005_001/DIAGNOSIS.md",
+    "predecessor_all_four_closed": true,
+    "successor_started_at_utc": "2026-10-21T12:41:45.917027+00:00",
+    "source003_TF60_comparisons": [
+      {
+        "reference": "C00",
+        "gain_bag_seconds": 73151.29627901316,
+        "completed_delta": 3,
+        "on_time_delta": -2,
+        "known_completion_harm": 217,
+        "known_lateness_harm": 180,
+        "service_gate": false
       },
-      "native_gate_audit": {
-        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\gates\\native_gate_audit_001.json",
-        "sha256": "a3613c8c168eb0353cc58461488369aaab54646ea49d205a31f967c67e819ba2"
+      {
+        "reference": "TF-current",
+        "gain_bag_seconds": 45130.755851984024,
+        "completed_delta": 1,
+        "on_time_delta": 1,
+        "known_completion_harm": 332,
+        "known_lateness_harm": 313,
+        "service_gate": false
       },
-      "pure_gate": {
-        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\gates\\pure_final_002.json",
-        "sha256": "94587e4243b33a9dc49ed882520f513c2d2cc846009f587a8a0a85a7e8106962"
-      },
-      "stage_registration": {
-        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\stage\\registration.json",
-        "sha256": "b738bf25e9cec753a27df69e2a26fa18d009ca1ccb5bc69f3afc6de24a07c98a"
-      },
-      "dispatch": {
-        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\stage\\advance_002.dispatch.json",
-        "sha256": "978960d40403ff3a5834b001f871554f48f09469aa6585043d0a7cc4178a21bc"
-      },
-      "snapshot_at_utc": "2026-10-21T04:05:02.657136+00:00",
-      "budget_snapshot": {
-        "native_starts": 9,
-        "by_batch": {
-          "gates": 8,
-          "bridge": 1,
-          "initial": 0,
-          "recollect": 0,
-          "development": 0,
-          "formal": 0,
-          "reserve": 0
+      {
+        "reference": "C10",
+        "gain_bag_seconds": -93884.66696697474,
+        "completed_delta": -2,
+        "on_time_delta": 0,
+        "known_completion_harm": 657,
+        "known_lateness_harm": 640,
+        "service_gate": false
+      }
+    ],
+    "predecessor_block": "outputs/experiments/g31_ics_joint_reposition_20261021/cycle_001/terminal_flow/bridge_P2201_003/block.json",
+    "predecessor_source_manifest_sha256": "1b6e9f81b1e96c0607e1fac21b8b2e15cdd373bdce5e22eab121ba26611136c3",
+    "workflow": "outputs/experiments/g31_ics_joint_reposition_20261021/cycle_001/terminal_flow/workflow_005/registration.json",
+    "export_equivalence_passed": {
+      "C00": 16,
+      "TF-B1-300": 16
+    },
+    "full_TRAIN005_closed": {
+      "runs": [
+        {
+          "parent": 2101,
+          "receipt": {
+            "path": "outputs/experiments/g31_ics_joint_reposition_20261021/cycle_001/runs/TF_full_train_005_TF-B1-300_P2101/receipt.json",
+            "sha256": "019ba81e0ad78b2130644f91fbad83dee886ce1c417783763245f31428cd50eb"
+          },
+          "worker": {
+            "path": "outputs/experiments/g31_ics_joint_reposition_20261021/cycle_001/runs/TF_full_train_005_TF-B1-300_P2101/worker_report.json",
+            "sha256": "a4d0e2b045592f5d8cb91c99319a3b510e3fc00a29ab2caba86654800d64bb7b"
+          }
         },
-        "active_seconds": 558.1835900000001,
-        "open_runners": [
-          "stage-008635e0c72ef1e3e09c2bc5"
-        ],
-        "unfinished_native_tasks": [
-          "JOINT_bridge_R0_legacy_P2201_001"
-        ],
-        "evidence_bytes": 325913868,
-        "free_bytes": 163259699200,
-        "calendar_seconds": 3006.744571
+        {
+          "parent": 2102,
+          "receipt": {
+            "path": "outputs/experiments/g31_ics_joint_reposition_20261021/cycle_001/runs/TF_full_train_005_TF-B1-300_P2102/receipt.json",
+            "sha256": "29b368fc0eb9d45aa7e1f94659fb055b7ee80f0ff7efd57ee89908c8826bf293"
+          },
+          "worker": {
+            "path": "outputs/experiments/g31_ics_joint_reposition_20261021/cycle_001/runs/TF_full_train_005_TF-B1-300_P2102/worker_report.json",
+            "sha256": "cbafc534fce6abd5fb7f8c5c181a8aa05e35a907682cc1e4e0bf74d9b773dc12"
+          }
+        }
+      ],
+      "fitting": {
+        "path": "outputs/experiments/g31_ics_joint_reposition_20261021/cycle_001/terminal_flow/workflow_005/training_fit_receipt.json",
+        "sha256": "799c7eaf9c9bee9549eec03cf2bdcfd240bbe88f317a5e35ea1fd3c015e46f83"
       },
-      "physical_jobs": 28506,
-      "physical_trays": 22,
-      "full_horizon": 59400,
-      "formal_RL_fits": 0,
-      "test_locked": true,
-      "all_execution_local": true,
-      "claimed_RL_gain": false
-    }
+      "rows": 580,
+      "model_file": {
+        "path": "outputs/experiments/g31_ics_terminal_flow_20261021/forecast_full_train_001/model.json",
+        "sha256": "c2d00b588272e0df52e672c607983df6b9b43ff7c761084eba4f044dc8f4834d"
+      },
+      "model_internal_identity": "87ffe492603d71e65b0563f81ecaf69047a75c413f68cfdec65e0d4f76c9fc36",
+      "fit_runner_open": "2026-10-21T13:51:50.117514+00:00",
+      "fit_runner_close": "2026-10-21T13:52:06.344847+00:00",
+      "fit_charged_seconds": 16.227333,
+      "DEV_or_TEST_used_for_fit": false,
+      "native_starts_for_fit": 0
+    },
+    "native_workflow005_closed": {
+      "completion": "outputs/experiments/g31_ics_joint_reposition_20261021/cycle_001/terminal_flow/workflow_005/completion.json",
+      "completion_sha256": "658b421515f995c64a3bd29e34fed66c46f4c527c957909b4a598935399d3d4b",
+      "native_runs_closed": 32,
+      "full_DEV_runs_closed": 28,
+      "original_ledger_total_native_starts": 54,
+      "workflow_exitcode": 0,
+      "successor_finished_at_utc": "2026-10-22T02:42:17.774050+00:00",
+      "scientific_promotion": false
+    },
+    "offline_audit003": {
+      "ready_spec": "outputs/experiments/g31_ics_terminal_flow_20261021/offline_budget_spec_005_ready_003.json",
+      "ready_spec_sha256": "25be054117a868b3b9578875d6fca4baed898f45dc8bae39a2a8ff207aa779ba",
+      "output": "outputs/experiments/g31_ics_terminal_flow_20261021/offline_budget_execution_005_003",
+      "tasks": 11,
+      "status": "failed_closed_before_science_output",
+      "native_starts": 0,
+      "error": "frozen TRAIN block validator resolved runtime calibration below frozen code root",
+      "actual_runner_seconds": 85.730185,
+      "closure_review": "outputs/experiments/g31_ics_terminal_flow_20261021/offline_budget_failure_closure_review_005_003.json"
+    },
+    "offline_audit004": {
+      "status": "failed_closed_registered_audit_timeout",
+      "tasks": 11,
+      "native_starts": 0,
+      "ready_spec": "outputs/experiments/g31_ics_terminal_flow_20261021/offline_budget_spec_005_ready_004.json",
+      "ready_spec_sha256": "7e95527ab0560a608a45a53b16b5097aba2a09a934095426070c8236eb9ffc16",
+      "output": "outputs/experiments/g31_ics_terminal_flow_20261021/offline_budget_execution_005_004",
+      "path_binding_repair_only": true,
+      "task_caps_unchanged": true,
+      "pure_tests_passed": 26,
+      "actual_TRAIN_metadata_preflight_passed": true,
+      "completed_tasks": [
+        "full_train_time_scale",
+        "granularity"
+      ],
+      "partial_completed_run_reports": 11,
+      "failed_task": "final_science",
+      "reason": "registered 3600-second audit limit",
+      "actual_runner_seconds": 5954.098387,
+      "closure_review": {
+        "path": "outputs/experiments/g31_ics_terminal_flow_20261021/offline_budget_failure_closure_review_005_004.json",
+        "sha256": "e93613814ed1e9272edb4999a02f7340c6328ec6d357a79bc28e6b15c0f3a562"
+      }
+    },
+    "offline_audit005": {
+      "status": "complete_all_nine_closed",
+      "tasks": 9,
+      "native_starts": 0,
+      "ready_spec": {
+        "path": "outputs/experiments/g31_ics_terminal_flow_20261021/offline_budget_spec_005_ready_005.json",
+        "sha256": "eb247ca57630e8905e6ad237ea071c44aaa6c9e2f0cc524d2cecaa64a067ca17"
+      },
+      "runner_id": "terminal-flow-offline-8604df8cdf62f0dbd7baee1a",
+      "reused_completed_run_reports": 11,
+      "remaining_run_audits": 0,
+      "completed_prior_tasks_not_rerun": true,
+      "output": "outputs/experiments/g31_ics_terminal_flow_20261021/offline_budget_execution_005_005",
+      "remaining_bins600_native_and_audit_reserved_seconds": 13200,
+      "same_original_budget": true,
+      "TEST_unlocked": false,
+      "actual_runner_seconds": 6350.022956,
+      "closure_review": {
+        "path": "outputs/experiments/g31_ics_terminal_flow_20261021/offline_budget_success_closure_review_005_005.json",
+        "sha256": "c54fdc126004ce94a6b9a91a362bb0725302e131c79b3137373d29171dd2968e"
+      },
+      "service_promotion": false
+    },
+    "full_train_time_scale005": {
+      "status": "complete",
+      "report": {
+        "path": "outputs/experiments/g31_ics_terminal_flow_20261021/full_train_time_scale_005_001/full_train_time_scale_report.json",
+        "sha256": "10eb1ddd7b20aa256bdeddd41672dfb71aa5d301b447a418ec4c7b53c17bc0b9"
+      }
+    },
+    "granularity005": {
+      "status": "complete",
+      "report": {
+        "path": "outputs/experiments/g31_ics_terminal_flow_20261021/granularity_005_full_001/granularity_report.json",
+        "sha256": "ac60cfe8c0cb7559adccf1cd0a940d96c182b16874e7a880087f298a13ccdcc3"
+      },
+      "recorded_decisions": 6968,
+      "in_window": 6960,
+      "replayed_opportunities": 430,
+      "excluded_uncredited_claims": 6530,
+      "first_action_changes_600_vs_60": 5,
+      "native_600_required": true,
+      "native_600_started": true
+    },
+    "bins600005": {
+      "status": "complete_closed",
+      "report": {
+        "path": "outputs/experiments/g31_ics_terminal_flow_20261021/bins600_science_005_001/bins600_science_report.json",
+        "sha256": "ef3557cf079b4296a2baa890fd00a8f7ee8c10ceab43e80e6dee5571dcb3866d"
+      }
+    },
+    "user_stop": {
+      "path": "outputs/experiments/g31_ics_terminal_flow_20261021/USER_STOP_CLOSURE_005_001.json",
+      "sha256": "74551c9e116effe44e28ae64a97708f256ccb5f3d2eb420b7967614d473dcab3"
+    },
+    "next_action": "Review TERMINAL_FLOW_GPT_PRO_HANDOFF_20261022.md; no automatic experiment restart."
   },
   "blocked_claims": [
     "No complete LT2 original28506/57012 business success. Old full-day negatives remain version-bound; new control-budget and hard-timeout prefixes have null full-day metrics.",
@@ -1223,5 +1375,64 @@
     "test_locked": true,
     "all_execution_local": true,
     "claimed_RL_gain": false
-  }
+  },
+  "previous_active_experiment_before_terminal_flow_20261021": {
+    "status": "joint_pretest_chain_running_initial_bridge",
+    "root": "outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001",
+    "report": "docs/g31_ics_circulation/JOINT_STAGE_PROGRESS_20261021.md",
+    "snapshot": {
+      "report": "docs/g31_ics_circulation/JOINT_STAGE_PROGRESS_20261021.md",
+      "source_bundle": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\sources\\runtime_004\\source_manifest.json",
+        "sha256": "be6fa782ad78963d092c55d55711bf7c3334f5e0ede80ee77b3493d4fa343cd4"
+      },
+      "native_gate_audit": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\gates\\native_gate_audit_001.json",
+        "sha256": "a3613c8c168eb0353cc58461488369aaab54646ea49d205a31f967c67e819ba2"
+      },
+      "pure_gate": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\gates\\pure_final_002.json",
+        "sha256": "94587e4243b33a9dc49ed882520f513c2d2cc846009f587a8a0a85a7e8106962"
+      },
+      "stage_registration": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\stage\\registration.json",
+        "sha256": "b738bf25e9cec753a27df69e2a26fa18d009ca1ccb5bc69f3afc6de24a07c98a"
+      },
+      "dispatch": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\stage\\advance_002.dispatch.json",
+        "sha256": "978960d40403ff3a5834b001f871554f48f09469aa6585043d0a7cc4178a21bc"
+      },
+      "snapshot_at_utc": "2026-10-21T04:05:02.657136+00:00",
+      "budget_snapshot": {
+        "native_starts": 9,
+        "by_batch": {
+          "gates": 8,
+          "bridge": 1,
+          "initial": 0,
+          "recollect": 0,
+          "development": 0,
+          "formal": 0,
+          "reserve": 0
+        },
+        "active_seconds": 558.1835900000001,
+        "open_runners": [
+          "stage-008635e0c72ef1e3e09c2bc5"
+        ],
+        "unfinished_native_tasks": [
+          "JOINT_bridge_R0_legacy_P2201_001"
+        ],
+        "evidence_bytes": 325913868,
+        "free_bytes": 163259699200,
+        "calendar_seconds": 3006.744571
+      },
+      "physical_jobs": 28506,
+      "physical_trays": 22,
+      "full_horizon": 59400,
+      "formal_RL_fits": 0,
+      "test_locked": true,
+      "all_execution_local": true,
+      "claimed_RL_gain": false
+    }
+  },
+  "previous_working_tree_identity_before_terminal_flow_20261021": "codex/g31-ics-v3-circulation; new-stage anchor f3567943e31bbbfa6ac40887547603d397ce25d6 plus exact frozen runtime004; publication identity separate from execution identity."
 }

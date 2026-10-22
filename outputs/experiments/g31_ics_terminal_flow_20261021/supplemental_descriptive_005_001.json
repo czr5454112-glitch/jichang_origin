@@ -1,0 +1,678 @@
+{
+  "status": "descriptive_completed_evidence",
+  "inputs": [
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_terminal_flow_20261021\\supplemental_descriptive_005.py",
+      "sha256": "a8728e6cda9589e2cc5cb63b305441209945be0ccddc7da4006ef70053328cd5"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\sources\\terminal_flow_runtime_005\\source_manifest.json",
+      "sha256": "22201c59569d2c2a67460ebff7be249432e25fc6a3f42941d4d15ddac8113bef"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\sources\\terminal_flow_runtime_005\\scripts\\experiments\\g31_ics_circulation\\foundation_airport_json_stream.py",
+      "sha256": "1e4f7a92b4dfb2fc18d5786540c41270dc877d3da2899b60bc3f725952e31147"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_terminal_flow_20261021\\final_contract_summary_005_001.json",
+      "sha256": "161d06ad313caaefca07d79bd6c19d18282b0058166ed3946861fa8930e8e914"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\runs\\TF_bridge_all_005_TF-B1-60_P2203\\decisions.json.gz",
+      "sha256": "85e114661424b464a16e778e42aba3fd43ae9c1ab520f2d74166f62c59d9052d"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_terminal_flow_20261021\\unified_orders_005_001\\P2203_TF-B1-60_unified_orders.json.gz",
+      "sha256": "68a332bc78f6b9127ceb781643baeb55709adedbcbe270f26c46ff6a7cbaf6aa"
+    }
+  ],
+  "performance": [
+    {
+      "method": "C00",
+      "runs": 4,
+      "count": 6968,
+      "callback_seconds": 367.19588789949194,
+      "per_run_p95_range_seconds": [
+        0.12015119998250157,
+        0.12252440000884235
+      ],
+      "stage_seconds": {
+        "candidate_features": 1.5138651970773935,
+        "current_projection_and_reference": 31.317079096566886,
+        "decision_and_observation_stream_write": 333.97067440033425
+      },
+      "stage_share_of_measured_callback": {
+        "candidate_features": 0.004122772740559027,
+        "current_projection_and_reference": 0.08528711820743191,
+        "decision_and_observation_stream_write": 0.9095163791478732
+      },
+      "worker_seconds": 5026.781000000075
+    },
+    {
+      "method": "C10",
+      "runs": 4,
+      "count": 6968,
+      "callback_seconds": 1440.259929597145,
+      "per_run_p95_range_seconds": [
+        0.3377895000157878,
+        0.35793489997740835
+      ],
+      "stage_seconds": {
+        "B1_forecast": 999.5251990976976,
+        "candidate_features": 9.353893398190849,
+        "current_projection_and_reference": 32.18534620304126,
+        "decision_and_observation_stream_write": 347.26047669618856,
+        "forecast_inventory_projection": 47.299723402946256,
+        "forecast_reference_scoring": 4.231695904978551,
+        "forecast_representation_and_calibration": 0.007783595705404878
+      },
+      "stage_share_of_measured_callback": {
+        "B1_forecast": 0.6939894518743397,
+        "candidate_features": 0.006494586988063485,
+        "current_projection_and_reference": 0.022346901098639762,
+        "decision_and_observation_stream_write": 0.24110958692943765,
+        "forecast_inventory_projection": 0.03284110210312972,
+        "forecast_reference_scoring": 0.0029381473566109685,
+        "forecast_representation_and_calibration": 5.404299283381456e-06
+      },
+      "worker_seconds": 6172.0470000000205
+    },
+    {
+      "method": "TF-B1-300",
+      "runs": 4,
+      "count": 6968,
+      "callback_seconds": 2355.380142688169,
+      "per_run_p95_range_seconds": [
+        0.6632046999875456,
+        0.6875474998960271
+      ],
+      "stage_seconds": {
+        "B1_forecast": 951.9989320996683,
+        "candidate_features": 5.967212895047851,
+        "current_projection_and_reference": 31.71572339104023,
+        "decision_and_observation_stream_write": 337.96429459552746,
+        "forecast_inventory_projection": 42.17311210243497,
+        "forecast_representation_and_calibration": 24.128960003261454,
+        "transport_allocation_verification_and_order": 961.0326563017443
+      },
+      "stage_share_of_measured_callback": {
+        "B1_forecast": 0.4041805884519186,
+        "candidate_features": 0.002533439416805789,
+        "current_projection_and_reference": 0.013465224918999031,
+        "decision_and_observation_stream_write": 0.14348609316618105,
+        "forecast_inventory_projection": 0.01790501301174394,
+        "forecast_representation_and_calibration": 0.010244189277966545,
+        "transport_allocation_verification_and_order": 0.40801594565747185
+      },
+      "worker_seconds": 7022.891999999993
+    },
+    {
+      "method": "TF-B1-300-replan300",
+      "runs": 4,
+      "count": 6968,
+      "callback_seconds": 2352.4946266930783,
+      "per_run_p95_range_seconds": [
+        0.6614927999908105,
+        0.6846302000340074
+      ],
+      "stage_seconds": {
+        "B1_forecast": 950.7650281045353,
+        "candidate_features": 5.974385000299662,
+        "current_projection_and_reference": 31.531646196730435,
+        "decision_and_observation_stream_write": 337.87656119687017,
+        "forecast_inventory_projection": 42.006463998230174,
+        "forecast_representation_and_calibration": 24.122550795553252,
+        "transport_allocation_verification_and_order": 959.8258510043379
+      },
+      "stage_share_of_measured_callback": {
+        "B1_forecast": 0.4041518383576645,
+        "candidate_features": 0.0025395955988634527,
+        "current_projection_and_reference": 0.013403493397583116,
+        "decision_and_observation_stream_write": 0.14362479614749477,
+        "forecast_inventory_projection": 0.01785613600201035,
+        "forecast_representation_and_calibration": 0.010254030135432244,
+        "transport_allocation_verification_and_order": 0.408003419057145
+      },
+      "worker_seconds": 7015.906000000075
+    },
+    {
+      "method": "TF-B1-60",
+      "runs": 4,
+      "count": 6968,
+      "callback_seconds": 2408.394146600971,
+      "per_run_p95_range_seconds": [
+        0.6769392000278458,
+        0.6903079999610782
+      ],
+      "stage_seconds": {
+        "B1_forecast": 954.3159882996697,
+        "candidate_features": 10.56375780235976,
+        "current_projection_and_reference": 31.47950729879085,
+        "decision_and_observation_stream_write": 341.1033137969207,
+        "forecast_inventory_projection": 46.4967244049767,
+        "forecast_representation_and_calibration": 54.30686649563722,
+        "transport_allocation_verification_and_order": 969.7143367936369
+      },
+      "stage_share_of_measured_callback": {
+        "B1_forecast": 0.3962457680137284,
+        "candidate_features": 0.004386224662299842,
+        "current_projection_and_reference": 0.013070745643199098,
+        "decision_and_observation_stream_write": 0.1416310176132626,
+        "forecast_inventory_projection": 0.019306110866694613,
+        "forecast_representation_and_calibration": 0.022548994554019288,
+        "transport_allocation_verification_and_order": 0.4026393844887141
+      },
+      "worker_seconds": 7086.328000000096
+    },
+    {
+      "method": "TF-current",
+      "runs": 4,
+      "count": 6968,
+      "callback_seconds": 1324.8275934007252,
+      "per_run_p95_range_seconds": [
+        0.4442761999089271,
+        0.46556680009234697
+      ],
+      "stage_seconds": {
+        "candidate_features": 1.697850594180636,
+        "current_projection_and_reference": 31.963640097994357,
+        "decision_and_observation_stream_write": 334.1693830016302,
+        "transport_allocation_verification_and_order": 956.618324204348
+      },
+      "stage_share_of_measured_callback": {
+        "candidate_features": 0.0012815634295647413,
+        "current_projection_and_reference": 0.024126641275598947,
+        "decision_and_observation_stream_write": 0.25223612843377186,
+        "transport_allocation_verification_and_order": 0.7220700481855048
+      },
+      "worker_seconds": 6018.420999999973
+    },
+    {
+      "method": "TF-predictor",
+      "runs": 4,
+      "count": 6968,
+      "callback_seconds": 2510.314010697184,
+      "per_run_p95_range_seconds": [
+        0.6686520000221208,
+        0.8412768999114633
+      ],
+      "stage_seconds": {
+        "B1_forecast": 1000.9063857940491,
+        "candidate_features": 6.213214604766108,
+        "current_projection_and_reference": 33.16616799798794,
+        "decision_and_observation_stream_write": 356.82432739972137,
+        "forecast_inventory_projection": 41.882865504245274,
+        "forecast_representation_and_calibration": 62.519203200237826,
+        "transport_allocation_verification_and_order": 1008.3973384940764
+      },
+      "stage_share_of_measured_callback": {
+        "B1_forecast": 0.39871760326751693,
+        "candidate_features": 0.0024750746632850626,
+        "current_projection_and_reference": 0.013211959880977907,
+        "decision_and_observation_stream_write": 0.142143303936953,
+        "forecast_inventory_projection": 0.016684313327245157,
+        "forecast_representation_and_calibration": 0.02490493338037599,
+        "transport_allocation_verification_and_order": 0.40170167325561645
+      },
+      "worker_seconds": 7433.000999999931
+    }
+  ],
+  "performance_scope": "6968 callbacks per method include endpoint callbacks; p95 ranges are not pooled percentiles. Callback excludes catalogue, protocol, native and final export.",
+  "cross_owner_receiver_case": [
+    {
+      "decision_id": "9b84503b9adc0fcccc0553cd5bef65a4f0734bc98f17e8ad85db09ef484d63b0",
+      "owner": "owner:system_domestic",
+      "at": 9780.0,
+      "action": {
+        "owner_id": "owner:system_domestic",
+        "public_state_digest": "1e793d3290ae6853748e8803c5f877c0145c85016c99592dd3ed5265c4decc66",
+        "priority_baseline_digest": "022efcc839130c6bc4c6af833b20f6b128ac44bb1c599f4380bb50bb54a57e4d",
+        "immutable_prefix_digest": "c9978f14e66c551a5552b0e6470cbc262ffebe444850139af60d427e859d375a",
+        "catalog_version": "actual_multisource_loader_reserve_target_relaxed_v1",
+        "observed_at": 9780.0,
+        "current_view_version": 0,
+        "action_id": "a_transfer:e869e23bbe2b2de7ba8352dca37c494b0a7a62b7ac543adb3ec4e0713887088e",
+        "action_type": "transfer",
+        "kind": "transfer",
+        "tray_id": "initial:136:0",
+        "source": 136,
+        "destination": 57,
+        "intent": {
+          "tray_id": "initial:136:0",
+          "source": 136,
+          "destination": 57,
+          "owner_id": "owner:system_domestic",
+          "issued_at": 9780.0,
+          "message_delay": 2.0,
+          "earliest_departure": 9782.0,
+          "expiry": 10101.703,
+          "forecast_dependency": "initial:136:0:empty",
+          "forecast_ledger": "actual_available",
+          "transfer_scope": "local_empty_return",
+          "control_reason": "joint_optional_reposition"
+        },
+        "source_generation_or_dependency": "initial:136:0:empty",
+        "earliest_departure": 9782.0,
+        "static_arrival_estimate": 10041.703,
+        "nominal_arrival_time": 10041.703,
+        "static_travel_time": 259.703,
+        "eta_model_kind": "public_static_capacity_relaxed_estimate",
+        "transfer_scope": "local_empty_return",
+        "hard_eligibility_reasons": [
+          "actual_uncommitted",
+          "fifo_and_minimum_reserved",
+          "priority_exhausted",
+          "public_scope_and_path"
+        ],
+        "source_category": "loader_optional",
+        "source_fifo_reserved": 0,
+        "source_actual_unpledged": 2,
+        "destination_inventory_known": true,
+        "destination_actual_empty": 1,
+        "bridge_eligible": false
+      },
+      "receiver_claims_deducted": {},
+      "receiver": [
+        {
+          "node": 57,
+          "is_loader": true,
+          "is_actual_eligible_source": false,
+          "resource_owner": "owner:system_domestic",
+          "inventory_known": true,
+          "actual_empty": 1,
+          "receiver": {
+            "node": 57,
+            "known": true,
+            "capacity": 4,
+            "current_occupancy": 1,
+            "current_space": 3,
+            "unrepresented_committed_or_pending": 0,
+            "available_slots": 3,
+            "observation_asof": 9780.0,
+            "coverage": "current_local_sensor",
+            "all_owner_incoming_complete": false,
+            "native_revalidation_required": true
+          }
+        }
+      ],
+      "planned_order": {
+        "order_id": "49961e4cb6549b4af6c886534e138a572465d9514243198b8a1bdc0a065855a3",
+        "order_type": "EMPTY_TRAY_TRANSFER",
+        "reason": "FORECAST_REPOSITION",
+        "forecast_guided": true,
+        "plan_id": "64959082e455af57f96c16f460e573d112cbf5a5402f4f5e9f68edc18d0f0d83",
+        "physical_tray_id": "initial:136:0",
+        "source_terminal": 136,
+        "destination_terminal": 57,
+        "owner_scope": "owner:system_domestic",
+        "forecast_id": "c3e2f0984a5af8eebcc658efbe8dc91ae3d05d3ac637139132ae12097a055d68",
+        "status": "PLANNED",
+        "request_id": null,
+        "target_by": 10277.672648038788,
+        "useful_until": 10380.0,
+        "latest_issue_estimate": 10015.969648038788,
+        "plan_valid_until": 9840.0,
+        "native_expiry": 10101.703,
+        "estimated_arrival": 10041.703,
+        "proposed_at": 9780.0,
+        "allocation_epoch": "c3e2f0984a5af8eebcc658efbe8dc91ae3d05d3ac637139132ae12097a055d68",
+        "allocation_valid_until": 9840.0,
+        "allocation_slot_id": "32f087e360579d1ff25765dcef31143e40877d4012d8b0f6bafc48a74933f276",
+        "decision_id": "bd6d02b9f84e1ff00928ba2107d409e13d019112a8ed7c81c1dae4b8747ef1a8",
+        "native_business_deadline": null
+      },
+      "audited_request_chain": {
+        "order_id": "49961e4cb6549b4af6c886534e138a572465d9514243198b8a1bdc0a065855a3",
+        "request_id": "live:21:owner:system_domestic:transfer:85",
+        "reason": "FORECAST_REPOSITION",
+        "phase": "post_priority",
+        "phase_basis": "plan_id present versus priority hook; phase not separately serialized",
+        "status": "RECEIVED",
+        "native_status": "received",
+        "owner_scope": "owner:system_domestic",
+        "source": 136,
+        "destination": 57,
+        "physical_tray_id": "initial:136:0",
+        "proposed_at": 9780.0,
+        "target_by": 10277.672648038788,
+        "useful_until": 10380.0,
+        "plan_valid_until": 9840.0,
+        "native_expiry": 10101.703,
+        "payload_expiry": 10101.703,
+        "soft_fields_passed_to_native": [],
+        "accepted": true,
+        "received": true,
+        "native_transfer": {
+          "request_id": "live:21:owner:system_domestic:transfer:85",
+          "transfer_scope": "local_empty_return",
+          "status": "received",
+          "reason": "",
+          "tray": 16,
+          "delivered_at": 9782.0,
+          "departed_at": 9782.001,
+          "received_at": 10041.703
+        },
+        "delivered_acks": [
+          {
+            "request_id": "live:21:owner:system_domestic:transfer:85",
+            "sequence": 1,
+            "attempt": 1,
+            "observed_at": 9782.0,
+            "delivered_at": 9782.2,
+            "status": "dispatching",
+            "reason": "",
+            "received_at": -1.0,
+            "delivered_copies": 1
+          },
+          {
+            "request_id": "live:21:owner:system_domestic:transfer:85",
+            "sequence": 2,
+            "attempt": 2,
+            "observed_at": 9842.0,
+            "delivered_at": 9842.2,
+            "status": "departed",
+            "reason": "",
+            "received_at": -1.0,
+            "delivered_copies": 1
+          },
+          {
+            "request_id": "live:21:owner:system_domestic:transfer:85",
+            "sequence": 3,
+            "attempt": 3,
+            "observed_at": 9902.0,
+            "delivered_at": 9902.2,
+            "status": "departed",
+            "reason": "",
+            "received_at": -1.0,
+            "delivered_copies": 1
+          },
+          {
+            "request_id": "live:21:owner:system_domestic:transfer:85",
+            "sequence": 4,
+            "attempt": 4,
+            "observed_at": 9962.0,
+            "delivered_at": 9962.2,
+            "status": "departed",
+            "reason": "",
+            "received_at": -1.0,
+            "delivered_copies": 1
+          },
+          {
+            "request_id": "live:21:owner:system_domestic:transfer:85",
+            "sequence": 5,
+            "attempt": 5,
+            "observed_at": 10022.0,
+            "delivered_at": 10022.2,
+            "status": "departed",
+            "reason": "",
+            "received_at": -1.0,
+            "delivered_copies": 1
+          },
+          {
+            "request_id": "live:21:owner:system_domestic:transfer:85",
+            "sequence": 6,
+            "attempt": 6,
+            "observed_at": 10082.0,
+            "delivered_at": 10082.2,
+            "status": "received",
+            "reason": "",
+            "received_at": 10041.703,
+            "delivered_copies": 1
+          }
+        ],
+        "actual_submission": {
+          "tray_id": "initial:136:0",
+          "source": 136,
+          "destination": 57,
+          "owner_id": "owner:system_domestic",
+          "issued_at": 9780.0,
+          "message_delay": 2.0,
+          "earliest_departure": 9782.0,
+          "expiry": 10101.703,
+          "forecast_dependency": "initial:136:0:empty",
+          "forecast_ledger": "actual_available",
+          "transfer_scope": "local_empty_return",
+          "control_reason": "joint_optional_reposition",
+          "request_id": "live:21:owner:system_domestic:transfer:85"
+        }
+      }
+    },
+    {
+      "decision_id": "ea8d1b574a8610fe6b99d3b77341c57f3db7c1257cabcf3ff25ee9a66ff94c0f",
+      "owner": "owner:system_international",
+      "at": 9900.0,
+      "action": {
+        "owner_id": "owner:system_international",
+        "public_state_digest": "ffcc410c12789fceee992c83f2946503f10f1fa68bad110dec96cf822ab7b960",
+        "priority_baseline_digest": "f9dc9b78112e9ea933543808af1e05f27c04478fe3eeb22e455f4cc170e4e895",
+        "immutable_prefix_digest": "930af11b5ca9da2b5b8b0f8b6894dd16bbb2a3a7acb0ab5b1ba911e015e6d3c8",
+        "catalog_version": "actual_multisource_loader_reserve_target_relaxed_v1",
+        "observed_at": 9900.0,
+        "current_view_version": 0,
+        "action_id": "a_transfer:7687456c9a2f0e8bf3d88b45fce95a5aa8bde8de460e2b9c691386ea457ec376",
+        "action_type": "transfer",
+        "kind": "transfer",
+        "tray_id": "initial:49:0",
+        "source": 49,
+        "destination": 57,
+        "intent": {
+          "tray_id": "initial:49:0",
+          "source": 49,
+          "destination": 57,
+          "owner_id": "owner:system_international",
+          "issued_at": 9900.0,
+          "message_delay": 2.0,
+          "earliest_departure": 9902.0,
+          "expiry": 10263.417,
+          "forecast_dependency": "initial:49:0:empty",
+          "forecast_ledger": "actual_available",
+          "transfer_scope": "cross_zone_transfer",
+          "control_reason": "joint_optional_reposition"
+        },
+        "source_generation_or_dependency": "initial:49:0:empty",
+        "earliest_departure": 9902.0,
+        "static_arrival_estimate": 10203.417,
+        "nominal_arrival_time": 10203.417,
+        "static_travel_time": 301.417,
+        "eta_model_kind": "public_static_capacity_relaxed_estimate",
+        "transfer_scope": "cross_zone_transfer",
+        "hard_eligibility_reasons": [
+          "actual_uncommitted",
+          "fifo_and_minimum_reserved",
+          "priority_exhausted",
+          "public_scope_and_path"
+        ],
+        "source_category": "loader_optional",
+        "source_fifo_reserved": 0,
+        "source_actual_unpledged": 2,
+        "destination_inventory_known": true,
+        "destination_actual_empty": 0,
+        "bridge_eligible": true
+      },
+      "receiver_claims_deducted": {
+        "95": 1,
+        "57": 1
+      },
+      "receiver": [
+        {
+          "node": 57,
+          "is_loader": true,
+          "is_actual_eligible_source": false,
+          "resource_owner": "owner:system_domestic",
+          "inventory_known": true,
+          "actual_empty": 0,
+          "receiver": {
+            "node": 57,
+            "known": true,
+            "capacity": 4,
+            "current_occupancy": 1,
+            "current_space": 3,
+            "unrepresented_committed_or_pending": 0,
+            "available_slots": 2,
+            "observation_asof": 9842.0,
+            "coverage": "delivered_planning_snapshot",
+            "all_owner_incoming_complete": false,
+            "native_revalidation_required": true
+          }
+        }
+      ],
+      "planned_order": {
+        "order_id": "54390227fa18d17fca468b9fa1dff3546841528c5e66210021236aa09d6650f5",
+        "order_type": "EMPTY_TRAY_TRANSFER",
+        "reason": "FORECAST_REPOSITION",
+        "forecast_guided": true,
+        "plan_id": "726322f2b47556f8206d8fe1124dc31fabd8a49a3e2ece6bc7b22cbe6bf56ae9",
+        "physical_tray_id": "initial:49:0",
+        "source_terminal": 49,
+        "destination_terminal": 57,
+        "owner_scope": "owner:system_international",
+        "forecast_id": "34e896f307e9260f15e966539eda65576203a59c13631f01a62eacf558bdae36",
+        "status": "PLANNED",
+        "request_id": null,
+        "target_by": 9900.0,
+        "useful_until": 10500.0,
+        "latest_issue_estimate": 9596.583,
+        "plan_valid_until": 9960.0,
+        "native_expiry": 10263.417,
+        "estimated_arrival": 10203.417,
+        "proposed_at": 9900.0,
+        "allocation_epoch": "34e896f307e9260f15e966539eda65576203a59c13631f01a62eacf558bdae36",
+        "allocation_valid_until": 9960.0,
+        "allocation_slot_id": "321ed72c28c0a981e7c938eaa7a5371eb2f5bc76822234ee6fad28f869082d7d",
+        "decision_id": "aa4db23461c4925498a37ad5c17f99200e2e25ed189eb81ef7e4d7af89574ed8",
+        "native_business_deadline": null
+      },
+      "audited_request_chain": {
+        "order_id": "54390227fa18d17fca468b9fa1dff3546841528c5e66210021236aa09d6650f5",
+        "request_id": "live:26:owner:system_international:transfer:84",
+        "reason": "FORECAST_REPOSITION",
+        "phase": "post_priority",
+        "phase_basis": "plan_id present versus priority hook; phase not separately serialized",
+        "status": "RECEIVED",
+        "native_status": "received",
+        "owner_scope": "owner:system_international",
+        "source": 49,
+        "destination": 57,
+        "physical_tray_id": "initial:49:0",
+        "proposed_at": 9900.0,
+        "target_by": 9900.0,
+        "useful_until": 10500.0,
+        "plan_valid_until": 9960.0,
+        "native_expiry": 10263.417,
+        "payload_expiry": 10263.417,
+        "soft_fields_passed_to_native": [],
+        "accepted": true,
+        "received": true,
+        "native_transfer": {
+          "request_id": "live:26:owner:system_international:transfer:84",
+          "transfer_scope": "cross_zone_transfer",
+          "status": "received",
+          "reason": "",
+          "tray": 6,
+          "delivered_at": 9902.0,
+          "departed_at": 9903.0,
+          "received_at": 10203.417000000003
+        },
+        "delivered_acks": [
+          {
+            "request_id": "live:26:owner:system_international:transfer:84",
+            "sequence": 1,
+            "attempt": 1,
+            "observed_at": 9902.0,
+            "delivered_at": 9902.2,
+            "status": "dispatching",
+            "reason": "",
+            "received_at": -1.0,
+            "delivered_copies": 1
+          },
+          {
+            "request_id": "live:26:owner:system_international:transfer:84",
+            "sequence": 2,
+            "attempt": 2,
+            "observed_at": 9962.0,
+            "delivered_at": 9962.2,
+            "status": "departed",
+            "reason": "",
+            "received_at": -1.0,
+            "delivered_copies": 1
+          },
+          {
+            "request_id": "live:26:owner:system_international:transfer:84",
+            "sequence": 3,
+            "attempt": 3,
+            "observed_at": 10022.0,
+            "delivered_at": 10022.2,
+            "status": "departed",
+            "reason": "",
+            "received_at": -1.0,
+            "delivered_copies": 1
+          },
+          {
+            "request_id": "live:26:owner:system_international:transfer:84",
+            "sequence": 4,
+            "attempt": 4,
+            "observed_at": 10082.0,
+            "delivered_at": 10082.2,
+            "status": "departed",
+            "reason": "",
+            "received_at": -1.0,
+            "delivered_copies": 1
+          },
+          {
+            "request_id": "live:26:owner:system_international:transfer:84",
+            "sequence": 5,
+            "attempt": 5,
+            "observed_at": 10142.0,
+            "delivered_at": 10142.2,
+            "status": "departed",
+            "reason": "",
+            "received_at": -1.0,
+            "delivered_copies": 1
+          },
+          {
+            "request_id": "live:26:owner:system_international:transfer:84",
+            "sequence": 6,
+            "attempt": 6,
+            "observed_at": 10202.0,
+            "delivered_at": 10202.2,
+            "status": "departed",
+            "reason": "",
+            "received_at": -1.0,
+            "delivered_copies": 1
+          },
+          {
+            "request_id": "live:26:owner:system_international:transfer:84",
+            "sequence": 7,
+            "attempt": 7,
+            "observed_at": 10262.0,
+            "delivered_at": 10262.2,
+            "status": "received",
+            "reason": "",
+            "received_at": 10203.417000000003,
+            "delivered_copies": 1
+          }
+        ],
+        "actual_submission": {
+          "tray_id": "initial:49:0",
+          "source": 49,
+          "destination": 57,
+          "owner_id": "owner:system_international",
+          "issued_at": 9900.0,
+          "message_delay": 2.0,
+          "earliest_departure": 9902.0,
+          "expiry": 10263.417,
+          "forecast_dependency": "initial:49:0:empty",
+          "forecast_ledger": "actual_available",
+          "transfer_scope": "cross_zone_transfer",
+          "control_reason": "joint_optional_reposition",
+          "request_id": "live:26:owner:system_international:transfer:84"
+        }
+      }
+    }
+  ],
+  "cross_owner_scope": "Two distinct owners use destination57 while the first request is still in transit. Second recorded plan deducts one logical claim and has two remaining receiver slots. This is not an identical-capacity-slot collision test or causal service benefit.",
+  "native_starts": 0,
+  "raw_observations_read": false,
+  "full_owner_ACK_read": false,
+  "complete_request_100ms_certified": false
+}

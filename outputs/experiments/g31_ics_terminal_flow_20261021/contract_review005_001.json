@@ -1,0 +1,59 @@
+{
+  "schema": "g31.terminal_flow.independent_contract_review.v1",
+  "source_manifest_sha256": "22201c59569d2c2a67460ebff7be249432e25fc6a3f42941d4d15ddac8113bef",
+  "reviewed_source_sha256": {
+    "scripts/experiments/g31_ics_circulation/foundation_airport_joint_campaign.py": "67754735aff952ed785ebedeb6643e6201301a9b6bd7ddab84a903eb24e07db1",
+    "scripts/experiments/g31_ics_circulation/foundation_airport_joint_opportunities.py": "3e3279a2290ca9cd619c431c9300b861c56cbfc5048692773b054602f3daada8",
+    "scripts/experiments/g31_ics_circulation/foundation_airport_joint_control.py": "4df25e9715abfc73f6019074e85da7ae12789b788099f4293d7b47338a44cf41",
+    "scripts/experiments/g31_ics_circulation/foundation_airport_inventory_rule.py": "4d8b1cc7edcd7e51197e01b6cc9ba9b50474371859ea97ca62a76039a6f114fd",
+    "scripts/experiments/g31_ics_circulation/foundation_airport_inventory_projection.py": "54a149ac946a6ba4a319bb348088dc1f217c6920dbb1fa6ef5f74389421baf2e",
+    "scripts/experiments/g31_ics_circulation/foundation_airport_transport_control.py": "76e6183daa6aec7920696c4b6a8f4f0532435def58ac2d7365d5555b6ed80632",
+    "scripts/experiments/g31_ics_circulation/foundation_airport_transport_allocation.py": "d913038dcd7af4240a5caf7512792b514d2f9e000da480714797101ed800259f",
+    "scripts/experiments/g31_ics_circulation/foundation_airport_transport_orders.py": "5f266441e0efb6ed0e0b858a05025e7ea9ce2de5e6651cbdeeafcd689b01b919",
+    "scripts/experiments/g31_ics_circulation/protocol_control.py": "08237e66931139489c9f9a2ff0b14b20adf1b0dba61eafe26efc6d411c4f1869"
+  },
+  "producer_sha256": "32a6bdb201c9fc327d93e38f6b1039ba60aadfd1804dfeb066f3aecf1b5e0859",
+  "native_starts": 0,
+  "full_native_ack_opened": false,
+  "observations_opened": false,
+  "confirmed_defects": [],
+  "cases": [
+    {
+      "case": "TF-current_no_forecast_and_unknown_ordinary_fallback",
+      "passed": true,
+      "forecast_calls": 0,
+      "action": "a_transfer:1ceb11baec7884aab6276679d9d428237d60e12c7aa1b0d903e28fa0a4ad1fdb",
+      "fallback": "flow_no_covered_ordinary_solution_C00"
+    },
+    {
+      "case": "fresh_real_demand_blocks_post_priority",
+      "passed": true
+    },
+    {
+      "case": "real_tray_fifo_and_source_ceiling",
+      "passed": true,
+      "source_cap": 1,
+      "eligible_trays": [
+        "E2"
+      ]
+    },
+    {
+      "case": "soft_target_cannot_change_native_departure_lease",
+      "passed": true,
+      "target_by": 10.0,
+      "native_expiry": 75.002
+    },
+    {
+      "case": "lost_reply_quota_restore_and_original_id_retry",
+      "passed": true,
+      "new_attempts": 1,
+      "physical_send_calls_including_retry": 2,
+      "immutable_retry": true
+    }
+  ],
+  "result": "no_confirmed_defect_in_scoped_review",
+  "limitations": [
+    "Finite pure/fake-client contracts, not native admission or service nonharm certification.",
+    "Existing receipt/capture repair is excluded from this independent scope."
+  ]
+}

@@ -385,7 +385,21 @@ def _post_inventory_return(client: ProtocolClient, owner: str, state: dict, *,
     slot["new_submissions"] += 1
     if stock_return_selector is not None:
         joint["phase"] = "submission_attempted"
-    request_id, reply = client.submit(owner, "transfer", decision["intents"][0])
+    # Reserve the same client identity before I/O so a lost reply can be joined
+    # to upper order metadata and restored without releasing its logical slot.
+    callback = getattr(stock_return_selector, "on_submission", None)
+    if callback is None:
+        request_id, reply = client.submit(owner, "transfer", decision["intents"][0])
+    else:
+        request_id = client.next_id(owner, "transfer")
+        try:
+            request_id, reply = client.submit(owner, "transfer", decision["intents"][0], request_id=request_id)
+        except BaseException as error:
+            callback(policy_state=joint["policy_state"], decision=decision,
+                request_id=request_id, reply=None, exception_type=type(error).__name__)
+            raise
+        callback(policy_state=joint["policy_state"], decision=decision,
+            request_id=request_id, reply=reply, exception_type=None)
     if stock_return_selector is not None:
         joint["last_submission"] = {"request_id": request_id, "reply": copy.deepcopy(reply),
             "decision_id": context["decision_id"]}

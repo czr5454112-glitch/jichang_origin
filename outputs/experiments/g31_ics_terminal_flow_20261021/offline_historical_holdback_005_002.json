@@ -1,0 +1,45 @@
+{
+  "schema": "g31.terminal_flow.offline_budget.v1.historical_holdback",
+  "startup_lower_bound_utc": "2026-10-21T03:14:28.929435+00:00",
+  "cutoff_utc": "2026-10-21T13:46:54.082118+00:00",
+  "reserve_seconds": 37945.152683,
+  "basis_campaign_budget": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\campaign_budget.json",
+    "sha256": "6c8714103fbf2e85a7ad951cb4f6d1fe88104ef199645864047d91e613b1b719"
+  },
+  "startup_basis": "Original budget registration is an earlier conservative bound; actual terminal-flow startup UTC was not recorded.",
+  "actual_task_startup_timestamp_known": false,
+  "native_seconds_subtracted": 0,
+  "ledger_rewritten": false,
+  "is_measured_active_time": false,
+  "may_double_count_metered_native_and_offline_wall_time": true,
+  "concurrent_preparation_inside_native_runner_already_covered_by_wall_time": true,
+  "CPU_seconds_not_added": true,
+  "scope": "Upper bound on potentially unmetered activity through cutoff; not proof all offline work lacked metering.",
+  "post_cutoff_rule": "Dynamically reserve all cutoff-to-snapshot calendar time minus exact intersections with real closed/open runner intervals. Includes boundary validation and idle gaps; no fabricated ledger debit.",
+  "ledger_prefix": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\ledger.jsonl",
+    "bytes": 25843,
+    "sha256": "3a74749b1b27c6d08fb76eb6f206fdc72b02f0c97ef24a832fef61f13e737899"
+  },
+  "original_ledger_snapshot": {
+    "active_seconds": 13537.902001000002,
+    "open_runners": [
+      "terminal-flow-2d5825da987e8c09258685e8"
+    ],
+    "unfinished_native_tasks": [
+      "TF_full_train_005_TF-B1-300_P2102"
+    ],
+    "native_starts": 26,
+    "ledger_snapshot_bytes": 25843,
+    "ledger_snapshot_sha256": "3a74749b1b27c6d08fb76eb6f206fdc72b02f0c97ef24a832fef61f13e737899",
+    "at_utc": "2026-10-21T13:46:54.082118+00:00"
+  },
+  "predecessor_fixed_holdback": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_terminal_flow_20261021\\offline_historical_holdback_005_001.json",
+    "sha256": "21abb34c72007aa37ce74cfb3ae0c6ef3cb1e453fe71f9328f319cbe4eac82ee"
+  },
+  "fixed_cutoff_and_fixed_reserve_preserved": true,
+  "dynamic_gap_formula": "(snapshot-cutoff) - sum(length([runner_open,runner_close_or_snapshot] intersect [cutoff,snapshot]))",
+  "interval_validation": "UTC-aware, chronological events, no overlapping runners, closed intervals must have open; current open interval extends to snapshot."
+}

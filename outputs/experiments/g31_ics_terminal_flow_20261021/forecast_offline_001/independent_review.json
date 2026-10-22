@@ -1,0 +1,29 @@
+{
+  "schema": "g31.terminal_forecast_independent_review.v1",
+  "status": "passed",
+  "training_rows_recounted_from_native_receipts": 120,
+  "DEV_station_window_labels_recounted_from_native_receipts": 870,
+  "mature_training_labels_digest_valid": true,
+  "model_digest_valid": true,
+  "current_source_files_match_evidence": true,
+  "all_actual_loader_origins_covered": true,
+  "common_window_evaluation_recomputed": true,
+  "non_calibrated_representations_conserve_mass": true,
+  "train_parent_uids": [
+    "joint_reposition_group_plan_20261021:2101",
+    "joint_reposition_group_plan_20261021:2102"
+  ],
+  "evaluation_parent_uids": [
+    "joint_reposition_group_plan_20261021:2201"
+  ],
+  "calibration_DEV_MAE_worse_all_windows": true,
+  "promotion": "not_promoted_negative_forecast_result",
+  "RL_predictor": "not_implemented",
+  "native_starts": 0,
+  "limitations": [
+    "Early TRAIN prefixes only; full-day demand scale can shift.",
+    "A single synthetic DEV parent shares the historical template.",
+    "Common-window equality does not establish equal near-term stockout timing.",
+    "Offline forecast accuracy is not native closed-loop service gain."
+  ]
+}

@@ -1,0 +1,70 @@
+{
+  "schema": "g31.final_science.complete_timing_rows_change.v1",
+  "scope": "offline output evidence extension only; pending execution under a new producer binding",
+  "producers": [
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_terminal_flow_20261021\\final_science_audit_004.py",
+      "sha256": "efe072c507dfe3d6f933bbbe6eb360e6f9568912ba2ac4eae2105ba7d67679b8",
+      "bytes": 38998
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_terminal_flow_20261021\\test_final_science_audit.py",
+      "sha256": "39e0b6324cd1819125d1cfb6c5f910f7f77213eab1067f6c4c6279722cb4f023",
+      "bytes": 22798
+    }
+  ],
+  "prior_exact_bytes": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_terminal_flow_20261021\\final_science_timing_rows_history_001\\history_manifest.json",
+    "sha256": "befd3e00d15099b66bca5a104793090a184756c19984e5d8484951b38b544b4c",
+    "bytes": 1084
+  },
+  "pure_test_evidence": {
+    "binding": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_terminal_flow_20261021\\final_science_timing_rows_pure_002.xml",
+      "sha256": "8fcc7d02d36002790ecebcc3d2cc232ec10ac792704bb6960b6c103d90df0f7d",
+      "bytes": 4978
+    },
+    "tests": 25,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 1.537
+  },
+  "existing_counts_examples_and_scoring_equations_preserved": true,
+  "legacy_compatibility_test": "Historical counts/invalid/gain_gaps/examples compared against preserved producer for unchanged, ETA-change, HOLD, claims and changed-cost cases.",
+  "added_fields": [
+    "timing.ranking_rows",
+    "timing.ranking_rows_count",
+    "timing.ranking_rows_truncated",
+    "timing.ranking_row_scope",
+    "timing.ranking_score_scope",
+    "timing.ranking_hold_encoding"
+  ],
+  "population": "Every opportunity with at least two known scored OD candidates under unchanged receiver capacity and ordinary protection filters; unchanged cases included without truncation.",
+  "candidate_fields": "All scored candidates retain action/tray/source/destination/owner, fractional nominal ETA and transfer duration, proxy gains, costs and common/exact_same_cost/exact_actual_cost net scores.",
+  "causal_scope": "Only common versus exact_same_cost changes identify ETA-only ranking differences; exact_same_cost versus exact_actual_cost is a separately named cost-model comparison.",
+  "change_denominators": "Source and destination changes require both bests to be moves. HOLD and tray changes are separate flags; all candidate rows and all three bests remain available.",
+  "exclusion_scope": "Untimed receiver claims retain original exclusion counters and produce no fabricated score or ranking row. Unknown scored candidates are not imputed as zero.",
+  "pure_guards": [
+    "35 unchanged full opportunities with zero examples",
+    "35 changed opportunities beyond 30-example cap",
+    "source-only change",
+    "destination-only change",
+    "HOLD-only change",
+    "cost change without ETA change",
+    "claim exclusion without observation read",
+    "unknown candidate exclusion",
+    "unchanged legacy counters and examples"
+  ],
+  "production_rebinding_required": [
+    "root pending003 producer SHA",
+    "strong_baseline helper dependencies if they bind final_science SHA",
+    "figures dependencies if they bind final_science SHA",
+    "offline budget/spec producer bindings"
+  ],
+  "native_starts": 0,
+  "real_DEV_records_read": false,
+  "frozen_sources_modified": false,
+  "registration_or_ledger_modified": false,
+  "independent_root_review_pending": true
+}

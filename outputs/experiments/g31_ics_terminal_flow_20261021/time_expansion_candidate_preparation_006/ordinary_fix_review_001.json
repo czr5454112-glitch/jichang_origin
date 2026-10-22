@@ -1,0 +1,1295 @@
+{
+  "schema": "g31.pending_time_solver.ordinary_protection_fix_review.v1",
+  "scope": "pending prototype only; tiny synthetic pure reproductions",
+  "entry_exit_producers_equal": true,
+  "producers": [
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_terminal_flow_20261021\\time_expansion_candidate_preparation_006\\pending_time_solver.py",
+      "sha256": "fbc002c1308145a2983efee753ed8e67046f3a17a24a0811c8f757f66f23a1e8",
+      "bytes": 23904
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_terminal_flow_20261021\\time_expansion_candidate_preparation_006\\test_pending_time_solver.py",
+      "sha256": "0c6c9bd2d52c27a9301ae1cc10b0fd2225f5a0b724c3f96fcb72bdb62598ca1f",
+      "bytes": 15433
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_terminal_flow_20261021\\time_expansion_candidate_preparation_006\\README.md",
+      "sha256": "d7ac30a0d6e5e791a428427ea2911fb92fcdc95d4d2005d7bdaf0617f9489965",
+      "bytes": 7084
+    }
+  ],
+  "prior_independent_review": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_terminal_flow_20261021\\time_expansion_independent_review_006.json",
+    "sha256": "ffe4056374714842fe23ffdc8b0180689b318a99f5da5c9f926f1ff54dda750f",
+    "bytes": 8210
+  },
+  "pre_fix_history_manifest": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_terminal_flow_20261021\\time_expansion_candidate_preparation_006\\history_before_ordinary_fix_001\\history_manifest.json",
+    "sha256": "f7d1b89bc60b8e9ee0ee11e6a0af94520656517e9d3f9253137235334d35978a",
+    "bytes": 1825
+  },
+  "reproductions": [
+    {
+      "case": "receiver_cap_zero",
+      "input_scope": "synthetic accepted prototype input; production reachability not established",
+      "inputs": {
+        "catalog": {
+          "catalog_id": "synthetic-full-menu",
+          "public_state_digest": "synthetic-public-state",
+          "owner_id": "owner:synthetic",
+          "pruning": "none_full_legal_single_move_menu",
+          "catalog_uses_future_plan": false,
+          "candidates": [
+            {
+              "action_type": "noop",
+              "action_id": "noop"
+            },
+            {
+              "action_type": "transfer",
+              "action_id": "ordinary:1:10",
+              "tray_id": "ordinary",
+              "source": 1,
+              "destination": 10,
+              "owner_id": "owner:synthetic",
+              "source_category": "ordinary_return",
+              "earliest_departure": 2.0,
+              "static_travel_time": 1.0,
+              "nominal_arrival_time": 3.0
+            },
+            {
+              "action_type": "transfer",
+              "action_id": "optional:2:20",
+              "tray_id": "optional",
+              "source": 2,
+              "destination": 20,
+              "owner_id": "owner:synthetic",
+              "source_category": "loader_optional",
+              "earliest_departure": 2.0,
+              "static_travel_time": 0.125,
+              "nominal_arrival_time": 2.125
+            }
+          ]
+        },
+        "offers": {
+          "catalog_id": "synthetic-full-menu",
+          "public_state_digest": "synthetic-public-state",
+          "owner_id": "owner:synthetic",
+          "now": 0.0,
+          "sources": {
+            "1": {
+              "source": 1,
+              "owner_id": "owner:synthetic",
+              "source_category": "ordinary_return",
+              "tray_ids": [
+                "ordinary"
+              ],
+              "source_cap": 1
+            },
+            "2": {
+              "source": 2,
+              "owner_id": "owner:synthetic",
+              "source_category": "loader_optional",
+              "tray_ids": [
+                "optional"
+              ],
+              "source_cap": 1
+            }
+          },
+          "trays": {
+            "ordinary": {
+              "tray_id": "ordinary",
+              "source": 1,
+              "owner_id": "owner:synthetic",
+              "source_category": "ordinary_return",
+              "available_at": 0.0,
+              "legal_actions": [
+                {
+                  "action_type": "transfer",
+                  "action_id": "ordinary:1:10",
+                  "tray_id": "ordinary",
+                  "source": 1,
+                  "destination": 10,
+                  "owner_id": "owner:synthetic",
+                  "source_category": "ordinary_return",
+                  "earliest_departure": 2.0,
+                  "static_travel_time": 1.0,
+                  "nominal_arrival_time": 3.0
+                }
+              ]
+            },
+            "optional": {
+              "tray_id": "optional",
+              "source": 2,
+              "owner_id": "owner:synthetic",
+              "source_category": "loader_optional",
+              "available_at": 0.0,
+              "legal_actions": [
+                {
+                  "action_type": "transfer",
+                  "action_id": "optional:2:20",
+                  "tray_id": "optional",
+                  "source": 2,
+                  "destination": 20,
+                  "owner_id": "owner:synthetic",
+                  "source_category": "loader_optional",
+                  "earliest_departure": 2.0,
+                  "static_travel_time": 0.125,
+                  "nominal_arrival_time": 2.125
+                }
+              ]
+            }
+          }
+        },
+        "projection": {
+          "now": 0.0,
+          "owner": "owner:synthetic",
+          "public_state_digest": "synthetic-public-state",
+          "horizon_seconds": 600.0,
+          "actual_by_tray": {
+            "ordinary": 1,
+            "optional": 2
+          },
+          "nodes": {
+            "1": {
+              "stock": 2.0,
+              "waiting": 0.0,
+              "inventory_known": true,
+              "waiting_known": true,
+              "service_rate": 100.0,
+              "events": []
+            },
+            "2": {
+              "stock": 2.0,
+              "waiting": 0.0,
+              "inventory_known": true,
+              "waiting_known": true,
+              "service_rate": 100.0,
+              "events": []
+            },
+            "10": {
+              "stock": 0.0,
+              "waiting": 1.0,
+              "inventory_known": true,
+              "waiting_known": true,
+              "service_rate": 100.0,
+              "events": []
+            },
+            "20": {
+              "stock": 0.0,
+              "waiting": 5.0,
+              "inventory_known": true,
+              "waiting_known": true,
+              "service_rate": 100.0,
+              "events": []
+            }
+          },
+          "forecast": null,
+          "forecast_edges": [
+            0.0,
+            600.0
+          ],
+          "forecast_curves": {
+            "1": [
+              0.0
+            ],
+            "2": [
+              0.0
+            ],
+            "10": [
+              0.0
+            ],
+            "20": [
+              0.0
+            ]
+          },
+          "forecast_missing": {
+            "1": [
+              false
+            ],
+            "2": [
+              false
+            ],
+            "10": [
+              false
+            ],
+            "20": [
+              false
+            ]
+          }
+        },
+        "receiver_contract": {
+          "1": {
+            "known": true,
+            "available_slots": 4
+          },
+          "2": {
+            "known": true,
+            "available_slots": 4
+          },
+          "10": {
+            "known": true,
+            "available_slots": 0
+          },
+          "20": {
+            "known": true,
+            "available_slots": 4
+          }
+        },
+        "uncredited_claims": [],
+        "known_assignment_coverage": {},
+        "next_eligible_tick": 0.0,
+        "config": {
+          "horizon_seconds": 600.0,
+          "dispatch_slot_seconds": 60.0,
+          "command_delay_seconds": 2.0,
+          "transport_penalty_weight": 0.01,
+          "delay_cost_model": "none",
+          "delay_penalty_weight": 0.0,
+          "marginal_reference_available_offset_seconds": 2.0,
+          "minimum_net_gain": 0.0,
+          "use_forecast": false,
+          "max_expanded_nodes": 30000,
+          "max_completed_plans": 10000,
+          "max_wall_seconds": 20.0
+        }
+      },
+      "previous_result": {
+        "case": "receiver_cap_zero",
+        "input_scope": "synthetic accepted prototype input, not proven production menu reachability",
+        "status": "optimal_within_declared_proxy_and_slot_grid",
+        "ordinary_return_present": true,
+        "protected_planned_quantity": 0,
+        "current_slot_action": {
+          "kind": "move",
+          "action": {
+            "action_type": "transfer",
+            "action_id": "optional:2:20",
+            "tray_id": "optional",
+            "source": 2,
+            "destination": 20,
+            "owner_id": "owner:synthetic",
+            "source_category": "loader_optional",
+            "earliest_departure": 2.0,
+            "static_travel_time": 0.125,
+            "nominal_arrival_time": 2.125
+          },
+          "action_id": "optional:2:20",
+          "tray_id": "optional",
+          "source": 2,
+          "destination": 20,
+          "owner_id": "owner:synthetic",
+          "source_category": "loader_optional",
+          "slot_index": 0,
+          "clock_slot_index": 0,
+          "submit_at": 0.0,
+          "earliest_departure": 2.0,
+          "estimated_arrival": 2.125,
+          "optimistic_advisory_only": true
+        },
+        "baseline_fallback_required": false
+      },
+      "fixed_result": {
+        "schema": "g31.pending_identity_time_plan_reference.v1",
+        "preparation_status": "pending_not_enabled",
+        "native_execution_authority": false,
+        "information_asof": 0.0,
+        "owner_scope": "owner:synthetic",
+        "public_state_digest": "synthetic-public-state",
+        "catalog_id": "synthetic-full-menu",
+        "config": {
+          "horizon_seconds": 600.0,
+          "dispatch_slot_seconds": 60.0,
+          "command_delay_seconds": 2.0,
+          "transport_penalty_weight": 0.01,
+          "delay_cost_model": "none",
+          "delay_penalty_weight": 0.0,
+          "marginal_reference_available_offset_seconds": 2.0,
+          "minimum_net_gain": 0.0,
+          "use_forecast": false,
+          "max_expanded_nodes": 30000,
+          "max_completed_plans": 10000,
+          "max_wall_seconds": 20.0
+        },
+        "full_supplied_menu_digest": "4bd6b55921de446ea722fd11b0a779ca9f0cfa34dbe84127e64747aa9011f6a3",
+        "full_legal_transfer_count": 2,
+        "full_legal_tray_count": 2,
+        "source_caps": {
+          "1": 1,
+          "2": 1
+        },
+        "receiver_caps_after_claims": {
+          "1": 4,
+          "2": 4,
+          "10": 0,
+          "20": 4
+        },
+        "logical_claim_counts": {},
+        "additional_capacity_claim_deductions": {},
+        "current_slot_action": null,
+        "dispatch_profile": [],
+        "baseline_fallback_required": true,
+        "ordinary_return_present": true,
+        "independent_native_service_gain_claimed": false,
+        "whole_ICS_optimal_claimed": false,
+        "cannot_pass_to_legacy_reranking_adapter": true,
+        "menu_completeness_scope": "exact_supplied_common_catalog_checked; original_menu_builder_not_reexecuted",
+        "execution_contract": "caller must keep priority, quota consumption, same-ID retry, current-menu revalidation, baseline fallback, task 7.3.1 stable first-action ordering and exact-positive optional first-action verification",
+        "joint_plan_gain_does_not_waive_exact_positive_first_action": true,
+        "menu_coverage_exclusions": [],
+        "simulator_source": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\sources\\terminal_flow_runtime_005\\scripts\\experiments\\g31_ics_circulation\\foundation_airport_inventory_projection.py",
+          "sha256": "54a149ac946a6ba4a319bb348088dc1f217c6920dbb1fa6ef5f74389421baf2e",
+          "functions": [
+            "require",
+            "simulate_node"
+          ],
+          "loading": "verified_original_AST_functions_only_stdlib_defaultdict"
+        },
+        "status": "optimal_within_declared_proxy_and_slot_grid",
+        "chosen": [],
+        "objective": null,
+        "rejected_reference_plan": {
+          "current_slot_action": {
+            "kind": "move",
+            "action": {
+              "action_type": "transfer",
+              "action_id": "optional:2:20",
+              "tray_id": "optional",
+              "source": 2,
+              "destination": 20,
+              "owner_id": "owner:synthetic",
+              "source_category": "loader_optional",
+              "earliest_departure": 2.0,
+              "static_travel_time": 0.125,
+              "nominal_arrival_time": 2.125
+            },
+            "action_id": "optional:2:20",
+            "tray_id": "optional",
+            "source": 2,
+            "destination": 20,
+            "owner_id": "owner:synthetic",
+            "source_category": "loader_optional",
+            "slot_index": 0,
+            "clock_slot_index": 0,
+            "submit_at": 0.0,
+            "earliest_departure": 2.0,
+            "estimated_arrival": 2.125,
+            "optimistic_advisory_only": true
+          },
+          "dispatch_profile": [
+            {
+              "kind": "move",
+              "action": {
+                "action_type": "transfer",
+                "action_id": "optional:2:20",
+                "tray_id": "optional",
+                "source": 2,
+                "destination": 20,
+                "owner_id": "owner:synthetic",
+                "source_category": "loader_optional",
+                "earliest_departure": 2.0,
+                "static_travel_time": 0.125,
+                "nominal_arrival_time": 2.125
+              },
+              "action_id": "optional:2:20",
+              "tray_id": "optional",
+              "source": 2,
+              "destination": 20,
+              "owner_id": "owner:synthetic",
+              "source_category": "loader_optional",
+              "slot_index": 0,
+              "clock_slot_index": 0,
+              "submit_at": 0.0,
+              "earliest_departure": 2.0,
+              "estimated_arrival": 2.125,
+              "optimistic_advisory_only": true
+            },
+            {
+              "kind": "HOLD",
+              "owner_id": "owner:synthetic",
+              "slot_index": 1,
+              "submit_at": 60.0,
+              "clock_slot_index": 1,
+              "optimistic_advisory_only": true
+            },
+            {
+              "kind": "HOLD",
+              "owner_id": "owner:synthetic",
+              "slot_index": 2,
+              "submit_at": 120.0,
+              "clock_slot_index": 2,
+              "optimistic_advisory_only": true
+            },
+            {
+              "kind": "HOLD",
+              "owner_id": "owner:synthetic",
+              "slot_index": 3,
+              "submit_at": 180.0,
+              "clock_slot_index": 3,
+              "optimistic_advisory_only": true
+            },
+            {
+              "kind": "HOLD",
+              "owner_id": "owner:synthetic",
+              "slot_index": 4,
+              "submit_at": 240.0,
+              "clock_slot_index": 4,
+              "optimistic_advisory_only": true
+            },
+            {
+              "kind": "HOLD",
+              "owner_id": "owner:synthetic",
+              "slot_index": 5,
+              "submit_at": 300.0,
+              "clock_slot_index": 5,
+              "optimistic_advisory_only": true
+            },
+            {
+              "kind": "HOLD",
+              "owner_id": "owner:synthetic",
+              "slot_index": 6,
+              "submit_at": 360.0,
+              "clock_slot_index": 6,
+              "optimistic_advisory_only": true
+            },
+            {
+              "kind": "HOLD",
+              "owner_id": "owner:synthetic",
+              "slot_index": 7,
+              "submit_at": 420.0,
+              "clock_slot_index": 7,
+              "optimistic_advisory_only": true
+            },
+            {
+              "kind": "HOLD",
+              "owner_id": "owner:synthetic",
+              "slot_index": 8,
+              "submit_at": 480.0,
+              "clock_slot_index": 8,
+              "optimistic_advisory_only": true
+            },
+            {
+              "kind": "HOLD",
+              "owner_id": "owner:synthetic",
+              "slot_index": 9,
+              "submit_at": 540.0,
+              "clock_slot_index": 9,
+              "optimistic_advisory_only": true
+            }
+          ],
+          "chosen": [
+            {
+              "kind": "move",
+              "action": {
+                "action_type": "transfer",
+                "action_id": "optional:2:20",
+                "tray_id": "optional",
+                "source": 2,
+                "destination": 20,
+                "owner_id": "owner:synthetic",
+                "source_category": "loader_optional",
+                "earliest_departure": 2.0,
+                "static_travel_time": 0.125,
+                "nominal_arrival_time": 2.125
+              },
+              "action_id": "optional:2:20",
+              "tray_id": "optional",
+              "source": 2,
+              "destination": 20,
+              "owner_id": "owner:synthetic",
+              "source_category": "loader_optional",
+              "slot_index": 0,
+              "clock_slot_index": 0,
+              "submit_at": 0.0,
+              "earliest_departure": 2.0,
+              "estimated_arrival": 2.125,
+              "optimistic_advisory_only": true
+            }
+          ],
+          "objective": {
+            "objective_cost": -597.8687499999999,
+            "net_proxy_gain": 597.8687499999999,
+            "physical_backlog_area_delta": -597.8699999999999,
+            "source_opportunity_cost": 0.0,
+            "transport_cost": 0.00125,
+            "delay_regularizer": 0.0,
+            "minimum_gain_penalty": 0.0,
+            "nodes": {
+              "2": {
+                "baseline": {
+                  "backlog_area": 0.0,
+                  "first_shortage_offset": null,
+                  "ending_inventory": 2.0,
+                  "ending_backlog": 0.0,
+                  "served_mass": 0.0,
+                  "minimum_inventory": 2.0,
+                  "service_model": "finite_rate_single_use_fluid"
+                },
+                "after_now_source_reserve": {
+                  "backlog_area": 0.0,
+                  "first_shortage_offset": null,
+                  "ending_inventory": 1.0,
+                  "ending_backlog": 0.0,
+                  "served_mass": 0.0,
+                  "minimum_inventory": 1.0,
+                  "service_model": "finite_rate_single_use_fluid"
+                },
+                "with_plan_arrivals": {
+                  "backlog_area": 0.0,
+                  "first_shortage_offset": null,
+                  "ending_inventory": 1.0,
+                  "ending_backlog": 0.0,
+                  "served_mass": 0.0,
+                  "minimum_inventory": 1.0,
+                  "service_model": "finite_rate_single_use_fluid"
+                },
+                "source_reserved_quantity": 1,
+                "added_arrival_events": [],
+                "backlog_area_delta": 0.0,
+                "source_opportunity_cost": 0.0
+              },
+              "20": {
+                "baseline": {
+                  "backlog_area": 3000.0,
+                  "first_shortage_offset": 0.0,
+                  "ending_inventory": 0.0,
+                  "ending_backlog": 5.0,
+                  "served_mass": 0.0,
+                  "minimum_inventory": 0.0,
+                  "service_model": "finite_rate_single_use_fluid"
+                },
+                "after_now_source_reserve": {
+                  "backlog_area": 3000.0,
+                  "first_shortage_offset": 0.0,
+                  "ending_inventory": 0.0,
+                  "ending_backlog": 5.0,
+                  "served_mass": 0.0,
+                  "minimum_inventory": 0.0,
+                  "service_model": "finite_rate_single_use_fluid"
+                },
+                "with_plan_arrivals": {
+                  "backlog_area": 2402.13,
+                  "first_shortage_offset": 0.0,
+                  "ending_inventory": 0.0,
+                  "ending_backlog": 4.0,
+                  "served_mass": 1.0,
+                  "minimum_inventory": 0.0,
+                  "service_model": "finite_rate_single_use_fluid"
+                },
+                "source_reserved_quantity": 0,
+                "added_arrival_events": [
+                  [
+                    2.125,
+                    1.0
+                  ]
+                ],
+                "backlog_area_delta": -597.8699999999999,
+                "source_opportunity_cost": 0.0
+              }
+            },
+            "source_reserve_assumption": "selected_real_source_trays_reserved_from_now_in_proxy_only"
+          },
+          "planned_quantity": 1,
+          "protected_planned_quantity": 0,
+          "reason": "current_protected_ordinary_not_preserved",
+          "diagnostic_only": true
+        },
+        "current_slot_standalone_score": null,
+        "current_slot_standalone_gain_positive": null,
+        "fallback_contract": "current ordinary obligation remains with original baseline under its existing quota; rejected reference plan is diagnostic only, not an optional or HOLD command",
+        "search": {
+          "applicable": true,
+          "method": "explicit_identity_preserving_enumeration",
+          "expanded_nodes": 66,
+          "completed_plans": 11,
+          "initial_all_HOLD_incumbent": true,
+          "all_HOLD_incumbent_counted_as_completed_plan": false,
+          "cutoff_reason": null,
+          "supplied_legal_actions": 2,
+          "coverage_supported_actions": 2,
+          "owner_slots": 10,
+          "slot_times": [
+            0.0,
+            60.0,
+            120.0,
+            180.0,
+            240.0,
+            300.0,
+            360.0,
+            420.0,
+            480.0,
+            540.0
+          ],
+          "forecast_score_pruning": false,
+          "negative_single_action_pruning": false,
+          "beam_used": false,
+          "exhaustive_over_declared_supported_action_slot_grid": true,
+          "bound_or_gap": null,
+          "wall_seconds": 0.0009667000267654657,
+          "repeated_partial_feasibility_rejections": {
+            "receiver_cap": 55,
+            "tray_already_selected": 45
+          }
+        },
+        "planned_quantity": 0,
+        "protected_planned_quantity": 0,
+        "HOLD_tray_quantity": null,
+        "pending_claims_added_as_inventory": false,
+        "future_qualification_and_priority_revalidation_required": true,
+        "known_committed_ETA_events_preserved": true
+      }
+    },
+    {
+      "case": "source_cap_zero",
+      "input_scope": "synthetic accepted prototype input; production reachability not established",
+      "inputs": {
+        "catalog": {
+          "catalog_id": "synthetic-full-menu",
+          "public_state_digest": "synthetic-public-state",
+          "owner_id": "owner:synthetic",
+          "pruning": "none_full_legal_single_move_menu",
+          "catalog_uses_future_plan": false,
+          "candidates": [
+            {
+              "action_type": "noop",
+              "action_id": "noop"
+            },
+            {
+              "action_type": "transfer",
+              "action_id": "ordinary:1:10",
+              "tray_id": "ordinary",
+              "source": 1,
+              "destination": 10,
+              "owner_id": "owner:synthetic",
+              "source_category": "ordinary_return",
+              "earliest_departure": 2.0,
+              "static_travel_time": 1.0,
+              "nominal_arrival_time": 3.0
+            },
+            {
+              "action_type": "transfer",
+              "action_id": "optional:2:20",
+              "tray_id": "optional",
+              "source": 2,
+              "destination": 20,
+              "owner_id": "owner:synthetic",
+              "source_category": "loader_optional",
+              "earliest_departure": 2.0,
+              "static_travel_time": 0.125,
+              "nominal_arrival_time": 2.125
+            }
+          ]
+        },
+        "offers": {
+          "catalog_id": "synthetic-full-menu",
+          "public_state_digest": "synthetic-public-state",
+          "owner_id": "owner:synthetic",
+          "now": 0.0,
+          "sources": {
+            "1": {
+              "source": 1,
+              "owner_id": "owner:synthetic",
+              "source_category": "ordinary_return",
+              "tray_ids": [
+                "ordinary"
+              ],
+              "source_cap": 0
+            },
+            "2": {
+              "source": 2,
+              "owner_id": "owner:synthetic",
+              "source_category": "loader_optional",
+              "tray_ids": [
+                "optional"
+              ],
+              "source_cap": 1
+            }
+          },
+          "trays": {
+            "ordinary": {
+              "tray_id": "ordinary",
+              "source": 1,
+              "owner_id": "owner:synthetic",
+              "source_category": "ordinary_return",
+              "available_at": 0.0,
+              "legal_actions": [
+                {
+                  "action_type": "transfer",
+                  "action_id": "ordinary:1:10",
+                  "tray_id": "ordinary",
+                  "source": 1,
+                  "destination": 10,
+                  "owner_id": "owner:synthetic",
+                  "source_category": "ordinary_return",
+                  "earliest_departure": 2.0,
+                  "static_travel_time": 1.0,
+                  "nominal_arrival_time": 3.0
+                }
+              ]
+            },
+            "optional": {
+              "tray_id": "optional",
+              "source": 2,
+              "owner_id": "owner:synthetic",
+              "source_category": "loader_optional",
+              "available_at": 0.0,
+              "legal_actions": [
+                {
+                  "action_type": "transfer",
+                  "action_id": "optional:2:20",
+                  "tray_id": "optional",
+                  "source": 2,
+                  "destination": 20,
+                  "owner_id": "owner:synthetic",
+                  "source_category": "loader_optional",
+                  "earliest_departure": 2.0,
+                  "static_travel_time": 0.125,
+                  "nominal_arrival_time": 2.125
+                }
+              ]
+            }
+          }
+        },
+        "projection": {
+          "now": 0.0,
+          "owner": "owner:synthetic",
+          "public_state_digest": "synthetic-public-state",
+          "horizon_seconds": 600.0,
+          "actual_by_tray": {
+            "ordinary": 1,
+            "optional": 2
+          },
+          "nodes": {
+            "1": {
+              "stock": 2.0,
+              "waiting": 0.0,
+              "inventory_known": true,
+              "waiting_known": true,
+              "service_rate": 100.0,
+              "events": []
+            },
+            "2": {
+              "stock": 2.0,
+              "waiting": 0.0,
+              "inventory_known": true,
+              "waiting_known": true,
+              "service_rate": 100.0,
+              "events": []
+            },
+            "10": {
+              "stock": 0.0,
+              "waiting": 1.0,
+              "inventory_known": true,
+              "waiting_known": true,
+              "service_rate": 100.0,
+              "events": []
+            },
+            "20": {
+              "stock": 0.0,
+              "waiting": 5.0,
+              "inventory_known": true,
+              "waiting_known": true,
+              "service_rate": 100.0,
+              "events": []
+            }
+          },
+          "forecast": null,
+          "forecast_edges": [
+            0.0,
+            600.0
+          ],
+          "forecast_curves": {
+            "1": [
+              0.0
+            ],
+            "2": [
+              0.0
+            ],
+            "10": [
+              0.0
+            ],
+            "20": [
+              0.0
+            ]
+          },
+          "forecast_missing": {
+            "1": [
+              false
+            ],
+            "2": [
+              false
+            ],
+            "10": [
+              false
+            ],
+            "20": [
+              false
+            ]
+          }
+        },
+        "receiver_contract": {
+          "1": {
+            "known": true,
+            "available_slots": 4
+          },
+          "2": {
+            "known": true,
+            "available_slots": 4
+          },
+          "10": {
+            "known": true,
+            "available_slots": 4
+          },
+          "20": {
+            "known": true,
+            "available_slots": 4
+          }
+        },
+        "uncredited_claims": [],
+        "known_assignment_coverage": {},
+        "next_eligible_tick": 0.0,
+        "config": {
+          "horizon_seconds": 600.0,
+          "dispatch_slot_seconds": 60.0,
+          "command_delay_seconds": 2.0,
+          "transport_penalty_weight": 0.01,
+          "delay_cost_model": "none",
+          "delay_penalty_weight": 0.0,
+          "marginal_reference_available_offset_seconds": 2.0,
+          "minimum_net_gain": 0.0,
+          "use_forecast": false,
+          "max_expanded_nodes": 30000,
+          "max_completed_plans": 10000,
+          "max_wall_seconds": 20.0
+        }
+      },
+      "previous_result": {
+        "case": "source_cap_zero",
+        "input_scope": "synthetic accepted prototype input, not proven production menu reachability",
+        "status": "optimal_within_declared_proxy_and_slot_grid",
+        "ordinary_return_present": true,
+        "protected_planned_quantity": 0,
+        "current_slot_action": {
+          "kind": "move",
+          "action": {
+            "action_type": "transfer",
+            "action_id": "optional:2:20",
+            "tray_id": "optional",
+            "source": 2,
+            "destination": 20,
+            "owner_id": "owner:synthetic",
+            "source_category": "loader_optional",
+            "earliest_departure": 2.0,
+            "static_travel_time": 0.125,
+            "nominal_arrival_time": 2.125
+          },
+          "action_id": "optional:2:20",
+          "tray_id": "optional",
+          "source": 2,
+          "destination": 20,
+          "owner_id": "owner:synthetic",
+          "source_category": "loader_optional",
+          "slot_index": 0,
+          "clock_slot_index": 0,
+          "submit_at": 0.0,
+          "earliest_departure": 2.0,
+          "estimated_arrival": 2.125,
+          "optimistic_advisory_only": true
+        },
+        "baseline_fallback_required": false
+      },
+      "fixed_result": {
+        "schema": "g31.pending_identity_time_plan_reference.v1",
+        "preparation_status": "pending_not_enabled",
+        "native_execution_authority": false,
+        "information_asof": 0.0,
+        "owner_scope": "owner:synthetic",
+        "public_state_digest": "synthetic-public-state",
+        "catalog_id": "synthetic-full-menu",
+        "config": {
+          "horizon_seconds": 600.0,
+          "dispatch_slot_seconds": 60.0,
+          "command_delay_seconds": 2.0,
+          "transport_penalty_weight": 0.01,
+          "delay_cost_model": "none",
+          "delay_penalty_weight": 0.0,
+          "marginal_reference_available_offset_seconds": 2.0,
+          "minimum_net_gain": 0.0,
+          "use_forecast": false,
+          "max_expanded_nodes": 30000,
+          "max_completed_plans": 10000,
+          "max_wall_seconds": 20.0
+        },
+        "full_supplied_menu_digest": "4bd6b55921de446ea722fd11b0a779ca9f0cfa34dbe84127e64747aa9011f6a3",
+        "full_legal_transfer_count": 2,
+        "full_legal_tray_count": 2,
+        "source_caps": {
+          "1": 0,
+          "2": 1
+        },
+        "receiver_caps_after_claims": {
+          "1": 4,
+          "2": 4,
+          "10": 4,
+          "20": 4
+        },
+        "logical_claim_counts": {},
+        "additional_capacity_claim_deductions": {},
+        "current_slot_action": null,
+        "dispatch_profile": [],
+        "baseline_fallback_required": true,
+        "ordinary_return_present": true,
+        "independent_native_service_gain_claimed": false,
+        "whole_ICS_optimal_claimed": false,
+        "cannot_pass_to_legacy_reranking_adapter": true,
+        "menu_completeness_scope": "exact_supplied_common_catalog_checked; original_menu_builder_not_reexecuted",
+        "execution_contract": "caller must keep priority, quota consumption, same-ID retry, current-menu revalidation, baseline fallback, task 7.3.1 stable first-action ordering and exact-positive optional first-action verification",
+        "joint_plan_gain_does_not_waive_exact_positive_first_action": true,
+        "menu_coverage_exclusions": [],
+        "simulator_source": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\sources\\terminal_flow_runtime_005\\scripts\\experiments\\g31_ics_circulation\\foundation_airport_inventory_projection.py",
+          "sha256": "54a149ac946a6ba4a319bb348088dc1f217c6920dbb1fa6ef5f74389421baf2e",
+          "functions": [
+            "require",
+            "simulate_node"
+          ],
+          "loading": "verified_original_AST_functions_only_stdlib_defaultdict"
+        },
+        "status": "optimal_within_declared_proxy_and_slot_grid",
+        "chosen": [],
+        "objective": null,
+        "rejected_reference_plan": {
+          "current_slot_action": {
+            "kind": "move",
+            "action": {
+              "action_type": "transfer",
+              "action_id": "optional:2:20",
+              "tray_id": "optional",
+              "source": 2,
+              "destination": 20,
+              "owner_id": "owner:synthetic",
+              "source_category": "loader_optional",
+              "earliest_departure": 2.0,
+              "static_travel_time": 0.125,
+              "nominal_arrival_time": 2.125
+            },
+            "action_id": "optional:2:20",
+            "tray_id": "optional",
+            "source": 2,
+            "destination": 20,
+            "owner_id": "owner:synthetic",
+            "source_category": "loader_optional",
+            "slot_index": 0,
+            "clock_slot_index": 0,
+            "submit_at": 0.0,
+            "earliest_departure": 2.0,
+            "estimated_arrival": 2.125,
+            "optimistic_advisory_only": true
+          },
+          "dispatch_profile": [
+            {
+              "kind": "move",
+              "action": {
+                "action_type": "transfer",
+                "action_id": "optional:2:20",
+                "tray_id": "optional",
+                "source": 2,
+                "destination": 20,
+                "owner_id": "owner:synthetic",
+                "source_category": "loader_optional",
+                "earliest_departure": 2.0,
+                "static_travel_time": 0.125,
+                "nominal_arrival_time": 2.125
+              },
+              "action_id": "optional:2:20",
+              "tray_id": "optional",
+              "source": 2,
+              "destination": 20,
+              "owner_id": "owner:synthetic",
+              "source_category": "loader_optional",
+              "slot_index": 0,
+              "clock_slot_index": 0,
+              "submit_at": 0.0,
+              "earliest_departure": 2.0,
+              "estimated_arrival": 2.125,
+              "optimistic_advisory_only": true
+            },
+            {
+              "kind": "HOLD",
+              "owner_id": "owner:synthetic",
+              "slot_index": 1,
+              "submit_at": 60.0,
+              "clock_slot_index": 1,
+              "optimistic_advisory_only": true
+            },
+            {
+              "kind": "HOLD",
+              "owner_id": "owner:synthetic",
+              "slot_index": 2,
+              "submit_at": 120.0,
+              "clock_slot_index": 2,
+              "optimistic_advisory_only": true
+            },
+            {
+              "kind": "HOLD",
+              "owner_id": "owner:synthetic",
+              "slot_index": 3,
+              "submit_at": 180.0,
+              "clock_slot_index": 3,
+              "optimistic_advisory_only": true
+            },
+            {
+              "kind": "HOLD",
+              "owner_id": "owner:synthetic",
+              "slot_index": 4,
+              "submit_at": 240.0,
+              "clock_slot_index": 4,
+              "optimistic_advisory_only": true
+            },
+            {
+              "kind": "HOLD",
+              "owner_id": "owner:synthetic",
+              "slot_index": 5,
+              "submit_at": 300.0,
+              "clock_slot_index": 5,
+              "optimistic_advisory_only": true
+            },
+            {
+              "kind": "HOLD",
+              "owner_id": "owner:synthetic",
+              "slot_index": 6,
+              "submit_at": 360.0,
+              "clock_slot_index": 6,
+              "optimistic_advisory_only": true
+            },
+            {
+              "kind": "HOLD",
+              "owner_id": "owner:synthetic",
+              "slot_index": 7,
+              "submit_at": 420.0,
+              "clock_slot_index": 7,
+              "optimistic_advisory_only": true
+            },
+            {
+              "kind": "HOLD",
+              "owner_id": "owner:synthetic",
+              "slot_index": 8,
+              "submit_at": 480.0,
+              "clock_slot_index": 8,
+              "optimistic_advisory_only": true
+            },
+            {
+              "kind": "HOLD",
+              "owner_id": "owner:synthetic",
+              "slot_index": 9,
+              "submit_at": 540.0,
+              "clock_slot_index": 9,
+              "optimistic_advisory_only": true
+            }
+          ],
+          "chosen": [
+            {
+              "kind": "move",
+              "action": {
+                "action_type": "transfer",
+                "action_id": "optional:2:20",
+                "tray_id": "optional",
+                "source": 2,
+                "destination": 20,
+                "owner_id": "owner:synthetic",
+                "source_category": "loader_optional",
+                "earliest_departure": 2.0,
+                "static_travel_time": 0.125,
+                "nominal_arrival_time": 2.125
+              },
+              "action_id": "optional:2:20",
+              "tray_id": "optional",
+              "source": 2,
+              "destination": 20,
+              "owner_id": "owner:synthetic",
+              "source_category": "loader_optional",
+              "slot_index": 0,
+              "clock_slot_index": 0,
+              "submit_at": 0.0,
+              "earliest_departure": 2.0,
+              "estimated_arrival": 2.125,
+              "optimistic_advisory_only": true
+            }
+          ],
+          "objective": {
+            "objective_cost": -597.8687499999999,
+            "net_proxy_gain": 597.8687499999999,
+            "physical_backlog_area_delta": -597.8699999999999,
+            "source_opportunity_cost": 0.0,
+            "transport_cost": 0.00125,
+            "delay_regularizer": 0.0,
+            "minimum_gain_penalty": 0.0,
+            "nodes": {
+              "2": {
+                "baseline": {
+                  "backlog_area": 0.0,
+                  "first_shortage_offset": null,
+                  "ending_inventory": 2.0,
+                  "ending_backlog": 0.0,
+                  "served_mass": 0.0,
+                  "minimum_inventory": 2.0,
+                  "service_model": "finite_rate_single_use_fluid"
+                },
+                "after_now_source_reserve": {
+                  "backlog_area": 0.0,
+                  "first_shortage_offset": null,
+                  "ending_inventory": 1.0,
+                  "ending_backlog": 0.0,
+                  "served_mass": 0.0,
+                  "minimum_inventory": 1.0,
+                  "service_model": "finite_rate_single_use_fluid"
+                },
+                "with_plan_arrivals": {
+                  "backlog_area": 0.0,
+                  "first_shortage_offset": null,
+                  "ending_inventory": 1.0,
+                  "ending_backlog": 0.0,
+                  "served_mass": 0.0,
+                  "minimum_inventory": 1.0,
+                  "service_model": "finite_rate_single_use_fluid"
+                },
+                "source_reserved_quantity": 1,
+                "added_arrival_events": [],
+                "backlog_area_delta": 0.0,
+                "source_opportunity_cost": 0.0
+              },
+              "20": {
+                "baseline": {
+                  "backlog_area": 3000.0,
+                  "first_shortage_offset": 0.0,
+                  "ending_inventory": 0.0,
+                  "ending_backlog": 5.0,
+                  "served_mass": 0.0,
+                  "minimum_inventory": 0.0,
+                  "service_model": "finite_rate_single_use_fluid"
+                },
+                "after_now_source_reserve": {
+                  "backlog_area": 3000.0,
+                  "first_shortage_offset": 0.0,
+                  "ending_inventory": 0.0,
+                  "ending_backlog": 5.0,
+                  "served_mass": 0.0,
+                  "minimum_inventory": 0.0,
+                  "service_model": "finite_rate_single_use_fluid"
+                },
+                "with_plan_arrivals": {
+                  "backlog_area": 2402.13,
+                  "first_shortage_offset": 0.0,
+                  "ending_inventory": 0.0,
+                  "ending_backlog": 4.0,
+                  "served_mass": 1.0,
+                  "minimum_inventory": 0.0,
+                  "service_model": "finite_rate_single_use_fluid"
+                },
+                "source_reserved_quantity": 0,
+                "added_arrival_events": [
+                  [
+                    2.125,
+                    1.0
+                  ]
+                ],
+                "backlog_area_delta": -597.8699999999999,
+                "source_opportunity_cost": 0.0
+              }
+            },
+            "source_reserve_assumption": "selected_real_source_trays_reserved_from_now_in_proxy_only"
+          },
+          "planned_quantity": 1,
+          "protected_planned_quantity": 0,
+          "reason": "current_protected_ordinary_not_preserved",
+          "diagnostic_only": true
+        },
+        "current_slot_standalone_score": null,
+        "current_slot_standalone_gain_positive": null,
+        "fallback_contract": "current ordinary obligation remains with original baseline under its existing quota; rejected reference plan is diagnostic only, not an optional or HOLD command",
+        "search": {
+          "applicable": true,
+          "method": "explicit_identity_preserving_enumeration",
+          "expanded_nodes": 66,
+          "completed_plans": 11,
+          "initial_all_HOLD_incumbent": true,
+          "all_HOLD_incumbent_counted_as_completed_plan": false,
+          "cutoff_reason": null,
+          "supplied_legal_actions": 2,
+          "coverage_supported_actions": 2,
+          "owner_slots": 10,
+          "slot_times": [
+            0.0,
+            60.0,
+            120.0,
+            180.0,
+            240.0,
+            300.0,
+            360.0,
+            420.0,
+            480.0,
+            540.0
+          ],
+          "forecast_score_pruning": false,
+          "negative_single_action_pruning": false,
+          "beam_used": false,
+          "exhaustive_over_declared_supported_action_slot_grid": true,
+          "bound_or_gap": null,
+          "wall_seconds": 0.0008744000224396586,
+          "repeated_partial_feasibility_rejections": {
+            "source_cap": 55,
+            "tray_already_selected": 45
+          }
+        },
+        "planned_quantity": 0,
+        "protected_planned_quantity": 0,
+        "HOLD_tray_quantity": null,
+        "pending_claims_added_as_inventory": false,
+        "future_qualification_and_priority_revalidation_required": true,
+        "known_committed_ETA_events_preserved": true
+      }
+    },
+    {
+      "case": "joint_positive_boundary_is_not_execution_authority",
+      "net_proxy_gain": 143.485,
+      "first_action_standalone_gain": -355.755,
+      "current_slot_standalone_gain_positive": false,
+      "joint_plan_gain_does_not_waive_exact_positive_first_action": true,
+      "native_execution_authority": false
+    }
+  ],
+  "pure_test_runs": [
+    {
+      "evidence": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_terminal_flow_20261021\\time_expansion_candidate_preparation_006\\pure_tests_003.xml",
+        "sha256": "2fe3033412a726d02c9e135f43fb728b4fe2277b8daa1d96c21208af41eea278",
+        "bytes": 8641
+      },
+      "tests": 25,
+      "failures": 2,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 1.351
+    },
+    {
+      "evidence": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_terminal_flow_20261021\\time_expansion_candidate_preparation_006\\pure_tests_004.xml",
+        "sha256": "067c9ecd2457cd1be2cceba43c3081e49f9c36fd2f6b141b86049179faecd7a5",
+        "bytes": 6128
+      },
+      "tests": 25,
+      "failures": 0,
+      "errors": 0,
+      "skipped": 0,
+      "seconds": 1.107
+    }
+  ],
+  "first_test_attempt_note": "Two new cutoff assertions were initially inserted into claim tests; corrected test placement only. Failed XML is retained. Final suite passed.",
+  "production_contract": "Task 7.3.1 stable first-action ordering and exact-positive optional single-action verification remain mandatory; joint-positive/nonpositive-first example is a boundary only.",
+  "spent_tick_behavior": "Current HOLD cannot reopen quota; future slots require original qualification and ordinary priority revalidation.",
+  "preparation_status": "pending_not_enabled",
+  "native_or_real_DEV_executed": false,
+  "scripts_src_frozen_driver_model_ledger_modified": false,
+  "independent_root_review_pending": true
+}

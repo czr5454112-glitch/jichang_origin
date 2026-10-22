@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="9" time="3.705" timestamp="2026-10-22T15:19:33.659504+08:00" hostname="LAPTOP-M3GASC4G"><testcase classname="outputs.experiments.g31_ics_terminal_flow_20261021.test_projection_horizon_probe_005" name="test_later_source_demand_is_not_visible_to_short_proxy" time="0.002" /><testcase classname="outputs.experiments.g31_ics_terminal_flow_20261021.test_projection_horizon_probe_005" name="test_late_arrival_does_not_create_stock_before_eta" time="0.002" /><testcase classname="outputs.experiments.g31_ics_terminal_flow_20261021.test_projection_horizon_probe_005" name="test_actual_policy_replay_preserves_forecast_and_records_exact_verification" time="0.004"><failure message="KeyError: 'candidate_limit'">def test_actual_policy_replay_preserves_forecast_and_records_exact_verification():
+        from scripts.experiments.g31_ics_circulation import foundation_airport_inventory_rule as rules
+        from scripts.experiments.g31_ics_circulation import foundation_airport_joint_opportunities as opportunities
+        from scripts.experiments.g31_ics_circulation import foundation_airport_transport_control as control
+        obs=fixture((2,0,0));obs['control_projection'].update(exact_waiting_count=0,known_origin_nodes=[0,1,2])
+        f=forecast(obs,{2:[0.]*15+[3.]+[0.]*14})
+&gt;       current=opportunities.prepare_current(obs,rules.r0_priority_planner(obs),message_delay=2.)
+                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+outputs\experiments\g31_ics_terminal_flow_20261021\test_projection_horizon_probe_005.py:46: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\foundation_airport_inventory_rule.py:43: in r0_priority_planner
+    decision = transfer_candidates(observation, predictive=False,
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+observation = {'schema': 'g31.owner_protocol_observation.v1', 'owner_id': 'A', 'now': 10.0, 'node_records': [(0, 10, 0.001, 0, 0, [1, 2]), (1, 10, 0.001, 0, 0, [0, 2]), (2, 10, 0.001, 0, 0, [0, 1])], ...}
+predictive = False, message_delay = 0, expiry_slack = 60
+request_prefix = 'analytic', terminal_clearing = True
+respect_service_forecasts = False, compress_equivalent_demands = True
+_reuse_observation_work = True
+
+    def transfer_candidates(observation: dict[str, Any], *, predictive: bool,
+                            message_delay: float = 0, expiry_slack: float = 60,
+                            request_prefix: str = "analytic", terminal_clearing: bool = True,
+                            respect_service_forecasts: bool = False,
+                            compress_equivalent_demands: bool = True,
+                            _reuse_observation_work: bool = True) -&gt; dict[str, Any]:
+        """Build a common feasible-intent pool and solve its analytical assignment.
+    
+        Local FIFO demand is protected before cross-zone export. Existing pending
+        transfers count once and block duplicate promises. Final export/receive
+        authority remains in the native owner. Stale observations can be rejected.
+        """
+        now = float(observation["now"])
+        if message_delay &lt; 0 or expiry_slack &lt;= 0:
+            raise ValueError("analytic_control:invalid_timing")
+        compact = "control_projection" in observation
+        if compact:
+            if not compress_equivalent_demands:
+                raise ValueError("analytic_control:compact_projection_requires_equivalent_columns")
+            waiting, local_demand, demand_time, known_ports = _compact_demand(observation)
+        else:
+            jobs = _visible_demand(observation)
+            waiting = sorted((j for j in jobs.values() if j["status"] in ("waiting", "waiting_for_tray")),
+                             key=lambda j: (j["arrival"], j["business_bag_id"]))
+            local_demand = Counter(int(j["origin"]) for j in waiting)
+            demand_time = {int(j["origin"]): j["demand_observed_at"] for j in waiting}
+            known_ports = {int(j["origin"]) for j in jobs.values()}
+        contracts = {int(n["node"]): n for n in observation["node_contracts"]}
+        needs_future_travel = predictive and any(t["mode"] in ("loading", "loaded", "storage", "empty_transit")
+                                                 for t in observation.get("trays", []))
+        travel = PublicTravel(observation, _reuse_source_searches=_reuse_observation_work) if needs_future_travel else None
+        all_forecasts = release_forecasts(observation, include_future=predictive, travel=travel)
+        active = [t for t in observation.get("transfers", [])
+                  if t["status"] in ("pending", "granted", "in_transit", "requested", "delivered",
+                                      "undelivered", "dispatching", "departed")]
+        pledged = {t["tray_id"] for t in active}
+        incoming = Counter(int(t["destination"]) for t in active)
+        # A completed delivery newer than the latest destination queue snapshot
+        # already covers that old request. Do not ship another tray merely because
+        # the receiver's clearing message is still in flight.
+        for transfer in observation.get("transfers", []):
+            dest = int(transfer["destination"])
+            if transfer["status"] == "received" and transfer.get("received_at", -1) &gt;= demand_time.get(dest, math.inf):
+                incoming[dest] += 1
+        grouped: dict[int, list[ReleaseForecast]] = defaultdict(list)
+        for forecast in all_forecasts:
+            source_owner = contracts[forecast.node].get("resource_owner", contracts[forecast.node]["zone"])
+            if source_owner != observation.get("owner_id"):
+                continue  # A future remote release is not this controller's export authority.
+            if forecast.tray_id not in pledged and (predictive or forecast.ledger == "actual_available"):
+                grouped[forecast.node].append(forecast)
+        supplies: list[ReleaseForecast] = []
+        covered = incoming.copy()
+        for node, rows in grouped.items():
+            rows.sort(key=lambda f: (f.estimate, f.tray_id))
+            demand_reserve = max(0, local_demand[node] - incoming[node])
+            covered[node] += min(demand_reserve, len(rows))
+            retained = demand_reserve + int(contracts[node].get("export_min_stock", 0))
+            if contracts[node].get("allow_export", True):
+                supplies.extend(rows[retained:])
+        demand: list[dict[str, Any]] = []
+        exact_demand_count = sum(max(0, count-covered[node]) for node, count in local_demand.items()
+                                 if contracts[node].get("allow_receive", True))
+        if compact:
+            projection = observation["control_projection"]
+&gt;           if len(supplies) &gt; int(projection["candidate_limit"]):
+                                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E           KeyError: 'candidate_limit'
+
+scripts\experiments\g31_ics_circulation\analytic_control.py:548: KeyError</failure></testcase><testcase classname="outputs.experiments.g31_ics_terminal_flow_20261021.test_projection_horizon_probe_005" name="test_nonzero_claim_excluded_before_any_replay" time="0.001" /><testcase classname="outputs.experiments.g31_ics_terminal_flow_20261021.test_projection_horizon_probe_005" name="test_unknown_or_invalid_claim_not_assumed_zero[None]" time="0.001" /><testcase classname="outputs.experiments.g31_ics_terminal_flow_20261021.test_projection_horizon_probe_005" name="test_unknown_or_invalid_claim_not_assumed_zero[claim1]" time="0.001" /><testcase classname="outputs.experiments.g31_ics_terminal_flow_20261021.test_projection_horizon_probe_005" name="test_unknown_or_invalid_claim_not_assumed_zero[claim2]" time="0.001" /><testcase classname="outputs.experiments.g31_ics_terminal_flow_20261021.test_projection_horizon_probe_005" name="test_unknown_or_invalid_claim_not_assumed_zero[claim3]" time="0.001" /><testcase classname="outputs.experiments.g31_ics_terminal_flow_20261021.test_projection_horizon_probe_005" name="test_wrapper_accepts_only_single_diagnostic_task" time="0.010" /></testsuite></testsuites>

@@ -45,7 +45,8 @@ def run_airport_bounded_protocol_control(session: Any, owners: list[str], *, hor
                          stock_return_selector=None, stock_return_selector_identity: str | None = None,
                          post_decision_observer=None, pre_stock_return_observer=None,
                          actual_only_activate_at: float | None = None,
-                         recover_failed_empty: bool = False, _consume_state: bool = False) -> dict:
+                         recover_failed_empty: bool = False, _consume_state: bool = False,
+                         defer_intermediate_result: bool = False) -> dict:
     """Advance common public ticks, including retries and both real control layers.
 
     Each call preserves the next unexecuted tick. Native + JSON client/controller
@@ -56,10 +57,18 @@ def run_airport_bounded_protocol_control(session: Any, owners: list[str], *, hor
     an exception poisons the consumed state against partial-tick reuse. No
     histories are pruned. Evaluators must use their separate ``client_state``
     argument for the live client, regardless of ownership mode.
+
+    ``defer_intermediate_result=True`` omits only a successful intermediate
+    offline result export. The caller must leave it false at the final horizon.
+    Native draining, control state and complete-timestamp checks are unchanged;
+    a soft stop still exports its actual completed timestamp. Deferred calls
+    carry the last bounded advance receipt instead of materializing history.
     """
     call_started = time.perf_counter()
     if type(_consume_state) is not bool:
         raise ValueError("airport_bounded_protocol:invalid_consume_state")
+    if type(defer_intermediate_result) is not bool:
+        raise ValueError("airport_bounded_protocol:invalid_defer_intermediate_result")
     if soft_deadline is not None and not math.isfinite(soft_deadline):
         raise ValueError("airport_bounded_protocol:invalid_soft_deadline")
     if tick_start_observer is not None and not callable(tick_start_observer):
@@ -133,12 +142,15 @@ def run_airport_bounded_protocol_control(session: Any, owners: list[str], *, hor
             _consume_state=_consume_state)
         records, native_batches = [], []
         trace_sequence = 0
+        last_advance = None
 
         def advance(target):
-            nonlocal trace_sequence
+            nonlocal trace_sequence, last_advance
             start_at = session.physical_time
             started = time.perf_counter(); cpu = time.process_time()
             response = session.advance_to(target, max_events=event_budget)
+            if defer_intermediate_result:
+                last_advance = dict(response)
             native_batches.append({"target": target, "status": response["status"],
                                    "start_at": start_at, "end_at": session.physical_time, "trace_sequence": trace_sequence,
                                    "wall_ms": 1000*(time.perf_counter()-started),
@@ -241,7 +253,24 @@ def run_airport_bounded_protocol_control(session: Any, owners: list[str], *, hor
                 for _ in range(len(initial["intents"])):
                     if not decision["intents"]:
                         break
-                    request_id, reply = client.submit(owner, "transfer", decision["intents"][0])
+                    callback = getattr(stock_return_selector, "on_priority_submission", None)
+                    if callback is None:
+                        request_id, reply = client.submit(owner, "transfer", decision["intents"][0])
+                    else:
+                        joint = current.setdefault("joint_post_priority", {"selector_identity":
+                            stock_return_selector_identity, "policy_state": {}, "phase": "priority"})
+                        if joint["selector_identity"] != stock_return_selector_identity:
+                            raise ValueError("protocol_control:stock_return_selector_state_identity_mismatch")
+                        payload = decision["intents"][0]
+                        request_id = client.next_id(owner, "transfer")
+                        try:
+                            request_id, reply = client.submit(owner, "transfer", payload, request_id=request_id)
+                        except BaseException as error:
+                            callback(policy_state=joint["policy_state"], payload=payload,
+                                request_id=request_id, reply=None, exception_type=type(error).__name__)
+                            raise
+                        callback(policy_state=joint["policy_state"], payload=payload,
+                            request_id=request_id, reply=reply, exception_type=None)
                     attempts.append({"request_id": request_id, "reply": reply})
                     if reply.get("status") != "pending":
                         priority_error = True
@@ -286,8 +315,13 @@ def run_airport_bounded_protocol_control(session: Any, owners: list[str], *, hor
         # result_at itself advances and uses a separate native budget. It must
         # never silently execute the rest of a budget-truncated timestamp.
         snapshot_horizon = session.physical_time if soft_stopped else horizon
-        result = session.result_at(snapshot_horizon) if complete else None
-        complete = complete and result.get("advance", {}).get("status") == "reached" and result.get("advance", {}).get("horizon_complete", False)
+        # Keep the final real drain above even when exporting is deferred: a
+        # submit after an earlier same-timestamp drain can schedule new work.
+        # Only its reached + horizon_complete receipt certifies this boundary.
+        should_export = complete and (not defer_intermediate_result or soft_stopped)
+        result = session.result_at(snapshot_horizon) if should_export else None
+        if should_export:
+            complete = complete and result.get("advance", {}).get("status") == "reached" and result.get("advance", {}).get("horizon_complete", False)
         current["control_boundary_complete"] = complete
         status = "soft_deadline_reached" if soft_stopped and complete else "reached" if complete else "budget_exhausted"
         continuation = {"status": status, "timestamp_complete": complete,
@@ -301,6 +335,10 @@ def run_airport_bounded_protocol_control(session: Any, owners: list[str], *, hor
                 "wall_seconds": time.perf_counter()-call_started,
                 "complete_100ms_requirement_certified": False,
                 "scope": "actual R1/R2 analytic baseline on public native protocol; no new-method or deployment claim"}
+        if defer_intermediate_result:
+            output["boundary_advance"] = last_advance
+            output["result_export"] = ("exported_soft_stop" if result is not None else
+                                       "deferred_complete_boundary" if complete else "not_exported_incomplete")
         if inventory_snapshots:
             output["inventory_snapshot_reads"] = client.inventory_snapshot_reads
         if tick_start_observer is not None:

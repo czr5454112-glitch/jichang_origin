@@ -1,0 +1,1890 @@
+{
+  "schema": "g31.terminal_flow.claim_capture_riskcase.v1",
+  "native_started": false,
+  "native003_occurrence_claimed": false,
+  "scope": "pure_reachable_legal_observation_riskcase",
+  "cross_owner_missing_sender_ledger": {
+    "observation": {
+      "schema": "g31.owner_protocol_observation.v1",
+      "owner_id": "A",
+      "now": 60.0,
+      "node_records": [
+        [
+          0,
+          10,
+          0.001,
+          0,
+          0,
+          [
+            1,
+            2
+          ]
+        ],
+        [
+          1,
+          10,
+          0.001,
+          0,
+          0,
+          [
+            0,
+            2
+          ]
+        ],
+        [
+          2,
+          10,
+          0.001,
+          0,
+          0,
+          [
+            0,
+            1
+          ]
+        ]
+      ],
+      "edge_records": [
+        [
+          0,
+          1,
+          2.0,
+          1.0
+        ],
+        [
+          0,
+          2,
+          3.0,
+          1.0
+        ],
+        [
+          1,
+          0,
+          1.0,
+          1.0
+        ],
+        [
+          1,
+          2,
+          3.0,
+          1.0
+        ],
+        [
+          2,
+          0,
+          1.0,
+          1.0
+        ],
+        [
+          2,
+          1,
+          2.0,
+          1.0
+        ]
+      ],
+      "edge_contracts": [
+        {
+          "from": 0,
+          "to": 1,
+          "capacity": 10
+        },
+        {
+          "from": 0,
+          "to": 2,
+          "capacity": 10
+        },
+        {
+          "from": 1,
+          "to": 0,
+          "capacity": 10
+        },
+        {
+          "from": 1,
+          "to": 2,
+          "capacity": 10
+        },
+        {
+          "from": 2,
+          "to": 0,
+          "capacity": 10
+        },
+        {
+          "from": 2,
+          "to": 1,
+          "capacity": 10
+        }
+      ],
+      "node_contracts": [
+        {
+          "node": 0,
+          "zone": "A",
+          "resource_owner": "A",
+          "capacity": 10,
+          "export_min_stock": 0,
+          "allow_export": true,
+          "allow_receive": true,
+          "actual_available": 2,
+          "occupancy": 2
+        },
+        {
+          "node": 1,
+          "zone": "B",
+          "resource_owner": "B",
+          "capacity": 10,
+          "export_min_stock": 0,
+          "allow_export": true,
+          "allow_receive": true
+        },
+        {
+          "node": 2,
+          "zone": "C",
+          "resource_owner": "C",
+          "capacity": 10,
+          "export_min_stock": 0,
+          "allow_export": true,
+          "allow_receive": true
+        }
+      ],
+      "trays": [
+        {
+          "tray_id": "E0",
+          "node": 0,
+          "mode": "empty",
+          "edge_from": -1,
+          "edge_to": -1,
+          "reception_node": -1,
+          "generation": 0,
+          "traversal_id": 0,
+          "available_at": 0.0,
+          "business_bag_id": ""
+        },
+        {
+          "tray_id": "E1",
+          "node": 0,
+          "mode": "empty",
+          "edge_from": -1,
+          "edge_to": -1,
+          "reception_node": -1,
+          "generation": 0,
+          "traversal_id": 0,
+          "available_at": 0.0,
+          "business_bag_id": ""
+        }
+      ],
+      "jobs": [],
+      "delivered_messages": [],
+      "known_faults": [],
+      "client_transfer_ledger": [],
+      "transfers": [],
+      "planning_snapshots": [
+        {
+          "schema": "g31.planning_snapshot.v1",
+          "kind": "planning_snapshot",
+          "digest_format": "g31.planning_capture_digest.v1",
+          "capture": {
+            "schema": "g31.planning_capture.v1",
+            "message_id": "B-capture",
+            "source_owner": "B",
+            "target_owner": "A",
+            "publication_sequence": 1,
+            "captured_at": 2.0,
+            "valid_until": 122.0,
+            "static_contract_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "semantics": {
+              "queue_discipline": "fifo",
+              "resource_semantics": "physical",
+              "event_semantics": "native",
+              "scorer_mode": "S4_queue_aware_rule_only",
+              "merge_grant_rule": "M3",
+              "merge_grant_timing_mode": "jit_fair_aging_deadline",
+              "minimum_service_seconds": 0.001
+            },
+            "jobs": [],
+            "trays": [
+              {
+                "tray_id": "B0",
+                "node": 1,
+                "mode": "empty",
+                "edge_from": -1,
+                "edge_to": -1,
+                "reception_node": -1,
+                "generation": 0,
+                "traversal_id": 0,
+                "available_at": 0.0,
+                "business_bag_id": "",
+                "ready_kind": "empty",
+                "service_ready_at": 0.0,
+                "service_ready_known": true,
+                "load_complete_at": -1.0,
+                "committed_prefix": []
+              }
+            ],
+            "nodes": [
+              {
+                "node": 1,
+                "actual_available": 1,
+                "occupancy": 1,
+                "unrepresented_occupancy": 0
+              }
+            ],
+            "known_faults": [],
+            "coverage": {
+              "scope": "source_waiting_or_locally_carried_released_jobs_and_local_trays",
+              "complete_for_declared_local_scope": true,
+              "future_arrivals_included": false,
+              "local_node_ids": [
+                1
+              ],
+              "tray_ids": [
+                "B0"
+              ],
+              "business_bag_ids": [],
+              "unrepresented_occupancy": 0
+            }
+          },
+          "payload_sha256": "c052857a39880065e0b146f95d18a83d53919924138c81e82d4fbbde92332dba",
+          "delivered_at": 4.0,
+          "status": "conditional"
+        },
+        {
+          "schema": "g31.planning_snapshot.v1",
+          "kind": "planning_snapshot",
+          "digest_format": "g31.planning_capture_digest.v1",
+          "capture": {
+            "schema": "g31.planning_capture.v1",
+            "message_id": "C-capture",
+            "source_owner": "C",
+            "target_owner": "A",
+            "publication_sequence": 1,
+            "captured_at": 2.0,
+            "valid_until": 122.0,
+            "static_contract_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "semantics": {
+              "queue_discipline": "fifo",
+              "resource_semantics": "physical",
+              "event_semantics": "native",
+              "scorer_mode": "S4_queue_aware_rule_only",
+              "merge_grant_rule": "M3",
+              "merge_grant_timing_mode": "jit_fair_aging_deadline",
+              "minimum_service_seconds": 0.001
+            },
+            "jobs": [],
+            "trays": [],
+            "nodes": [
+              {
+                "node": 2,
+                "actual_available": 0,
+                "occupancy": 0,
+                "unrepresented_occupancy": 0
+              }
+            ],
+            "known_faults": [],
+            "coverage": {
+              "scope": "source_waiting_or_locally_carried_released_jobs_and_local_trays",
+              "complete_for_declared_local_scope": true,
+              "future_arrivals_included": false,
+              "local_node_ids": [
+                2
+              ],
+              "tray_ids": [],
+              "business_bag_ids": [],
+              "unrepresented_occupancy": 0
+            }
+          },
+          "payload_sha256": "3a55609cd8ea7782b5b7314c28beb6e76825eeac18d1305f7be99327ba058ebb",
+          "delivered_at": 4.0,
+          "status": "conditional"
+        }
+      ],
+      "static_role_contract": {
+        "schema": "g31.static_node_roles.v1",
+        "loader_nodes": [
+          0,
+          1,
+          2
+        ]
+      },
+      "observation_scope": "controller_policy",
+      "version": 7
+    },
+    "policy_state": {
+      "empty_transport_orders": {
+        "schema": "g31.terminal_flow.orders.v1",
+        "orders": {
+          "B-received": {
+            "status": "RECEIVED",
+            "request_id": "B-transfer",
+            "physical_tray_id": "B0",
+            "destination_terminal": 2,
+            "source_terminal": 1,
+            "owner_scope": "B",
+            "proposed_at": 10.0,
+            "received_at": 30.0
+          }
+        },
+        "counts": {},
+        "coordination": "upper_public_coordinator_owner_confirmed_native_execution"
+      }
+    },
+    "accepted_remote_views": {
+      "1": {
+        "node": 1,
+        "known": true,
+        "reported_actual_empty": 1,
+        "as_of": 2.0,
+        "source_owner": "B",
+        "source": "delivered_planning_snapshot",
+        "reason": null,
+        "occupancy": 1,
+        "captured_at": 2.0,
+        "delivered_at": 4.0,
+        "valid_until": 122.0,
+        "message_id": "B-capture",
+        "revision": 1,
+        "payload_sha256": "c052857a39880065e0b146f95d18a83d53919924138c81e82d4fbbde92332dba",
+        "static_contract_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      },
+      "2": {
+        "node": 2,
+        "known": true,
+        "reported_actual_empty": 0,
+        "as_of": 2.0,
+        "source_owner": "C",
+        "source": "delivered_planning_snapshot",
+        "reason": null,
+        "occupancy": 0,
+        "captured_at": 2.0,
+        "delivered_at": 4.0,
+        "valid_until": 122.0,
+        "message_id": "C-capture",
+        "revision": 1,
+        "payload_sha256": "3a55609cd8ea7782b5b7314c28beb6e76825eeac18d1305f7be99327ba058ebb",
+        "static_contract_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+      }
+    },
+    "before_claims": {},
+    "after_claims": {
+      "2": 1
+    },
+    "before_allocation": {
+      "claims": {},
+      "chosen": [
+        {
+          "owner_id": "A",
+          "public_state_digest": "bcaf841a5d773c1f59ae96e6973c714012311048f8aa218539c89e36d6fc4360",
+          "priority_baseline_digest": "27f2d1c5e1424fb60864b014b00636124d2c2d7a453e7590245fb6ed002b99b8",
+          "immutable_prefix_digest": "b8c473290b0ea25f8693b2062c5178d8b3a8e2de0d5fffee429af1fc299a86e8",
+          "catalog_version": "actual_multisource_loader_reserve_target_relaxed_v1",
+          "observed_at": 60.0,
+          "current_view_version": 7,
+          "action_id": "a_transfer:976de758697ad4002ed9e8ea48c458d85f687bae7117d5531f54f1a78ac37d10",
+          "action_type": "transfer",
+          "kind": "transfer",
+          "tray_id": "E0",
+          "source": 0,
+          "destination": 2,
+          "intent": {
+            "tray_id": "E0",
+            "source": 0,
+            "destination": 2,
+            "owner_id": "A",
+            "issued_at": 60.0,
+            "message_delay": 2.0,
+            "earliest_departure": 62.0,
+            "expiry": 125.002,
+            "forecast_dependency": "E0:empty",
+            "forecast_ledger": "actual_available",
+            "transfer_scope": "cross_zone_transfer",
+            "control_reason": "joint_optional_reposition"
+          },
+          "source_generation_or_dependency": "E0:empty",
+          "earliest_departure": 62.0,
+          "static_arrival_estimate": 65.002,
+          "nominal_arrival_time": 65.002,
+          "static_travel_time": 3.002,
+          "eta_model_kind": "public_static_capacity_relaxed_estimate",
+          "transfer_scope": "cross_zone_transfer",
+          "hard_eligibility_reasons": [
+            "actual_uncommitted",
+            "fifo_and_minimum_reserved",
+            "priority_exhausted",
+            "public_scope_and_path"
+          ],
+          "source_category": "loader_optional",
+          "source_fifo_reserved": 0,
+          "source_actual_unpledged": 2,
+          "destination_inventory_known": true,
+          "destination_actual_empty": 0,
+          "bridge_eligible": true,
+          "suggested_submit_at": 60.0,
+          "suggested_departure_at": 62.0,
+          "suggested_arrival_at": 65.002,
+          "marginal_source_cost": 0.0,
+          "marginal_receiver_benefit": 569.9666661111019,
+          "transport_cost": 0.060039999999999996,
+          "proxy_marginal_gain": 569.9066261111019
+        }
+      ]
+    },
+    "after_allocation": {
+      "claims": {
+        "2": 1
+      },
+      "chosen": []
+    }
+  },
+  "own_sender_ledger": {
+    "observation": {
+      "schema": "g31.owner_protocol_observation.v1",
+      "owner_id": "A",
+      "now": 60.0,
+      "node_records": [
+        [
+          0,
+          10,
+          0.001,
+          0,
+          0,
+          [
+            1,
+            2
+          ]
+        ],
+        [
+          1,
+          10,
+          0.001,
+          0,
+          0,
+          [
+            0,
+            2
+          ]
+        ],
+        [
+          2,
+          10,
+          0.001,
+          0,
+          0,
+          [
+            0,
+            1
+          ]
+        ]
+      ],
+      "edge_records": [
+        [
+          0,
+          1,
+          2.0,
+          1.0
+        ],
+        [
+          0,
+          2,
+          3.0,
+          1.0
+        ],
+        [
+          1,
+          0,
+          1.0,
+          1.0
+        ],
+        [
+          1,
+          2,
+          3.0,
+          1.0
+        ],
+        [
+          2,
+          0,
+          1.0,
+          1.0
+        ],
+        [
+          2,
+          1,
+          2.0,
+          1.0
+        ]
+      ],
+      "edge_contracts": [
+        {
+          "from": 0,
+          "to": 1,
+          "capacity": 10
+        },
+        {
+          "from": 0,
+          "to": 2,
+          "capacity": 10
+        },
+        {
+          "from": 1,
+          "to": 0,
+          "capacity": 10
+        },
+        {
+          "from": 1,
+          "to": 2,
+          "capacity": 10
+        },
+        {
+          "from": 2,
+          "to": 0,
+          "capacity": 10
+        },
+        {
+          "from": 2,
+          "to": 1,
+          "capacity": 10
+        }
+      ],
+      "node_contracts": [
+        {
+          "node": 0,
+          "zone": "A",
+          "resource_owner": "A",
+          "capacity": 10,
+          "export_min_stock": 0,
+          "allow_export": true,
+          "allow_receive": true,
+          "actual_available": 2,
+          "occupancy": 2
+        },
+        {
+          "node": 1,
+          "zone": "A",
+          "resource_owner": "A",
+          "capacity": 10,
+          "export_min_stock": 0,
+          "allow_export": true,
+          "allow_receive": true,
+          "actual_available": 0,
+          "occupancy": 0
+        },
+        {
+          "node": 2,
+          "zone": "B",
+          "resource_owner": "B",
+          "capacity": 10,
+          "export_min_stock": 0,
+          "allow_export": true,
+          "allow_receive": true
+        }
+      ],
+      "trays": [
+        {
+          "tray_id": "E0",
+          "node": 0,
+          "mode": "empty",
+          "edge_from": -1,
+          "edge_to": -1,
+          "reception_node": -1,
+          "generation": 0,
+          "traversal_id": 0,
+          "available_at": 0.0,
+          "business_bag_id": ""
+        },
+        {
+          "tray_id": "E1",
+          "node": 0,
+          "mode": "empty",
+          "edge_from": -1,
+          "edge_to": -1,
+          "reception_node": -1,
+          "generation": 0,
+          "traversal_id": 0,
+          "available_at": 0.0,
+          "business_bag_id": ""
+        }
+      ],
+      "jobs": [],
+      "delivered_messages": [],
+      "known_faults": [],
+      "client_transfer_ledger": [
+        {
+          "request_id": "r1",
+          "tray_id": "B0",
+          "source": 0,
+          "destination": 2,
+          "issued_at": 10.0,
+          "earliest_departure": 2.0,
+          "status": "received",
+          "received_at": 30.0,
+          "status_scope": "own_payload_and_last_delivered_ack_only"
+        }
+      ],
+      "transfers": [
+        {
+          "request_id": "r1",
+          "tray_id": "B0",
+          "source": 0,
+          "destination": 2,
+          "issued_at": 10.0,
+          "earliest_departure": 2.0,
+          "status": "received",
+          "received_at": 30.0,
+          "status_scope": "own_payload_and_last_delivered_ack_only"
+        }
+      ],
+      "planning_snapshots": [
+        {
+          "schema": "g31.planning_snapshot.v1",
+          "kind": "planning_snapshot",
+          "digest_format": "g31.planning_capture_digest.v1",
+          "capture": {
+            "schema": "g31.planning_capture.v1",
+            "message_id": "m1",
+            "source_owner": "B",
+            "target_owner": "A",
+            "publication_sequence": 1,
+            "captured_at": 2.0,
+            "valid_until": 122.0,
+            "static_contract_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+            "semantics": {
+              "queue_discipline": "fifo",
+              "resource_semantics": "physical",
+              "event_semantics": "native",
+              "scorer_mode": "S4_queue_aware_rule_only",
+              "merge_grant_rule": "M3",
+              "merge_grant_timing_mode": "jit_fair_aging_deadline",
+              "minimum_service_seconds": 0.001
+            },
+            "jobs": [],
+            "trays": [
+              {
+                "tray_id": "B0",
+                "node": 2,
+                "mode": "empty",
+                "edge_from": -1,
+                "edge_to": -1,
+                "reception_node": -1,
+                "generation": 0,
+                "traversal_id": 0,
+                "available_at": 0.0,
+                "business_bag_id": "",
+                "ready_kind": "empty",
+                "service_ready_at": 0.0,
+                "service_ready_known": true,
+                "load_complete_at": -1.0,
+                "committed_prefix": []
+              }
+            ],
+            "nodes": [
+              {
+                "node": 2,
+                "actual_available": 1,
+                "occupancy": 1,
+                "unrepresented_occupancy": 0
+              }
+            ],
+            "known_faults": [],
+            "coverage": {
+              "scope": "source_waiting_or_locally_carried_released_jobs_and_local_trays",
+              "complete_for_declared_local_scope": true,
+              "future_arrivals_included": false,
+              "local_node_ids": [
+                2
+              ],
+              "tray_ids": [
+                "B0"
+              ],
+              "business_bag_ids": [],
+              "unrepresented_occupancy": 0
+            }
+          },
+          "payload_sha256": "5d8f297bda22600bca14763f887bcdfda95e6b9113b44ac4002a684f98043fb7",
+          "delivered_at": 4.0,
+          "status": "conditional"
+        }
+      ],
+      "static_role_contract": {
+        "schema": "g31.static_node_roles.v1",
+        "loader_nodes": [
+          0,
+          1,
+          2
+        ]
+      },
+      "observation_scope": "controller_policy",
+      "version": 7
+    },
+    "policy_state": {
+      "empty_transport_orders": {
+        "schema": "g31.terminal_flow.orders.v1",
+        "orders": {
+          "own": {
+            "status": "RECEIVED",
+            "request_id": "r1",
+            "physical_tray_id": "B0",
+            "destination_terminal": 2,
+            "source_terminal": 0,
+            "owner_scope": "A",
+            "proposed_at": 10.0,
+            "received_at": 30.0
+          }
+        },
+        "counts": {},
+        "coordination": "upper_public_coordinator_owner_confirmed_native_execution"
+      }
+    },
+    "before": {
+      "actual_by_tray": {
+        "E0": 0,
+        "E1": 0,
+        "B0": 2
+      },
+      "destination_stock": 1.0,
+      "destination_inventory_known": true,
+      "tray_supply": [
+        {
+          "physical_tray_id": "B0",
+          "availability_kind": "actual_current",
+          "location": 2,
+          "source_observation_version": 1,
+          "commitment_id_or_dependency": null,
+          "event_time_estimate": 60.0,
+          "certainty_class": "observed_at_capture",
+          "included_in_current_capture": true,
+          "captured_at": 2.0,
+          "source_kind": "delivered_capture"
+        }
+      ],
+      "deduplication": [
+        {
+          "tray_id": "B0",
+          "request_id": "r1",
+          "reason": "commitment_already_covered_by_capture"
+        }
+      ],
+      "claims": {}
+    },
+    "after": {
+      "actual_by_tray": {
+        "E0": 0,
+        "E1": 0
+      },
+      "destination_stock": 0.0,
+      "destination_inventory_known": true,
+      "tray_supply": [
+        {
+          "physical_tray_id": "B0",
+          "availability_kind": "accepted_inbound",
+          "location": 2,
+          "source_observation_version": 7,
+          "commitment_id_or_dependency": "r1",
+          "event_time_estimate": 60.0,
+          "certainty_class": "delivered_ack_full_remaining_trip_estimate",
+          "included_in_current_capture": false
+        }
+      ],
+      "deduplication": [
+        {
+          "tray_id": "B0",
+          "captured_at": 2.0,
+          "request_ids": [
+            "r1"
+          ],
+          "reason": "actual_capture_superseded_by_newer_transfer_evidence"
+        }
+      ],
+      "claims": {}
+    }
+  },
+  "retained_request_history": {
+    "pending": {
+      "observation": {
+        "schema": "g31.owner_protocol_observation.v1",
+        "owner_id": "A",
+        "now": 60.0,
+        "node_records": [
+          [
+            0,
+            10,
+            0.001,
+            0,
+            0,
+            [
+              1,
+              2
+            ]
+          ],
+          [
+            1,
+            10,
+            0.001,
+            0,
+            0,
+            [
+              0,
+              2
+            ]
+          ],
+          [
+            2,
+            10,
+            0.001,
+            0,
+            0,
+            [
+              0,
+              1
+            ]
+          ]
+        ],
+        "edge_records": [
+          [
+            0,
+            1,
+            2.0,
+            1.0
+          ],
+          [
+            0,
+            2,
+            3.0,
+            1.0
+          ],
+          [
+            1,
+            0,
+            1.0,
+            1.0
+          ],
+          [
+            1,
+            2,
+            3.0,
+            1.0
+          ],
+          [
+            2,
+            0,
+            1.0,
+            1.0
+          ],
+          [
+            2,
+            1,
+            2.0,
+            1.0
+          ]
+        ],
+        "edge_contracts": [
+          {
+            "from": 0,
+            "to": 1,
+            "capacity": 10
+          },
+          {
+            "from": 0,
+            "to": 2,
+            "capacity": 10
+          },
+          {
+            "from": 1,
+            "to": 0,
+            "capacity": 10
+          },
+          {
+            "from": 1,
+            "to": 2,
+            "capacity": 10
+          },
+          {
+            "from": 2,
+            "to": 0,
+            "capacity": 10
+          },
+          {
+            "from": 2,
+            "to": 1,
+            "capacity": 10
+          }
+        ],
+        "node_contracts": [
+          {
+            "node": 0,
+            "zone": "A",
+            "resource_owner": "A",
+            "capacity": 10,
+            "export_min_stock": 0,
+            "allow_export": true,
+            "allow_receive": true,
+            "actual_available": 2,
+            "occupancy": 2
+          },
+          {
+            "node": 1,
+            "zone": "A",
+            "resource_owner": "A",
+            "capacity": 10,
+            "export_min_stock": 0,
+            "allow_export": true,
+            "allow_receive": true,
+            "actual_available": 0,
+            "occupancy": 0
+          },
+          {
+            "node": 2,
+            "zone": "B",
+            "resource_owner": "B",
+            "capacity": 10,
+            "export_min_stock": 0,
+            "allow_export": true,
+            "allow_receive": true
+          }
+        ],
+        "trays": [
+          {
+            "tray_id": "E0",
+            "node": 0,
+            "mode": "empty",
+            "edge_from": -1,
+            "edge_to": -1,
+            "reception_node": -1,
+            "generation": 0,
+            "traversal_id": 0,
+            "available_at": 0.0,
+            "business_bag_id": ""
+          },
+          {
+            "tray_id": "E1",
+            "node": 0,
+            "mode": "empty",
+            "edge_from": -1,
+            "edge_to": -1,
+            "reception_node": -1,
+            "generation": 0,
+            "traversal_id": 0,
+            "available_at": 0.0,
+            "business_bag_id": ""
+          }
+        ],
+        "jobs": [],
+        "delivered_messages": [],
+        "known_faults": [],
+        "client_transfer_ledger": [
+          {
+            "request_id": "r1",
+            "tray_id": "B0",
+            "source": 0,
+            "destination": 2,
+            "issued_at": 10.0,
+            "earliest_departure": 2.0,
+            "status": "received",
+            "received_at": 20.0,
+            "status_scope": "own_payload_and_last_delivered_ack_only"
+          },
+          {
+            "request_id": "r2",
+            "tray_id": "B0",
+            "source": 0,
+            "destination": 2,
+            "issued_at": 40.0,
+            "earliest_departure": 42.0,
+            "status": "pending",
+            "received_at": -1.0,
+            "status_scope": "own_payload_and_last_delivered_ack_only"
+          }
+        ],
+        "transfers": [
+          {
+            "request_id": "r1",
+            "tray_id": "B0",
+            "source": 0,
+            "destination": 2,
+            "issued_at": 10.0,
+            "earliest_departure": 2.0,
+            "status": "received",
+            "received_at": 20.0,
+            "status_scope": "own_payload_and_last_delivered_ack_only"
+          },
+          {
+            "request_id": "r2",
+            "tray_id": "B0",
+            "source": 0,
+            "destination": 2,
+            "issued_at": 40.0,
+            "earliest_departure": 42.0,
+            "status": "pending",
+            "received_at": -1.0,
+            "status_scope": "own_payload_and_last_delivered_ack_only"
+          }
+        ],
+        "planning_snapshots": [
+          {
+            "schema": "g31.planning_snapshot.v1",
+            "kind": "planning_snapshot",
+            "digest_format": "g31.planning_capture_digest.v1",
+            "capture": {
+              "schema": "g31.planning_capture.v1",
+              "message_id": "m1",
+              "source_owner": "B",
+              "target_owner": "A",
+              "publication_sequence": 1,
+              "captured_at": 2.0,
+              "valid_until": 122.0,
+              "static_contract_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "semantics": {
+                "queue_discipline": "fifo",
+                "resource_semantics": "physical",
+                "event_semantics": "native",
+                "scorer_mode": "S4_queue_aware_rule_only",
+                "merge_grant_rule": "M3",
+                "merge_grant_timing_mode": "jit_fair_aging_deadline",
+                "minimum_service_seconds": 0.001
+              },
+              "jobs": [],
+              "trays": [
+                {
+                  "tray_id": "B0",
+                  "node": 2,
+                  "mode": "empty",
+                  "edge_from": -1,
+                  "edge_to": -1,
+                  "reception_node": -1,
+                  "generation": 0,
+                  "traversal_id": 0,
+                  "available_at": 0.0,
+                  "business_bag_id": "",
+                  "ready_kind": "empty",
+                  "service_ready_at": 0.0,
+                  "service_ready_known": true,
+                  "load_complete_at": -1.0,
+                  "committed_prefix": []
+                }
+              ],
+              "nodes": [
+                {
+                  "node": 2,
+                  "actual_available": 1,
+                  "occupancy": 1,
+                  "unrepresented_occupancy": 0
+                }
+              ],
+              "known_faults": [],
+              "coverage": {
+                "scope": "source_waiting_or_locally_carried_released_jobs_and_local_trays",
+                "complete_for_declared_local_scope": true,
+                "future_arrivals_included": false,
+                "local_node_ids": [
+                  2
+                ],
+                "tray_ids": [
+                  "B0"
+                ],
+                "business_bag_ids": [],
+                "unrepresented_occupancy": 0
+              }
+            },
+            "payload_sha256": "5d8f297bda22600bca14763f887bcdfda95e6b9113b44ac4002a684f98043fb7",
+            "delivered_at": 4.0,
+            "status": "conditional"
+          }
+        ],
+        "static_role_contract": {
+          "schema": "g31.static_node_roles.v1",
+          "loader_nodes": [
+            0,
+            1,
+            2
+          ]
+        },
+        "observation_scope": "controller_policy",
+        "version": 7
+      },
+      "before": {
+        "actual_by_tray": {
+          "E0": 0,
+          "E1": 0
+        },
+        "destination_stock": 0.0,
+        "destination_inventory_known": true,
+        "tray_supply": [
+          {
+            "physical_tray_id": "B0",
+            "availability_kind": "accepted_inbound",
+            "location": 2,
+            "source_observation_version": 7,
+            "commitment_id_or_dependency": "r1",
+            "event_time_estimate": 60.0,
+            "certainty_class": "delivered_ack_full_remaining_trip_estimate",
+            "included_in_current_capture": false
+          }
+        ],
+        "deduplication": [],
+        "claims": {
+          "2": 1
+        }
+      },
+      "after": {
+        "actual_by_tray": {
+          "E0": 0,
+          "E1": 0
+        },
+        "destination_stock": 0.0,
+        "destination_inventory_known": true,
+        "tray_supply": [
+          {
+            "physical_tray_id": "B0",
+            "availability_kind": "accepted_inbound",
+            "location": 2,
+            "source_observation_version": 7,
+            "commitment_id_or_dependency": "r1",
+            "event_time_estimate": 60.0,
+            "certainty_class": "delivered_ack_full_remaining_trip_estimate",
+            "included_in_current_capture": false
+          }
+        ],
+        "deduplication": [
+          {
+            "tray_id": "B0",
+            "captured_at": 2.0,
+            "request_ids": [
+              "r1"
+            ],
+            "reason": "actual_capture_superseded_by_newer_transfer_evidence"
+          }
+        ],
+        "claims": {
+          "2": 1
+        }
+      }
+    },
+    "accepted": {
+      "observation": {
+        "schema": "g31.owner_protocol_observation.v1",
+        "owner_id": "A",
+        "now": 60.0,
+        "node_records": [
+          [
+            0,
+            10,
+            0.001,
+            0,
+            0,
+            [
+              1,
+              2
+            ]
+          ],
+          [
+            1,
+            10,
+            0.001,
+            0,
+            0,
+            [
+              0,
+              2
+            ]
+          ],
+          [
+            2,
+            10,
+            0.001,
+            0,
+            0,
+            [
+              0,
+              1
+            ]
+          ]
+        ],
+        "edge_records": [
+          [
+            0,
+            1,
+            2.0,
+            1.0
+          ],
+          [
+            0,
+            2,
+            3.0,
+            1.0
+          ],
+          [
+            1,
+            0,
+            1.0,
+            1.0
+          ],
+          [
+            1,
+            2,
+            3.0,
+            1.0
+          ],
+          [
+            2,
+            0,
+            1.0,
+            1.0
+          ],
+          [
+            2,
+            1,
+            2.0,
+            1.0
+          ]
+        ],
+        "edge_contracts": [
+          {
+            "from": 0,
+            "to": 1,
+            "capacity": 10
+          },
+          {
+            "from": 0,
+            "to": 2,
+            "capacity": 10
+          },
+          {
+            "from": 1,
+            "to": 0,
+            "capacity": 10
+          },
+          {
+            "from": 1,
+            "to": 2,
+            "capacity": 10
+          },
+          {
+            "from": 2,
+            "to": 0,
+            "capacity": 10
+          },
+          {
+            "from": 2,
+            "to": 1,
+            "capacity": 10
+          }
+        ],
+        "node_contracts": [
+          {
+            "node": 0,
+            "zone": "A",
+            "resource_owner": "A",
+            "capacity": 10,
+            "export_min_stock": 0,
+            "allow_export": true,
+            "allow_receive": true,
+            "actual_available": 2,
+            "occupancy": 2
+          },
+          {
+            "node": 1,
+            "zone": "A",
+            "resource_owner": "A",
+            "capacity": 10,
+            "export_min_stock": 0,
+            "allow_export": true,
+            "allow_receive": true,
+            "actual_available": 0,
+            "occupancy": 0
+          },
+          {
+            "node": 2,
+            "zone": "B",
+            "resource_owner": "B",
+            "capacity": 10,
+            "export_min_stock": 0,
+            "allow_export": true,
+            "allow_receive": true
+          }
+        ],
+        "trays": [
+          {
+            "tray_id": "E0",
+            "node": 0,
+            "mode": "empty",
+            "edge_from": -1,
+            "edge_to": -1,
+            "reception_node": -1,
+            "generation": 0,
+            "traversal_id": 0,
+            "available_at": 0.0,
+            "business_bag_id": ""
+          },
+          {
+            "tray_id": "E1",
+            "node": 0,
+            "mode": "empty",
+            "edge_from": -1,
+            "edge_to": -1,
+            "reception_node": -1,
+            "generation": 0,
+            "traversal_id": 0,
+            "available_at": 0.0,
+            "business_bag_id": ""
+          }
+        ],
+        "jobs": [],
+        "delivered_messages": [],
+        "known_faults": [],
+        "client_transfer_ledger": [
+          {
+            "request_id": "r1",
+            "tray_id": "B0",
+            "source": 0,
+            "destination": 2,
+            "issued_at": 10.0,
+            "earliest_departure": 2.0,
+            "status": "received",
+            "received_at": 20.0,
+            "status_scope": "own_payload_and_last_delivered_ack_only"
+          },
+          {
+            "request_id": "r2",
+            "tray_id": "B0",
+            "source": 0,
+            "destination": 2,
+            "issued_at": 40.0,
+            "earliest_departure": 42.0,
+            "status": "accepted",
+            "received_at": -1.0,
+            "status_scope": "own_payload_and_last_delivered_ack_only"
+          }
+        ],
+        "transfers": [
+          {
+            "request_id": "r1",
+            "tray_id": "B0",
+            "source": 0,
+            "destination": 2,
+            "issued_at": 10.0,
+            "earliest_departure": 2.0,
+            "status": "received",
+            "received_at": 20.0,
+            "status_scope": "own_payload_and_last_delivered_ack_only"
+          },
+          {
+            "request_id": "r2",
+            "tray_id": "B0",
+            "source": 0,
+            "destination": 2,
+            "issued_at": 40.0,
+            "earliest_departure": 42.0,
+            "status": "accepted",
+            "received_at": -1.0,
+            "status_scope": "own_payload_and_last_delivered_ack_only"
+          }
+        ],
+        "planning_snapshots": [
+          {
+            "schema": "g31.planning_snapshot.v1",
+            "kind": "planning_snapshot",
+            "digest_format": "g31.planning_capture_digest.v1",
+            "capture": {
+              "schema": "g31.planning_capture.v1",
+              "message_id": "m1",
+              "source_owner": "B",
+              "target_owner": "A",
+              "publication_sequence": 1,
+              "captured_at": 2.0,
+              "valid_until": 122.0,
+              "static_contract_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "semantics": {
+                "queue_discipline": "fifo",
+                "resource_semantics": "physical",
+                "event_semantics": "native",
+                "scorer_mode": "S4_queue_aware_rule_only",
+                "merge_grant_rule": "M3",
+                "merge_grant_timing_mode": "jit_fair_aging_deadline",
+                "minimum_service_seconds": 0.001
+              },
+              "jobs": [],
+              "trays": [
+                {
+                  "tray_id": "B0",
+                  "node": 2,
+                  "mode": "empty",
+                  "edge_from": -1,
+                  "edge_to": -1,
+                  "reception_node": -1,
+                  "generation": 0,
+                  "traversal_id": 0,
+                  "available_at": 0.0,
+                  "business_bag_id": "",
+                  "ready_kind": "empty",
+                  "service_ready_at": 0.0,
+                  "service_ready_known": true,
+                  "load_complete_at": -1.0,
+                  "committed_prefix": []
+                }
+              ],
+              "nodes": [
+                {
+                  "node": 2,
+                  "actual_available": 1,
+                  "occupancy": 1,
+                  "unrepresented_occupancy": 0
+                }
+              ],
+              "known_faults": [],
+              "coverage": {
+                "scope": "source_waiting_or_locally_carried_released_jobs_and_local_trays",
+                "complete_for_declared_local_scope": true,
+                "future_arrivals_included": false,
+                "local_node_ids": [
+                  2
+                ],
+                "tray_ids": [
+                  "B0"
+                ],
+                "business_bag_ids": [],
+                "unrepresented_occupancy": 0
+              }
+            },
+            "payload_sha256": "5d8f297bda22600bca14763f887bcdfda95e6b9113b44ac4002a684f98043fb7",
+            "delivered_at": 4.0,
+            "status": "conditional"
+          }
+        ],
+        "static_role_contract": {
+          "schema": "g31.static_node_roles.v1",
+          "loader_nodes": [
+            0,
+            1,
+            2
+          ]
+        },
+        "observation_scope": "controller_policy",
+        "version": 7
+      },
+      "before": {
+        "error_type": "ValueError",
+        "error": "airport_inventory_projection:one_live_accepted_commitment_per_tray"
+      },
+      "after": {
+        "actual_by_tray": {
+          "E0": 0,
+          "E1": 0
+        },
+        "destination_stock": 0.0,
+        "destination_inventory_known": true,
+        "tray_supply": [
+          {
+            "physical_tray_id": "B0",
+            "availability_kind": "accepted_inbound",
+            "location": 2,
+            "source_observation_version": 7,
+            "commitment_id_or_dependency": "r2",
+            "event_time_estimate": 63.002,
+            "certainty_class": "delivered_ack_full_remaining_trip_estimate",
+            "included_in_current_capture": false
+          }
+        ],
+        "deduplication": [
+          {
+            "tray_id": "B0",
+            "captured_at": 2.0,
+            "request_ids": [
+              "r1"
+            ],
+            "reason": "actual_capture_superseded_by_newer_transfer_evidence"
+          },
+          {
+            "tray_id": "B0",
+            "request_id": "r1",
+            "superseding_request_id": "r2",
+            "reason": "historical_receipt_superseded_by_newer_commitment"
+          }
+        ],
+        "claims": {}
+      }
+    },
+    "received": {
+      "observation": {
+        "schema": "g31.owner_protocol_observation.v1",
+        "owner_id": "A",
+        "now": 60.0,
+        "node_records": [
+          [
+            0,
+            10,
+            0.001,
+            0,
+            0,
+            [
+              1,
+              2
+            ]
+          ],
+          [
+            1,
+            10,
+            0.001,
+            0,
+            0,
+            [
+              0,
+              2
+            ]
+          ],
+          [
+            2,
+            10,
+            0.001,
+            0,
+            0,
+            [
+              0,
+              1
+            ]
+          ]
+        ],
+        "edge_records": [
+          [
+            0,
+            1,
+            2.0,
+            1.0
+          ],
+          [
+            0,
+            2,
+            3.0,
+            1.0
+          ],
+          [
+            1,
+            0,
+            1.0,
+            1.0
+          ],
+          [
+            1,
+            2,
+            3.0,
+            1.0
+          ],
+          [
+            2,
+            0,
+            1.0,
+            1.0
+          ],
+          [
+            2,
+            1,
+            2.0,
+            1.0
+          ]
+        ],
+        "edge_contracts": [
+          {
+            "from": 0,
+            "to": 1,
+            "capacity": 10
+          },
+          {
+            "from": 0,
+            "to": 2,
+            "capacity": 10
+          },
+          {
+            "from": 1,
+            "to": 0,
+            "capacity": 10
+          },
+          {
+            "from": 1,
+            "to": 2,
+            "capacity": 10
+          },
+          {
+            "from": 2,
+            "to": 0,
+            "capacity": 10
+          },
+          {
+            "from": 2,
+            "to": 1,
+            "capacity": 10
+          }
+        ],
+        "node_contracts": [
+          {
+            "node": 0,
+            "zone": "A",
+            "resource_owner": "A",
+            "capacity": 10,
+            "export_min_stock": 0,
+            "allow_export": true,
+            "allow_receive": true,
+            "actual_available": 2,
+            "occupancy": 2
+          },
+          {
+            "node": 1,
+            "zone": "A",
+            "resource_owner": "A",
+            "capacity": 10,
+            "export_min_stock": 0,
+            "allow_export": true,
+            "allow_receive": true,
+            "actual_available": 0,
+            "occupancy": 0
+          },
+          {
+            "node": 2,
+            "zone": "B",
+            "resource_owner": "B",
+            "capacity": 10,
+            "export_min_stock": 0,
+            "allow_export": true,
+            "allow_receive": true
+          }
+        ],
+        "trays": [
+          {
+            "tray_id": "E0",
+            "node": 0,
+            "mode": "empty",
+            "edge_from": -1,
+            "edge_to": -1,
+            "reception_node": -1,
+            "generation": 0,
+            "traversal_id": 0,
+            "available_at": 0.0,
+            "business_bag_id": ""
+          },
+          {
+            "tray_id": "E1",
+            "node": 0,
+            "mode": "empty",
+            "edge_from": -1,
+            "edge_to": -1,
+            "reception_node": -1,
+            "generation": 0,
+            "traversal_id": 0,
+            "available_at": 0.0,
+            "business_bag_id": ""
+          }
+        ],
+        "jobs": [],
+        "delivered_messages": [],
+        "known_faults": [],
+        "client_transfer_ledger": [
+          {
+            "request_id": "r1",
+            "tray_id": "B0",
+            "source": 0,
+            "destination": 2,
+            "issued_at": 10.0,
+            "earliest_departure": 2.0,
+            "status": "received",
+            "received_at": 20.0,
+            "status_scope": "own_payload_and_last_delivered_ack_only"
+          },
+          {
+            "request_id": "r2",
+            "tray_id": "B0",
+            "source": 0,
+            "destination": 2,
+            "issued_at": 40.0,
+            "earliest_departure": 42.0,
+            "status": "received",
+            "received_at": 50.0,
+            "status_scope": "own_payload_and_last_delivered_ack_only"
+          }
+        ],
+        "transfers": [
+          {
+            "request_id": "r1",
+            "tray_id": "B0",
+            "source": 0,
+            "destination": 2,
+            "issued_at": 10.0,
+            "earliest_departure": 2.0,
+            "status": "received",
+            "received_at": 20.0,
+            "status_scope": "own_payload_and_last_delivered_ack_only"
+          },
+          {
+            "request_id": "r2",
+            "tray_id": "B0",
+            "source": 0,
+            "destination": 2,
+            "issued_at": 40.0,
+            "earliest_departure": 42.0,
+            "status": "received",
+            "received_at": 50.0,
+            "status_scope": "own_payload_and_last_delivered_ack_only"
+          }
+        ],
+        "planning_snapshots": [
+          {
+            "schema": "g31.planning_snapshot.v1",
+            "kind": "planning_snapshot",
+            "digest_format": "g31.planning_capture_digest.v1",
+            "capture": {
+              "schema": "g31.planning_capture.v1",
+              "message_id": "m1",
+              "source_owner": "B",
+              "target_owner": "A",
+              "publication_sequence": 1,
+              "captured_at": 2.0,
+              "valid_until": 122.0,
+              "static_contract_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+              "semantics": {
+                "queue_discipline": "fifo",
+                "resource_semantics": "physical",
+                "event_semantics": "native",
+                "scorer_mode": "S4_queue_aware_rule_only",
+                "merge_grant_rule": "M3",
+                "merge_grant_timing_mode": "jit_fair_aging_deadline",
+                "minimum_service_seconds": 0.001
+              },
+              "jobs": [],
+              "trays": [
+                {
+                  "tray_id": "B0",
+                  "node": 2,
+                  "mode": "empty",
+                  "edge_from": -1,
+                  "edge_to": -1,
+                  "reception_node": -1,
+                  "generation": 0,
+                  "traversal_id": 0,
+                  "available_at": 0.0,
+                  "business_bag_id": "",
+                  "ready_kind": "empty",
+                  "service_ready_at": 0.0,
+                  "service_ready_known": true,
+                  "load_complete_at": -1.0,
+                  "committed_prefix": []
+                }
+              ],
+              "nodes": [
+                {
+                  "node": 2,
+                  "actual_available": 1,
+                  "occupancy": 1,
+                  "unrepresented_occupancy": 0
+                }
+              ],
+              "known_faults": [],
+              "coverage": {
+                "scope": "source_waiting_or_locally_carried_released_jobs_and_local_trays",
+                "complete_for_declared_local_scope": true,
+                "future_arrivals_included": false,
+                "local_node_ids": [
+                  2
+                ],
+                "tray_ids": [
+                  "B0"
+                ],
+                "business_bag_ids": [],
+                "unrepresented_occupancy": 0
+              }
+            },
+            "payload_sha256": "5d8f297bda22600bca14763f887bcdfda95e6b9113b44ac4002a684f98043fb7",
+            "delivered_at": 4.0,
+            "status": "conditional"
+          }
+        ],
+        "static_role_contract": {
+          "schema": "g31.static_node_roles.v1",
+          "loader_nodes": [
+            0,
+            1,
+            2
+          ]
+        },
+        "observation_scope": "controller_policy",
+        "version": 7
+      },
+      "before": {
+        "actual_by_tray": {
+          "E0": 0,
+          "E1": 0,
+          "B0": 2
+        },
+        "destination_stock": 1.0,
+        "destination_inventory_known": true,
+        "tray_supply": [
+          {
+            "physical_tray_id": "B0",
+            "availability_kind": "actual_current",
+            "location": 2,
+            "source_observation_version": 1,
+            "commitment_id_or_dependency": null,
+            "event_time_estimate": 60.0,
+            "certainty_class": "observed_at_capture",
+            "included_in_current_capture": true,
+            "captured_at": 2.0,
+            "source_kind": "delivered_capture"
+          }
+        ],
+        "deduplication": [
+          {
+            "tray_id": "B0",
+            "request_id": "r1",
+            "reason": "commitment_already_covered_by_capture"
+          },
+          {
+            "tray_id": "B0",
+            "request_id": "r2",
+            "reason": "commitment_already_covered_by_capture"
+          }
+        ],
+        "claims": {}
+      },
+      "after": {
+        "actual_by_tray": {
+          "E0": 0,
+          "E1": 0
+        },
+        "destination_stock": 0.0,
+        "destination_inventory_known": true,
+        "tray_supply": [
+          {
+            "physical_tray_id": "B0",
+            "availability_kind": "accepted_inbound",
+            "location": 2,
+            "source_observation_version": 7,
+            "commitment_id_or_dependency": "r2",
+            "event_time_estimate": 60.0,
+            "certainty_class": "delivered_ack_full_remaining_trip_estimate",
+            "included_in_current_capture": false
+          }
+        ],
+        "deduplication": [
+          {
+            "tray_id": "B0",
+            "captured_at": 2.0,
+            "request_ids": [
+              "r1",
+              "r2"
+            ],
+            "reason": "actual_capture_superseded_by_newer_transfer_evidence"
+          },
+          {
+            "tray_id": "B0",
+            "request_id": "r1",
+            "superseding_request_id": "r2",
+            "reason": "historical_receipt_superseded_by_newer_commitment"
+          }
+        ],
+        "claims": {}
+      }
+    }
+  },
+  "source_hashes": {
+    "foundation_airport_transport_orders.py": {
+      "before004": "a18753f2b8010bd66330bbbd5822e2b0bfc96aaee4cb684b9c9da5e55172bec9",
+      "working005": "5f266441e0efb6ed0e0b858a05025e7ea9ce2de5e6651cbdeeafcd689b01b919"
+    },
+    "foundation_airport_inventory_projection.py": {
+      "before004": "c8f3662bea4180851c7f9b74d66d9a1c3899aebaee274442aa4e04160cb4f991",
+      "working005": "54a149ac946a6ba4a319bb348088dc1f217c6920dbb1fa6ef5f74389421baf2e"
+    }
+  }
+}

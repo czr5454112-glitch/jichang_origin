@@ -1,0 +1,56 @@
+{
+  "schema": "g31.final_science.complete_timing_rows_change.v1",
+  "scope": "owner identity fail-closed guard only; no real-data execution",
+  "supersedes_change_binding": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_terminal_flow_20261021\\final_science_timing_rows_change_001.json",
+    "sha256": "365878fbd524cc5008c97db0e5449b336455f807d95fce7bb4b5434b7e1acdbd",
+    "bytes": 3719
+  },
+  "prior_exact_bytes": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_terminal_flow_20261021\\final_science_timing_rows_history_002\\history_manifest.json",
+    "sha256": "c68175b28547a52e3a5e6dfeda1af8e38f6e2c60f6d1083d3cf5d9117c64e841",
+    "bytes": 1016
+  },
+  "producers": [
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_terminal_flow_20261021\\final_science_audit_004.py",
+      "sha256": "fa3518b68ed3e0c6abea0293752ba58c922c53bc290bfe31ea1a1d9bf96ca6c2",
+      "bytes": 39094
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_terminal_flow_20261021\\test_final_science_audit.py",
+      "sha256": "e7b813d09b9b82d61f9f9fe810fbdb1a336e4e4d12ffdea195d6865fd3651aa2",
+      "bytes": 23824
+    }
+  ],
+  "pure_test_evidence": {
+    "binding": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_terminal_flow_20261021\\final_science_timing_rows_pure_003.xml",
+      "sha256": "138c6e777f27c081c8eb3ef3f8cdbed394ca89c7f8483636261b58811e045501",
+      "bytes": 5574
+    },
+    "tests": 28,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "seconds": 1.719
+  },
+  "guard": "An action owner_id field, if present, must exactly equal the bound decision owner. Missing fields may inherit that owner; explicit null or another owner fail closed.",
+  "pure_guards": [
+    "conflicting candidate owner cannot be overwritten",
+    "conflicting selected action owner cannot be overwritten",
+    "missing owner inherits bound decision",
+    "matching explicit owner succeeds",
+    "explicit null owner fails"
+  ],
+  "retained_opportunity_unknown_candidate_denominator": "Per timing.ranking_rows item, eligible_candidate_checks minus known_scored_candidates counts candidates excluded because common or exact projection was not known.",
+  "excluded_opportunity_denominators": "Original fewer_than_two_known_scored_od_candidates and fewer_than_two_eligible_od_candidates are decision counts. reconstructed_candidate_checks covers attempted candidates, including opportunities later excluded. Do not subtract retained-row known counts from global checks to invent a global unknown-candidate count.",
+  "existing_counts_examples_and_scoring_equations_preserved": true,
+  "new_global_unknown_candidate_count_claimed": false,
+  "native_starts": 0,
+  "real_DEV_records_read": false,
+  "frozen_sources_modified": false,
+  "registration_or_ledger_modified": false,
+  "pending_spec_and_dependent_producer_rebinding_required": true,
+  "independent_root_review_pending": true
+}

@@ -1,0 +1,194 @@
+{
+  "schema": "g31.terminal_demand_supported_calibration.v1",
+  "base_calibration": {
+    "schema": "g31.terminal_demand_poisson_calibration.v1",
+    "method": "supervised_regularized_Poisson_exposure_calibration",
+    "parameters": {
+      "airport_node_0": {
+        "expected": 175.29226871363164,
+        "actual": 191,
+        "windows": 12,
+        "scale": 1.08569772962388
+      },
+      "airport_node_134": {
+        "expected": 154.86825377777572,
+        "actual": 162,
+        "windows": 12,
+        "scale": 1.0437884367075927
+      },
+      "airport_node_136": {
+        "expected": 165.57440272169862,
+        "actual": 206,
+        "windows": 12,
+        "scale": 1.2329006849190658
+      },
+      "airport_node_138": {
+        "expected": 151.2293660749255,
+        "actual": 103,
+        "windows": 12,
+        "scale": 0.6971075922500932
+      },
+      "airport_node_149": {
+        "expected": 226.82611560461936,
+        "actual": 175,
+        "windows": 12,
+        "scale": 0.7793000345332975
+      },
+      "airport_node_24": {
+        "expected": 164.76873593076317,
+        "actual": 187,
+        "windows": 12,
+        "scale": 1.1286764295025344
+      },
+      "airport_node_26": {
+        "expected": 155.18813731557137,
+        "actual": 181,
+        "windows": 12,
+        "scale": 1.1581724205510964
+      },
+      "airport_node_49": {
+        "expected": 211.1471942183979,
+        "actual": 212,
+        "windows": 12,
+        "scale": 1.003891474790009
+      },
+      "airport_node_57": {
+        "expected": 215.25750917068675,
+        "actual": 207,
+        "windows": 12,
+        "scale": 0.9630135210172319
+      },
+      "airport_node_95": {
+        "expected": 428.28731793006745,
+        "actual": 469,
+        "windows": 12,
+        "scale": 1.0933162170816488
+      }
+    },
+    "prior_exposure": 8.0,
+    "scale_bounds": [
+      0.25,
+      4.0
+    ],
+    "train_parent_ids": [
+      "joint_reposition_group_plan_20261021:2101:r0",
+      "joint_reposition_group_plan_20261021:2102:r0"
+    ],
+    "train_parent_uids": [
+      "joint_reposition_group_plan_20261021:2101",
+      "joint_reposition_group_plan_20261021:2102"
+    ],
+    "training_labels_sha256": "c0b4811d2d9c6c162c4114117a2fde21a3b4b46b33ada51aa1c39d41e31314b3",
+    "training_row_count": 120,
+    "training_labels_closed_at_epoch_seconds": 1793566800.0,
+    "model_available_at_epoch_seconds": 1793566801.0,
+    "latest_label_available_at_epoch_seconds": 1793566800.0,
+    "base_model_sha256": "2058378b338e5c3d3e6cdb279405ada63cbb0b7d443484903b5a9d37df9f3934",
+    "mapping_sha256": "b1bfa1200d96986c974eb30cb13220a5ab77c2fcdbe3af5344f72313b0f053a7",
+    "bin_edges_seconds": [
+      0.0,
+      300.0,
+      600.0,
+      900.0,
+      1200.0,
+      1500.0,
+      1800.0
+    ],
+    "source_evidence_ids": [
+      "1b2a86288ea85c5908f6aee45ec0c5cca58b8d3a7cfeee0d758ba8b9980f5d61",
+      "99911c234a2d47d9004a670608e06e0e9d3e5139c73e62e69aaeb970d4f0b7f5"
+    ],
+    "dev_or_test_labels_used": false,
+    "native_execution_authority": false,
+    "output_semantics": "expected_new_arrivals_only",
+    "is_RL": false,
+    "label_semantics": "actual_arrival_counts_not_transport_commands",
+    "calibration_status": "TRAIN_fitted_candidate_requires_held_out_same_window_validation",
+    "uncertainty_status": "unknown_dependent_B1_bins_mapping_and_fitted_scale",
+    "shared_template_synthetic_parents_are_independent_real_days": false,
+    "sha256": "558ae07c50a6eebd2f488a999d06d853cb3bf386b4125806af19c31d9634e90d"
+  },
+  "support_by_station": {
+    "airport_node_0": [
+      [
+        7200.0,
+        18000.0
+      ]
+    ],
+    "airport_node_134": [
+      [
+        7200.0,
+        18000.0
+      ]
+    ],
+    "airport_node_136": [
+      [
+        7200.0,
+        18000.0
+      ]
+    ],
+    "airport_node_138": [
+      [
+        7200.0,
+        18000.0
+      ]
+    ],
+    "airport_node_149": [
+      [
+        7200.0,
+        18000.0
+      ]
+    ],
+    "airport_node_24": [
+      [
+        7200.0,
+        18000.0
+      ]
+    ],
+    "airport_node_26": [
+      [
+        7200.0,
+        18000.0
+      ]
+    ],
+    "airport_node_49": [
+      [
+        7200.0,
+        18000.0
+      ]
+    ],
+    "airport_node_57": [
+      [
+        7200.0,
+        18000.0
+      ]
+    ],
+    "airport_node_95": [
+      [
+        7200.0,
+        18000.0
+      ]
+    ]
+  },
+  "train_parent_calendars": [
+    {
+      "parent_group": "joint_reposition_group_plan_20261021:2101:r0",
+      "split": "train",
+      "calendar_start_epoch_seconds": 1793462400.0
+    },
+    {
+      "parent_group": "joint_reposition_group_plan_20261021:2102:r0",
+      "split": "train",
+      "calendar_start_epoch_seconds": 1793548800.0
+    }
+  ],
+  "support_derivation": "intersection_of_actual_mature_nonoverlapping_TRAIN_windows_per_station",
+  "outside_support": "unchanged_frozen_B1",
+  "boundary_bin": "overlap_duration_weighted_mean_under_published_uniform_bin_semantics",
+  "native_execution_authority": false,
+  "is_RL": false,
+  "dev_labels_used_to_fit_or_choose_support": false,
+  "development_status": "candidate_after_DEV_diagnosis_requires_new_independent_validation",
+  "uncertainty_status": "unavailable_dependent_B1_bins_mapping_and_fitted_scale",
+  "sha256": "e06af9778d72153d9372580152bec505cacc36eceb64bfac4ca3b95c775c3074"
+}

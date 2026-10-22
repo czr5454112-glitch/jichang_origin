@@ -37,6 +37,7 @@ def _readonly_array(values):
 def _regional(template_bytes, params, contexts, edges, windows, absolute_now, horizon):
     result = json.loads(template_bytes)
     result.update(forecast_origin=float(absolute_now),
+        bin_edges_seconds=edges.tolist(),
         absolute_bin_edges=(absolute_now + edges).tolist(),
         remaining_support_until=absolute_now + horizon)
     for region, shape, rate, cdf_edges, cdf_values in params:
@@ -67,7 +68,8 @@ def _regional(template_bytes, params, contexts, edges, windows, absolute_now, ho
     return result
 
 
-def prepare_forecast_provider(binding, receipts, *, horizon_seconds=1800, loader_mapping=None):
+def prepare_forecast_provider(binding, receipts, *, horizon_seconds=1800, loader_mapping=None,
+                              bin_edges_seconds=None):
     """Return forecast_at(*, observation, parent), using only supplied actual receipts.
 
     Calling this never records a receipt or creates/advances a native session.
@@ -82,8 +84,10 @@ def prepare_forecast_provider(binding, receipts, *, horizon_seconds=1800, loader
         loader_mapping_bytes = _json_bytes(loader_mapping)
     else:
         loader_mapping_bytes = None
-    require(type(horizon_seconds) is int and 0 < horizon_seconds <= 1800
-            and horizon_seconds % 60 == 0, "bounded_forecast_grid")
+    require(type(horizon_seconds) is int and 0 < horizon_seconds <= 1800, "bounded_forecast_grid")
+    from .foundation_airport_terminal_forecast import bin_edges, validate_edges
+    grid = (bin_edges("60", horizon_seconds=horizon_seconds) if bin_edges_seconds is None
+            else validate_edges(bin_edges_seconds, horizon_seconds=horizon_seconds))
     require(type(receipts) is dict and receipts, "actual_owner_receipts_required")
     require(all(type(owner) is str and owner for owner in receipts), "receipt_owner_keys")
     start = manifest["target_parent"]["calendar_start_epoch_seconds"]
@@ -101,7 +105,7 @@ def prepare_forecast_provider(binding, receipts, *, horizon_seconds=1800, loader
         parameter_rows.append((region, param["shape"], param["rate"],
             _readonly_array(param["cdf_edges"]), _readonly_array(param["cdf_values"])))
     parameters = tuple(parameter_rows)
-    edges = _readonly_array(np.arange(0, horizon_seconds + 60, 60, dtype=float))
+    edges = _readonly_array(grid)
     # The original predictor uses integer WINDOWS and identical float addition.
     windows = np.frombuffer(np.asarray(original.WINDOWS).tobytes(), dtype=np.asarray(original.WINDOWS).dtype)
     owners = {}
@@ -117,14 +121,16 @@ def prepare_forecast_provider(binding, receipts, *, horizon_seconds=1800, loader
         require(context is not None and all(e.scheduled_event_type == "STD" for e in context.entries),
                 "live_STD_context_required")
         _, _, template = original._base(checkpoint, now=start, owner=owner, regions=None,
-            bin_seconds=60, horizon_seconds=horizon_seconds, context=context)
+            bin_seconds=60 if horizon_seconds % 60 == 0 else 1,
+            horizon_seconds=horizon_seconds, context=context)
+        template["bin_edges_seconds"] = edges.tolist()
         template.update(status="forecast", method="flight_gamma_poisson",
             context_availability_basis=context.availability_basis, plan_group_count=len(context.entries))
         owners[owner] = (_json_bytes(receipt), context, _json_bytes(template), calendar.digest(plan), received)
     owners = MappingProxyType(owners)
     # No caller-owned mutable structure is retained in the closure.
 
-    def forecast_at(*, observation, parent):
+    def forecast_at(*, observation, parent, bin_edges_seconds=None):
         now, owner, _, _, _ = public.validate_public(observation)
         require(math.isfinite(now) and 0 <= now <= 86400., "physical_day_clock")
         require(_json_bytes(calendar._target_parent(parent)) == parent_bytes, "current_parent_binding")
@@ -137,7 +143,9 @@ def prepare_forecast_provider(binding, receipts, *, horizon_seconds=1800, loader
         require(context.validity_policy.valid_until is None or absolute_now < context.validity_policy.valid_until,
                 "fixed_plan_expired_requires_new_provider")
         receipt = json.loads(receipt_bytes)
-        regional = _regional(template_bytes, parameters, context, edges, windows,
+        current_edges = (edges if bin_edges_seconds is None else _readonly_array(
+            validate_edges(bin_edges_seconds, horizon_seconds=horizon_seconds)))
+        regional = _regional(template_bytes, parameters, context, current_edges, windows,
                              absolute_now, horizon_seconds)
         if loader_mapping_bytes is None:
             projected = calendar.airport.project_forecast(regional, json.loads(mapping_bytes),

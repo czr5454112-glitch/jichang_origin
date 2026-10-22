@@ -1,0 +1,179 @@
+{
+  "schema": "g31.airport_joint_campaign.v1",
+  "task_id": "TF_full_train_005_TF-B1-300_P2101",
+  "process_status": "completed",
+  "scientific_status": "closed",
+  "native_constructor_attempts": 1,
+  "terminal_evidence": {
+    "chunks": 6746297,
+    "json_bytes": 35399345,
+    "max_chunk_bytes": 84,
+    "c_encoded_subtrees": 1602548,
+    "wall_seconds": 18.64370500005316,
+    "gzip_bytes": 3130199,
+    "split_depth": 3,
+    "temporary_text_bound": "one subtree at configured split_depth; measured; not a hard byte cap"
+  },
+  "terminal_evidence_scope": {
+    "complete_physical_history": true,
+    "retained_fields": [
+      "schema",
+      "physical_clock",
+      "advance",
+      "population",
+      "jobs",
+      "trays",
+      "transfers",
+      "leg_identities",
+      "receipts",
+      "events_processed",
+      "status"
+    ],
+    "full_native_export_retained": false
+  },
+  "physical_progress": {
+    "window": [
+      7200.0,
+      59400.0
+    ],
+    "edge_progress_timestamps": 79336,
+    "longest_no_edge_progress_seconds": 6982.513836000002,
+    "longest_no_edge_progress_interval": [
+      10804.402999999998,
+      17786.916836
+    ],
+    "last_edge_progress_at": 59399.202999999994,
+    "global_only_not_node_deadlock_proof": true
+  },
+  "offline_diagnostics": {
+    "chunks": 79443,
+    "json_bytes": 488282,
+    "max_chunk_bytes": 98,
+    "c_encoded_subtrees": 18060,
+    "wall_seconds": 0.21278989990241826,
+    "gzip_bytes": 61721,
+    "split_depth": 3,
+    "temporary_text_bound": "one subtree at configured split_depth; measured; not a hard byte cap"
+  },
+  "wait_graph": {
+    "chunks": 4697,
+    "json_bytes": 614318,
+    "max_chunk_bytes": 377,
+    "c_encoded_subtrees": 2076,
+    "wall_seconds": 0.02947199996560812,
+    "gzip_bytes": 34649,
+    "split_depth": 3,
+    "temporary_text_bound": "one subtree at configured split_depth; measured; not a hard byte cap"
+  },
+  "cost": {
+    "label_start": 7200.0,
+    "label_end": 59400.0,
+    "horizon_seconds": 52200.0,
+    "backlog_integral_bag_seconds": 486085324.265087,
+    "target_return": -486085324.265087,
+    "physical_population": 28506,
+    "arrived_by_end": 20927,
+    "not_yet_arrived_by_end": 7579,
+    "completed_by_end": 1258,
+    "arrived_unfinished_by_end": 19669,
+    "on_time_by_end": 94,
+    "arrived_unfinished_past_deadline": 17348,
+    "completion_times_unknown_for_arrived": 19669,
+    "completion_times_imputed": false,
+    "right_censored_for_integral_only": true,
+    "waiting_for_tray_integral_bag_seconds": 485315561.030252,
+    "loaded_or_processing_integral_bag_seconds": 769763.2348350286,
+    "wait_load_decomposition_status": "actual_LOAD_START_receipts",
+    "per_job_nonharm_certified": false,
+    "uncompleted_jobs_excluded": 0
+  },
+  "delivered_ack_evidence": {
+    "chunks": 17255,
+    "json_bytes": 2078480,
+    "max_chunk_bytes": 393,
+    "c_encoded_subtrees": 8587,
+    "wall_seconds": 0.10336870001628995,
+    "gzip_bytes": 119508,
+    "split_depth": 3,
+    "temporary_text_bound": "one subtree at configured split_depth; measured; not a hard byte cap"
+  },
+  "delivered_ack_evidence_scope": "complete transfer ACK history and transfer ledger; owner protocol subset",
+  "final_physical_time": 59400.0,
+  "decisions": 1742,
+  "funnel": {
+    "legal_decisions": 1742,
+    "multiple_source_nodes": 65,
+    "nonreference": 8,
+    "proposal_noop": 1737,
+    "post_priority_visits": 1742,
+    "post_reason:flow_has_no_valid_first_action": 1737,
+    "proposal_transfer": 5,
+    "post_reason:inventory_return_submitted": 5
+  },
+  "root": null,
+  "strict_nonharm_certified": false,
+  "policy_timing": {
+    "count": 1742,
+    "total_seconds": 706.8962533972226,
+    "p50_seconds": 0.41102609992958605,
+    "p95_seconds": 0.7784798999782652,
+    "maximum_seconds": 1.1317129000090063,
+    "scope": "selector scoring plus evidence stream writes; excludes catalogue, protocol, native and final export",
+    "complete_request_100ms_certified": false,
+    "stages": {
+      "B1_forecast": {
+        "count": 1742,
+        "total_seconds": 289.24913860077504,
+        "p50_seconds": 0.17506180005148053,
+        "p95_seconds": 0.2526704000774771,
+        "maximum_seconds": 0.3331074999878183
+      },
+      "candidate_features": {
+        "count": 1742,
+        "total_seconds": 1.650778296054341,
+        "p50_seconds": 0.0007037000032141805,
+        "p95_seconds": 0.0012699998915195465,
+        "maximum_seconds": 0.01159670006018132
+      },
+      "current_projection_and_reference": {
+        "count": 1742,
+        "total_seconds": 9.84495369810611,
+        "p50_seconds": 0.00383460009470582,
+        "p95_seconds": 0.014699099934659898,
+        "maximum_seconds": 0.2002423000521958
+      },
+      "decision_and_observation_stream_write": {
+        "count": 1742,
+        "total_seconds": 101.89200750156306,
+        "p50_seconds": 0.05926819995511323,
+        "p95_seconds": 0.12939180003013462,
+        "maximum_seconds": 0.17378249997273088
+      },
+      "forecast_inventory_projection": {
+        "count": 1742,
+        "total_seconds": 12.076028397423215,
+        "p50_seconds": 0.005380699993111193,
+        "p95_seconds": 0.016215399955399334,
+        "maximum_seconds": 0.11948029999621212
+      },
+      "forecast_representation_and_calibration": {
+        "count": 1742,
+        "total_seconds": 6.8625693002250046,
+        "p50_seconds": 0.003671600017696619,
+        "p95_seconds": 0.005117000080645084,
+        "maximum_seconds": 0.006966499960981309
+      },
+      "transport_allocation_verification_and_order": {
+        "count": 1742,
+        "total_seconds": 285.2045103999553,
+        "p50_seconds": 0.15349980001337826,
+        "p95_seconds": 0.37956409994512796,
+        "maximum_seconds": 0.7093332000076771
+      }
+    },
+    "stage_scope": "nonoverlapping measured callback sections; uninstrumented bookkeeping remains in callback total; catalogue, submission, native advance and final export are excluded"
+  },
+  "wall_seconds": 2080.359000000055,
+  "peak_memory_bytes": 14485458944,
+  "cpu_seconds": 2030.9375
+}

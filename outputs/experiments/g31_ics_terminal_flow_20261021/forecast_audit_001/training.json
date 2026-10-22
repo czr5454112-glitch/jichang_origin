@@ -1,0 +1,109 @@
+{
+  "schema": "g31.terminal_prediction_training_audit.v1",
+  "status": "passed",
+  "original_model": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_terminal_flow_20261021\\forecast_offline_001\\model.json",
+    "sha256": "3b3d6c3a7dd363530d520483585d6eefe63c3f7d2219f6b3386770de2c6ea0b0",
+    "bytes": 3334
+  },
+  "supported_model": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_terminal_flow_20261021\\forecast_support_001\\model.json",
+    "sha256": "2d1f739e4d84be8b5d4ed54ef67d6b48e88895e16246713604aa7a69587ba1ca",
+    "bytes": 5500
+  },
+  "source_reports": [
+    {
+      "parent_id": "joint_reposition_group_plan_20261021:2101:r0",
+      "native_arrival_recount_and_actual_forecast_reproduction": true,
+      "actual_callback_availability_checks": 362,
+      "latest_pipeline_available_at_epoch_seconds": 1790571660.0,
+      "mapping": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\training\\mapping_fit_001\\mapping.json",
+        "sha256": "83e36e1da7737d4f5dad2b02e5e82f0d592de4cca012ad486de03132db1ced44"
+      }
+    },
+    {
+      "parent_id": "joint_reposition_group_plan_20261021:2102:r0",
+      "native_arrival_recount_and_actual_forecast_reproduction": true,
+      "actual_callback_availability_checks": 362,
+      "latest_pipeline_available_at_epoch_seconds": 1790571660.0,
+      "mapping": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\training\\mapping_fit_001\\mapping.json",
+        "sha256": "83e36e1da7737d4f5dad2b02e5e82f0d592de4cca012ad486de03132db1ced44"
+      }
+    }
+  ],
+  "training_rows": 120,
+  "station_count": 10,
+  "support_by_station": {
+    "airport_node_0": [
+      [
+        7200.0,
+        18000.0
+      ]
+    ],
+    "airport_node_134": [
+      [
+        7200.0,
+        18000.0
+      ]
+    ],
+    "airport_node_136": [
+      [
+        7200.0,
+        18000.0
+      ]
+    ],
+    "airport_node_138": [
+      [
+        7200.0,
+        18000.0
+      ]
+    ],
+    "airport_node_149": [
+      [
+        7200.0,
+        18000.0
+      ]
+    ],
+    "airport_node_24": [
+      [
+        7200.0,
+        18000.0
+      ]
+    ],
+    "airport_node_26": [
+      [
+        7200.0,
+        18000.0
+      ]
+    ],
+    "airport_node_49": [
+      [
+        7200.0,
+        18000.0
+      ]
+    ],
+    "airport_node_57": [
+      [
+        7200.0,
+        18000.0
+      ]
+    ],
+    "airport_node_95": [
+      [
+        7200.0,
+        18000.0
+      ]
+    ]
+  },
+  "parameter_learning": "stationwise_Gamma_prior_regularized_Poisson_rate_from_actual_mature_arrival_counts",
+  "learned_scale_formula": "clip((sum_actual + prior_exposure)/(sum_expected + prior_exposure), 0.25, 4.0)",
+  "support_learning": "intersection_of_labelled_TRAIN_physical_windows; no_DEV_threshold_search",
+  "RL": "not_implemented_no_policy_state_transition_or_delayed_RL_reward_update",
+  "training_actions_or_service_rewards_used": false,
+  "runtime_reads_labels": false,
+  "TEST_opened": false,
+  "native_starts": 0,
+  "causal_limit": "Simulated calendar availability is not wall-clock artifact creation time."
+}

@@ -1,0 +1,80 @@
+{
+  "R1_enabled": false,
+  "batch": "initial",
+  "demand_model": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_terminal_flow_20261021\\forecast_full_train_001\\model.json",
+    "sha256": "c2d00b588272e0df52e672c607983df6b9b43ff7c761084eba4f044dc8f4834d"
+  },
+  "dependencies": [
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\terminal_flow\\bins_all_005\\block.json",
+      "sha256": "627a3f6b7036e752f556d46fc36bb0c6c934a1cc9e3096bb70c1c3360fea68b0"
+    }
+  ],
+  "fixed_allocator": {
+    "command_delay_seconds": 2.0,
+    "delay_cost_model": "linear_excess_over_reference",
+    "delay_penalty_weight": 0.01,
+    "dispatch_slot_seconds": 60.0,
+    "first_action_verification_mode": "exact_eta_positive_net_gain",
+    "marginal_approximation": "conservative_monotone_v1",
+    "marginal_reference_available_offset_seconds": 2.0,
+    "minimum_net_gain": 0.0,
+    "transport_penalty_weight": 0.01
+  },
+  "formal_test_locked": true,
+  "methods": [
+    "TF-predictor"
+  ],
+  "name": "predictor_all_005",
+  "no_claim_of_service_improvement": true,
+  "old_action_Q_stages": "not_dispatched; preserved_unchanged_historical_registration",
+  "parents": [
+    2201,
+    2202,
+    2203,
+    2204
+  ],
+  "phase": "predictor",
+  "prior_budget": {
+    "active_seconds": 52414.779088,
+    "by_batch": {
+      "bridge": 4,
+      "development": 24,
+      "formal": 0,
+      "gates": 8,
+      "initial": 6,
+      "recollect": 0,
+      "reserve": 8
+    },
+    "calendar_seconds": 76971.604338,
+    "evidence_bytes": 14491770343,
+    "free_bytes": 137571672064,
+    "native_starts": 50,
+    "open_runners": [],
+    "unfinished_native_tasks": []
+  },
+  "schema": "g31.terminal_flow.campaign.v1",
+  "source_bundle": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\sources\\terminal_flow_runtime_005\\source_manifest.json",
+    "sha256": "22201c59569d2c2a67460ebff7be249432e25fc6a3f42941d4d15ddac8113bef"
+  },
+  "task_plans": [
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\runs\\TF_predictor_all_005_TF-predictor_P2201\\plan.json",
+      "sha256": "d1159be64dd61f84166412da2633850d456ffa0cf7d18272a29b94ed26ea861c"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\runs\\TF_predictor_all_005_TF-predictor_P2202\\plan.json",
+      "sha256": "9de8a042b86e48198bbbd22d378cc51be7e82d95510df47f3524658758195cde"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\runs\\TF_predictor_all_005_TF-predictor_P2203\\plan.json",
+      "sha256": "8375230920607061e3ca38f87422517393a9c16741649e65b4e666d9e2165f0d"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_ics_joint_reposition_20261021\\cycle_001\\runs\\TF_predictor_all_005_TF-predictor_P2204\\plan.json",
+      "sha256": "298f0232d3d913cb776124c26f605e623fceda2c07988756b7278aaaac7392b9"
+    }
+  ]
+}

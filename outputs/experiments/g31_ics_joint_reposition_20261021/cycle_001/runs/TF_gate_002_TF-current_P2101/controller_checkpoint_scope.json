@@ -1,0 +1,839 @@
+{
+  "physical_time": 18000.0,
+  "native_state_sha256": "051adedc5ebc1b2a335cdc317ac84fed83d079e6a3776baa5db305de9eed5e62",
+  "controller_state_sha256": "be3e0b8129409bc90f1166c6061532b8bfd85e52f0b0e445108cb546e8a36d63",
+  "physical_restore_supported": false,
+  "resume_semantics": "completed tasks reused; any physical prefix replay consumes another native start",
+  "quota": {
+    "owner:system_domestic": {
+      "tick": 300,
+      "new_submissions": 0,
+      "priority_error": false,
+      "last_joint_decision_id": "392989b3d101b8473c77418bdfcd2813cb9f7c44bc7f41538f435a6ae5f249cd"
+    },
+    "owner:system_international": {
+      "tick": 300,
+      "new_submissions": 0,
+      "priority_error": false,
+      "last_joint_decision_id": "c24229721b4f76ea361b6e135b8c072dfd4238d47b0a06e92d95ff3fa6efa8d3"
+    }
+  },
+  "policy_state": {
+    "empty_transport_orders": {
+      "schema": "g31.terminal_flow.orders.v1",
+      "orders": {},
+      "counts": {},
+      "coordination": "upper_public_coordinator_owner_confirmed_native_execution"
+    },
+    "terminal_flow_plans": {
+      "owner:system_domestic": {
+        "signature": "b8ffd17ba9aeb29816ab511e297800baef2b5e664151ec14770de931385910bc",
+        "plan": {
+          "schema": "g31.terminal_flow.control.v1.plan",
+          "public_state_digest": "6c424113a6edd9c9c6f50df1f416a4967044223705cadaa9c766a6158dbab6cf",
+          "catalog_id": "679b96e202791f9b85c586ccb8cec5369f1fc0f1b411ad7aeec8949a7613d7ba",
+          "chosen": [],
+          "flows": [],
+          "hold_by_source": {},
+          "hold_quantity": 0,
+          "protected_unallocated_quantity": 0,
+          "ordinary_return_fallback_required": false,
+          "proxy_flow_objective_cost": 0.0,
+          "objective": {
+            "protected_cost": 0.0,
+            "optional_cost": 0.0,
+            "net_proxy_gain": -0.0,
+            "minimum_gain_penalty_included": 0.0
+          },
+          "dispatch_profile": [],
+          "config": {
+            "marginal_reference_available_offset_seconds": 2.0,
+            "delay_cost_model": "linear_excess_over_reference",
+            "delay_penalty_weight": 0.01,
+            "transport_penalty_weight": 0.01,
+            "dispatch_slot_seconds": 60.0,
+            "command_delay_seconds": 2.0,
+            "first_action_verification_mode": "exact_eta_positive_net_gain",
+            "minimum_net_gain": 0.0,
+            "marginal_approximation": "conservative_monotone_v1"
+          },
+          "marginal_gain_profile": [],
+          "shared_witness_edges": [],
+          "first_action_verification": {
+            "status": "required_in_controller",
+            "mode": "exact_eta_positive_net_gain"
+          },
+          "optimization_scope": "protected_maximum_feasible_return_then_optional_conservative_separable_mcf",
+          "slot_delay_in_flow_cost": false,
+          "later_slots_require_replanning": true,
+          "native_execution_authority": false,
+          "allocation_id": "8cb065b58ab3deba535225aa7464b5a8d91834d17a3ad23ee2ac1297575ef701",
+          "version": 1,
+          "owner_scope": "owner:system_domestic",
+          "information_asof": 18000.0,
+          "plan_valid_until": 18060.0,
+          "forecast_id": null,
+          "mapping_id": null,
+          "projection_version": "g31.foundation.airport_joint_inventory_projection.v1",
+          "projection_horizon_seconds": 600.0,
+          "supply_mode": "committed_only",
+          "receiver_claims_deducted": {},
+          "station_table": [
+            {
+              "node": 0,
+              "is_loader": true,
+              "is_actual_eligible_source": false,
+              "resource_owner": "owner:system_international",
+              "inventory_known": false,
+              "actual_empty": null,
+              "receiver": {
+                "node": 0,
+                "known": false,
+                "capacity": 4,
+                "current_occupancy": null,
+                "current_space": null,
+                "unrepresented_committed_or_pending": 1,
+                "available_slots": 0,
+                "observation_asof": null,
+                "coverage": "unknown",
+                "all_owner_incoming_complete": false,
+                "native_revalidation_required": true
+              }
+            },
+            {
+              "node": 24,
+              "is_loader": true,
+              "is_actual_eligible_source": false,
+              "resource_owner": "owner:system_international",
+              "inventory_known": false,
+              "actual_empty": null,
+              "receiver": {
+                "node": 24,
+                "known": false,
+                "capacity": 4,
+                "current_occupancy": null,
+                "current_space": null,
+                "unrepresented_committed_or_pending": 1,
+                "available_slots": 0,
+                "observation_asof": null,
+                "coverage": "unknown",
+                "all_owner_incoming_complete": false,
+                "native_revalidation_required": true
+              }
+            },
+            {
+              "node": 26,
+              "is_loader": true,
+              "is_actual_eligible_source": false,
+              "resource_owner": "owner:system_international",
+              "inventory_known": false,
+              "actual_empty": null,
+              "receiver": {
+                "node": 26,
+                "known": false,
+                "capacity": 4,
+                "current_occupancy": null,
+                "current_space": null,
+                "unrepresented_committed_or_pending": 1,
+                "available_slots": 0,
+                "observation_asof": null,
+                "coverage": "unknown",
+                "all_owner_incoming_complete": false,
+                "native_revalidation_required": true
+              }
+            },
+            {
+              "node": 49,
+              "is_loader": true,
+              "is_actual_eligible_source": false,
+              "resource_owner": "owner:system_international",
+              "inventory_known": false,
+              "actual_empty": null,
+              "receiver": {
+                "node": 49,
+                "known": false,
+                "capacity": 4,
+                "current_occupancy": null,
+                "current_space": null,
+                "unrepresented_committed_or_pending": 0,
+                "available_slots": 0,
+                "observation_asof": null,
+                "coverage": "unknown",
+                "all_owner_incoming_complete": false,
+                "native_revalidation_required": true
+              }
+            },
+            {
+              "node": 57,
+              "is_loader": true,
+              "is_actual_eligible_source": false,
+              "resource_owner": "owner:system_domestic",
+              "inventory_known": true,
+              "actual_empty": 0,
+              "receiver": {
+                "node": 57,
+                "known": true,
+                "capacity": 4,
+                "current_occupancy": 2,
+                "current_space": 2,
+                "unrepresented_committed_or_pending": 2,
+                "available_slots": 0,
+                "observation_asof": 18000.0,
+                "coverage": "current_local_sensor",
+                "all_owner_incoming_complete": false,
+                "native_revalidation_required": true
+              }
+            },
+            {
+              "node": 92,
+              "is_loader": true,
+              "is_actual_eligible_source": false,
+              "resource_owner": "owner:system_domestic",
+              "inventory_known": true,
+              "actual_empty": 0,
+              "receiver": {
+                "node": 92,
+                "known": true,
+                "capacity": 4,
+                "current_occupancy": 0,
+                "current_space": 4,
+                "unrepresented_committed_or_pending": 0,
+                "available_slots": 4,
+                "observation_asof": 18000.0,
+                "coverage": "current_local_sensor",
+                "all_owner_incoming_complete": false,
+                "native_revalidation_required": true
+              }
+            },
+            {
+              "node": 95,
+              "is_loader": true,
+              "is_actual_eligible_source": false,
+              "resource_owner": "owner:system_domestic",
+              "inventory_known": true,
+              "actual_empty": 0,
+              "receiver": {
+                "node": 95,
+                "known": true,
+                "capacity": 4,
+                "current_occupancy": 0,
+                "current_space": 4,
+                "unrepresented_committed_or_pending": 0,
+                "available_slots": 4,
+                "observation_asof": 18000.0,
+                "coverage": "current_local_sensor",
+                "all_owner_incoming_complete": false,
+                "native_revalidation_required": true
+              }
+            },
+            {
+              "node": 134,
+              "is_loader": true,
+              "is_actual_eligible_source": false,
+              "resource_owner": "owner:system_domestic",
+              "inventory_known": true,
+              "actual_empty": 0,
+              "receiver": {
+                "node": 134,
+                "known": true,
+                "capacity": 4,
+                "current_occupancy": 0,
+                "current_space": 4,
+                "unrepresented_committed_or_pending": 0,
+                "available_slots": 4,
+                "observation_asof": 18000.0,
+                "coverage": "current_local_sensor",
+                "all_owner_incoming_complete": false,
+                "native_revalidation_required": true
+              }
+            },
+            {
+              "node": 136,
+              "is_loader": true,
+              "is_actual_eligible_source": false,
+              "resource_owner": "owner:system_domestic",
+              "inventory_known": true,
+              "actual_empty": 0,
+              "receiver": {
+                "node": 136,
+                "known": true,
+                "capacity": 4,
+                "current_occupancy": 3,
+                "current_space": 1,
+                "unrepresented_committed_or_pending": 0,
+                "available_slots": 1,
+                "observation_asof": 18000.0,
+                "coverage": "current_local_sensor",
+                "all_owner_incoming_complete": false,
+                "native_revalidation_required": true
+              }
+            },
+            {
+              "node": 138,
+              "is_loader": true,
+              "is_actual_eligible_source": false,
+              "resource_owner": "owner:system_domestic",
+              "inventory_known": true,
+              "actual_empty": 0,
+              "receiver": {
+                "node": 138,
+                "known": true,
+                "capacity": 4,
+                "current_occupancy": 0,
+                "current_space": 4,
+                "unrepresented_committed_or_pending": 0,
+                "available_slots": 4,
+                "observation_asof": 18000.0,
+                "coverage": "current_local_sensor",
+                "all_owner_incoming_complete": false,
+                "native_revalidation_required": true
+              }
+            },
+            {
+              "node": 149,
+              "is_loader": true,
+              "is_actual_eligible_source": false,
+              "resource_owner": "owner:system_domestic",
+              "inventory_known": true,
+              "actual_empty": 0,
+              "receiver": {
+                "node": 149,
+                "known": true,
+                "capacity": 4,
+                "current_occupancy": 0,
+                "current_space": 4,
+                "unrepresented_committed_or_pending": 0,
+                "available_slots": 4,
+                "observation_asof": 18000.0,
+                "coverage": "current_local_sensor",
+                "all_owner_incoming_complete": false,
+                "native_revalidation_required": true
+              }
+            }
+          ],
+          "marginal_audit": [
+            {
+              "side": "receiver",
+              "node": 0,
+              "known": false,
+              "absolute_error_sum": 0.0,
+              "maximum_absolute_error": 0.0,
+              "monotonicity_violation": 0.0
+            },
+            {
+              "side": "receiver",
+              "node": 24,
+              "known": false,
+              "absolute_error_sum": 0.0,
+              "maximum_absolute_error": 0.0,
+              "monotonicity_violation": 0.0
+            },
+            {
+              "side": "receiver",
+              "node": 26,
+              "known": false,
+              "absolute_error_sum": 0.0,
+              "maximum_absolute_error": 0.0,
+              "monotonicity_violation": 0.0
+            },
+            {
+              "side": "receiver",
+              "node": 49,
+              "known": false,
+              "absolute_error_sum": 0.0,
+              "maximum_absolute_error": 0.0,
+              "monotonicity_violation": 0.0
+            },
+            {
+              "side": "receiver",
+              "node": 57,
+              "known": true,
+              "absolute_error_sum": 0.0,
+              "maximum_absolute_error": 0.0,
+              "monotonicity_violation": 0.0
+            },
+            {
+              "side": "receiver",
+              "node": 92,
+              "known": true,
+              "absolute_error_sum": 0.0,
+              "maximum_absolute_error": 0.0,
+              "monotonicity_violation": 0.0
+            },
+            {
+              "side": "receiver",
+              "node": 95,
+              "known": true,
+              "absolute_error_sum": 0.0,
+              "maximum_absolute_error": 0.0,
+              "monotonicity_violation": 0.0
+            },
+            {
+              "side": "receiver",
+              "node": 134,
+              "known": true,
+              "absolute_error_sum": 0.0,
+              "maximum_absolute_error": 0.0,
+              "monotonicity_violation": 0.0
+            },
+            {
+              "side": "receiver",
+              "node": 136,
+              "known": true,
+              "absolute_error_sum": 0.0,
+              "maximum_absolute_error": 0.0,
+              "monotonicity_violation": 0.0
+            },
+            {
+              "side": "receiver",
+              "node": 138,
+              "known": true,
+              "absolute_error_sum": 0.0,
+              "maximum_absolute_error": 0.0,
+              "monotonicity_violation": 0.0
+            },
+            {
+              "side": "receiver",
+              "node": 149,
+              "known": true,
+              "absolute_error_sum": 0.0,
+              "maximum_absolute_error": 0.0,
+              "monotonicity_violation": 0.0
+            }
+          ],
+          "configuration": {
+            "marginal_reference_available_offset_seconds": 2.0,
+            "delay_cost_model": "linear_excess_over_reference",
+            "delay_penalty_weight": 0.01,
+            "transport_penalty_weight": 0.01,
+            "dispatch_slot_seconds": 60.0,
+            "command_delay_seconds": 2.0,
+            "first_action_verification_mode": "exact_eta_positive_net_gain",
+            "minimum_net_gain": 0.0,
+            "marginal_approximation": "conservative_monotone_v1"
+          },
+          "recompute_period_seconds": 60.0,
+          "submitted_quantity": 0,
+          "already_accepted_quantity": 0,
+          "assumptions": [
+            "future_dispatch_slots_are_optimistic_lower_bounds",
+            "single_use_proxy",
+            "native_shared_bottleneck_admission",
+            "upper_public_coordinator"
+          ],
+          "plan_id": "acd289175d1532130eabb8326dd77c4f7302aa74ee3cb935b1c40d0441a0e77e",
+          "solve_seconds": 0.020903299911879003
+        }
+      },
+      "owner:system_international": {
+        "signature": "4aba7443e2877d3a130a44912c155888a96a49505e88f415bd1d79c02330f2e9",
+        "plan": {
+          "schema": "g31.terminal_flow.control.v1.plan",
+          "public_state_digest": "e5545cd62827b1944defdb8588112fc1554c693a7cd770f37457d23257e4634c",
+          "catalog_id": "706ff1d9ade16f15f174d967b000de2a5476c5f46bcdaa0837df63b046ad4143",
+          "chosen": [],
+          "flows": [],
+          "hold_by_source": {},
+          "hold_quantity": 0,
+          "protected_unallocated_quantity": 0,
+          "ordinary_return_fallback_required": false,
+          "proxy_flow_objective_cost": 0.0,
+          "objective": {
+            "protected_cost": 0.0,
+            "optional_cost": 0.0,
+            "net_proxy_gain": -0.0,
+            "minimum_gain_penalty_included": 0.0
+          },
+          "dispatch_profile": [],
+          "config": {
+            "marginal_reference_available_offset_seconds": 2.0,
+            "delay_cost_model": "linear_excess_over_reference",
+            "delay_penalty_weight": 0.01,
+            "transport_penalty_weight": 0.01,
+            "dispatch_slot_seconds": 60.0,
+            "command_delay_seconds": 2.0,
+            "first_action_verification_mode": "exact_eta_positive_net_gain",
+            "minimum_net_gain": 0.0,
+            "marginal_approximation": "conservative_monotone_v1"
+          },
+          "marginal_gain_profile": [],
+          "shared_witness_edges": [],
+          "first_action_verification": {
+            "status": "required_in_controller",
+            "mode": "exact_eta_positive_net_gain"
+          },
+          "optimization_scope": "protected_maximum_feasible_return_then_optional_conservative_separable_mcf",
+          "slot_delay_in_flow_cost": false,
+          "later_slots_require_replanning": true,
+          "native_execution_authority": false,
+          "allocation_id": "c97f38fc6a27e8ca6c5a5063f16fac2223a3b93dbb2eb4d88acbfb1f39a480e4",
+          "version": 1,
+          "owner_scope": "owner:system_international",
+          "information_asof": 18000.0,
+          "plan_valid_until": 18060.0,
+          "forecast_id": null,
+          "mapping_id": null,
+          "projection_version": "g31.foundation.airport_joint_inventory_projection.v1",
+          "projection_horizon_seconds": 600.0,
+          "supply_mode": "committed_only",
+          "receiver_claims_deducted": {},
+          "station_table": [
+            {
+              "node": 0,
+              "is_loader": true,
+              "is_actual_eligible_source": false,
+              "resource_owner": "owner:system_international",
+              "inventory_known": true,
+              "actual_empty": 0,
+              "receiver": {
+                "node": 0,
+                "known": true,
+                "capacity": 4,
+                "current_occupancy": 0,
+                "current_space": 4,
+                "unrepresented_committed_or_pending": 0,
+                "available_slots": 4,
+                "observation_asof": 18000.0,
+                "coverage": "current_local_sensor",
+                "all_owner_incoming_complete": false,
+                "native_revalidation_required": true
+              }
+            },
+            {
+              "node": 24,
+              "is_loader": true,
+              "is_actual_eligible_source": false,
+              "resource_owner": "owner:system_international",
+              "inventory_known": true,
+              "actual_empty": 0,
+              "receiver": {
+                "node": 24,
+                "known": true,
+                "capacity": 4,
+                "current_occupancy": 1,
+                "current_space": 3,
+                "unrepresented_committed_or_pending": 0,
+                "available_slots": 3,
+                "observation_asof": 18000.0,
+                "coverage": "current_local_sensor",
+                "all_owner_incoming_complete": false,
+                "native_revalidation_required": true
+              }
+            },
+            {
+              "node": 26,
+              "is_loader": true,
+              "is_actual_eligible_source": false,
+              "resource_owner": "owner:system_international",
+              "inventory_known": true,
+              "actual_empty": 0,
+              "receiver": {
+                "node": 26,
+                "known": true,
+                "capacity": 4,
+                "current_occupancy": 0,
+                "current_space": 4,
+                "unrepresented_committed_or_pending": 0,
+                "available_slots": 4,
+                "observation_asof": 18000.0,
+                "coverage": "current_local_sensor",
+                "all_owner_incoming_complete": false,
+                "native_revalidation_required": true
+              }
+            },
+            {
+              "node": 49,
+              "is_loader": true,
+              "is_actual_eligible_source": false,
+              "resource_owner": "owner:system_international",
+              "inventory_known": true,
+              "actual_empty": 0,
+              "receiver": {
+                "node": 49,
+                "known": true,
+                "capacity": 4,
+                "current_occupancy": 0,
+                "current_space": 4,
+                "unrepresented_committed_or_pending": 0,
+                "available_slots": 4,
+                "observation_asof": 18000.0,
+                "coverage": "current_local_sensor",
+                "all_owner_incoming_complete": false,
+                "native_revalidation_required": true
+              }
+            },
+            {
+              "node": 57,
+              "is_loader": true,
+              "is_actual_eligible_source": false,
+              "resource_owner": "owner:system_domestic",
+              "inventory_known": false,
+              "actual_empty": null,
+              "receiver": {
+                "node": 57,
+                "known": false,
+                "capacity": 4,
+                "current_occupancy": null,
+                "current_space": null,
+                "unrepresented_committed_or_pending": 0,
+                "available_slots": 0,
+                "observation_asof": null,
+                "coverage": "unknown",
+                "all_owner_incoming_complete": false,
+                "native_revalidation_required": true
+              }
+            },
+            {
+              "node": 92,
+              "is_loader": true,
+              "is_actual_eligible_source": false,
+              "resource_owner": "owner:system_domestic",
+              "inventory_known": false,
+              "actual_empty": null,
+              "receiver": {
+                "node": 92,
+                "known": false,
+                "capacity": 4,
+                "current_occupancy": null,
+                "current_space": null,
+                "unrepresented_committed_or_pending": 0,
+                "available_slots": 0,
+                "observation_asof": null,
+                "coverage": "unknown",
+                "all_owner_incoming_complete": false,
+                "native_revalidation_required": true
+              }
+            },
+            {
+              "node": 95,
+              "is_loader": true,
+              "is_actual_eligible_source": false,
+              "resource_owner": "owner:system_domestic",
+              "inventory_known": false,
+              "actual_empty": null,
+              "receiver": {
+                "node": 95,
+                "known": false,
+                "capacity": 4,
+                "current_occupancy": null,
+                "current_space": null,
+                "unrepresented_committed_or_pending": 1,
+                "available_slots": 0,
+                "observation_asof": null,
+                "coverage": "unknown",
+                "all_owner_incoming_complete": false,
+                "native_revalidation_required": true
+              }
+            },
+            {
+              "node": 134,
+              "is_loader": true,
+              "is_actual_eligible_source": false,
+              "resource_owner": "owner:system_domestic",
+              "inventory_known": false,
+              "actual_empty": null,
+              "receiver": {
+                "node": 134,
+                "known": false,
+                "capacity": 4,
+                "current_occupancy": null,
+                "current_space": null,
+                "unrepresented_committed_or_pending": 0,
+                "available_slots": 0,
+                "observation_asof": null,
+                "coverage": "unknown",
+                "all_owner_incoming_complete": false,
+                "native_revalidation_required": true
+              }
+            },
+            {
+              "node": 136,
+              "is_loader": true,
+              "is_actual_eligible_source": false,
+              "resource_owner": "owner:system_domestic",
+              "inventory_known": false,
+              "actual_empty": null,
+              "receiver": {
+                "node": 136,
+                "known": false,
+                "capacity": 4,
+                "current_occupancy": null,
+                "current_space": null,
+                "unrepresented_committed_or_pending": 0,
+                "available_slots": 0,
+                "observation_asof": null,
+                "coverage": "unknown",
+                "all_owner_incoming_complete": false,
+                "native_revalidation_required": true
+              }
+            },
+            {
+              "node": 138,
+              "is_loader": true,
+              "is_actual_eligible_source": false,
+              "resource_owner": "owner:system_domestic",
+              "inventory_known": false,
+              "actual_empty": null,
+              "receiver": {
+                "node": 138,
+                "known": false,
+                "capacity": 4,
+                "current_occupancy": null,
+                "current_space": null,
+                "unrepresented_committed_or_pending": 0,
+                "available_slots": 0,
+                "observation_asof": null,
+                "coverage": "unknown",
+                "all_owner_incoming_complete": false,
+                "native_revalidation_required": true
+              }
+            },
+            {
+              "node": 149,
+              "is_loader": true,
+              "is_actual_eligible_source": false,
+              "resource_owner": "owner:system_domestic",
+              "inventory_known": false,
+              "actual_empty": null,
+              "receiver": {
+                "node": 149,
+                "known": false,
+                "capacity": 4,
+                "current_occupancy": null,
+                "current_space": null,
+                "unrepresented_committed_or_pending": 0,
+                "available_slots": 0,
+                "observation_asof": null,
+                "coverage": "unknown",
+                "all_owner_incoming_complete": false,
+                "native_revalidation_required": true
+              }
+            }
+          ],
+          "marginal_audit": [
+            {
+              "side": "receiver",
+              "node": 0,
+              "known": true,
+              "absolute_error_sum": 0.0,
+              "maximum_absolute_error": 0.0,
+              "monotonicity_violation": 0.0
+            },
+            {
+              "side": "receiver",
+              "node": 24,
+              "known": true,
+              "absolute_error_sum": 0.0,
+              "maximum_absolute_error": 0.0,
+              "monotonicity_violation": 0.0
+            },
+            {
+              "side": "receiver",
+              "node": 26,
+              "known": true,
+              "absolute_error_sum": 0.0,
+              "maximum_absolute_error": 0.0,
+              "monotonicity_violation": 0.0
+            },
+            {
+              "side": "receiver",
+              "node": 49,
+              "known": true,
+              "absolute_error_sum": 0.0,
+              "maximum_absolute_error": 0.0,
+              "monotonicity_violation": 0.0
+            },
+            {
+              "side": "receiver",
+              "node": 57,
+              "known": false,
+              "absolute_error_sum": 0.0,
+              "maximum_absolute_error": 0.0,
+              "monotonicity_violation": 0.0
+            },
+            {
+              "side": "receiver",
+              "node": 92,
+              "known": false,
+              "absolute_error_sum": 0.0,
+              "maximum_absolute_error": 0.0,
+              "monotonicity_violation": 0.0
+            },
+            {
+              "side": "receiver",
+              "node": 95,
+              "known": false,
+              "absolute_error_sum": 0.0,
+              "maximum_absolute_error": 0.0,
+              "monotonicity_violation": 0.0
+            },
+            {
+              "side": "receiver",
+              "node": 134,
+              "known": false,
+              "absolute_error_sum": 0.0,
+              "maximum_absolute_error": 0.0,
+              "monotonicity_violation": 0.0
+            },
+            {
+              "side": "receiver",
+              "node": 136,
+              "known": false,
+              "absolute_error_sum": 0.0,
+              "maximum_absolute_error": 0.0,
+              "monotonicity_violation": 0.0
+            },
+            {
+              "side": "receiver",
+              "node": 138,
+              "known": false,
+              "absolute_error_sum": 0.0,
+              "maximum_absolute_error": 0.0,
+              "monotonicity_violation": 0.0
+            },
+            {
+              "side": "receiver",
+              "node": 149,
+              "known": false,
+              "absolute_error_sum": 0.0,
+              "maximum_absolute_error": 0.0,
+              "monotonicity_violation": 0.0
+            }
+          ],
+          "configuration": {
+            "marginal_reference_available_offset_seconds": 2.0,
+            "delay_cost_model": "linear_excess_over_reference",
+            "delay_penalty_weight": 0.01,
+            "transport_penalty_weight": 0.01,
+            "dispatch_slot_seconds": 60.0,
+            "command_delay_seconds": 2.0,
+            "first_action_verification_mode": "exact_eta_positive_net_gain",
+            "minimum_net_gain": 0.0,
+            "marginal_approximation": "conservative_monotone_v1"
+          },
+          "recompute_period_seconds": 60.0,
+          "submitted_quantity": 0,
+          "already_accepted_quantity": 0,
+          "assumptions": [
+            "future_dispatch_slots_are_optimistic_lower_bounds",
+            "single_use_proxy",
+            "native_shared_bottleneck_admission",
+            "upper_public_coordinator"
+          ],
+          "plan_id": "4120d222d5b68ae0c0e06e98bfe7d7b763ca3bfc35ddd70c4c9ce5bca4f401c4",
+          "solve_seconds": 0.029589800047688186
+        }
+      }
+    },
+    "decision_count": 362,
+    "last_decision_context": {
+      "owner_id": "owner:system_international",
+      "tick": 300,
+      "phase": "post_priority",
+      "view_version": 0,
+      "observed_at": 18000.0,
+      "public_state_digest": "e5545cd62827b1944defdb8588112fc1554c693a7cd770f37457d23257e4634c",
+      "decision_id": "c24229721b4f76ea361b6e135b8c072dfd4238d47b0a06e92d95ff3fa6efa8d3"
+    }
+  }
+}

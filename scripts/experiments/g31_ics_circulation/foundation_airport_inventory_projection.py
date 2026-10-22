@@ -58,6 +58,10 @@ def _empty(tray, at):
             and tray.get("reception_node", -1) < 0 and tray.get("available_at", at) <= at)
 
 
+def _valid_time(value):
+    return type(value) in (int, float) and math.isfinite(value) and value >= 0
+
+
 def prepare_inventory_projection(observation, *, forecast=None,
                                  supply_mode="committed_only", horizon_seconds=600.,
                                  prepared_current=None, arrival_support_contract=None,
@@ -139,12 +143,33 @@ def prepare_inventory_projection(observation, *, forecast=None,
                 nodes[job["origin"]]["waiting"] += 1.
     requests = observation["client_transfer_ledger"]
     active = {row["tray_id"] for row in requests if row["status"] not in public.TERMINAL}
+    received_cutoffs = defaultdict(list)
+    latest_commitment = {}
+    for request in requests:
+        if request["status"] in public.COMMITTED or request["status"] == "received":
+            key = (request["issued_at"], request["request_id"])
+            if key > latest_commitment.get(request["tray_id"], (-1., "")):
+                latest_commitment[request["tray_id"]] = key
+        if request["status"] == "received":
+            receipt = request.get("received_at")
+            cutoff = receipt if _valid_time(receipt) else request["issued_at"]
+            if _valid_time(cutoff):
+                received_cutoffs[request["tray_id"]].append((cutoff, request["request_id"]))
     actual, events, audit_rows = {}, [], []
     raw_counts = defaultdict(int)
     for identity, (tray, at, version, kind) in physical.items():
         node = tray["node"]
         if _empty(tray, at) and nodes[node]["inventory_known"]:
             raw_counts[node] += 1
+            newer_receipts = [(cutoff, request_id) for cutoff, request_id in received_cutoffs.get(identity, [])
+                              if at < cutoff]
+            if newer_receipts:
+                # The captured identity still participates in snapshot count validation,
+                # but cannot also be stock after a later delivered transfer event.
+                audit_rows.append({"tray_id": identity, "captured_at": at,
+                    "request_ids": [request_id for _, request_id in newer_receipts],
+                    "reason": "actual_capture_superseded_by_newer_transfer_evidence"})
+                continue
             # A newer destination capture dominates a stale sender ACK.
             already_at_destination = any(row["tray_id"] == identity and row["destination"] == node
                 and at >= row["issued_at"] for row in requests if row["status"] in public.COMMITTED)
@@ -171,19 +196,30 @@ def prepare_inventory_projection(observation, *, forecast=None,
         destination = request["destination"]
         capture_at = nodes[destination]["inventory_as_of"]
         received = request.get("received_at")
-        included = identity in actual and actual[identity] == destination
-        included |= (status == "received" and type(received) in (int, float) and received >= 0
-                     and capture_at is not None and capture_at >= received)
+        later_issue, later_request = latest_commitment[identity]
+        if (status == "received" and _valid_time(received)
+                and later_issue > request["issued_at"] and later_issue >= received):
+            # Full native ledgers retain old cycles. A later confirmed transfer
+            # owns this tray's one supply slot; a merely pending intent does not.
+            audit_rows.append({"tray_id": identity, "request_id": request["request_id"],
+                "superseding_request_id": later_request,
+                "reason": "historical_receipt_superseded_by_newer_commitment"})
+            continue
+        included = (status != "received" and identity in actual and actual[identity] == destination
+                    and physical[identity][1] >= request["issued_at"])
+        included |= (status == "received" and _valid_time(received)
+                     and nodes[destination]["inventory_known"]
+                     and _valid_time(capture_at) and capture_at >= received)
         # A historical received request may remain in the ledger after this
         # physical tray has already loaded or returned somewhere else. Its
         # later visible state supersedes that receipt, even outside old dest.
-        included |= (status == "received" and type(received) in (int, float) and received >= 0
+        included |= (status == "received" and _valid_time(received)
                      and identity in physical and physical[identity][1] >= received)
         if included:
             audit_rows.append({"tray_id": identity, "request_id": request["request_id"],
                                "reason": "commitment_already_covered_by_capture"})
             continue
-        if status == "received" and (type(received) not in (int, float) or received < 0):
+        if status == "received" and not _valid_time(received):
             audit_rows.append({"tray_id": identity, "reason": "receipt_time_unknown_no_supply_credit"})
             continue
         require(identity not in committed_seen, "one_live_accepted_commitment_per_tray")

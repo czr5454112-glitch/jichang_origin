@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="7" time="1.097" timestamp="2026-10-22T13:37:09.412909+08:00" hostname="LAPTOP-M3GASC4G"><testcase classname="outputs.experiments.g31_ics_terminal_flow_20261021.test_final_contract_summary_005" name="test_later_success_cannot_replace_failed_first_item" time="0.001" /><testcase classname="outputs.experiments.g31_ics_terminal_flow_20261021.test_final_contract_summary_005" name="test_censored_first_item_remains_in_denominator" time="0.001" /><testcase classname="outputs.experiments.g31_ics_terminal_flow_20261021.test_final_contract_summary_005" name="test_missing_first_lifecycle_is_error" time="0.001" /><testcase classname="outputs.experiments.g31_ics_terminal_flow_20261021.test_final_contract_summary_005" name="test_duplicate_requests_are_not_counted_as_independent_first_batches" time="0.001" /><testcase classname="outputs.experiments.g31_ics_terminal_flow_20261021.test_final_contract_summary_005" name="test_later_replan_success_is_not_attached_to_earlier_plan" time="0.001" /><testcase classname="outputs.experiments.g31_ics_terminal_flow_20261021.test_final_contract_summary_005" name="test_advisory_expiry_boundary_and_horizon_are_distinct" time="0.001"><failure message="NameError: name 'm' is not defined">def test_advisory_expiry_boundary_and_horizon_are_distinct():
+        report={'plan_order_chain':{'plans':[dict(plan_id='p',owner_scope='o',information_asof=100.,
+            valid_until=160.,item_count=2,dispatch_profile=[
+                dict(tray_id='a',source=1,destination=3,submit_at=100.,estimated_arrival=700.),
+                dict(tray_id='b',source=2,destination=3,submit_at=160.,estimated_arrival=701.)])]}}
+&gt;       result=m.advisory_timing(report,600.)
+               ^
+E       NameError: name 'm' is not defined
+
+outputs\experiments\g31_ics_terminal_flow_20261021\test_final_contract_summary_005.py:51: NameError</failure></testcase><testcase classname="outputs.experiments.g31_ics_terminal_flow_20261021.test_final_contract_summary_005" name="test_advisory_does_not_silently_drop_plan_items" time="0.001"><failure message="NameError: name 'm' is not defined">def test_advisory_does_not_silently_drop_plan_items():
+        report={'plan_order_chain':{'plans':[dict(item_count=2,dispatch_profile=[])]}}
+        with pytest.raises(ValueError,match='complete_original_dispatch_profile'):
+&gt;           m.advisory_timing(report,600.)
+            ^
+E           NameError: name 'm' is not defined
+
+outputs\experiments\g31_ics_terminal_flow_20261021\test_final_contract_summary_005.py:60: NameError</failure></testcase></testsuite></testsuites>

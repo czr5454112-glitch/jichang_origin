@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="1" skipped="0" tests="9" time="3.743" timestamp="2026-10-22T15:18:58.622517+08:00" hostname="LAPTOP-M3GASC4G"><testcase classname="outputs.experiments.g31_ics_terminal_flow_20261021.test_projection_horizon_probe_005" name="test_later_source_demand_is_not_visible_to_short_proxy" time="0.003" /><testcase classname="outputs.experiments.g31_ics_terminal_flow_20261021.test_projection_horizon_probe_005" name="test_late_arrival_does_not_create_stock_before_eta" time="0.002" /><testcase classname="outputs.experiments.g31_ics_terminal_flow_20261021.test_projection_horizon_probe_005" name="test_actual_policy_replay_preserves_forecast_and_records_exact_verification" time="0.018"><failure message="KeyError: 'exact_waiting_count'">def test_actual_policy_replay_preserves_forecast_and_records_exact_verification():
+        from scripts.experiments.g31_ics_circulation import foundation_airport_inventory_rule as rules
+        from scripts.experiments.g31_ics_circulation import foundation_airport_joint_opportunities as opportunities
+        from scripts.experiments.g31_ics_circulation import foundation_airport_transport_control as control
+        obs=fixture((2,0,0));f=forecast(obs,{2:[0.]*15+[3.]+[0.]*14})
+&gt;       current=opportunities.prepare_current(obs,rules.r0_priority_planner(obs),message_delay=2.)
+                                                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+outputs\experiments\g31_ics_terminal_flow_20261021\test_projection_horizon_probe_005.py:45: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\experiments\g31_ics_circulation\foundation_airport_inventory_rule.py:43: in r0_priority_planner
+    decision = transfer_candidates(observation, predictive=False,
+scripts\experiments\g31_ics_circulation\analytic_control.py:502: in transfer_candidates
+    waiting, local_demand, demand_time, known_ports = _compact_demand(observation)
+                                                      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+observation = {'schema': 'g31.owner_protocol_observation.v1', 'owner_id': 'A', 'now': 10.0, 'node_records': [(0, 10, 0.001, 0, 0, [1, 2]), (1, 10, 0.001, 0, 0, [0, 2]), (2, 10, 0.001, 0, 0, [0, 1])], ...}
+
+    def _compact_demand(observation: dict[str, Any]) -&gt; tuple[list[dict[str, Any]], Counter, dict[int, float], set[int]]:
+        """Read exact queue counts with bounded FIFO identities, never expand them.
+    
+        The native port has already applied local-over-remote identity precedence
+        and delivered-snapshot selection. Counts protect local work; identities
+        only represent the equivalent assignment columns after incoming coverage.
+        """
+        projection = observation["control_projection"]
+        if projection.get("schema") != "g31.analytic_control_projection.v1":
+            raise ValueError("analytic_control:unsupported_control_projection")
+        waiting, counts, observed = [], Counter(), {}
+        for group in projection["waiting_groups"]:
+            origin, count = int(group["origin"]), int(group["count"])
+            if origin in counts or count &lt; 0:
+                raise ValueError("analytic_control:invalid_compact_queue")
+            counts[origin] = count
+            observed[origin] = float(group["demand_observed_at"])
+            rows = group["jobs"]
+            if len(rows) &gt; count or [int(j["fifo_index"]) for j in rows] != list(range(len(rows))):
+                raise ValueError("analytic_control:invalid_compact_fifo_prefix")
+            for job in rows:
+                if (int(job["origin"]) != origin or job["status"] not in ("waiting", "waiting_for_tray")
+                        or job["arrival"] &gt; job["demand_observed_at"] + 1e-9
+                        or job["demand_observed_at"] &gt; observation["now"] + 1e-9):
+                    raise ValueError("analytic_control:invalid_compact_demand")
+            waiting.extend(rows)
+&gt;       if sum(counts.values()) != int(projection["exact_waiting_count"]):
+                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+E       KeyError: 'exact_waiting_count'
+
+scripts\experiments\g31_ics_circulation\analytic_control.py:208: KeyError</failure></testcase><testcase classname="outputs.experiments.g31_ics_terminal_flow_20261021.test_projection_horizon_probe_005" name="test_nonzero_claim_excluded_before_any_replay" time="0.001" /><testcase classname="outputs.experiments.g31_ics_terminal_flow_20261021.test_projection_horizon_probe_005" name="test_unknown_or_invalid_claim_not_assumed_zero[None]" time="0.001" /><testcase classname="outputs.experiments.g31_ics_terminal_flow_20261021.test_projection_horizon_probe_005" name="test_unknown_or_invalid_claim_not_assumed_zero[claim1]" time="0.001" /><testcase classname="outputs.experiments.g31_ics_terminal_flow_20261021.test_projection_horizon_probe_005" name="test_unknown_or_invalid_claim_not_assumed_zero[claim2]" time="0.001" /><testcase classname="outputs.experiments.g31_ics_terminal_flow_20261021.test_projection_horizon_probe_005" name="test_unknown_or_invalid_claim_not_assumed_zero[claim3]" time="0.001" /><testcase classname="outputs.experiments.g31_ics_terminal_flow_20261021.test_projection_horizon_probe_005" name="test_wrapper_accepts_only_single_diagnostic_task" time="0.013" /></testsuite></testsuites>

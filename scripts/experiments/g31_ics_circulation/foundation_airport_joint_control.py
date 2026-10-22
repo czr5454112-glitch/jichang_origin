@@ -83,6 +83,16 @@ class JointPostPrioritySelector:
         self.policy = policy
         self.decision_sink = decision_sink
 
+    def on_submission(self, **kwargs):
+        callback = getattr(self.policy, "on_submission", None)
+        if callback is not None:
+            callback(**kwargs)
+
+    def on_priority_submission(self, **kwargs):
+        callback = getattr(self.policy, "on_priority_submission", None)
+        if callback is not None:
+            callback(**kwargs)
+
     def __call__(self, observation, baseline, *, message_delay, request_prefix,
                  policy_state, decision_context):
         prepared = prepare_current(observation, baseline, message_delay=message_delay)
