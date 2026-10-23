@@ -3382,6 +3382,10 @@ py::dict g4irsf11_event_runtime_summary_row(
       summary.scorer_score_direction;
   row["scorer_claim_boundary"] =
       summary.scorer_claim_boundary;
+  if (summary.s4_wait_estimator != "legacy") {
+    row["s4_wait_estimator"] = summary.s4_wait_estimator;
+    row["s4_wait_metrics"] = summary.s4_wait_metrics;
+  }
   if (summary.s4_local_potential_descent_guard_enabled) {
     row["s4_local_potential_descent_guard_enabled"] = true;
     row["s4_local_potential_descent_guard_learning_active"] =
@@ -4866,6 +4870,12 @@ py::list g4irsf11_event_candidate_rows(
     features["target_scheduled_incoming"] = candidate.target_scheduled_incoming;
     features["corridor_next_available"] = candidate.corridor_next_available;
     features["target_next_available"] = candidate.target_next_available;
+    if (candidate.s4_wait_prediction_enabled) {
+      features["projected_arrival"] = candidate.projected_arrival;
+      features["predicted_entry_wait"] = candidate.predicted_entry_wait;
+      features["predicted_merge_wait"] = candidate.predicted_merge_wait;
+      features["predicted_post_service_wait"] = candidate.predicted_post_service_wait;
+    }
     features["advertised_fault"] = candidate.advertised_fault;
     features["fault_message_age_seconds"] = candidate.fault_message_age_seconds;
     features["recent_visit_count"] = candidate.recent_visit_count;
@@ -6232,7 +6242,8 @@ py::dict g4irsf11_event_runtime_from_records(
     const std::vector<int>& storage_source_nodes,
     bool enable_s4_local_potential_descent_guard,
     bool enable_s4_direct_neighbor_merge_calendar_visibility,
-    bool complete_on_goal_arrival) {
+    bool complete_on_goal_arrival,
+    const std::string& s4_wait_estimator) {
   // Keep G4IRSF13/G4IRSF14 controls append-only so existing positional callers
   // retain the exact F2/Q0/P0/E0 behavior.
   const int merge_grant_max_pending_requests =
@@ -6471,6 +6482,7 @@ py::dict g4irsf11_event_runtime_from_records(
   config.enable_s4_direct_neighbor_merge_calendar_visibility =
       enable_s4_direct_neighbor_merge_calendar_visibility;
   config.complete_on_goal_arrival = complete_on_goal_arrival;
+  config.s4_wait_estimator = s4_wait_estimator;
   // Append-only Table 5.4 reconstruction seam; zero remains exact-off.
   config.legacy_observation_bias_max_seconds =
       legacy_observation_bias_max_seconds;
@@ -7235,7 +7247,8 @@ PYBIND11_MODULE(czr005_cpp, module) {
              py::arg(
                  "enable_s4_direct_neighbor_merge_calendar_visibility") =
                  false,
-             py::arg("complete_on_goal_arrival") = false);
+             py::arg("complete_on_goal_arrival") = false,
+             py::arg("s4_wait_estimator") = std::string("legacy"));
   module.def(
       "g4irsf14_state_clone_noop_rerun_from_records",
       &g4irsf14_state_clone_noop_rerun_from_records,

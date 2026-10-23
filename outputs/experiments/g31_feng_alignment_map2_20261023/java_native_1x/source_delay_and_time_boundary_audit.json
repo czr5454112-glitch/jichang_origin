@@ -1,0 +1,77 @@
+{
+  "schema": "g31.feng_alignment.map2.Java_source_time_audit.v1",
+  "lifecycle_sha256": "d8c68b68952155181179b1a0ff25939a2a0c6371c4952d1830b7359e58131e5c",
+  "canonical_sha256": "968d2c876fcbf03c5b25c8e865ccd469431af3ddbf59dc9ebe073752bd93678f",
+  "denominator": 43603,
+  "phase_definitions": "canonical -> actual generator release -> successful full-route plan -> observed terminal epoch; first phase may be negative by <1 sec due original Java quantization",
+  "phases_seconds": {
+    "generator_minus_canonical": {
+      "count": 43603,
+      "mean": 107.33750459952297,
+      "min": -0.9999900000002526,
+      "p50": -0.005779999999504071,
+      "p95": 791.427995,
+      "p99": 1542.0,
+      "max": 1832.0
+    },
+    "plan_minus_generator": {
+      "count": 43603,
+      "mean": 1.3626585326697704,
+      "min": 0.0,
+      "p50": 0.0,
+      "p95": 5.0,
+      "p99": 15.0,
+      "max": 367.0
+    },
+    "finish_minus_plan": {
+      "count": 43603,
+      "mean": 193.28000366947228,
+      "min": 55.0,
+      "p50": 234.0,
+      "p95": 338.0,
+      "p99": 342.0,
+      "max": 434.0
+    },
+    "finish_minus_canonical": {
+      "count": 43603,
+      "mean": 301.980166801665,
+      "min": 54.00615000000107,
+      "p50": 249.8644200000017,
+      "p95": 1055.9000000000015,
+      "p99": 1787.9800000000032,
+      "max": 2101.0
+    }
+  },
+  "max_phase_identity_error": 0.0,
+  "early_generator_release_count": 21911,
+  "early_generator_max_seconds": 0.9999900000002526,
+  "horizon": {
+    "start": 8260,
+    "end": 98259,
+    "epochs_run": 90000,
+    "last_epoch": 98259.0,
+    "minimum_release": 8267.0,
+    "maximum_release": 81942.0,
+    "minimum_finish": 8327.0,
+    "maximum_finish": 82203.0,
+    "unfinished_count": 0,
+    "active_route_count": 0
+  },
+  "ebs": {
+    "paired_bags": 15097,
+    "out_plan_before_in_finish_count": 0,
+    "in_finish_to_out_plan_gap_seconds": {
+      "count": 15097,
+      "mean": 4444.214347221302,
+      "min": 2052.0,
+      "p50": 3774.0,
+      "p95": 9290.0,
+      "p99": 10860.039999999999,
+      "max": 12798.0
+    },
+    "storage_in_goal": 47,
+    "storage_out_start": 52,
+    "causal_scope": "This check concerns scheduled segment ordering only; does not add tray/body/edge-capacity physics."
+  },
+  "completion_definition": "Original output.txt completion epoch is the integer observation of goal T1 arrival; routes.csv exported goal T2 is not the completion metric."
+}

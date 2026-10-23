@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="utf-8"?><testsuites name="pytest tests"><testsuite name="pytest" errors="0" failures="2" skipped="0" tests="33" time="19.011" timestamp="2026-10-23T20:14:55.643630+08:00" hostname="LAPTOP-M3GASC4G"><testcase classname="tests.test_g31_feng_alignment_map2" name="test_six_map2_requests_preserve_official_inputs_and_isolate_factors" time="10.261" /><testcase classname="tests.test_g31_feng_alignment_map2" name="test_map2_rejects_nanning_ebs_roles_despite_matching_segment_ids" time="1.580" /><testcase classname="tests.test_g31_feng_alignment_map2" name="test_comparison_and_summary_use_explicit_map_canonical" time="0.049" /><testcase classname="tests.test_g31_feng_alignment_map2" name="test_request_audit_requires_explicit_map_identity" time="0.040" /><testcase classname="tests.test_g31_feng_alignment_metrics" name="test_segment_mean_and_business_final_delivery_have_distinct_denominators" time="0.001" /><testcase classname="tests.test_g31_feng_alignment_metrics" name="test_independent_ebs_segments_remain_offered_and_causality_is_diagnostic" time="0.001" /><testcase classname="tests.test_g31_feng_alignment_metrics" name="test_incomplete_segments_keep_full_denominator_without_a_survivor_mean_claim" time="0.001" /><testcase classname="tests.test_g31_feng_alignment_metrics" name="test_duplicate_or_missing_segment_cannot_silently_change_the_population" time="0.001" /><testcase classname="tests.test_g31_feng_alignment_metrics" name="test_generator_release_sensitivity_uses_release_not_successful_plan_epoch" time="0.001" /><testcase classname="tests.test_g31_feng_alignment_metrics" name="test_lifecycle_order_is_checked_against_actual_release_not_fractional_schedule" time="0.001" /><testcase classname="tests.test_g4irsf31_map2_native" name="test_manifest_has_38_executable_cases_and_explicit_nm" time="0.001" /><testcase classname="tests.test_g4irsf31_map2_native" name="test_real_map_profile_is_built_from_canonical_data_with_storage_52" time="0.001" /><testcase classname="tests.test_g4irsf31_map2_native" name="test_stable_dry_request_freezes_all_four_final_policy_items" time="0.018" /><testcase classname="tests.test_g4irsf31_map2_native" name="test_case_and_aggregate_serialize_repo_paths_portably" time="0.035" /><testcase classname="tests.test_g4irsf31_map2_native" name="test_fault_request_reuses_local_fixed_point_and_topology_upper" time="0.012" /><testcase classname="tests.test_g4irsf31_map2_native" name="test_fake_native_echo_is_admitted_and_old_policy_artifact_is_not" time="0.018" /><testcase classname="tests.test_g4irsf31_map2_native" name="test_resume_all_dry_cases_and_reject_stale_artifact" time="0.032"><failure message="PermissionError: [WinError 5] 拒绝访问。: 'C:\\Users\\38908\\AppData\\Local\\Packages\\sandbox.{ee660b08-42bc-42b8-a8bf-6326f53593e9}\\AC\\Temp\\pytest-of-38908\\pytest-0\\test_resume_all_dry_cases_and_0\\cases\\.t5_2_map2_1x_speed_1p5.json.49008.tmp' -&gt; 'C:\\Users\\38908\\AppData\\Local\\Packages\\sandbox.{ee660b08-42bc-42b8-a8bf-6326f53593e9}\\AC\\Temp\\pytest-of-38908\\pytest-0\\test_resume_all_dry_cases_and_0\\cases\\t5_2_map2_1x_speed_1p5.json'">tmp_path = WindowsPath('C:/Users/38908/AppData/Local/Packages/sandbox.{ee660b08-42bc-42b8-a8bf-6326f53593e9}/AC/Temp/pytest-of-38908/pytest-0/test_resume_all_dry_cases_and_0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001AFCEF88310&gt;
+
+    def test_resume_all_dry_cases_and_reject_stale_artifact(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -&gt; None:
+        workload_1x, workload_2x, _binary = _fixture(tmp_path, monkeypatch)
+        case_root = tmp_path / "cases"
+&gt;       code = native.main(
+            [
+                "resume",
+                "--workload-1x",
+                str(workload_1x),
+                "--workload-2x",
+                str(workload_2x),
+                "--case-root",
+                str(case_root),
+                "--dry-run",
+                "--force",
+            ]
+        )
+
+tests\test_g4irsf31_map2_native.py:323: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\eval\run_g4irsf31_map2_native.py:761: in main
+    return _resume(args)
+           ^^^^^^^^^^^^^
+scripts\eval\run_g4irsf31_map2_native.py:735: in _resume
+    exit_code = _run_one(args, case_id, case_root / f"{case_id}.json")
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+scripts\eval\run_g4irsf31_map2_native.py:725: in _run_one
+    _write_json(output, payload)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+path = WindowsPath('C:/Users/38908/AppData/Local/Packages/sandbox.{ee660b08-42bc-42b8-a8bf-6326f53593e9}/AC/Temp/pytest-of-38908/pytest-0/test_resume_all_dry_cases_and_0/cases/t5_2_map2_1x_speed_1p5.json')
+value = {'schema': 'czr005.g4irsf31.map2_final_policy_case.v1', 'protocol': 'G31_FINAL_POLICY_MAP2_V1', 'case_id': 't5_2_map2_...5', 'case': {'case_id': 't5_2_map2_1x_speed_1p5', 'paper_table': '5.2', 'group': 'stable_speed', 'scale': 1, ...}, ...}
+
+    def _write_json(path: Path, value: Mapping[str, Any]) -&gt; None:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        temporary = path.with_name(f".{path.name}.{os.getpid()}.tmp")
+        temporary.write_text(
+            json.dumps(value, ensure_ascii=False, indent=2, allow_nan=False) + "\n",
+            encoding="utf-8",
+            newline="\n",
+        )
+&gt;       os.replace(temporary, path)
+E       PermissionError: [WinError 5] 拒绝访问。: 'C:\\Users\\38908\\AppData\\Local\\Packages\\sandbox.{ee660b08-42bc-42b8-a8bf-6326f53593e9}\\AC\\Temp\\pytest-of-38908\\pytest-0\\test_resume_all_dry_cases_and_0\\cases\\.t5_2_map2_1x_speed_1p5.json.49008.tmp' -&gt; 'C:\\Users\\38908\\AppData\\Local\\Packages\\sandbox.{ee660b08-42bc-42b8-a8bf-6326f53593e9}\\AC\\Temp\\pytest-of-38908\\pytest-0\\test_resume_all_dry_cases_and_0\\cases\\t5_2_map2_1x_speed_1p5.json'
+
+scripts\eval\run_g4irsf31_map2_native.py:255: PermissionError</failure></testcase><testcase classname="tests.test_g4irsf31_map2_same_hca_release_timing" name="test_formal_hca_run_directories_cover_both_scales_and_four_speeds" time="0.001" /><testcase classname="tests.test_g4irsf31_map2_same_hca_release_timing" name="test_formal_g24_default_run_is_identified_as_2p5_without_speed_field" time="0.010" /><testcase classname="tests.test_g4irsf31_map2_same_hca_release_timing" name="test_full_repeat_identical_hca_trace_prepares_frozen_map2_request" time="0.035" /><testcase classname="tests.test_g4irsf31_map2_same_hca_release_timing" name="test_repeat_release_mismatch_is_strict_na_and_never_builds_s4" time="0.040" /><testcase classname="tests.test_g4irsf31_map2_same_hca_release_timing" name="test_incomplete_2x_hca_outcome_is_na_without_common_cohort" time="0.073" /><testcase classname="tests.test_g4irsf31_map2_same_hca_release_timing" name="test_fake_full_population_execution_outputs_exactly_five_metrics" time="0.041" /><testcase classname="tests.test_g4irsf31_map2_same_hca_release_timing" name="test_incomplete_s4_is_na_and_never_compares_survivors" time="0.041" /><testcase classname="tests.test_g4irsf31_map2_same_hca_release_timing" name="test_cli_dry_run_writes_ready_artifact_without_native" time="0.053"><failure message="PermissionError: [WinError 5] 拒绝访问。: 'C:\\Users\\38908\\AppData\\Local\\Packages\\sandbox.{ee660b08-42bc-42b8-a8bf-6326f53593e9}\\AC\\Temp\\pytest-of-38908\\pytest-0\\test_cli_dry_run_writes_ready_0\\.paired.json.49008.tmp' -&gt; 'C:\\Users\\38908\\AppData\\Local\\Packages\\sandbox.{ee660b08-42bc-42b8-a8bf-6326f53593e9}\\AC\\Temp\\pytest-of-38908\\pytest-0\\test_cli_dry_run_writes_ready_0\\paired.json'">tmp_path = WindowsPath('C:/Users/38908/AppData/Local/Packages/sandbox.{ee660b08-42bc-42b8-a8bf-6326f53593e9}/AC/Temp/pytest-of-38908/pytest-0/test_cli_dry_run_writes_ready_0')
+monkeypatch = &lt;_pytest.monkeypatch.MonkeyPatch object at 0x000001AFD1021350&gt;
+
+    def test_cli_dry_run_writes_ready_artifact_without_native(
+        tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+    ) -&gt; None:
+        workload_1x, workload_2x, _binary = _fixture(tmp_path, monkeypatch)
+        workload = paired.map2_native.load_workload(1, workload_1x, workload_2x)
+        hca_root = _hca_case_root(tmp_path / "hca", workload, speed=1.5)
+        output = tmp_path / "paired.json"
+    
+        assert (
+&gt;           paired.main(
+                [
+                    "--case-id",
+                    "t5_2_map2_1x_speed_1p5",
+                    "--workload-1x",
+                    str(workload_1x),
+                    "--workload-2x",
+                    str(workload_2x),
+                    "--hca-case-root",
+                    str(hca_root),
+                    "--output",
+                    str(output),
+                    "--dry-run",
+                    "--force",
+                ]
+            )
+            == 0
+        )
+
+tests\test_g4irsf31_map2_same_hca_release_timing.py:390: 
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+scripts\eval\run_g4irsf31_map2_same_hca_release_timing.py:681: in main
+    _write_json(output, payload)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+path = WindowsPath('C:/Users/38908/AppData/Local/Packages/sandbox.{ee660b08-42bc-42b8-a8bf-6326f53593e9}/AC/Temp/pytest-of-38908/pytest-0/test_cli_dry_run_writes_ready_0/paired.json')
+value = {'schema': 'czr005.g4irsf31.map2_same_hca_release_timing.v1', 'case_id': 't5_2_map2_1x_speed_1p5', 'case': {'case_id':...5', 'paper_table': '5.2', 'group': 'stable_speed', 'scale': 1, ...}, 'map_id': 'protected_map2_54_nodes_69_edges', ...}
+
+    def _write_json(path: Path, value: Mapping[str, Any]) -&gt; None:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        temporary = path.with_name(f".{path.name}.{os.getpid()}.tmp")
+        temporary.write_text(
+            json.dumps(value, ensure_ascii=False, indent=2, allow_nan=False) + "\n",
+            encoding="utf-8",
+            newline="\n",
+        )
+&gt;       os.replace(temporary, path)
+E       PermissionError: [WinError 5] 拒绝访问。: 'C:\\Users\\38908\\AppData\\Local\\Packages\\sandbox.{ee660b08-42bc-42b8-a8bf-6326f53593e9}\\AC\\Temp\\pytest-of-38908\\pytest-0\\test_cli_dry_run_writes_ready_0\\.paired.json.49008.tmp' -&gt; 'C:\\Users\\38908\\AppData\\Local\\Packages\\sandbox.{ee660b08-42bc-42b8-a8bf-6326f53593e9}\\AC\\Temp\\pytest-of-38908\\pytest-0\\test_cli_dry_run_writes_ready_0\\paired.json'
+
+scripts\eval\run_g4irsf31_map2_same_hca_release_timing.py:132: PermissionError</failure></testcase><testcase classname="tests.test_g4irsf31_map_adapter" name="test_synthetic_profile_builds_model_free_local_active_request" time="0.014" /><testcase classname="tests.test_g4irsf31_map_adapter" name="test_map2_profile_keeps_storage_node_52_default" time="0.005" /><testcase classname="tests.test_g4irsf31_map_adapter" name="test_sparse_node_ids_are_rejected_at_the_actual_heuristic_boundary" time="0.011" /><testcase classname="tests.test_g4irsf31_map_adapter" name="test_storage_role_tail_is_opt_in_and_legacy_52_call_shape_is_unchanged" time="0.006" /><testcase classname="tests.test_g4irsf31_map_adapter" name="test_merge_calendar_visibility_is_an_independent_append_only_tail" time="0.007" /><testcase classname="tests.test_g4irsf31_map_adapter" name="test_goal_arrival_completion_is_final_append_only_default_off_tail" time="0.009" /><testcase classname="tests.test_g4irsf31_map_adapter" name="test_wait_estimator_preserves_legacy_call_and_appends_explicit_mode" time="0.007" /><testcase classname="tests.test_g4irsf31_map_adapter" name="test_storage_role_tail_rejects_negative_or_duplicate_ids" time="0.002" /></testsuite></testsuites>

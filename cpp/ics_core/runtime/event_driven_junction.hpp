@@ -44,6 +44,7 @@
 #include "ics_core/runtime/g4irsf17_source_policy.hpp"
 #include "ics_core/runtime/g4irsf18_merge_policy.hpp"
 #include "ics_core/runtime/request_timing_recorder.hpp"
+#include "ics_core/runtime/s4_wait_estimator.hpp"
 
 namespace czr005::ics {
 
@@ -637,6 +638,9 @@ struct EventDrivenJunctionConfig {
   // direct merge neighbour's existing service-calendar scalar to the existing
   // calendar-wait score.  J2 remains the sole grant/reservation authority.
   bool enable_s4_direct_neighbor_merge_calendar_visibility = false;
+  // Exact-off default. ETA modes change S4 ranking only; service calendars,
+  // J2 permissions, and PIBT publication retain their existing authority.
+  std::string s4_wait_estimator = "legacy";  // legacy, eta_calendar, eta_flow
   // Exact-off compatibility default.  G31 may opt into the legacy HCA
   // completion seam: crossing the final physical edge completes the bag at
   // goal arrival, without reserving or executing goal-node service.
@@ -760,6 +764,11 @@ struct EventCandidateRecord {
   int target_scheduled_incoming = 0;
   double corridor_next_available = 0.0;
   double target_next_available = 0.0;
+  bool s4_wait_prediction_enabled = false;
+  double predicted_entry_wait = 0.0;
+  double predicted_merge_wait = 0.0;
+  double predicted_post_service_wait = 0.0;
+  double projected_arrival = 0.0;
   bool advertised_fault = false;
   double fault_message_age_seconds = 0.0;
   int recent_visit_count = 0;
@@ -1003,6 +1012,8 @@ struct EventRuntimeSummary {
   bool s4_direct_neighbor_merge_calendar_visibility_enabled = false;
   bool s4_direct_neighbor_merge_calendar_visibility_learning_active = false;
   std::string s4_direct_neighbor_merge_calendar_visibility_claim_boundary;
+  std::string s4_wait_estimator = "legacy";
+  std::map<std::string, double> s4_wait_metrics;
   bool complete_on_goal_arrival_enabled = false;
   std::string complete_on_goal_arrival_claim_boundary;
   bool scorer_out_of_distribution_diagnostic = false;
@@ -2670,6 +2681,9 @@ class EventDrivenJunctionRuntime {
         pending_merge_dispatches;
     ExpiringFirstEdgeCreditCheckpoint credit_ledger;
     std::unordered_map<long long, int> directed_inflight_counts;
+    std::map<int, S4QueueFlowEstimate> s4_queue_flow;
+    std::map<int, S4CommittedWaitForecast> s4_wait_forecasts;
+    S4WaitAudit s4_wait_audit;
     std::unordered_set<int> fault_affected_bags;
     std::unordered_map<long long, std::set<int>>
         fault_affected_bags_by_edge;
@@ -2980,6 +2994,7 @@ class EventDrivenJunctionRuntime {
         "no_teacher_input;no_future_route_or_schedule;no_global_task_scan;"
         "Q1_is_ordinal_local_projection_not_invented_numeric_thesis_weights";
     result_.summary.scorer_id = canonical_scorer_id();
+    result_.summary.s4_wait_estimator = config_.s4_wait_estimator;
     result_.summary.scorer_model_sha256 =
         config_.scorer_model_sha256;
     result_.summary.scorer_score_direction =
@@ -3604,6 +3619,7 @@ class EventDrivenJunctionRuntime {
     require_checkpoint_safe_boundary();
     active_backlog_at_runtime_stop_ = active_bag_count_;
     finalize_incomplete();
+    finish_s4_wait_metrics();
     build_bag_results();
     build_junction_results();
     build_credit_results();
@@ -5145,6 +5161,16 @@ class EventDrivenJunctionRuntime {
       throw std::invalid_argument(
           "direct-neighbor merge-calendar visibility requires the S4 scorer");
     }
+    if (config_.s4_wait_estimator != "legacy" &&
+        config_.s4_wait_estimator != "eta_calendar" &&
+        config_.s4_wait_estimator != "eta_flow") {
+      throw std::invalid_argument(
+          "s4_wait_estimator must be legacy, eta_calendar, or eta_flow");
+    }
+    if (config_.s4_wait_estimator != "legacy" &&
+        canonical_scorer_mode() != "S4") {
+      throw std::invalid_argument("ETA waiting estimates require the S4 scorer");
+    }
     if (dlp.deterministic_surviving_graph_values && dlp.mode != "td") {
       throw std::invalid_argument(
           "deterministic surviving-graph values require G4IRSF24 TD mode");
@@ -5414,6 +5440,13 @@ class EventDrivenJunctionRuntime {
     runtime_phase_ = EventDrivenJunctionRuntimePhase::kIdle;
     time_limit_ = 0.0;
     result_ = {};
+    s4_queue_flow_.clear();
+    s4_wait_forecasts_.clear();
+    s4_wait_audit_ = {};
+    if (config_.s4_wait_estimator != "legacy") {
+      for (int node : graph_.node_locations())
+        s4_queue_flow_.emplace(node, S4QueueFlowEstimate{});
+    }
     bags_.clear();
     segment_runtime_ids_.clear();
     junctions_.clear();
@@ -5617,6 +5650,7 @@ class EventDrivenJunctionRuntime {
   }
 
   void publish_prepared_event(RuntimeEvent event) {
+    observe_s4_committed_departure(event);
     circulation_publish_event(event);
     event.seq = next_event_seq_++;
     events_.push(std::move(event));
@@ -5624,6 +5658,7 @@ class EventDrivenJunctionRuntime {
 
   void publish_prepared_reserved_event(
       RuntimeEvent event) noexcept {
+    observe_s4_committed_departure(event);
     circulation_publish_event(event);
     event.seq = next_event_seq_++;
     events_.push(std::move(event));
@@ -5735,6 +5770,8 @@ class EventDrivenJunctionRuntime {
       }
       auto& bag = found->second;
       bag.status = BagStatus::kSourceQueue;
+      if (config_.s4_wait_estimator != "legacy")
+        s4_wait_forecasts_.try_emplace(event.task_id);
       bag.active_in_runtime = true;
       ++active_bag_count_;
       result_.summary.peak_active_bag_count =
@@ -9808,7 +9845,12 @@ class EventDrivenJunctionRuntime {
         double score =
             candidate.travel_time + candidate.static_potential;
         if (mode == "S4") {
-          score +=
+          if (config_.s4_wait_estimator != "legacy") {
+            score += candidate.predicted_entry_wait +
+                     candidate.predicted_merge_wait +
+                     candidate.predicted_post_service_wait;
+          } else {
+            score +=
               static_cast<double>(
                   candidate.target_queue_length +
                   candidate.target_scheduled_incoming) +
@@ -9819,6 +9861,7 @@ class EventDrivenJunctionRuntime {
                   0.0,
                   candidate.target_next_available -
                       (trace.event_time + candidate.travel_time));
+          }
         }
         candidate.pre_fault_policy_score = score;
         candidate.model_score =
@@ -14711,6 +14754,130 @@ class EventDrivenJunctionRuntime {
     }
   }
 
+  double s4_post_service_wait(int node, int excluded_bag,
+                              double now, double ready_at) const noexcept {
+    const auto found = junctions_.find(node);
+    const auto flow = s4_queue_flow_.find(node);
+    if (found == junctions_.end() || flow == s4_queue_flow_.end())
+      return 0.0;
+    const auto& target = found->second;
+    int queued = 0;
+    double front_enqueued = -1.0;
+    for (int id : target.queue) {
+      if (id == excluded_bag) continue;
+      const auto bag = bags_.find(id);
+      if (bag == bags_.end() ||
+          bag->second.status != BagStatus::kJunctionQueue) continue;
+      ++queued;
+      if (front_enqueued < 0.0)
+        front_enqueued = bag->second.junction_enqueued_at;
+    }
+    int committed_completions = 0;
+    target.service_calendar.inspect([&](const auto& interval) {
+      if (interval.task_id == excluded_bag ||
+          interval.end <= now + event_runtime_detail::kEpsilon ||
+          interval.end > ready_at + event_runtime_detail::kEpsilon) return;
+      const auto bag = bags_.find(interval.task_id);
+      if (bag != bags_.end() && bag->second.request.goal != node &&
+          (bag->second.status == BagStatus::kInTransit ||
+           bag->second.status == BagStatus::kInService))
+        ++committed_completions;
+    });
+    const double minimum = std::max(config_.dispatch_headway_seconds,
+                                    config_.minimum_service_seconds);
+    const double prior = std::max(minimum, service_duration(node));
+    const double headway = flow->second.headway(
+        now, front_enqueued, prior, minimum);
+    return s4_projected_post_service_wait(
+        queued, committed_completions, ready_at - now, headway);
+  }
+
+  // All three native commit paths (ordinary, J2, and atomic PIBT) publish one
+  // EDGE_ENTER here. No attempted or rolled-back dispatch can train this
+  // estimator. State and map entries are allocated before publication.
+  void observe_s4_committed_departure(const RuntimeEvent& event) noexcept {
+    if (config_.s4_wait_estimator == "legacy" ||
+        event.type != JunctionEventType::kEdgeEnter) return;
+    const auto found = bags_.find(event.task_id);
+    const auto forecast = s4_wait_forecasts_.find(event.task_id);
+    const auto flow = s4_queue_flow_.find(event.from_node);
+    if (found == bags_.end() || forecast == s4_wait_forecasts_.end() ||
+        flow == s4_queue_flow_.end()) return;
+    const auto& bag = found->second;
+    if (bag.status != BagStatus::kInTransit ||
+        bag.transit_from != event.from_node ||
+        bag.transit_to != event.to_node) return;
+    auto& prior = forecast->second;
+    if (prior.pending && prior.node == event.from_node) {
+      const double actual = std::max(
+          0.0, event.time - bag.junction_enqueued_at);
+      s4_wait_audit_.observe(prior.predicted_post_wait,
+                             prior.legacy_queue_proxy, actual);
+    }
+    prior.pending = false;
+    const double minimum = std::max(config_.dispatch_headway_seconds,
+                                    config_.minimum_service_seconds);
+    flow->second.observe_departure(event.time, bag.junction_enqueued_at,
+                                   minimum);
+    ++s4_wait_audit_.flow_departure_count;
+    if (event.to_node == bag.request.goal) return;
+
+    // This forecast is made AFTER the actual current hop is committed. Its
+    // arrival/service slot is therefore known; it predicts only the wait
+    // after that service, not the J2 hold already spent at the upstream node.
+    const double travel = std::max(
+        graph_.edge(event.from_node, event.to_node).travel_time(),
+        config_.minimum_service_seconds);
+    const double ready_at = event.time + travel +
+                            service_duration(event.to_node);
+    prior.pending = true;
+    prior.node = event.to_node;
+    prior.commit_time = event.time;
+    prior.predicted_post_wait =
+        config_.s4_wait_estimator == "eta_flow"
+            ? s4_post_service_wait(event.to_node, event.task_id,
+                                   event.time, ready_at)
+            : 0.0;
+    const auto target = junctions_.find(event.to_node);
+    prior.legacy_queue_proxy =
+        target == junctions_.end()
+            ? 0.0
+            : static_cast<double>(target->second.queue.size());
+    ++s4_wait_audit_.commit_forecast_count;
+  }
+
+  void finish_s4_wait_metrics() {
+    if (config_.s4_wait_estimator == "legacy") return;
+    const auto& audit = s4_wait_audit_;
+    const double count = static_cast<double>(audit.resolved_forecast_count);
+    const double denominator = std::max(1.0, count);
+    auto& metrics = result_.summary.s4_wait_metrics;
+    metrics["candidate_prediction_count"] =
+        static_cast<double>(result_.summary.scorer_candidate_evaluation_count);
+    metrics["flow_departure_count"] =
+        static_cast<double>(audit.flow_departure_count);
+    metrics["commit_forecast_count"] =
+        static_cast<double>(audit.commit_forecast_count);
+    metrics["resolved_forecast_count"] = count;
+    metrics["censored_forecast_count"] = static_cast<double>(
+        audit.commit_forecast_count - audit.resolved_forecast_count);
+    metrics["predicted_post_wait_mae"] =
+        audit.predicted_absolute_error / denominator;
+    metrics["predicted_post_wait_rmse"] =
+        std::sqrt(audit.predicted_squared_error / denominator);
+    metrics["predicted_post_wait_bias"] =
+        audit.predicted_signed_error / denominator;
+    metrics["legacy_queue_proxy_mae"] =
+        audit.legacy_absolute_error / denominator;
+    metrics["legacy_queue_proxy_rmse"] =
+        std::sqrt(audit.legacy_squared_error / denominator);
+    metrics["legacy_queue_proxy_bias"] =
+        audit.legacy_signed_error / denominator;
+    metrics["actual_post_wait_mean"] =
+        audit.actual_post_wait_sum / denominator;
+    metrics["ewma_alpha"] = 0.25;
+  }
+
   EventCandidateRecord candidate_record(const BagState& bag,
                                         int current,
                                         int candidate,
@@ -14752,6 +14919,26 @@ class EventDrivenJunctionRuntime {
         (!destination_merge_candidate || s4_merge_calendar_visible)) {
       record.target_next_available =
           target.service_calendar.earliest_start(time + record.travel_time, service);
+    }
+    if (config_.s4_wait_estimator != "legacy") {
+      record.s4_wait_prediction_enabled = true;
+      record.predicted_entry_wait =
+          std::max(0.0, record.corridor_next_available - time);
+      record.projected_arrival =
+          time + record.predicted_entry_wait + record.travel_time;
+      const double service_start =
+          uses_destination_calendar(candidate, bag.request.goal)
+              ? target.service_calendar.earliest_start(
+                    record.projected_arrival, service)
+              : record.projected_arrival;
+      record.predicted_merge_wait =
+          std::max(0.0, service_start - record.projected_arrival);
+      if (config_.s4_wait_estimator == "eta_flow" &&
+          candidate != bag.request.goal) {
+        record.predicted_post_service_wait = s4_post_service_wait(
+            candidate, bag.request.runtime_bag_id, time,
+            service_start + service);
+      }
     }
 
     const auto current_goal = goal_queue_state(current_controller,
@@ -18137,6 +18324,9 @@ class EventDrivenJunctionRuntime {
       pending_merge_dispatches_;
   ExpiringFirstEdgeCreditLedger credit_ledger_;
   std::unordered_map<long long, int> directed_inflight_counts_;
+  std::map<int, S4QueueFlowEstimate> s4_queue_flow_;
+  std::map<int, S4CommittedWaitForecast> s4_wait_forecasts_;
+  S4WaitAudit s4_wait_audit_;
   std::unordered_set<int> fault_affected_bags_;
   std::unordered_map<long long, std::set<int>>
       fault_affected_bags_by_edge_;
@@ -18343,6 +18533,9 @@ EventDrivenJunctionRuntime::capture_state_checkpoint() const {
   storage->credit_ledger =
       credit_ledger_.capture_exact_checkpoint();
   storage->directed_inflight_counts = directed_inflight_counts_;
+  storage->s4_queue_flow = s4_queue_flow_;
+  storage->s4_wait_forecasts = s4_wait_forecasts_;
+  storage->s4_wait_audit = s4_wait_audit_;
   storage->fault_affected_bags = fault_affected_bags_;
   storage->fault_affected_bags_by_edge =
       fault_affected_bags_by_edge_;
@@ -18516,6 +18709,9 @@ restore_state_checkpoint(const StateCheckpoint& checkpoint) {
           storage.credit_ledger);
   directed_inflight_counts_ =
       storage.directed_inflight_counts;
+  s4_queue_flow_ = storage.s4_queue_flow;
+  s4_wait_forecasts_ = storage.s4_wait_forecasts;
+  s4_wait_audit_ = storage.s4_wait_audit;
   fault_affected_bags_ = storage.fault_affected_bags;
   fault_affected_bags_by_edge_ =
       storage.fault_affected_bags_by_edge;
@@ -18747,6 +18943,15 @@ inline void EventDrivenJunctionRuntime::
 fingerprint_deterministic_summary(
     StateFingerprintWriter& writer,
     const EventRuntimeSummary& summary) {
+  if (summary.s4_wait_estimator != "legacy") {
+    writer.string("s4_eta_wait_estimator_v1");
+    writer.string(summary.s4_wait_estimator);
+    writer.u64(summary.s4_wait_metrics.size());
+    for (const auto& metric : summary.s4_wait_metrics) {
+      writer.string(metric.first);
+      writer.floating(metric.second);
+    }
+  }
   writer.string(summary.resource_semantics_id);
   writer.string(summary.resource_semantics_echo);
   writer.string(summary.pressure_mode);
@@ -19407,6 +19612,13 @@ EventDrivenJunctionRuntime::compute_replay_hashes_projection() const {
                 candidate.corridor_next_available);
             deterministic.floating(
                 candidate.target_next_available);
+            if (candidate.s4_wait_prediction_enabled) {
+              deterministic.string("s4_eta_wait_prediction_v1");
+              deterministic.floating(candidate.predicted_entry_wait);
+              deterministic.floating(candidate.predicted_merge_wait);
+              deterministic.floating(candidate.predicted_post_service_wait);
+              deterministic.floating(candidate.projected_arrival);
+            }
             deterministic.boolean(candidate.advertised_fault);
             deterministic.floating(
                 candidate.fault_message_age_seconds);
@@ -19802,6 +20014,36 @@ EventDrivenJunctionRuntime::compute_runtime_state_digests() const {
   current_time.floating(last_physical_repair_time_);
   current_time.i64(active_backlog_at_last_repair_);
   current_time.i64(active_backlog_at_runtime_stop_);
+  if (config_.s4_wait_estimator != "legacy") {
+    current_time.string("s4_eta_wait_observation_state_v1");
+    current_time.u64(s4_queue_flow_.size());
+    for (const auto& entry : s4_queue_flow_) {
+      current_time.i64(entry.first);
+      current_time.floating(entry.second.last_departure);
+      current_time.floating(entry.second.ewma_headway);
+      current_time.u64(entry.second.departure_count);
+    }
+    current_time.u64(s4_wait_forecasts_.size());
+    for (const auto& entry : s4_wait_forecasts_) {
+      current_time.i64(entry.first);
+      current_time.boolean(entry.second.pending);
+      current_time.i64(entry.second.node);
+      current_time.floating(entry.second.commit_time);
+      current_time.floating(entry.second.predicted_post_wait);
+      current_time.floating(entry.second.legacy_queue_proxy);
+    }
+    const auto& audit = s4_wait_audit_;
+    current_time.u64(audit.flow_departure_count);
+    current_time.u64(audit.commit_forecast_count);
+    current_time.u64(audit.resolved_forecast_count);
+    current_time.floating(audit.predicted_absolute_error);
+    current_time.floating(audit.predicted_squared_error);
+    current_time.floating(audit.predicted_signed_error);
+    current_time.floating(audit.legacy_absolute_error);
+    current_time.floating(audit.legacy_squared_error);
+    current_time.floating(audit.legacy_signed_error);
+    current_time.floating(audit.actual_post_wait_sum);
+  }
 
   std::vector<int> bag_ids;
   bag_ids.reserve(bags_.size());
@@ -20263,6 +20505,13 @@ EventDrivenJunctionRuntime::compute_runtime_state_digests() const {
           candidate.corridor_next_available);
       merge_grants.floating(
           candidate.target_next_available);
+      if (candidate.s4_wait_prediction_enabled) {
+        merge_grants.string("s4_eta_wait_prediction_v1");
+        merge_grants.floating(candidate.predicted_entry_wait);
+        merge_grants.floating(candidate.predicted_merge_wait);
+        merge_grants.floating(candidate.predicted_post_service_wait);
+        merge_grants.floating(candidate.projected_arrival);
+      }
       merge_grants.boolean(candidate.advertised_fault);
       merge_grants.floating(
           candidate.fault_message_age_seconds);
@@ -20521,6 +20770,10 @@ EventDrivenJunctionRuntime::compute_runtime_state_digests() const {
   scorer.string(config_.priority_mode);
   scorer.string(config_.pibt_preference_mode);
   scorer.string(config_.scorer_mode);
+  if (config_.s4_wait_estimator != "legacy") {
+    scorer.string("s4_eta_wait_estimator_v1");
+    scorer.string(config_.s4_wait_estimator);
+  }
   if (config_.enable_s4_local_potential_descent_guard) {
     scorer.string("s4_local_potential_descent_guard_v1");
     scorer.boolean(

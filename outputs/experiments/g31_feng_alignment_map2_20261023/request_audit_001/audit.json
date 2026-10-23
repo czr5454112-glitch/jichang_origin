@@ -1,0 +1,182 @@
+{
+  "schema": "g31.feng_alignment.request_audit.v1",
+  "argv": [
+    "scripts\\experiments\\g31_feng_alignment\\audit_requests.py",
+    "--canonical",
+    "data\\processed\\tasks\\inputdata.jsonl",
+    "--reference",
+    "outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_legacy_001",
+    "--own",
+    "G31_legacy=outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_legacy_001",
+    "--own",
+    "G31_calendar=outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_calendar_001",
+    "--own",
+    "G31_flow=outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_flow_001",
+    "--aligned",
+    "G31_legacy_same_HCA=outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_legacy_same_hca_release_001",
+    "--aligned",
+    "G31_calendar_same_HCA=outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_calendar_same_hca_release_001",
+    "--aligned",
+    "G31_flow_same_HCA=outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_flow_same_hca_release_001",
+    "--release-trace",
+    "outputs\\experiments\\g31_feng_alignment_map2_20261023\\java_native_1x\\run_01\\segment_lifecycle.csv",
+    "--output",
+    "outputs\\experiments\\g31_feng_alignment_map2_20261023\\request_audit_001"
+  ],
+  "script": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_feng_alignment\\audit_requests.py",
+    "sha256": "ba1fbc9a948571904e73362e29813da672675fc9634042f596612a6e3df021f8"
+  },
+  "canonical": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\tasks\\inputdata.jsonl",
+    "sha256": "968d2c876fcbf03c5b25c8e865ccd469431af3ddbf59dc9ebe073752bd93678f"
+  },
+  "release_trace": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\java_native_1x\\run_01\\segment_lifecycle.csv",
+    "sha256": "d8c68b68952155181179b1a0ff25939a2a0c6371c4952d1830b7359e58131e5c"
+  },
+  "reference": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_legacy_001\\request.json.gz",
+    "sha256": "d1afbf3f71897844f06dc8e078e46e55eee00a8b47d4580dded45f193e70f0b3"
+  },
+  "reference_binary": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build\\g31_feng_alignment_001\\python\\czr005_cpp.cp311-win_amd64.pyd",
+    "sha256": "7260288ed0996ad01d445cbf906010faabba1a0bc531f8ba13d6c1d1dd63bb28"
+  },
+  "comparisons": [
+    {
+      "arm": "G31_legacy",
+      "directory": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_legacy_001",
+      "mode": "legacy",
+      "same_HCA_generator_release": false,
+      "segments_checked": 43603,
+      "release_changes_from_reference": 0,
+      "all_other_bag_fields_exact": true,
+      "all_execution_options_exact": true,
+      "same_binary_sha256": true,
+      "changed_request_keys": [],
+      "request": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_legacy_001\\request.json.gz",
+        "sha256": "d1afbf3f71897844f06dc8e078e46e55eee00a8b47d4580dded45f193e70f0b3"
+      },
+      "manifest": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_legacy_001\\manifest.json",
+        "sha256": "5aca290d14dea531a8dd09ba74f6264d1bc62a113e3870bc9590cb6aa4cba825"
+      }
+    },
+    {
+      "arm": "G31_calendar",
+      "directory": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_calendar_001",
+      "mode": "eta_calendar",
+      "same_HCA_generator_release": false,
+      "segments_checked": 43603,
+      "release_changes_from_reference": 0,
+      "all_other_bag_fields_exact": true,
+      "all_execution_options_exact": true,
+      "same_binary_sha256": true,
+      "changed_request_keys": [
+        "s4_wait_estimator"
+      ],
+      "request": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_calendar_001\\request.json.gz",
+        "sha256": "7af401c9167c5bc8c6861b87aa973cd1869602f3694c28cb336833d1b2622870"
+      },
+      "manifest": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_calendar_001\\manifest.json",
+        "sha256": "eb81fbf4d28be97908ea5d9186dc6b8d315c4d56f7d6aad9919dbd0b162d8905"
+      }
+    },
+    {
+      "arm": "G31_flow",
+      "directory": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_flow_001",
+      "mode": "eta_flow",
+      "same_HCA_generator_release": false,
+      "segments_checked": 43603,
+      "release_changes_from_reference": 0,
+      "all_other_bag_fields_exact": true,
+      "all_execution_options_exact": true,
+      "same_binary_sha256": true,
+      "changed_request_keys": [
+        "s4_wait_estimator"
+      ],
+      "request": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_flow_001\\request.json.gz",
+        "sha256": "e806aa8f2063267561d1abd694982590062870a77f2bd721e9017b3e12135c29"
+      },
+      "manifest": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_flow_001\\manifest.json",
+        "sha256": "9147a51a0dd18431c5023e5d62d553dd1cfa881206bac09a50a724bcd64b6ace"
+      }
+    },
+    {
+      "arm": "G31_legacy_same_HCA",
+      "directory": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_legacy_same_hca_release_001",
+      "mode": "legacy",
+      "same_HCA_generator_release": true,
+      "segments_checked": 43603,
+      "release_changes_from_reference": 43476,
+      "all_other_bag_fields_exact": true,
+      "all_execution_options_exact": true,
+      "same_binary_sha256": true,
+      "changed_request_keys": [
+        "bag_records"
+      ],
+      "request": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_legacy_same_hca_release_001\\request.json.gz",
+        "sha256": "15cd81b194ee06ad6810dadebaa0a36c6d0e9d0519384b7c4b04e9b8bf2fa177"
+      },
+      "manifest": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_legacy_same_hca_release_001\\manifest.json",
+        "sha256": "3b6ce8eeaccefba96044430e98c3fd4bb141888847a890335fa0d8e249f52062"
+      }
+    },
+    {
+      "arm": "G31_calendar_same_HCA",
+      "directory": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_calendar_same_hca_release_001",
+      "mode": "eta_calendar",
+      "same_HCA_generator_release": true,
+      "segments_checked": 43603,
+      "release_changes_from_reference": 43476,
+      "all_other_bag_fields_exact": true,
+      "all_execution_options_exact": true,
+      "same_binary_sha256": true,
+      "changed_request_keys": [
+        "bag_records",
+        "s4_wait_estimator"
+      ],
+      "request": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_calendar_same_hca_release_001\\request.json.gz",
+        "sha256": "85b1c9a365560313b5816b156dba67cddf7b025834e78485509fb20893292294"
+      },
+      "manifest": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_calendar_same_hca_release_001\\manifest.json",
+        "sha256": "686b81ae9e326f4a294c69ccdc4aa3dfff4d0b2c6eb50d29a8eb2366eb6bde7c"
+      }
+    },
+    {
+      "arm": "G31_flow_same_HCA",
+      "directory": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_flow_same_hca_release_001",
+      "mode": "eta_flow",
+      "same_HCA_generator_release": true,
+      "segments_checked": 43603,
+      "release_changes_from_reference": 43476,
+      "all_other_bag_fields_exact": true,
+      "all_execution_options_exact": true,
+      "same_binary_sha256": true,
+      "changed_request_keys": [
+        "bag_records",
+        "s4_wait_estimator"
+      ],
+      "request": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_flow_same_hca_release_001\\request.json.gz",
+        "sha256": "f14e5b58d327cd182d1b247bce475234bd0352bdc57c2231b16a6e343dd8fe0f"
+      },
+      "manifest": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_flow_same_hca_release_001\\manifest.json",
+        "sha256": "61838bea38887069a3e9da896bfd24647b2ca44611431ee01b885664e8ad15ff"
+      }
+    }
+  ],
+  "all_passed": true,
+  "boundary": "Java execution remains its original implementation. This gate proves factor isolation among the G31 arms only."
+}

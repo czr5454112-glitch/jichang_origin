@@ -1,0 +1,456 @@
+{
+  "schema": "g31.feng_alignment.arm.v1",
+  "arm": "G31_legacy",
+  "reused": false,
+  "map_id": "protected_map2_54_nodes_69_edges",
+  "map2_contract": {
+    "map_id": "protected_map2_54_nodes_69_edges",
+    "case_id": "t5_2_map2_1x_speed_2",
+    "workload_protocol": "ORIGINAL_PAPER_CANONICAL_EXPANDED_1X",
+    "raw_bags": 28506,
+    "segments": 43603,
+    "leg_counts": {
+      "storage_in": 15097,
+      "storage_out": 15097,
+      "direct": 13409
+    },
+    "start_epoch": 8260.0,
+    "horizon": 98259.0,
+    "max_events": 60000000,
+    "speed_mps": 2.0,
+    "map": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\maps\\map2.json",
+      "sha256": "9e8c5a236869336cf4c05a09a8ce0554f440eb45a6896972fc54116bcf78bbb4"
+    },
+    "canonical": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\tasks\\inputdata.jsonl",
+      "sha256": "968d2c876fcbf03c5b25c8e865ccd469431af3ddbf59dc9ebe073752bd93678f"
+    },
+    "node_count": 54,
+    "directed_edge_count": 69,
+    "storage_in_goals": [
+      47
+    ],
+    "storage_out_starts": [
+      52
+    ],
+    "release_contract": "canonical_pass_time_own_source",
+    "release_trace": null,
+    "scheduled_pass_range": [
+      8267.845453,
+      81900.0
+    ],
+    "official_local_contract": {
+      "activation": "FAULT_STRUCTURAL_VALUES_EXACT_OFF",
+      "learned_from_runtime_data": false,
+      "fault_edges": [],
+      "source_rejected_unreachable_segment_count": 0,
+      "runtime_reachable_segment_count": 43603,
+      "artifact_contract": null,
+      "artifact": null,
+      "service_aware_potential": {
+        "mode": "SERVICE_AWARE_STATIC_LOCAL_POTENTIAL",
+        "formula": "H(g,g)=0; H(u,g)=service_duration(u)+min_(u,v)(travel(u,v)+H(v,g))",
+        "service_duration": "max(map_node_service,minimum_service_seconds)",
+        "minimum_service_seconds": 0.001,
+        "candidate_score_identity": "travel(current,candidate)+H(candidate,goal) includes candidate and later non-goal service",
+        "precomputation": "reverse_dijkstra_once_per_goal",
+        "node_count": 54,
+        "directed_edge_count": 69,
+        "unreachable_finite_value_seconds": 1149.513,
+        "runtime_read_scope": "direct_outgoing_candidates_and_one_scalar_each",
+        "runtime_decision_complexity": "O(outdegree)",
+        "runtime_full_astar_required": false,
+        "future_route_materialized": false,
+        "global_reservation_table_required": false
+      },
+      "local_potential_descent_guard": {
+        "enabled": true,
+        "rule": "H_eff(next,goal)+epsilon<H_eff(current,goal)",
+        "read_scope": "current_and_direct_outgoing_neighbors",
+        "decision_scope": "one_next_edge_at_current_junction",
+        "no_descending_action": "hold_retry",
+        "learning_active": false,
+        "learned_values_allowed": false
+      },
+      "direct_neighbor_merge_calendar_visibility": {
+        "enabled": true,
+        "read_scope": "direct_outgoing_merge_neighbor_service_calendar_scalar",
+        "score_input": "existing_target_next_available_calendar_wait",
+        "score_weight": "existing_calendar_wait_weight",
+        "merge_authority": "E4/J2_unchanged",
+        "decision_scope": "one_next_edge_at_current_junction",
+        "learning_active": false
+      },
+      "goal_arrival_completion": {
+        "enabled": true,
+        "terminal_event": "physical_goal_edge_exit",
+        "goal_service": "not_reserved_or_executed",
+        "legacy_reference": "HCA_Tasks_ICS_goal_arrival_completion"
+      }
+    }
+  },
+  "execution_contract": "mature_G31_S4_J2_R3_no_edge_capacity_independent_segment_schedule",
+  "release_contract": "canonical_pass_time_own_source",
+  "release_trace": null,
+  "canonical": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\tasks\\inputdata.jsonl",
+    "sha256": "968d2c876fcbf03c5b25c8e865ccd469431af3ddbf59dc9ebe073752bd93678f"
+  },
+  "binary": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build\\g31_feng_alignment_001\\python\\czr005_cpp.cp311-win_amd64.pyd",
+    "sha256": "7260288ed0996ad01d445cbf906010faabba1a0bc531f8ba13d6c1d1dd63bb28"
+  },
+  "sources": [
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_feng_alignment\\map2_experiment.py",
+      "sha256": "4e40c38efc34bd00be3a495559a3ddcb1aa7d69d454864997bd09da296b53f9c"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_feng_alignment\\experiment.py",
+      "sha256": "26b75106c81ac0730c14d2d6622d43d4e2c94ca815d1dd41c677d70d9ee55d1b"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_feng_alignment\\metrics.py",
+      "sha256": "b28cace3d5bca76a0d11665f6ddb761b4bc7fa59819cd5c4f0e854a1b7b47f28"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\src\\czr005\\cpp_backend.py",
+      "sha256": "7871ea9030028d278c5c82ccbed23d6f931415006adf4af8f5dfdb7712b8fca2"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\CMakeLists.txt",
+      "sha256": "22224d655b57f2a76b68f28dfdb45099eb9f008ca07148488c2a203fcc4c4fd6"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf31_map2_native.py",
+      "sha256": "7704388e95f6fb9dee3d798ed01f291b3c066f03f8fdb2b8a53a7e653483db9c"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\g4irsf31_map_adapter.py",
+      "sha256": "878c0ee31788ab6ff9fb87e8306fe45f90dc2905a9e32356e55f17f2214b95f6"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\g4irsf11_fixed_map.py",
+      "sha256": "26b7f33b997c8d691e3e4d3c8fe093e37ec81cf8749e63d542bdb5e0826ea7b1"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\g4irsf14_opportunity_census.py",
+      "sha256": "60bea44339851d367397c359544acf1de3ca0e3d1eae91f5dc8e12fd14b3de4f"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf28_service_potential.py",
+      "sha256": "992ebc5b33f09acc5935e4c1724d8874da10dd46ca69390f72c74bd5bdd2b52f"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\eval\\run_g4irsf31_nanning_native.py",
+      "sha256": "0de347e43ca462c94897a27632e3fb6c787872afab02515559d5f0268430c069"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\experimental\\complete_tree_normalizer\\normalizer.cpp",
+      "sha256": "0621d204a43723f55ff2f9a89d703e92250b801a54a8f4dd9e1abbade00d9320"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\experimental\\planning_v2_typed_encoder\\encoder.cpp",
+      "sha256": "c8bcba1854d64103d45a4ed4a069fa1a3baf09734990f0354c2108c0c845a20e"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\baselines\\periodic_replanning.hpp",
+      "sha256": "020b9b44f5d0a819001ce5618e33f5cc54877962d192b05242efd350b9e4a4e2"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\baselines\\pibt.hpp",
+      "sha256": "af01ebf7dc7e5599a299e7fa2cb9aa8ffa7f71bf8956ff07c508ccf0b56247dc"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\baselines\\pibt_replay.hpp",
+      "sha256": "2dd6acbbe0d74752ef5658c1d3ecf1d3e36570dcd537ad0248000ff22949f486"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\baselines\\queue_aware.hpp",
+      "sha256": "4cb5c6d197400c7b84f5c3d94bc5c4b44fe6597b7777fd75679e5c65b71bdca6"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\baselines\\rolling_horizon.hpp",
+      "sha256": "996d6d0e62f7adb49529a6281a839da10d0a8481d5fa60f541b33e0eaa8304b7"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\bindings\\circulation.cpp",
+      "sha256": "c5f017e358f480e51899e5e18fa5e0e8e54b358aba0af0fae1e5d9e5a208693d"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\bindings\\circulation_session_binding.hpp",
+      "sha256": "0b14996b99ea3b873aeb39352488459a80250877a72d4ede5d517d088d15529d"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\bindings\\czr005_cpp.cpp",
+      "sha256": "2ca58e27ef4e64fa9c53c4c0de300f6f64650fc21004895aac8d813af7603b27"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\bindings\\g4irsf15_causal_campaign_binding.hpp",
+      "sha256": "aa4652253d7383f63c5c63234b1f3752cb866e554e01a6224a02772bca3b0021"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\event_sim\\event_sim.hpp",
+      "sha256": "a2278964dd8edeb79060e17f4b5bfe977e3a9528ea04e3174c98d63c4f3ac635"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\graph\\graph.hpp",
+      "sha256": "24c7710f7e643f81a01cafa6fe06a7202a5f905db044258e97d133250a90769f"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\io\\canonical_map2_reader.hpp",
+      "sha256": "ca6428927a4209404a1513723b9529c19adc1d112c3aac9ed12f94e64dbf2911"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\io\\incremental_sha256.hpp",
+      "sha256": "02fd9e785183554aec03efa53754eae1782187bbf4e6961a84dd6bd5afed5fa8"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\io\\legacy_map_reader.hpp",
+      "sha256": "6c55c4ecc4505633d8e4d0edb023ce02669bf50c33a960b3740940c18c571f2c"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\io\\legacy_task_reader.hpp",
+      "sha256": "d8ebb4b0449c43ff860ec6faeb4625a324a5f8f4edbbd4ba34fa359952580aac"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\legacy\\legacy_window.hpp",
+      "sha256": "cab0e9b0d6a88998b10626ce79725ac8daf1e6c692710689d7ef8044a1ca3050"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\metrics\\metrics.hpp",
+      "sha256": "ef43c28f0e17a43693525919f4da3d62781ba9daef7b44ca49c2bce412187f1e"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\models\\edge_score.hpp",
+      "sha256": "7f8f63aab39762130e9b7ede8dd26e59b433d2acf8797d46147a4e2f3cc84b28"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\models\\edge_score_io.hpp",
+      "sha256": "076d105e91f826d9cc886be81776d906f24f671fb8ace2bbb0bb5ef478511c24"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\reservation\\reservation.hpp",
+      "sha256": "f58d9837357fb24bc868dd6bcf1e6e2f071581925e715d0b2b4196f15df1f98d"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\routing\\astar.hpp",
+      "sha256": "c8c0bfac6e2ce600da6f951e3ab3401cd0f013fe10e1fab8da914e28831bc813"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\routing\\astar_types.hpp",
+      "sha256": "70a7bc425a4996836b101a606df599018d5578f6736ddd2ff1b93b36e93776bf"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\routing\\sipp.hpp",
+      "sha256": "ae02145b95271083dc703e2c0e9a7ae7666025a47aa4c21909dd629018db2bcc"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\runtime\\bounded_local_pibt.hpp",
+      "sha256": "14d5346bd52a3e94674b74e49bb10f7f0c8b0f5aff0bdf1462cacce0a904c5f6"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\runtime\\circulation.hpp",
+      "sha256": "3dbadcf36e9dbb63c4170eb64df85f51ac165386fc78fe3c511310896b351f3a"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\runtime\\circulation_checkpoint.hpp",
+      "sha256": "21024dbfd6d74cc191b6c0a7a50d639cbef1d30e37beae3c4f36216dc60f98fb"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\runtime\\circulation_notifications_impl.hpp",
+      "sha256": "fdba4f5463d263c38f437798c0cd3b340dc7b48579deabcae22220b30c5a8867"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\runtime\\circulation_observation_index.hpp",
+      "sha256": "8a1233ebcbf6c9f4f8e74fb09f20f9fc6433e46d6a3576e2ecbbfb5e5c634fee"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\runtime\\circulation_online_impl.hpp",
+      "sha256": "edd9dce3e59d0955b1566cc7f0c47b91d1253e159094de2e84ee50be17dc0868"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\runtime\\circulation_planning_snapshot_impl.hpp",
+      "sha256": "ace1df754bb1447f3b9e1dc310a108cf92866721e1eec486fa92d9a098257804"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\runtime\\circulation_protocol_commands_impl.hpp",
+      "sha256": "7cfc675327337e5ff12cefe1daf6d43c01ddcdcc2d79f5f899c8fec4e6d86edf"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\runtime\\circulation_protocol_impl.hpp",
+      "sha256": "ee44f23115ee4e405bd5ebaf87aee26724aec7881f3c10c554f65a63d3f82f84"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\runtime\\circulation_recovery_impl.hpp",
+      "sha256": "219c2b6272b360d7e3f0cabc208dfdf2f965ff247a54c45730cd9120e8fd4a80"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\runtime\\circulation_runtime_impl.hpp",
+      "sha256": "ba1fdf1a8d4f3330cdc25f0f5c3bcff5f1eef969282e0945f90f6e2acf43c861"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\runtime\\circulation_static_domain.hpp",
+      "sha256": "bb65bd24a0e7d88fdf9623e74f1adbf32ac50b65093f98967e1b682086addb6e"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\runtime\\destination_merge_grant.hpp",
+      "sha256": "a12f4dd41dc188951332705492accfa260d848c7c3473b14de02211e2c3b39d4"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\runtime\\edge_score_replay.hpp",
+      "sha256": "f0176cd1a1c654488637eefb374c5cabc6095475e71cacf7408dfb96d6d33520"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\runtime\\event_driven_junction.hpp",
+      "sha256": "6892abe511d81ae20e72a15aa12140a4ef62127fbc2507d6bf6ee1f9a3fd60ac"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\runtime\\expiring_first_edge_credit.hpp",
+      "sha256": "3f6603a40a40c824f94bc45252ced354ef537670d1155681ab7e807932d7fca4"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\runtime\\g4irsf14_causal_intervention.hpp",
+      "sha256": "09b49486642e54160c9e64eae4d3f179efe710a51822de987372b33a584065c8"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\runtime\\g4irsf14_state_clone.hpp",
+      "sha256": "a105f0d438f3e9fd9268a7e6931be71b77bf10d3fbeb1e948dc8a280495d142a"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\runtime\\g4irsf15_causal_campaign.hpp",
+      "sha256": "61772070e44fc713f3168decac4a4ecf29f9f74bb20868ff0375e99318d051a5"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\runtime\\g4irsf16_supervisor.hpp",
+      "sha256": "40660452ff19b24772a8627159643e8d251c18054f3d6e59b24104e10c7f723e"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\runtime\\g4irsf17_source_policy.hpp",
+      "sha256": "0d7d940d604929eb632440f74e6f18f5f744f193750fbb7d237bfe9b565f966b"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\runtime\\g4irsf18_merge_policy.hpp",
+      "sha256": "0294db661748147aecfe03f3251f5625d80cbc4fdff3de45858cc6aac9705a00"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\runtime\\request_timing_recorder.hpp",
+      "sha256": "e9df1c4e82560deb4f3e7b3993a404f7f5393640d4faf55bf41eb600b9f8c3fd"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\runtime\\s4_wait_estimator.hpp",
+      "sha256": "b3d90a2c6c69a271fbcfe88ab7e605aaf2f69f98eee14720c463497058a6fa96"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\shield\\junction_shield.hpp",
+      "sha256": "7b4581c19dfae9f4098c2f43f478796c4d1ccd925b564b4e0a12aa43831f3220"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\ics_core\\task_stream\\task_stream.hpp",
+      "sha256": "ddb2716dd2cc1e58eb7014122b2a3eb3a3c7555454ceb543ae7457cdccfa6161"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\tests\\g31_legacy_replay_fixture.cpp",
+      "sha256": "2e941eac7628e2a8cf8fbc3f7f2e56931dbc25a8a8326a2b7a9866b89a882a7e"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\tests\\test_bounded_local_pibt_real_map.cpp",
+      "sha256": "734c84013137a46511c0a55c234dae998399a2fb3e04b55140ec277aab930f06"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\tests\\test_circulation_checkpoint.cpp",
+      "sha256": "1ad460d25cb69fba3867447035ae58ae80a49e235b386c9d2e037fc1034e6ff1"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\tests\\test_circulation_runtime.cpp",
+      "sha256": "9cc6da4229771be93db3af5d273dcb04077ee55e2f06b1f05dea505555933066"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\tests\\test_cpp_core_smoke.cpp",
+      "sha256": "2aa9ea0dc6e65a3e232d664538ece131bd25f0ec7fa203a3bab0f5e9e4f317d7"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\tests\\test_destination_merge_grant_real_map.cpp",
+      "sha256": "b579723b6f556a4ab4f67d6232d9ceb406fec8ef2652e463a250b500d46f43d5"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\tests\\test_event_driven_junction.cpp",
+      "sha256": "236535e13a4a6bf6136e6dc3041f1de3f01b3f21e398a2f22fff494c987a53cd"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\tests\\test_event_runtime_bounded_local_pibt.cpp",
+      "sha256": "7248b0752f1d7c89956ea6d82e839027796066974d3455bb8aa462dbf4ce0995"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\tests\\test_expiring_first_edge_credit_real_map.cpp",
+      "sha256": "4369591909cf4cff714d487066f2fdf78a349acd426038a7b776f8959d2c33a6"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\tests\\test_g31_eta_wait.cpp",
+      "sha256": "21cd2e9f319a9f026479dfd86e2d48c99fea387e74e743b3d7f5cb837afc7b4a"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\tests\\test_g4irsf12_runtime_controls.cpp",
+      "sha256": "688ee9fbbffca6b183460c5c071867de78048c91dfb43499f5ae67bcf3fbdf6f"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\tests\\test_g4irsf14_causal_intervention.cpp",
+      "sha256": "d2c361c138c1fe9c78740c72f5bcc7a12f766d0f5485348cd7e23f23cc6ee6ad"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\tests\\test_g4irsf14_event_microphase.cpp",
+      "sha256": "e59af1eaf58c12aecafcc27b2792ff580f092f940505d09483fd1c129e168bff"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\tests\\test_g4irsf14_state_clone_protocol.cpp",
+      "sha256": "141e4e85954ced2a4cf8d61eb2a42ae0fdba1c293a520c97e2e8f175f783a2a3"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\tests\\test_g4irsf16_supervisor.cpp",
+      "sha256": "644b2740eca4b42685852ad8526a7cf2a72d05e9438b46d909103b5b5f41be35"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\tests\\test_g4irsf17_source_policy.cpp",
+      "sha256": "a26d6816338d94c6f158cd15f7712e06863dc052c063c4b58f95125fe7bafa4a"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\tests\\test_g4irsf17_source_wait_telemetry.cpp",
+      "sha256": "22a13c2172077b9e60e2ccdf95a3069d5f1dfc5815f0d68a7b749980c5acbe1c"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\tests\\test_g4irsf18_jit_destination_merge.cpp",
+      "sha256": "6faf4abbba7bd44827fc07af83649ff416873ca8f7fc1e95d8c030f8a17ac3f9"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\cpp\\tests\\test_g4irsf24_dlp.cpp",
+      "sha256": "bc1a41b9cb43580803c5fd678b2b39195036f586e01c8536776352015ab10dc2"
+    }
+  ],
+  "score_overrides": {
+    "s4_wait_estimator": "legacy"
+  },
+  "request": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_legacy_001\\request.json.gz",
+    "sha256": "d1afbf3f71897844f06dc8e078e46e55eee00a8b47d4580dded45f193e70f0b3"
+  },
+  "argv": [
+    "scripts/experiments/g31_feng_alignment/map2_experiment.py",
+    "run-native",
+    "--arm",
+    "G31_legacy",
+    "--binary",
+    "build/g31_feng_alignment_001/python/czr005_cpp.cp311-win_amd64.pyd",
+    "--output",
+    "outputs/experiments/g31_feng_alignment_map2_20261023/g31_legacy_001",
+    "--s4-wait-estimator",
+    "legacy"
+  ],
+  "source_snapshot_boundary": "current request/harness source and native binary recorded separately",
+  "causality_policy": "independent scheduled EBS segments; no predecessor coupling",
+  "native_call_wall_seconds_excluding_serialization": 18.484061500057578,
+  "native_payload": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_legacy_001\\native_payload.json.gz",
+    "sha256": "dd93f0610b91c9aca04626bd0964d3b1b2538d7039cef5ef008b9aea9c83733c"
+  }
+}

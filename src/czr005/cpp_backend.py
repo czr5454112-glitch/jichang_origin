@@ -723,6 +723,7 @@ def g4irsf11_event_runtime_from_records(
     enable_s4_local_potential_descent_guard: bool = False,
     enable_s4_direct_neighbor_merge_calendar_visibility: bool = False,
     complete_on_goal_arrival: bool = False,
+    s4_wait_estimator: str = "legacy",
 ) -> dict[str, Any]:
     """Run the G4IRSF11 one-edge-at-arrival C++ event runtime.
 
@@ -905,6 +906,8 @@ def g4irsf11_event_runtime_from_records(
         complete_on_goal_arrival,
         "complete_on_goal_arrival",
     )
+    if s4_wait_estimator not in ("legacy", "eta_calendar", "eta_flow"):
+        raise ValueError("s4_wait_estimator must be legacy, eta_calendar, or eta_flow")
     enable_opportunity_telemetry = strict_bool(
         enable_opportunity_telemetry,
         "enable_opportunity_telemetry",
@@ -1962,7 +1965,15 @@ def g4irsf11_event_runtime_from_records(
         int(legacy_observation_bias_seed),
     )
     map_tail_suffix: tuple[Any, ...] = ()
-    if complete_on_goal_arrival:
+    if s4_wait_estimator != "legacy":
+        map_tail_suffix = (
+            normalized_storage_source_nodes,
+            bool(enable_s4_local_potential_descent_guard),
+            bool(enable_s4_direct_neighbor_merge_calendar_visibility),
+            bool(complete_on_goal_arrival),
+            s4_wait_estimator,
+        )
+    elif complete_on_goal_arrival:
         map_tail_suffix = (
             normalized_storage_source_nodes,
             bool(enable_s4_local_potential_descent_guard),

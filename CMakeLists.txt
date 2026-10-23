@@ -38,6 +38,13 @@ target_link_libraries(test_event_driven_junction PRIVATE ics_core)
 target_compile_definitions(test_event_driven_junction PRIVATE CZR005_SOURCE_DIR="${CMAKE_CURRENT_SOURCE_DIR}")
 add_test(NAME event_driven_junction COMMAND test_event_driven_junction)
 
+add_executable(test_g31_eta_wait cpp/tests/test_g31_eta_wait.cpp)
+target_link_libraries(test_g31_eta_wait PRIVATE ics_core)
+if(MSVC)
+  target_compile_options(test_g31_eta_wait PRIVATE /bigobj)
+endif()
+add_test(NAME g31_eta_wait COMMAND test_g31_eta_wait)
+
 add_executable(
   test_g4irsf14_event_microphase
   cpp/tests/test_g4irsf14_event_microphase.cpp)
@@ -237,3 +244,16 @@ if(CZR005_BUILD_PYBIND)
       ${Python3_EXECUTABLE} ${CMAKE_CURRENT_SOURCE_DIR}/cpp/tests/test_pybind_smoke.py)
   set_tests_properties(pybind_smoke PROPERTIES DEPENDS czr005_cpp)
 endif()
+
+# Keep this header-only runtime's validation targets current even on localized
+# MSVC/Ninja installations where /showIncludes dependency parsing can fail.
+set_property(SOURCE
+  cpp/ics_core/bindings/czr005_cpp.cpp
+  cpp/tests/test_g31_eta_wait.cpp
+  cpp/tests/test_event_driven_junction.cpp
+  cpp/tests/test_g4irsf18_jit_destination_merge.cpp
+  cpp/tests/test_g4irsf14_state_clone_protocol.cpp
+  cpp/tests/test_event_runtime_bounded_local_pibt.cpp
+  APPEND PROPERTY OBJECT_DEPENDS
+  "${CMAKE_CURRENT_SOURCE_DIR}/cpp/ics_core/runtime/event_driven_junction.hpp"
+  "${CMAKE_CURRENT_SOURCE_DIR}/cpp/ics_core/runtime/s4_wait_estimator.hpp")

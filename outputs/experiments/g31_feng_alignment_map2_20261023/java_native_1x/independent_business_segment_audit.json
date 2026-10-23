@@ -1,0 +1,137 @@
+{
+  "schema": "g31.feng_alignment.map2.original_java_independent_audit.v1",
+  "source_manifest_sha256": "52808e6052474b82ef7db589c2410fec5e08b3e3793e6e34ebb2657301e4839a",
+  "canonical_sha256": "968d2c876fcbf03c5b25c8e865ccd469431af3ddbf59dc9ebe073752bd93678f",
+  "segment_lifecycle_sha256": "d8c68b68952155181179b1a0ff25939a2a0c6371c4952d1830b7359e58131e5c",
+  "original_sources_unchanged_after_run": true,
+  "metrics": {
+    "offered_business_bags": 28506,
+    "offered_transport_legs": 43603,
+    "primary_observation_unit": "all_independently_scheduled_transport_segments",
+    "full_population_segment_elapsed_from_canonical_pass_seconds": {
+      "count": 43603,
+      "mean": 301.980166801665,
+      "min": 54.00615000000107,
+      "p50": 249.8644200000017,
+      "p95": 1055.9000000000015,
+      "p99": 1787.9800000000032,
+      "max": 2101.0
+    },
+    "full_population_segment_elapsed_from_actual_release_seconds": {
+      "count": 43603,
+      "mean": 194.64266220214205,
+      "min": 55.0,
+      "p50": 237.0,
+      "p95": 339.0,
+      "p99": 344.0,
+      "max": 540.0
+    },
+    "full_population_segment_in_network_seconds": {
+      "count": 43603,
+      "mean": 193.28000366947228,
+      "min": 55.0,
+      "p50": 234.0,
+      "p95": 338.0,
+      "p99": 342.0,
+      "max": 434.0
+    },
+    "completed_subset_segment_elapsed_descriptive": {
+      "count": 43603,
+      "mean": 301.980166801665,
+      "min": 54.00615000000107,
+      "p50": 249.8644200000017,
+      "p95": 1055.9000000000015,
+      "p99": 1787.9800000000032,
+      "max": 2101.0
+    },
+    "full_population_restricted_segment_elapsed_seconds": {
+      "count": 43603,
+      "mean": 301.980166801665,
+      "min": 54.00615000000107,
+      "p50": 249.8644200000017,
+      "p95": 1055.9000000000015,
+      "p99": 1787.9800000000032,
+      "max": 2101.0
+    },
+    "completed_business_bags": 28506,
+    "unfinished_business_bags": 0,
+    "completed_transport_legs": 43603,
+    "entered_transport_legs": 43603,
+    "deadline_misses_including_unfinished": 0,
+    "ebs_causality_violation_count": 0,
+    "ebs_causality_violation_examples": [],
+    "observed_complete_and_ebs_causal_bags": 28506,
+    "full_population_observed_end_to_end_seconds": {
+      "count": 28506,
+      "mean": 2660.891714483021,
+      "min": 231.01196999999956,
+      "p50": 2684.676875000001,
+      "p95": 7816.2078950000005,
+      "p99": 10852.537474000004,
+      "max": 13108.16473
+    },
+    "full_population_ebs_causally_valid_end_to_end_seconds": {
+      "count": 28506,
+      "mean": 2660.891714483021,
+      "min": 231.01196999999956,
+      "p50": 2684.676875000001,
+      "p95": 7816.2078950000005,
+      "p99": 10852.537474000004,
+      "max": 13108.16473
+    },
+    "full_population_restricted_observed_end_to_end_seconds": {
+      "count": 28506,
+      "mean": 2660.891714483021,
+      "min": 231.01196999999956,
+      "p50": 2684.676875000001,
+      "p95": 7816.2078950000005,
+      "p99": 10852.537474000004,
+      "max": 13108.16473
+    },
+    "completed_subset_descriptive": {
+      "observed_end_to_end_seconds": {
+        "count": 28506,
+        "mean": 2660.891714483021,
+        "min": 231.01196999999956,
+        "p50": 2684.676875000001,
+        "p95": 7816.2078950000005,
+        "p99": 10852.537474000004,
+        "max": 13108.16473
+      },
+      "all_segments_finished_seconds": {
+        "count": 28506,
+        "mean": 2660.891714483021,
+        "min": 231.01196999999956,
+        "p50": 2684.676875000001,
+        "p95": 7816.2078950000005,
+        "p99": 10852.537474000004,
+        "max": 13108.16473
+      },
+      "sum_leg_elapsed_from_scheduled_pass_seconds": {
+        "count": 28506,
+        "mean": 461.9112191487055,
+        "min": 231.01196999999956,
+        "p50": 337.7018849999986,
+        "p95": 1405.5024725000003,
+        "p99": 2011.6573910000013,
+        "max": 2885.475549999999
+      },
+      "sum_leg_in_network_seconds": {
+        "count": 28506,
+        "mean": 295.6426015575668,
+        "min": 232.0,
+        "p50": 290.0,
+        "p95": 370.0,
+        "p99": 407.0,
+        "max": 442.0
+      }
+    },
+    "definitions": {
+      "business_end_to_end": "finish of direct/storage_out minus original entry exactly once; labeled observed when EBS causality is invalid",
+      "primary_segment_elapsed": "each independently scheduled segment finish minus its canonical pass_time; 43,603-segment denominator, never sum-leg elapsed mislabeled as business elapsed",
+      "restricted": "unfinished uses common horizon minus original entry; is never counted as completed",
+      "network_elapsed": "sum leg finish minus native admitted/Java successful-plan epoch; source-release policy differs",
+      "java_rounding": "original Java uses integer epochs and may release less than one second before fractional canonical pass time"
+    }
+  }
+}

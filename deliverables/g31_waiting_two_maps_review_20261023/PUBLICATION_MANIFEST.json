@@ -1,0 +1,1867 @@
+{
+  "schema": "g31.waiting.two_maps.publication.v1",
+  "base_commit": "9f23c25a631786ad4c1f47c442d72dcfb3ac098f",
+  "created_utc": "2026-10-23T12:23:50.118390+00:00",
+  "manifest_path": "deliverables/g31_waiting_two_maps_review_20261023/PUBLICATION_MANIFEST.json",
+  "manifest_self_hash_policy": "self excluded to avoid circular hashing; publication_paths includes its path",
+  "publication_paths": [
+    "CMakeLists.txt",
+    "cpp/ics_core/bindings/czr005_cpp.cpp",
+    "cpp/ics_core/runtime/event_driven_junction.hpp",
+    "cpp/ics_core/runtime/s4_wait_estimator.hpp",
+    "cpp/tests/test_g31_eta_wait.cpp",
+    "deliverables/g31_waiting_two_maps_review_20261023/PUBLICATION_MANIFEST.json",
+    "deliverables/g31_waiting_two_maps_review_20261023/README.md",
+    "deliverables/g31_waiting_two_maps_review_20261023/REVIEW_PROMPT.md",
+    "deliverables/g31_waiting_two_maps_review_20261023/VERIFICATION.json",
+    "deliverables/g31_waiting_two_maps_review_20261023/map2_full_evidence.zip",
+    "deliverables/g31_waiting_two_maps_review_20261023/nanning_full_evidence.zip",
+    "docs/g31_ics_circulation/FENG_NATIVE_WAITING_RULES_AUDIT_20261023.md",
+    "docs/g31_ics_circulation/PRO_REVIEW_CHECKLIST_20261023.md",
+    "docs/g31_ics_circulation/S4_WAIT_ESTIMATOR_CANDIDATE_20261023.md",
+    "outputs/experiments/g31_feng_alignment_20261023/REPORT.md",
+    "outputs/experiments/g31_feng_alignment_20261023/api_tests.xml",
+    "outputs/experiments/g31_feng_alignment_20261023/cpp_tests.xml",
+    "outputs/experiments/g31_feng_alignment_20261023/eta_tests_final.xml",
+    "outputs/experiments/g31_feng_alignment_20261023/final_audit_001/audit.json",
+    "outputs/experiments/g31_feng_alignment_20261023/g31_eta_calendar_001/manifest.json",
+    "outputs/experiments/g31_feng_alignment_20261023/g31_eta_calendar_001/summary.json",
+    "outputs/experiments/g31_feng_alignment_20261023/g31_eta_calendar_same_hca_release_001/manifest.json",
+    "outputs/experiments/g31_feng_alignment_20261023/g31_eta_calendar_same_hca_release_001/summary.json",
+    "outputs/experiments/g31_feng_alignment_20261023/g31_eta_flow_001/manifest.json",
+    "outputs/experiments/g31_feng_alignment_20261023/g31_eta_flow_001/summary.json",
+    "outputs/experiments/g31_feng_alignment_20261023/g31_eta_flow_same_hca_release_001/manifest.json",
+    "outputs/experiments/g31_feng_alignment_20261023/g31_eta_flow_same_hca_release_001/summary.json",
+    "outputs/experiments/g31_feng_alignment_20261023/g31_legacy_001/legacy_exact_regression.json",
+    "outputs/experiments/g31_feng_alignment_20261023/g31_legacy_001/manifest.json",
+    "outputs/experiments/g31_feng_alignment_20261023/g31_legacy_001/summary.json",
+    "outputs/experiments/g31_feng_alignment_20261023/g31_legacy_same_hca_release_001/manifest.json",
+    "outputs/experiments/g31_feng_alignment_20261023/g31_legacy_same_hca_release_001/summary.json",
+    "outputs/experiments/g31_feng_alignment_20261023/implementation_receipt.json",
+    "outputs/experiments/g31_feng_alignment_20261023/java_original_reused/manifest.json",
+    "outputs/experiments/g31_feng_alignment_20261023/java_original_reused/summary.json",
+    "outputs/experiments/g31_feng_alignment_20261023/python_regressions_002.xml",
+    "outputs/experiments/g31_feng_alignment_20261023/report_data_002/arm_table.csv",
+    "outputs/experiments/g31_feng_alignment_20261023/report_data_002/report_data.json",
+    "outputs/experiments/g31_feng_alignment_20261023/request_audit_001/audit.json",
+    "outputs/experiments/g31_feng_alignment_20261023/rollback_receipt.json",
+    "outputs/experiments/g31_feng_alignment_map2_20261023/REPORT.md",
+    "outputs/experiments/g31_feng_alignment_map2_20261023/final_audit_001/audit.json",
+    "outputs/experiments/g31_feng_alignment_map2_20261023/final_cross_map_check_001.json",
+    "outputs/experiments/g31_feng_alignment_map2_20261023/frozen_evidence_audit_001.json",
+    "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_calendar_001/manifest.json",
+    "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_calendar_001/summary.json",
+    "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_calendar_same_hca_release_001/manifest.json",
+    "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_calendar_same_hca_release_001/summary.json",
+    "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_flow_001/manifest.json",
+    "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_flow_001/summary.json",
+    "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_flow_same_hca_release_001/manifest.json",
+    "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_flow_same_hca_release_001/summary.json",
+    "outputs/experiments/g31_feng_alignment_map2_20261023/g31_legacy_001/manifest.json",
+    "outputs/experiments/g31_feng_alignment_map2_20261023/g31_legacy_001/summary.json",
+    "outputs/experiments/g31_feng_alignment_map2_20261023/g31_legacy_same_hca_release_001/manifest.json",
+    "outputs/experiments/g31_feng_alignment_map2_20261023/g31_legacy_same_hca_release_001/summary.json",
+    "outputs/experiments/g31_feng_alignment_map2_20261023/historical_legacy_exact.json",
+    "outputs/experiments/g31_feng_alignment_map2_20261023/java_native_1x/compile_receipt.json",
+    "outputs/experiments/g31_feng_alignment_map2_20261023/java_native_1x/independent_business_segment_audit.json",
+    "outputs/experiments/g31_feng_alignment_map2_20261023/java_native_1x/source_delay_and_time_boundary_audit.json",
+    "outputs/experiments/g31_feng_alignment_map2_20261023/java_native_1x/source_input_manifest.json",
+    "outputs/experiments/g31_feng_alignment_map2_20261023/java_original_001/manifest.json",
+    "outputs/experiments/g31_feng_alignment_map2_20261023/java_original_001/summary.json",
+    "outputs/experiments/g31_feng_alignment_map2_20261023/python_regressions_001.xml",
+    "outputs/experiments/g31_feng_alignment_map2_20261023/python_regressions_002.xml",
+    "outputs/experiments/g31_feng_alignment_map2_20261023/report_data_001/arm_table.csv",
+    "outputs/experiments/g31_feng_alignment_map2_20261023/report_data_001/report_data.json",
+    "outputs/experiments/g31_feng_alignment_map2_20261023/request_audit_001/audit.json",
+    "outputs/experiments/g31_physical_waiting_20261023/java_native_1x/compile_receipt.json",
+    "outputs/experiments/g31_physical_waiting_20261023/java_native_1x/source_input_manifest.json",
+    "scripts/experiments/g31_feng_alignment/audit_requests.py",
+    "scripts/experiments/g31_feng_alignment/build_review_bundle.py",
+    "scripts/experiments/g31_feng_alignment/experiment.py",
+    "scripts/experiments/g31_feng_alignment/java_map2.py",
+    "scripts/experiments/g31_feng_alignment/map2_experiment.py",
+    "scripts/experiments/g31_feng_alignment/metrics.py",
+    "scripts/experiments/g31_feng_alignment/summarize.py",
+    "scripts/experiments/g31_feng_alignment/verify_historical_legacy.py",
+    "src/czr005/cpp_backend.py",
+    "tests/test_g31_feng_alignment_map2.py",
+    "tests/test_g31_feng_alignment_metrics.py",
+    "tests/test_g4irsf31_map_adapter.py"
+  ],
+  "publication_files": [
+    {
+      "path": "CMakeLists.txt",
+      "sha256": "22224d655b57f2a76b68f28dfdb45099eb9f008ca07148488c2a203fcc4c4fd6",
+      "bytes": 9829
+    },
+    {
+      "path": "cpp/ics_core/bindings/czr005_cpp.cpp",
+      "sha256": "2ca58e27ef4e64fa9c53c4c0de300f6f64650fc21004895aac8d813af7603b27",
+      "bytes": 340409
+    },
+    {
+      "path": "cpp/ics_core/runtime/event_driven_junction.hpp",
+      "sha256": "6892abe511d81ae20e72a15aa12140a4ef62127fbc2507d6bf6ee1f9a3fd60ac",
+      "bytes": 875074
+    },
+    {
+      "path": "cpp/ics_core/runtime/s4_wait_estimator.hpp",
+      "sha256": "b3d90a2c6c69a271fbcfe88ab7e605aaf2f69f98eee14720c463497058a6fa96",
+      "bytes": 3382
+    },
+    {
+      "path": "cpp/tests/test_g31_eta_wait.cpp",
+      "sha256": "21cd2e9f319a9f026479dfd86e2d48c99fea387e74e743b3d7f5cb837afc7b4a",
+      "bytes": 17299
+    },
+    {
+      "path": "deliverables/g31_waiting_two_maps_review_20261023/README.md",
+      "sha256": "6b312e8cdcb1249e64d0c7d1d9b49291496d4fced0c77bcecc32e77ac51f386e",
+      "bytes": 7121
+    },
+    {
+      "path": "deliverables/g31_waiting_two_maps_review_20261023/REVIEW_PROMPT.md",
+      "sha256": "529aa4668e49085828d026c09dfc4ec69d1bd3b70d10bc2239312b2c74e5bd9e",
+      "bytes": 2697
+    },
+    {
+      "path": "deliverables/g31_waiting_two_maps_review_20261023/VERIFICATION.json",
+      "sha256": "e276632036fdce236dd12ddef4d4457b41725e03a0eec4ea7ebafe70366a20fc",
+      "bytes": 3564
+    },
+    {
+      "path": "deliverables/g31_waiting_two_maps_review_20261023/map2_full_evidence.zip",
+      "sha256": "0bdc8a279cd03b1f8835b5b5c9bb32c95c79db08fb72044b93532b6f28ba63dd",
+      "bytes": 28867448
+    },
+    {
+      "path": "deliverables/g31_waiting_two_maps_review_20261023/nanning_full_evidence.zip",
+      "sha256": "0d48a7691ab8f1c4bf5883d5d845714f75e9155c203651a37a2273677371be58",
+      "bytes": 34862640
+    },
+    {
+      "path": "docs/g31_ics_circulation/FENG_NATIVE_WAITING_RULES_AUDIT_20261023.md",
+      "sha256": "04f477ac1a0b78d774401b96956aa5f7e517ea8d7e0fbf416c876627f419f239",
+      "bytes": 12193
+    },
+    {
+      "path": "docs/g31_ics_circulation/PRO_REVIEW_CHECKLIST_20261023.md",
+      "sha256": "7f6506c8de7b1d351ad5c23e3d0e4e5ffbc08379c2de351637e35e52a868ae7b",
+      "bytes": 11436
+    },
+    {
+      "path": "docs/g31_ics_circulation/S4_WAIT_ESTIMATOR_CANDIDATE_20261023.md",
+      "sha256": "126ae73542148126d0fe51319eea7d6f49203dba69761e2b606a97a5a58ad683",
+      "bytes": 7290
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_20261023/REPORT.md",
+      "sha256": "d002e989a5e6ca98f2da177310fb932ac8260bf6e7040827415948c0893bdcaa",
+      "bytes": 9923
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_20261023/api_tests.xml",
+      "sha256": "141c169625cecc8994abfcafbfa42da069ac3ed5792294de07c35baae90017bb",
+      "bytes": 1365
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_20261023/cpp_tests.xml",
+      "sha256": "72349fc8e32cb52836145b38831b4aad7b278704eeac95390a35effccb09f739",
+      "bytes": 1315
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_20261023/eta_tests_final.xml",
+      "sha256": "1da3d7cceade5fbdc8fc7f16c3427ac8f9ac0971e73b4d87da8fd23ed201f74d",
+      "bytes": 426
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_20261023/final_audit_001/audit.json",
+      "sha256": "48e7f30225bae75f2d3cb0c31b4442202147d8d3f48c80cead72f5295ebb9f2d",
+      "bytes": 224990
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_20261023/g31_eta_calendar_001/manifest.json",
+      "sha256": "5b31c43d39d13152537943f534edb21f18f347f3f8c45d94f624be1c3eb7063a",
+      "bytes": 18532
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_20261023/g31_eta_calendar_001/summary.json",
+      "sha256": "9bb5bf5dd19c02688006ebad0d4f36a83b99a03f9c6c279d3226253f5d7367da",
+      "bytes": 24874
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_20261023/g31_eta_calendar_same_hca_release_001/manifest.json",
+      "sha256": "2ba975447b251d00c664462b6253b6d643cbd7b3ad2eb76eb7c2f6d3c3b74845",
+      "bytes": 19025
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_20261023/g31_eta_calendar_same_hca_release_001/summary.json",
+      "sha256": "ac7268d801ad172ab3d11ef32c325c8535f1307128a5bf15f3a54d7fc169df6e",
+      "bytes": 26089
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_20261023/g31_eta_flow_001/manifest.json",
+      "sha256": "2980c81e7e728f61f795aec0469270a6f949928eb5ba8768e8296fd03b38953d",
+      "bytes": 18502
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_20261023/g31_eta_flow_001/summary.json",
+      "sha256": "4578a2450087fd26aa0f83014ffb80f83c589499ef177663c8a45e580464774e",
+      "bytes": 24959
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_20261023/g31_eta_flow_same_hca_release_001/manifest.json",
+      "sha256": "da1b1056e55031923a56c94e7625688bff486b83569047f61523e1b967f5b6f5",
+      "bytes": 18996
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_20261023/g31_eta_flow_same_hca_release_001/summary.json",
+      "sha256": "a39d0e5f3ff1b57b91157ec5c983a7753e737777f10f13b4bd793737389cee08",
+      "bytes": 26083
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_20261023/g31_legacy_001/legacy_exact_regression.json",
+      "sha256": "1aae298f37612449cc2c1c69d5caf9227f695edef30e59a599c56093e3d3ad9f",
+      "bytes": 403
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_20261023/g31_legacy_001/manifest.json",
+      "sha256": "e1f02a8a30bd8c38ed18fff1baabcca019bc52a1221919624771811127e497f9",
+      "bytes": 19084
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_20261023/g31_legacy_001/summary.json",
+      "sha256": "54626908cd93ed570a0b755690cc167e4dfccbb5898e42dd405aaeaf1e6ca01a",
+      "bytes": 24549
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_20261023/g31_legacy_same_hca_release_001/manifest.json",
+      "sha256": "897a826814c167d7f795cb8e5595e1926d33be6e4b708260afcd94391c579261",
+      "bytes": 18983
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_20261023/g31_legacy_same_hca_release_001/summary.json",
+      "sha256": "44222fd05fe1b7a468a1e1b4d56b0251e2e2cec622a8f9f1e6ac9b8445af3309",
+      "bytes": 25391
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_20261023/implementation_receipt.json",
+      "sha256": "2433cabd223b1b955765206ace589028e0a5e5dfd0eeb220fd55eee689f529de",
+      "bytes": 1920
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_20261023/java_original_reused/manifest.json",
+      "sha256": "30ffbeda5b455bf09561486af16073614778d170c58ea8c850f2237f52b60aca",
+      "bytes": 10050
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_20261023/java_original_reused/summary.json",
+      "sha256": "0b3b91ca0430ea24ae6b7842b7d7204e2a236797187ea61e3cc4dd632a72888a",
+      "bytes": 6737
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_20261023/python_regressions_002.xml",
+      "sha256": "b6f760ac3244b55653c74b587b7759d3225d21e2ccaa367e36b73b2d63ee03f2",
+      "bytes": 3694
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_20261023/report_data_002/arm_table.csv",
+      "sha256": "7d7adcc70f789bf1da5238c1b1d5e467d936e7e62d36c74ee136e14bb6f3e46e",
+      "bytes": 4018
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_20261023/report_data_002/report_data.json",
+      "sha256": "b87520615acbf334fa45a78557bc00df6dc48579d37660775d41db416b0775a5",
+      "bytes": 247792
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_20261023/request_audit_001/audit.json",
+      "sha256": "064701283e54c0ae9e38ccd9d4ccbff8bf0c08c9e64577d432dbc26e0e508574",
+      "bytes": 9309
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_20261023/rollback_receipt.json",
+      "sha256": "dcdecb0dc52825f80897848508a9a02011db3c2cf3b0f6b34f1eee7a0f10c4b9",
+      "bytes": 3468
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_map2_20261023/REPORT.md",
+      "sha256": "bb6f72d3c9804e9329a3580da02e2b702ab399e89680f3a1d3b34d23ed167dda",
+      "bytes": 11198
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_map2_20261023/final_audit_001/audit.json",
+      "sha256": "f6f484c36fa4717e4d362efa88925c334e98a3286b368304d48fed91d43c94a5",
+      "bytes": 243558
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_map2_20261023/final_cross_map_check_001.json",
+      "sha256": "f83f4078cda67bba4278d7cdd90201317faf62830d83a8f3c290c4013175ebc6",
+      "bytes": 1383
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_map2_20261023/frozen_evidence_audit_001.json",
+      "sha256": "36318c99766b5587c57e8fd56c48d92e6780b043b97398fbbc331774691cbb40",
+      "bytes": 106739
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_calendar_001/manifest.json",
+      "sha256": "eb81fbf4d28be97908ea5d9186dc6b8d315c4d56f7d6aad9919dbd0b162d8905",
+      "bytes": 23290
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_calendar_001/summary.json",
+      "sha256": "80c148f752cfe424c062ac439895c3e7b5cdf7c884d3b96c9ef43d68c83c3be8",
+      "bytes": 23818
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_calendar_same_hca_release_001/manifest.json",
+      "sha256": "686b81ae9e326f4a294c69ccdc4aa3dfff4d0b2c6eb50d29a8eb2366eb6bde7c",
+      "bytes": 24080
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_calendar_same_hca_release_001/summary.json",
+      "sha256": "2ebdd3ae997c4bebacd5e0a48f24912c2a3079f911a20d36f0a5f67470e6102b",
+      "bytes": 23801
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_flow_001/manifest.json",
+      "sha256": "9147a51a0dd18431c5023e5d62d553dd1cfa881206bac09a50a724bcd64b6ace",
+      "bytes": 23262
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_flow_001/summary.json",
+      "sha256": "cbebbca69765f25badbe882d6f0a7ab3c21462330cc39a2d5fbd28a573d27bd4",
+      "bytes": 23828
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_flow_same_hca_release_001/manifest.json",
+      "sha256": "61838bea38887069a3e9da896bfd24647b2ca44611431ee01b885664e8ad15ff",
+      "bytes": 24051
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_flow_same_hca_release_001/summary.json",
+      "sha256": "76cb8e9671bc23e80efa0a905415b11b990f47356143df122819d0695aa9c1f7",
+      "bytes": 23795
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_legacy_001/manifest.json",
+      "sha256": "5aca290d14dea531a8dd09ba74f6264d1bc62a113e3870bc9590cb6aa4cba825",
+      "bytes": 23249
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_legacy_001/summary.json",
+      "sha256": "db6fed58ebd019bfbc5af5b2b2dcac310b27a2d060554360d4e782864a46e85c",
+      "bytes": 23123
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_legacy_same_hca_release_001/manifest.json",
+      "sha256": "3b6ce8eeaccefba96044430e98c3fd4bb141888847a890335fa0d8e249f52062",
+      "bytes": 24038
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_legacy_same_hca_release_001/summary.json",
+      "sha256": "e3da01b7095e44c98d25bb2d13b342fdcd28c84052ccbc841441bee8473acb34",
+      "bytes": 23108
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_map2_20261023/historical_legacy_exact.json",
+      "sha256": "bd9774041a043fc0cc28723b18d19f0e2c557da9f50ac782719b7a5a7da22741",
+      "bytes": 1150
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_map2_20261023/java_native_1x/compile_receipt.json",
+      "sha256": "1b9d171dacac89d733d7787206835a236a886bc1702708fc95bf611222e7eeaa",
+      "bytes": 3958
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_map2_20261023/java_native_1x/independent_business_segment_audit.json",
+      "sha256": "7a224a09656a6e8b733b74fc6c14927a8b994e678bb323b694fb5c1696dc6a4a",
+      "bytes": 4973
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_map2_20261023/java_native_1x/source_delay_and_time_boundary_audit.json",
+      "sha256": "2632ebfa1e35cec2a077f3c7d889bde916b3febd09211673eaa5375056479c29",
+      "bytes": 2489
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_map2_20261023/java_native_1x/source_input_manifest.json",
+      "sha256": "52808e6052474b82ef7db589c2410fec5e08b3e3793e6e34ebb2657301e4839a",
+      "bytes": 10684
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_map2_20261023/java_original_001/manifest.json",
+      "sha256": "654b94c7c7498441eeface884bef555f47acaea7b700ed4dc3746b5789855fef",
+      "bytes": 10608
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_map2_20261023/java_original_001/summary.json",
+      "sha256": "7d34087ff884242929d2a7c0ed5bcd3c785b658572e296b61c603026655166bf",
+      "bytes": 4589
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_map2_20261023/python_regressions_001.xml",
+      "sha256": "7a739b33c8863ba70752a94fd6663680a029c254d5281c60f7475008e0106efd",
+      "bytes": 11863
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_map2_20261023/python_regressions_002.xml",
+      "sha256": "0f795638e48d5b2c3e4e76393515ea3fa5439f08f0baa308a2374a0fd5cc8919",
+      "bytes": 5048
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_map2_20261023/report_data_001/arm_table.csv",
+      "sha256": "c668883f3177e53dcb97db3992150c2147832281d7aa04d4e76a965c44c3a895",
+      "bytes": 3990
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_map2_20261023/report_data_001/report_data.json",
+      "sha256": "d78f42c64b31ebd448755894ecad5ae7e5b4324055f578df1c5b43b54f5cff7d",
+      "bytes": 265747
+    },
+    {
+      "path": "outputs/experiments/g31_feng_alignment_map2_20261023/request_audit_001/audit.json",
+      "sha256": "7898c83e579ea225c0eb3217ae16c39d96cabcc828acb6d48bc9bd0467e1fbc2",
+      "bytes": 9495
+    },
+    {
+      "path": "outputs/experiments/g31_physical_waiting_20261023/java_native_1x/compile_receipt.json",
+      "sha256": "510f9b48b70bdd9578c91e1528ffbbd695e4d2ab7a2d693a6c90eb653078d583",
+      "bytes": 3958
+    },
+    {
+      "path": "outputs/experiments/g31_physical_waiting_20261023/java_native_1x/source_input_manifest.json",
+      "sha256": "9859fe2804acc571acbf50e5fe6f3c0c16673818151b722dcdfb723210ad9578",
+      "bytes": 9077
+    },
+    {
+      "path": "scripts/experiments/g31_feng_alignment/audit_requests.py",
+      "sha256": "ba1fbc9a948571904e73362e29813da672675fc9634042f596612a6e3df021f8",
+      "bytes": 5904
+    },
+    {
+      "path": "scripts/experiments/g31_feng_alignment/build_review_bundle.py",
+      "sha256": "48db8e2c8697be50e24426cd8781bd93f5da1659277ff29313763d6049426098",
+      "bytes": 34570
+    },
+    {
+      "path": "scripts/experiments/g31_feng_alignment/experiment.py",
+      "sha256": "26b75106c81ac0730c14d2d6622d43d4e2c94ca815d1dd41c677d70d9ee55d1b",
+      "bytes": 16036
+    },
+    {
+      "path": "scripts/experiments/g31_feng_alignment/java_map2.py",
+      "sha256": "cda9146442ecb8042213a1119c5c4e63072d9e7a1a53375d329dc0550fe4de9b",
+      "bytes": 8877
+    },
+    {
+      "path": "scripts/experiments/g31_feng_alignment/map2_experiment.py",
+      "sha256": "4e40c38efc34bd00be3a495559a3ddcb1aa7d69d454864997bd09da296b53f9c",
+      "bytes": 11592
+    },
+    {
+      "path": "scripts/experiments/g31_feng_alignment/metrics.py",
+      "sha256": "b28cace3d5bca76a0d11665f6ddb761b4bc7fa59819cd5c4f0e854a1b7b47f28",
+      "bytes": 12430
+    },
+    {
+      "path": "scripts/experiments/g31_feng_alignment/summarize.py",
+      "sha256": "8958015d7c8e9425a8bdae10085a46ea7382863bf187dd483a0479144f9424a2",
+      "bytes": 10899
+    },
+    {
+      "path": "scripts/experiments/g31_feng_alignment/verify_historical_legacy.py",
+      "sha256": "4f9bd8bf8750fc5976566ccd6b0f04058de52daf15d2172d083e2b43fd93160a",
+      "bytes": 3788
+    },
+    {
+      "path": "src/czr005/cpp_backend.py",
+      "sha256": "7871ea9030028d278c5c82ccbed23d6f931415006adf4af8f5dfdb7712b8fca2",
+      "bytes": 102167
+    },
+    {
+      "path": "tests/test_g31_feng_alignment_map2.py",
+      "sha256": "6364018e114d3acd0466fc348baac1150f2bdefae9072697e3edec11e8680598",
+      "bytes": 6074
+    },
+    {
+      "path": "tests/test_g31_feng_alignment_metrics.py",
+      "sha256": "60421d30cd077885f60ca30f59c00299c962958f0bca960bd142a80ad535d5f2",
+      "bytes": 3782
+    },
+    {
+      "path": "tests/test_g4irsf31_map_adapter.py",
+      "sha256": "97744cbfb22117da63b2f6eb26bee3fce5a877ed304594b12b9fb5103a9cd49e",
+      "bytes": 10473
+    }
+  ],
+  "archives": [
+    {
+      "path": "deliverables/g31_waiting_two_maps_review_20261023/nanning_full_evidence.zip",
+      "sha256": "0d48a7691ab8f1c4bf5883d5d845714f75e9155c203651a37a2273677371be58",
+      "bytes": 34862640,
+      "map": "nanning",
+      "entries": [
+        {
+          "path": "artifacts/tasks/g4irsf31_nanning/nanning_1x_canonical.jsonl",
+          "sha256": "f167648ca524770b48465c66eaa7a548390f31e35815fb9c73accff68520c3a1",
+          "bytes": 12345197,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\artifacts\\tasks\\g4irsf31_nanning\\nanning_1x_canonical.jsonl"
+        },
+        {
+          "path": "artifacts/tasks/g4irsf31_nanning/nanning_1x_manifest.json",
+          "sha256": "6d097ca9ddf6975dd79fdaa04d5e68276864bbdc790ac67a947ffc24f5d13de1",
+          "bytes": 4715,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\artifacts\\tasks\\g4irsf31_nanning\\nanning_1x_manifest.json"
+        },
+        {
+          "path": "artifacts/tasks/g4irsf31_nanning/nanning_1x_raw.txt",
+          "sha256": "5fc1a834f1cf03d28417d3e5a6c16114967a7f9f352af9b795f25a00df983ae6",
+          "bytes": 1150753,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\artifacts\\tasks\\g4irsf31_nanning\\nanning_1x_raw.txt"
+        },
+        {
+          "path": "data/processed/maps/nanning_airport_profile.json",
+          "sha256": "70aeeafe2c774d415fe9f922eedec36e8e35132bcba04596c2b1c486ffb3d1df",
+          "bytes": 713865,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\maps\\nanning_airport_profile.json"
+        },
+        {
+          "path": "data/processed/maps/nanning_legacy.txt",
+          "sha256": "daf51cf339862872ec1e6ce86fbdffccd326d83ebd80ebef0e926917c61ac0df",
+          "bytes": 149791,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\maps\\nanning_legacy.txt"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/REPORT.md",
+          "sha256": "d002e989a5e6ca98f2da177310fb932ac8260bf6e7040827415948c0893bdcaa",
+          "bytes": 9923,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\REPORT.md"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/api_tests.xml",
+          "sha256": "141c169625cecc8994abfcafbfa42da069ac3ed5792294de07c35baae90017bb",
+          "bytes": 1365,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\api_tests.xml"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/cpp_tests.xml",
+          "sha256": "72349fc8e32cb52836145b38831b4aad7b278704eeac95390a35effccb09f739",
+          "bytes": 1315,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\cpp_tests.xml"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/eta_tests_final.xml",
+          "sha256": "1da3d7cceade5fbdc8fc7f16c3427ac8f9ac0971e73b4d87da8fd23ed201f74d",
+          "bytes": 426,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\eta_tests_final.xml"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/final_audit_001/audit.json",
+          "sha256": "48e7f30225bae75f2d3cb0c31b4442202147d8d3f48c80cead72f5295ebb9f2d",
+          "bytes": 224990,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\final_audit_001\\audit.json"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/g31_eta_calendar_001/business.jsonl",
+          "sha256": "a1b6ee07fbc0eca704d629b697fde4a3dbb6ba7cc78969391899a343fb1b8691",
+          "bytes": 14435743,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\g31_eta_calendar_001\\business.jsonl"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/g31_eta_calendar_001/manifest.json",
+          "sha256": "5b31c43d39d13152537943f534edb21f18f347f3f8c45d94f624be1c3eb7063a",
+          "bytes": 18532,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\g31_eta_calendar_001\\manifest.json"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/g31_eta_calendar_001/request.json.gz",
+          "sha256": "503a8a3b70ec77b971e873ec5222f94bc4f46d5bbba76f6ecafa79de24dfaefb",
+          "bytes": 598830,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\g31_eta_calendar_001\\request.json.gz"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/g31_eta_calendar_001/segments.jsonl",
+          "sha256": "652d44bd4b7b51f811d1bcd8158c9b9ca67d6c8ec9065c6927aec41892445622",
+          "bytes": 24925143,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\g31_eta_calendar_001\\segments.jsonl"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/g31_eta_calendar_001/source/scripts/experiments/g31_feng_alignment/experiment.py",
+          "sha256": "a82682a6a9373494dfb2c42be7c70062d6a71ea06c29240e71b2badf97c6003c",
+          "bytes": 15921,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\g31_eta_calendar_001\\source\\scripts\\experiments\\g31_feng_alignment\\experiment.py"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/g31_eta_calendar_001/source/scripts/experiments/g31_feng_alignment/metrics.py",
+          "sha256": "aaaa0bd1094729d9e9ffe2d5b43547f60035d8dc5ba49c1127ffbde4a5915721",
+          "bytes": 12417,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\g31_eta_calendar_001\\source\\scripts\\experiments\\g31_feng_alignment\\metrics.py"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/g31_eta_calendar_001/summary.json",
+          "sha256": "9bb5bf5dd19c02688006ebad0d4f36a83b99a03f9c6c279d3226253f5d7367da",
+          "bytes": 24874,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\g31_eta_calendar_001\\summary.json"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/g31_eta_calendar_same_hca_release_001/business.jsonl",
+          "sha256": "6fb57867456d36485cf4ddf9c9eee7e37e82cb776c48c8fdd425249f70364fdf",
+          "bytes": 14776394,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\g31_eta_calendar_same_hca_release_001\\business.jsonl"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/g31_eta_calendar_same_hca_release_001/manifest.json",
+          "sha256": "2ba975447b251d00c664462b6253b6d643cbd7b3ad2eb76eb7c2f6d3c3b74845",
+          "bytes": 19025,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\g31_eta_calendar_same_hca_release_001\\manifest.json"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/g31_eta_calendar_same_hca_release_001/request.json.gz",
+          "sha256": "9c1a2ce01c624830a30b815335b73e52ab547a5816fbff82a437934331b73811",
+          "bytes": 550026,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\g31_eta_calendar_same_hca_release_001\\request.json.gz"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/g31_eta_calendar_same_hca_release_001/segments.jsonl",
+          "sha256": "02dd79ae7c138ff9bc8e3d1b4d0276099f57116fd1adfa9b43e1ca1a0e6e933e",
+          "bytes": 24505601,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\g31_eta_calendar_same_hca_release_001\\segments.jsonl"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/g31_eta_calendar_same_hca_release_001/source/scripts/experiments/g31_feng_alignment/experiment.py",
+          "sha256": "a82682a6a9373494dfb2c42be7c70062d6a71ea06c29240e71b2badf97c6003c",
+          "bytes": 15921,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\g31_eta_calendar_same_hca_release_001\\source\\scripts\\experiments\\g31_feng_alignment\\experiment.py"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/g31_eta_calendar_same_hca_release_001/source/scripts/experiments/g31_feng_alignment/metrics.py",
+          "sha256": "aaaa0bd1094729d9e9ffe2d5b43547f60035d8dc5ba49c1127ffbde4a5915721",
+          "bytes": 12417,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\g31_eta_calendar_same_hca_release_001\\source\\scripts\\experiments\\g31_feng_alignment\\metrics.py"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/g31_eta_calendar_same_hca_release_001/summary.json",
+          "sha256": "ac7268d801ad172ab3d11ef32c325c8535f1307128a5bf15f3a54d7fc169df6e",
+          "bytes": 26089,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\g31_eta_calendar_same_hca_release_001\\summary.json"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/g31_eta_flow_001/business.jsonl",
+          "sha256": "8b274bd5f7bf0a48768e033f289e91d42f20cec44c93c7d7d6ab46f9e95280e0",
+          "bytes": 14435797,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\g31_eta_flow_001\\business.jsonl"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/g31_eta_flow_001/manifest.json",
+          "sha256": "2980c81e7e728f61f795aec0469270a6f949928eb5ba8768e8296fd03b38953d",
+          "bytes": 18502,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\g31_eta_flow_001\\manifest.json"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/g31_eta_flow_001/request.json.gz",
+          "sha256": "a5e20ce91d5beb32865d5566851e779e0d67c03544442f78d0e66fd5c39015d8",
+          "bytes": 598832,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\g31_eta_flow_001\\request.json.gz"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/g31_eta_flow_001/segments.jsonl",
+          "sha256": "3d45d01a51c76ca03ce5de8d43ce30dc896d142894169935001cac6b29c9f5a9",
+          "bytes": 24945340,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\g31_eta_flow_001\\segments.jsonl"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/g31_eta_flow_001/source/scripts/experiments/g31_feng_alignment/experiment.py",
+          "sha256": "a82682a6a9373494dfb2c42be7c70062d6a71ea06c29240e71b2badf97c6003c",
+          "bytes": 15921,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\g31_eta_flow_001\\source\\scripts\\experiments\\g31_feng_alignment\\experiment.py"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/g31_eta_flow_001/source/scripts/experiments/g31_feng_alignment/metrics.py",
+          "sha256": "aaaa0bd1094729d9e9ffe2d5b43547f60035d8dc5ba49c1127ffbde4a5915721",
+          "bytes": 12417,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\g31_eta_flow_001\\source\\scripts\\experiments\\g31_feng_alignment\\metrics.py"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/g31_eta_flow_001/summary.json",
+          "sha256": "4578a2450087fd26aa0f83014ffb80f83c589499ef177663c8a45e580464774e",
+          "bytes": 24959,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\g31_eta_flow_001\\summary.json"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/g31_eta_flow_same_hca_release_001/business.jsonl",
+          "sha256": "d73b7fdc8a5cf355161dfd88963248420a25c5139537605142749f16ff569a49",
+          "bytes": 14776503,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\g31_eta_flow_same_hca_release_001\\business.jsonl"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/g31_eta_flow_same_hca_release_001/manifest.json",
+          "sha256": "da1b1056e55031923a56c94e7625688bff486b83569047f61523e1b967f5b6f5",
+          "bytes": 18996,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\g31_eta_flow_same_hca_release_001\\manifest.json"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/g31_eta_flow_same_hca_release_001/request.json.gz",
+          "sha256": "f5f89d4e8953f9a1cb62445086ba0d964f5ba6421316298a1a5540f32e055107",
+          "bytes": 550029,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\g31_eta_flow_same_hca_release_001\\request.json.gz"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/g31_eta_flow_same_hca_release_001/segments.jsonl",
+          "sha256": "3f00e67178151781a83771fe38fd02dd2876c28ef88a3f70442001c466bebb76",
+          "bytes": 24515077,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\g31_eta_flow_same_hca_release_001\\segments.jsonl"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/g31_eta_flow_same_hca_release_001/source/scripts/experiments/g31_feng_alignment/experiment.py",
+          "sha256": "a82682a6a9373494dfb2c42be7c70062d6a71ea06c29240e71b2badf97c6003c",
+          "bytes": 15921,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\g31_eta_flow_same_hca_release_001\\source\\scripts\\experiments\\g31_feng_alignment\\experiment.py"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/g31_eta_flow_same_hca_release_001/source/scripts/experiments/g31_feng_alignment/metrics.py",
+          "sha256": "aaaa0bd1094729d9e9ffe2d5b43547f60035d8dc5ba49c1127ffbde4a5915721",
+          "bytes": 12417,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\g31_eta_flow_same_hca_release_001\\source\\scripts\\experiments\\g31_feng_alignment\\metrics.py"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/g31_eta_flow_same_hca_release_001/summary.json",
+          "sha256": "a39d0e5f3ff1b57b91157ec5c983a7753e737777f10f13b4bd793737389cee08",
+          "bytes": 26083,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\g31_eta_flow_same_hca_release_001\\summary.json"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/g31_legacy_001/binary/czr005_cpp.cp311-win_amd64.pyd",
+          "sha256": "7260288ed0996ad01d445cbf906010faabba1a0bc531f8ba13d6c1d1dd63bb28",
+          "bytes": 2546176,
+          "origin": "frozen_native_binary_shared_by_both_maps",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\g31_legacy_001\\binary\\czr005_cpp.cp311-win_amd64.pyd"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/g31_legacy_001/business.jsonl",
+          "sha256": "e9dc468ab39bd64d3e30dc0931596a267262d7667ab746d0cda3a99d83894e74",
+          "bytes": 14439678,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\g31_legacy_001\\business.jsonl"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/g31_legacy_001/legacy_exact_regression.json",
+          "sha256": "1aae298f37612449cc2c1c69d5caf9227f695edef30e59a599c56093e3d3ad9f",
+          "bytes": 403,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\g31_legacy_001\\legacy_exact_regression.json"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/g31_legacy_001/manifest.json",
+          "sha256": "e1f02a8a30bd8c38ed18fff1baabcca019bc52a1221919624771811127e497f9",
+          "bytes": 19084,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\g31_legacy_001\\manifest.json"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/g31_legacy_001/request.json.gz",
+          "sha256": "e737def1dd5ac1d33cca808e90e37a2323ec3f5e63e30608dc056dbb0e2c68a4",
+          "bytes": 598828,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\g31_legacy_001\\request.json.gz"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/g31_legacy_001/segments.jsonl",
+          "sha256": "faa48ccf5145d9c23f526c3e06d1d96cb8824e2d32459c29a906512c7d4a2e5d",
+          "bytes": 25001329,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\g31_legacy_001\\segments.jsonl"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/g31_legacy_001/source/scripts/experiments/g31_feng_alignment/experiment.py",
+          "sha256": "a82682a6a9373494dfb2c42be7c70062d6a71ea06c29240e71b2badf97c6003c",
+          "bytes": 15921,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\g31_legacy_001\\source\\scripts\\experiments\\g31_feng_alignment\\experiment.py"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/g31_legacy_001/source/scripts/experiments/g31_feng_alignment/metrics.py",
+          "sha256": "aaaa0bd1094729d9e9ffe2d5b43547f60035d8dc5ba49c1127ffbde4a5915721",
+          "bytes": 12417,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\g31_legacy_001\\source\\scripts\\experiments\\g31_feng_alignment\\metrics.py"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/g31_legacy_001/summary.json",
+          "sha256": "54626908cd93ed570a0b755690cc167e4dfccbb5898e42dd405aaeaf1e6ca01a",
+          "bytes": 24549,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\g31_legacy_001\\summary.json"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/g31_legacy_same_hca_release_001/business.jsonl",
+          "sha256": "008be4d058418bbe6b9f56449e6578b342cbd98882af3cc36b66e0963e81bb90",
+          "bytes": 14786006,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\g31_legacy_same_hca_release_001\\business.jsonl"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/g31_legacy_same_hca_release_001/manifest.json",
+          "sha256": "897a826814c167d7f795cb8e5595e1926d33be6e4b708260afcd94391c579261",
+          "bytes": 18983,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\g31_legacy_same_hca_release_001\\manifest.json"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/g31_legacy_same_hca_release_001/request.json.gz",
+          "sha256": "c5da2eb5c03a3bd0ce3bd716987fc69226ea9328806412308f7a1b29eb2017cb",
+          "bytes": 550026,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\g31_legacy_same_hca_release_001\\request.json.gz"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/g31_legacy_same_hca_release_001/segments.jsonl",
+          "sha256": "6075bb8e4591d5f85f11bbb155f4720ac9290ea58023d9103dfd1b92e9677fad",
+          "bytes": 24561246,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\g31_legacy_same_hca_release_001\\segments.jsonl"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/g31_legacy_same_hca_release_001/source/scripts/experiments/g31_feng_alignment/experiment.py",
+          "sha256": "a82682a6a9373494dfb2c42be7c70062d6a71ea06c29240e71b2badf97c6003c",
+          "bytes": 15921,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\g31_legacy_same_hca_release_001\\source\\scripts\\experiments\\g31_feng_alignment\\experiment.py"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/g31_legacy_same_hca_release_001/source/scripts/experiments/g31_feng_alignment/metrics.py",
+          "sha256": "aaaa0bd1094729d9e9ffe2d5b43547f60035d8dc5ba49c1127ffbde4a5915721",
+          "bytes": 12417,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\g31_legacy_same_hca_release_001\\source\\scripts\\experiments\\g31_feng_alignment\\metrics.py"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/g31_legacy_same_hca_release_001/summary.json",
+          "sha256": "44222fd05fe1b7a468a1e1b4d56b0251e2e2cec622a8f9f1e6ac9b8445af3309",
+          "bytes": 25391,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\g31_legacy_same_hca_release_001\\summary.json"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/implementation_receipt.json",
+          "sha256": "2433cabd223b1b955765206ace589028e0a5e5dfd0eeb220fd55eee689f529de",
+          "bytes": 1920,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\implementation_receipt.json"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/java_original_reused/business.jsonl",
+          "sha256": "fee4782a447e3ddeef03b504f88445bee725d207822631fcce21158874494ffe",
+          "bytes": 14117970,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\java_original_reused\\business.jsonl"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/java_original_reused/manifest.json",
+          "sha256": "30ffbeda5b455bf09561486af16073614778d170c58ea8c850f2237f52b60aca",
+          "bytes": 10050,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\java_original_reused\\manifest.json"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/java_original_reused/segments.jsonl",
+          "sha256": "3dbb7034232e6da69132be1b968dbc0720eadb1bca8f3c21784b4a17b14c7eda",
+          "bytes": 15833419,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\java_original_reused\\segments.jsonl"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/java_original_reused/summary.json",
+          "sha256": "0b3b91ca0430ea24ae6b7842b7d7204e2a236797187ea61e3cc4dd632a72888a",
+          "bytes": 6737,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\java_original_reused\\summary.json"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/python_regressions_002.xml",
+          "sha256": "b6f760ac3244b55653c74b587b7759d3225d21e2ccaa367e36b73b2d63ee03f2",
+          "bytes": 3694,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\python_regressions_002.xml"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/report_data_002/arm_table.csv",
+          "sha256": "7d7adcc70f789bf1da5238c1b1d5e467d936e7e62d36c74ee136e14bb6f3e46e",
+          "bytes": 4018,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\report_data_002\\arm_table.csv"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/report_data_002/report_data.json",
+          "sha256": "b87520615acbf334fa45a78557bc00df6dc48579d37660775d41db416b0775a5",
+          "bytes": 247792,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\report_data_002\\report_data.json"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/request_audit_001/audit.json",
+          "sha256": "064701283e54c0ae9e38ccd9d4ccbff8bf0c08c9e64577d432dbc26e0e508574",
+          "bytes": 9309,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\request_audit_001\\audit.json"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_20261023/rollback_receipt.json",
+          "sha256": "dcdecb0dc52825f80897848508a9a02011db3c2cf3b0f6b34f1eee7a0f10c4b9",
+          "bytes": 3468,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_20261023\\rollback_receipt.json"
+        },
+        {
+          "path": "outputs/experiments/g31_physical_waiting_20261023/java_native_1x/compile_receipt.json",
+          "sha256": "510f9b48b70bdd9578c91e1528ffbbd695e4d2ab7a2d693a6c90eb653078d583",
+          "bytes": 3958,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_physical_waiting_20261023\\java_native_1x\\compile_receipt.json"
+        },
+        {
+          "path": "outputs/experiments/g31_physical_waiting_20261023/java_native_1x/run_01/output.txt",
+          "sha256": "73222761ef88bf624112746a49aac38327cf8fbb1203571ae203aec7186eeed5",
+          "bytes": 680171,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_physical_waiting_20261023\\java_native_1x\\run_01\\output.txt"
+        },
+        {
+          "path": "outputs/experiments/g31_physical_waiting_20261023/java_native_1x/run_01/outputstarttime.txt",
+          "sha256": "bb0afd339ee8bdb2e9be41a9a28bb2a200347d1aa4c3fbe5e1c04854d17ffb32",
+          "bytes": 1120413,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_physical_waiting_20261023\\java_native_1x\\run_01\\outputstarttime.txt"
+        },
+        {
+          "path": "outputs/experiments/g31_physical_waiting_20261023/java_native_1x/run_01/release.csv",
+          "sha256": "aea3f1cdff60da17ae119b1a593fc7f2bc2d465be920c589e76ee083dc99919e",
+          "bytes": 1161123,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_physical_waiting_20261023\\java_native_1x\\run_01\\release.csv"
+        },
+        {
+          "path": "outputs/experiments/g31_physical_waiting_20261023/java_native_1x/run_01/routes.csv",
+          "sha256": "c2f6784535753614578081e9d3ff3d99b82b59b58f55362c7984f6c26e1fc3f0",
+          "bytes": 4161629,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_physical_waiting_20261023\\java_native_1x\\run_01\\routes.csv"
+        },
+        {
+          "path": "outputs/experiments/g31_physical_waiting_20261023/java_native_1x/run_01/run_status.json",
+          "sha256": "59c65295729cd652f237c1e385c6b6b82bdeb243c725a58b5b726df993579768",
+          "bytes": 1880,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_physical_waiting_20261023\\java_native_1x\\run_01\\run_status.json"
+        },
+        {
+          "path": "outputs/experiments/g31_physical_waiting_20261023/java_native_1x/run_01/segment_lifecycle.csv",
+          "sha256": "673b2697a708b0f542ea5b954d37b85d762f1e4d96f018c8f410b8f64c7f3015",
+          "bytes": 4181436,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_physical_waiting_20261023\\java_native_1x\\run_01\\segment_lifecycle.csv"
+        },
+        {
+          "path": "outputs/experiments/g31_physical_waiting_20261023/java_native_1x/run_01/summary.csv",
+          "sha256": "1fddfe95276cb387df1b992076efc372c04ce1625f237bbbb649672f1bdf34d9",
+          "bytes": 397,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_physical_waiting_20261023\\java_native_1x\\run_01\\summary.csv"
+        },
+        {
+          "path": "outputs/experiments/g31_physical_waiting_20261023/java_native_1x/source_input_manifest.json",
+          "sha256": "9859fe2804acc571acbf50e5fe6f3c0c16673818151b722dcdfb723210ad9578",
+          "bytes": 9077,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_physical_waiting_20261023\\java_native_1x\\source_input_manifest.json"
+        }
+      ]
+    },
+    {
+      "path": "deliverables/g31_waiting_two_maps_review_20261023/map2_full_evidence.zip",
+      "sha256": "0bdc8a279cd03b1f8835b5b5c9bb32c95c79db08fb72044b93532b6f28ba63dd",
+      "bytes": 28867448,
+      "map": "map2",
+      "entries": [
+        {
+          "path": "data/processed/maps/map2.json",
+          "sha256": "9e8c5a236869336cf4c05a09a8ce0554f440eb45a6896972fc54116bcf78bbb4",
+          "bytes": 105086,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\maps\\map2.json"
+        },
+        {
+          "path": "data/processed/tasks/inputdata.jsonl",
+          "sha256": "968d2c876fcbf03c5b25c8e865ccd469431af3ddbf59dc9ebe073752bd93678f",
+          "bytes": 12252445,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\tasks\\inputdata.jsonl"
+        },
+        {
+          "path": "legacy/jichang_origin_readonly/inputdata.txt",
+          "sha256": "0f39d359b47a3f243ab077e4a294cbab56ec306a0f89bcc0ccc1d946caceef87",
+          "bytes": 1012027,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\legacy\\jichang_origin_readonly\\inputdata.txt"
+        },
+        {
+          "path": "legacy/jichang_origin_readonly/map2.txt",
+          "sha256": "55f578cb4b8fcc61f5b13963fcb8546aca91e517ea6f8ff4a7361670f1b03f8f",
+          "bytes": 15853,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\legacy\\jichang_origin_readonly\\map2.txt"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/REPORT.md",
+          "sha256": "bb6f72d3c9804e9329a3580da02e2b702ab399e89680f3a1d3b34d23ed167dda",
+          "bytes": 11198,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\REPORT.md"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/final_audit_001/audit.json",
+          "sha256": "f6f484c36fa4717e4d362efa88925c334e98a3286b368304d48fed91d43c94a5",
+          "bytes": 243558,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\final_audit_001\\audit.json"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/final_cross_map_check_001.json",
+          "sha256": "f83f4078cda67bba4278d7cdd90201317faf62830d83a8f3c290c4013175ebc6",
+          "bytes": 1383,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\final_cross_map_check_001.json"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/frozen_evidence_audit_001.json",
+          "sha256": "36318c99766b5587c57e8fd56c48d92e6780b043b97398fbbc331774691cbb40",
+          "bytes": 106739,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\frozen_evidence_audit_001.json"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_calendar_001/business.jsonl",
+          "sha256": "c940eb48ea39a54647a7bd72430393575ce95bd0180d368dfdbf7a69a4bea32b",
+          "bytes": 14342723,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_calendar_001\\business.jsonl"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_calendar_001/manifest.json",
+          "sha256": "eb81fbf4d28be97908ea5d9186dc6b8d315c4d56f7d6aad9919dbd0b162d8905",
+          "bytes": 23290,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_calendar_001\\manifest.json"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_calendar_001/request.json.gz",
+          "sha256": "7af401c9167c5bc8c6861b87aa973cd1869602f3694c28cb336833d1b2622870",
+          "bytes": 497362,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_calendar_001\\request.json.gz"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_calendar_001/segments.jsonl",
+          "sha256": "155348cf060f2be8a49f8178fc4c2c6c1cfdbf4e398635a621b0891e91a67ecc",
+          "bytes": 24427567,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_calendar_001\\segments.jsonl"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_calendar_001/source/scripts/experiments/g31_feng_alignment/experiment.py",
+          "sha256": "26b75106c81ac0730c14d2d6622d43d4e2c94ca815d1dd41c677d70d9ee55d1b",
+          "bytes": 16036,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_calendar_001\\source\\scripts\\experiments\\g31_feng_alignment\\experiment.py"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_calendar_001/source/scripts/experiments/g31_feng_alignment/map2_experiment.py",
+          "sha256": "4e40c38efc34bd00be3a495559a3ddcb1aa7d69d454864997bd09da296b53f9c",
+          "bytes": 11592,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_calendar_001\\source\\scripts\\experiments\\g31_feng_alignment\\map2_experiment.py"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_calendar_001/source/scripts/experiments/g31_feng_alignment/metrics.py",
+          "sha256": "b28cace3d5bca76a0d11665f6ddb761b4bc7fa59819cd5c4f0e854a1b7b47f28",
+          "bytes": 12430,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_calendar_001\\source\\scripts\\experiments\\g31_feng_alignment\\metrics.py"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_calendar_001/summary.json",
+          "sha256": "80c148f752cfe424c062ac439895c3e7b5cdf7c884d3b96c9ef43d68c83c3be8",
+          "bytes": 23818,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_calendar_001\\summary.json"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_calendar_same_hca_release_001/business.jsonl",
+          "sha256": "3e57d7692ca761e516bc06ac7ced0daf9c582bffa78dc7c6db60f4be8af36a93",
+          "bytes": 14667449,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_calendar_same_hca_release_001\\business.jsonl"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_calendar_same_hca_release_001/manifest.json",
+          "sha256": "686b81ae9e326f4a294c69ccdc4aa3dfff4d0b2c6eb50d29a8eb2366eb6bde7c",
+          "bytes": 24080,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_calendar_same_hca_release_001\\manifest.json"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_calendar_same_hca_release_001/request.json.gz",
+          "sha256": "85b1c9a365560313b5816b156dba67cddf7b025834e78485509fb20893292294",
+          "bytes": 444356,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_calendar_same_hca_release_001\\request.json.gz"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_calendar_same_hca_release_001/segments.jsonl",
+          "sha256": "d0a8079f9e89e54197e61bf08202cb07a2f2327e8d2ae6efd3ded6626e79c188",
+          "bytes": 23746432,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_calendar_same_hca_release_001\\segments.jsonl"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_calendar_same_hca_release_001/source/scripts/experiments/g31_feng_alignment/experiment.py",
+          "sha256": "26b75106c81ac0730c14d2d6622d43d4e2c94ca815d1dd41c677d70d9ee55d1b",
+          "bytes": 16036,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_calendar_same_hca_release_001\\source\\scripts\\experiments\\g31_feng_alignment\\experiment.py"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_calendar_same_hca_release_001/source/scripts/experiments/g31_feng_alignment/map2_experiment.py",
+          "sha256": "4e40c38efc34bd00be3a495559a3ddcb1aa7d69d454864997bd09da296b53f9c",
+          "bytes": 11592,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_calendar_same_hca_release_001\\source\\scripts\\experiments\\g31_feng_alignment\\map2_experiment.py"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_calendar_same_hca_release_001/source/scripts/experiments/g31_feng_alignment/metrics.py",
+          "sha256": "b28cace3d5bca76a0d11665f6ddb761b4bc7fa59819cd5c4f0e854a1b7b47f28",
+          "bytes": 12430,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_calendar_same_hca_release_001\\source\\scripts\\experiments\\g31_feng_alignment\\metrics.py"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_calendar_same_hca_release_001/summary.json",
+          "sha256": "2ebdd3ae997c4bebacd5e0a48f24912c2a3079f911a20d36f0a5f67470e6102b",
+          "bytes": 23801,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_calendar_same_hca_release_001\\summary.json"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_flow_001/business.jsonl",
+          "sha256": "550575d8162c81072c1e1be62ae84a7e331e8206d3bb9b9a46d755a2d02f1801",
+          "bytes": 14342335,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_flow_001\\business.jsonl"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_flow_001/manifest.json",
+          "sha256": "9147a51a0dd18431c5023e5d62d553dd1cfa881206bac09a50a724bcd64b6ace",
+          "bytes": 23262,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_flow_001\\manifest.json"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_flow_001/request.json.gz",
+          "sha256": "e806aa8f2063267561d1abd694982590062870a77f2bd721e9017b3e12135c29",
+          "bytes": 497365,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_flow_001\\request.json.gz"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_flow_001/segments.jsonl",
+          "sha256": "4324155efff9cb4d85cadf8e9a2bd92b5497c54ff7189f5c2d79009d6cb1a658",
+          "bytes": 24427198,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_flow_001\\segments.jsonl"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_flow_001/source/scripts/experiments/g31_feng_alignment/experiment.py",
+          "sha256": "26b75106c81ac0730c14d2d6622d43d4e2c94ca815d1dd41c677d70d9ee55d1b",
+          "bytes": 16036,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_flow_001\\source\\scripts\\experiments\\g31_feng_alignment\\experiment.py"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_flow_001/source/scripts/experiments/g31_feng_alignment/map2_experiment.py",
+          "sha256": "4e40c38efc34bd00be3a495559a3ddcb1aa7d69d454864997bd09da296b53f9c",
+          "bytes": 11592,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_flow_001\\source\\scripts\\experiments\\g31_feng_alignment\\map2_experiment.py"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_flow_001/source/scripts/experiments/g31_feng_alignment/metrics.py",
+          "sha256": "b28cace3d5bca76a0d11665f6ddb761b4bc7fa59819cd5c4f0e854a1b7b47f28",
+          "bytes": 12430,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_flow_001\\source\\scripts\\experiments\\g31_feng_alignment\\metrics.py"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_flow_001/summary.json",
+          "sha256": "cbebbca69765f25badbe882d6f0a7ab3c21462330cc39a2d5fbd28a573d27bd4",
+          "bytes": 23828,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_flow_001\\summary.json"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_flow_same_hca_release_001/business.jsonl",
+          "sha256": "3e57d7692ca761e516bc06ac7ced0daf9c582bffa78dc7c6db60f4be8af36a93",
+          "bytes": 14667449,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_flow_same_hca_release_001\\business.jsonl"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_flow_same_hca_release_001/manifest.json",
+          "sha256": "61838bea38887069a3e9da896bfd24647b2ca44611431ee01b885664e8ad15ff",
+          "bytes": 24051,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_flow_same_hca_release_001\\manifest.json"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_flow_same_hca_release_001/request.json.gz",
+          "sha256": "f14e5b58d327cd182d1b247bce475234bd0352bdc57c2231b16a6e343dd8fe0f",
+          "bytes": 444359,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_flow_same_hca_release_001\\request.json.gz"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_flow_same_hca_release_001/segments.jsonl",
+          "sha256": "d0a8079f9e89e54197e61bf08202cb07a2f2327e8d2ae6efd3ded6626e79c188",
+          "bytes": 23746432,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_flow_same_hca_release_001\\segments.jsonl"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_flow_same_hca_release_001/source/scripts/experiments/g31_feng_alignment/experiment.py",
+          "sha256": "26b75106c81ac0730c14d2d6622d43d4e2c94ca815d1dd41c677d70d9ee55d1b",
+          "bytes": 16036,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_flow_same_hca_release_001\\source\\scripts\\experiments\\g31_feng_alignment\\experiment.py"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_flow_same_hca_release_001/source/scripts/experiments/g31_feng_alignment/map2_experiment.py",
+          "sha256": "4e40c38efc34bd00be3a495559a3ddcb1aa7d69d454864997bd09da296b53f9c",
+          "bytes": 11592,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_flow_same_hca_release_001\\source\\scripts\\experiments\\g31_feng_alignment\\map2_experiment.py"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_flow_same_hca_release_001/source/scripts/experiments/g31_feng_alignment/metrics.py",
+          "sha256": "b28cace3d5bca76a0d11665f6ddb761b4bc7fa59819cd5c4f0e854a1b7b47f28",
+          "bytes": 12430,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_flow_same_hca_release_001\\source\\scripts\\experiments\\g31_feng_alignment\\metrics.py"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_flow_same_hca_release_001/summary.json",
+          "sha256": "76cb8e9671bc23e80efa0a905415b11b990f47356143df122819d0695aa9c1f7",
+          "bytes": 23795,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_eta_flow_same_hca_release_001\\summary.json"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_legacy_001/business.jsonl",
+          "sha256": "75ed86d429b943f55bdc184dbed71cc43d26c8be6b514320941b698b6a5cd14f",
+          "bytes": 14343175,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_legacy_001\\business.jsonl"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_legacy_001/manifest.json",
+          "sha256": "5aca290d14dea531a8dd09ba74f6264d1bc62a113e3870bc9590cb6aa4cba825",
+          "bytes": 23249,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_legacy_001\\manifest.json"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_legacy_001/request.json.gz",
+          "sha256": "d1afbf3f71897844f06dc8e078e46e55eee00a8b47d4580dded45f193e70f0b3",
+          "bytes": 497361,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_legacy_001\\request.json.gz"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_legacy_001/segments.jsonl",
+          "sha256": "7398e4febdf8f15ef1a9bab68eb226c5f9267141c7e040337e48a24f26dc9524",
+          "bytes": 24426900,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_legacy_001\\segments.jsonl"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_legacy_001/source/scripts/experiments/g31_feng_alignment/experiment.py",
+          "sha256": "26b75106c81ac0730c14d2d6622d43d4e2c94ca815d1dd41c677d70d9ee55d1b",
+          "bytes": 16036,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_legacy_001\\source\\scripts\\experiments\\g31_feng_alignment\\experiment.py"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_legacy_001/source/scripts/experiments/g31_feng_alignment/map2_experiment.py",
+          "sha256": "4e40c38efc34bd00be3a495559a3ddcb1aa7d69d454864997bd09da296b53f9c",
+          "bytes": 11592,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_legacy_001\\source\\scripts\\experiments\\g31_feng_alignment\\map2_experiment.py"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_legacy_001/source/scripts/experiments/g31_feng_alignment/metrics.py",
+          "sha256": "b28cace3d5bca76a0d11665f6ddb761b4bc7fa59819cd5c4f0e854a1b7b47f28",
+          "bytes": 12430,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_legacy_001\\source\\scripts\\experiments\\g31_feng_alignment\\metrics.py"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_legacy_001/summary.json",
+          "sha256": "db6fed58ebd019bfbc5af5b2b2dcac310b27a2d060554360d4e782864a46e85c",
+          "bytes": 23123,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_legacy_001\\summary.json"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_legacy_same_hca_release_001/business.jsonl",
+          "sha256": "bb7ba78e1084d3c7999c4c64a0fc951511c310a9d2e3b99ff555041de88f6985",
+          "bytes": 14667447,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_legacy_same_hca_release_001\\business.jsonl"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_legacy_same_hca_release_001/manifest.json",
+          "sha256": "3b6ce8eeaccefba96044430e98c3fd4bb141888847a890335fa0d8e249f52062",
+          "bytes": 24038,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_legacy_same_hca_release_001\\manifest.json"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_legacy_same_hca_release_001/request.json.gz",
+          "sha256": "15cd81b194ee06ad6810dadebaa0a36c6d0e9d0519384b7c4b04e9b8bf2fa177",
+          "bytes": 444355,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_legacy_same_hca_release_001\\request.json.gz"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_legacy_same_hca_release_001/segments.jsonl",
+          "sha256": "2c2a13e5e9d580635657f0b3226b02acae95cb33e002973e955cc03b914fe7c8",
+          "bytes": 23746348,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_legacy_same_hca_release_001\\segments.jsonl"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_legacy_same_hca_release_001/source/scripts/experiments/g31_feng_alignment/experiment.py",
+          "sha256": "26b75106c81ac0730c14d2d6622d43d4e2c94ca815d1dd41c677d70d9ee55d1b",
+          "bytes": 16036,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_legacy_same_hca_release_001\\source\\scripts\\experiments\\g31_feng_alignment\\experiment.py"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_legacy_same_hca_release_001/source/scripts/experiments/g31_feng_alignment/map2_experiment.py",
+          "sha256": "4e40c38efc34bd00be3a495559a3ddcb1aa7d69d454864997bd09da296b53f9c",
+          "bytes": 11592,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_legacy_same_hca_release_001\\source\\scripts\\experiments\\g31_feng_alignment\\map2_experiment.py"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_legacy_same_hca_release_001/source/scripts/experiments/g31_feng_alignment/metrics.py",
+          "sha256": "b28cace3d5bca76a0d11665f6ddb761b4bc7fa59819cd5c4f0e854a1b7b47f28",
+          "bytes": 12430,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_legacy_same_hca_release_001\\source\\scripts\\experiments\\g31_feng_alignment\\metrics.py"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_legacy_same_hca_release_001/summary.json",
+          "sha256": "e3da01b7095e44c98d25bb2d13b342fdcd28c84052ccbc841441bee8473acb34",
+          "bytes": 23108,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\g31_legacy_same_hca_release_001\\summary.json"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/historical_legacy_exact.json",
+          "sha256": "bd9774041a043fc0cc28723b18d19f0e2c557da9f50ac782719b7a5a7da22741",
+          "bytes": 1150,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\historical_legacy_exact.json"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/java_native_1x/compile_receipt.json",
+          "sha256": "1b9d171dacac89d733d7787206835a236a886bc1702708fc95bf611222e7eeaa",
+          "bytes": 3958,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\java_native_1x\\compile_receipt.json"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/java_native_1x/independent_business_segment_audit.json",
+          "sha256": "7a224a09656a6e8b733b74fc6c14927a8b994e678bb323b694fb5c1696dc6a4a",
+          "bytes": 4973,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\java_native_1x\\independent_business_segment_audit.json"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/java_native_1x/prepared_command.json",
+          "sha256": "b0ad89ff11d1d29f91d0163fdda19aab1a8c9d1b4e8d642303a6c4e731c77bf3",
+          "bytes": 1441,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\java_native_1x\\prepared_command.json"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/java_native_1x/run_01/output.txt",
+          "sha256": "371aacdaec7e89ecdaac3580e6aa931209337d450f2379e0d5c15a80ddb3b6ca",
+          "bytes": 680171,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\java_native_1x\\run_01\\output.txt"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/java_native_1x/run_01/outputstarttime.txt",
+          "sha256": "d765c88a0891e6dc50376073dcb916ca73b040b198a843869126d9b36e0817c0",
+          "bytes": 1091949,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\java_native_1x\\run_01\\outputstarttime.txt"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/java_native_1x/run_01/release.csv",
+          "sha256": "5f9ea6724d8e52da6d8ebb6240bacfabcd2e7ded65441a4b775574793e7c51e9",
+          "bytes": 1124488,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\java_native_1x\\run_01\\release.csv"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/java_native_1x/run_01/routes.csv",
+          "sha256": "683fd5ea5453bc7ae00cf0eff1d4b60bdab16d71272e3c310052bd5472e8971d",
+          "bytes": 2888574,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\java_native_1x\\run_01\\routes.csv"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/java_native_1x/run_01/run_status.json",
+          "sha256": "988a35280e2fdbbe05f4af1e12a2106cb76b48bdb4d58f36c3cfb06b890a6cc8",
+          "bytes": 1944,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\java_native_1x\\run_01\\run_status.json"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/java_native_1x/run_01/segment_lifecycle.csv",
+          "sha256": "d8c68b68952155181179b1a0ff25939a2a0c6371c4952d1830b7359e58131e5c",
+          "bytes": 4144801,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\java_native_1x\\run_01\\segment_lifecycle.csv"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/java_native_1x/run_01/summary.csv",
+          "sha256": "4dc79c1f6e7daae6f8a5c591986be065b6733cc538992c9ba80e529904e169ab",
+          "bytes": 397,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\java_native_1x\\run_01\\summary.csv"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/java_native_1x/source/original_inputs/inputdata.txt",
+          "sha256": "0f39d359b47a3f243ab077e4a294cbab56ec306a0f89bcc0ccc1d946caceef87",
+          "bytes": 1012027,
+          "origin": "external_original_bytes_at_declared_virtual_repository_path",
+          "source_at_build": "C:\\STUDY\\民航二所项目相关\\冯汝琛相关材料\\冯汝琛相关材料\\ICS项目\\代码-ICSsimulation\\inputdata.txt"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/java_native_1x/source/original_inputs/map2.txt",
+          "sha256": "0af0ae05883136f79209ce7f18297cd92d61e1e96433b1ab9f6ffcb70ed9c883",
+          "bytes": 15676,
+          "origin": "external_original_bytes_at_declared_virtual_repository_path",
+          "source_at_build": "C:\\STUDY\\民航二所项目相关\\冯汝琛相关材料\\冯汝琛相关材料\\ICS项目\\代码-ICSsimulation\\map2.txt"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/java_native_1x/source/src/App/Astar.java",
+          "sha256": "b2b7e001d55fd9cb265f73792918611b6d18aeea3b93bb0ebf36b975020c43f8",
+          "bytes": 4627,
+          "origin": "exact_original_java_source_snapshot",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\java_native_1x\\source\\src\\App\\Astar.java"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/java_native_1x/source/src/App/Edge.java",
+          "sha256": "45fc16634244acfd5d3303a8689bb7ed410b4835b5e08a3758b8c50606a94cce",
+          "bytes": 648,
+          "origin": "exact_original_java_source_snapshot",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\java_native_1x\\source\\src\\App\\Edge.java"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/java_native_1x/source/src/App/ICS_PathFinding.java",
+          "sha256": "a367fd8e79aba7b3d23b71fc9b4d01f76dd67f291f008401d676ffcbcf53d52a",
+          "bytes": 17669,
+          "origin": "exact_original_java_source_snapshot",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\java_native_1x\\source\\src\\App\\ICS_PathFinding.java"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/java_native_1x/source/src/App/Map.java",
+          "sha256": "3e2af71a17d204fdc6639feb2fa8efd252881d6b18b0b15f5248ba68e0d6ece6",
+          "bytes": 4281,
+          "origin": "exact_original_java_source_snapshot",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\java_native_1x\\source\\src\\App\\Map.java"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/java_native_1x/source/src/App/Node.java",
+          "sha256": "0dc21b5e6b9f8f1e9fc3c38f992da1b77612708cb3012527fae87bd99417ed62",
+          "bytes": 899,
+          "origin": "exact_original_java_source_snapshot",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\java_native_1x\\source\\src\\App\\Node.java"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/java_native_1x/source/src/App/Route.java",
+          "sha256": "841f1fd2d207a11279092be33ada5993d2a7407b17bfe009546c822389dafc5f",
+          "bytes": 1362,
+          "origin": "exact_original_java_source_snapshot",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\java_native_1x\\source\\src\\App\\Route.java"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/java_native_1x/source/src/App/Tasks.java",
+          "sha256": "dd4505e495fd3c0fa737923dca83c9d404fc3b1e3a7ce979e7dd384a57d0948b",
+          "bytes": 7928,
+          "origin": "exact_original_java_source_snapshot",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\java_native_1x\\source\\src\\App\\Tasks.java"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/java_native_1x/source/src/App/Vertex.java",
+          "sha256": "59390474713fe984614673d3f7b2849071f9c6a55d9935725f6c3ede26415eea",
+          "bytes": 1189,
+          "origin": "exact_original_java_source_snapshot",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\java_native_1x\\source\\src\\App\\Vertex.java"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/java_native_1x/source/src/App/task.java",
+          "sha256": "f34ce46a39d13a64cea07d2e71b121f67c3312d31913e3d267f24f1912f16ed5",
+          "bytes": 1444,
+          "origin": "exact_original_java_source_snapshot",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\java_native_1x\\source\\src\\App\\task.java"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/java_native_1x/source/src/ICS_GUI/ICS_GUI.java",
+          "sha256": "3a893424e4fbd5e2c9071a227fd9ed6867d7176f4dd00d44ccdc541fb697470b",
+          "bytes": 25803,
+          "origin": "exact_original_java_source_snapshot",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\java_native_1x\\source\\src\\ICS_GUI\\ICS_GUI.java"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/java_native_1x/source/src/RUN/Main.java",
+          "sha256": "af7ba8f8224a480f61e4d4b010d0c6fcf5e8798cccfdf6f298d786ac053bf5af",
+          "bytes": 8807,
+          "origin": "exact_original_java_source_snapshot",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\java_native_1x\\source\\src\\RUN\\Main.java"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/java_native_1x/source/src/RUN/test.java",
+          "sha256": "d9e58599918d026428cdcbe7748ab169f710bccc968ab9248c0ad652d5bc3f5a",
+          "bytes": 777,
+          "origin": "exact_original_java_source_snapshot",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\java_native_1x\\source\\src\\RUN\\test.java"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/java_native_1x/source/src/communication/SocketClient.java",
+          "sha256": "0cb1a4a916aecd2c11774efe672f144dc913b484888dc3bd096dfce39a752bd2",
+          "bytes": 2782,
+          "origin": "exact_original_java_source_snapshot",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\java_native_1x\\source\\src\\communication\\SocketClient.java"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/java_native_1x/source/src/communication/SocketClientHandler.java",
+          "sha256": "598a68aa62f008d88b3a0847d96a2f6d9dd5a5424c84e6f25ad9df8a05b5d1f8",
+          "bytes": 3095,
+          "origin": "exact_original_java_source_snapshot",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\java_native_1x\\source\\src\\communication\\SocketClientHandler.java"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/java_native_1x/source/src/communication/decode1.java",
+          "sha256": "acf49bcdc3a9c1a995489303a407c72ef080501a1d973b11fea1f281ad6c774a",
+          "bytes": 6459,
+          "origin": "exact_original_java_source_snapshot",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\java_native_1x\\source\\src\\communication\\decode1.java"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/java_native_1x/source_delay_and_time_boundary_audit.json",
+          "sha256": "2632ebfa1e35cec2a077f3c7d889bde916b3febd09211673eaa5375056479c29",
+          "bytes": 2489,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\java_native_1x\\source_delay_and_time_boundary_audit.json"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/java_native_1x/source_input_manifest.json",
+          "sha256": "52808e6052474b82ef7db589c2410fec5e08b3e3793e6e34ebb2657301e4839a",
+          "bytes": 10684,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\java_native_1x\\source_input_manifest.json"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/java_original_001/business.jsonl",
+          "sha256": "9e1b670e2a2aecfd6a30de92e35022591dda9d0d0d0543ee2cfd3853d7966c87",
+          "bytes": 14227909,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\java_original_001\\business.jsonl"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/java_original_001/manifest.json",
+          "sha256": "654b94c7c7498441eeface884bef555f47acaea7b700ed4dc3746b5789855fef",
+          "bytes": 10608,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\java_original_001\\manifest.json"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/java_original_001/segments.jsonl",
+          "sha256": "598bb60641f8083317b698b74703118517a97e089f8c26a40d4afcd1b8ae3b59",
+          "bytes": 15740667,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\java_original_001\\segments.jsonl"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/java_original_001/summary.json",
+          "sha256": "7d34087ff884242929d2a7c0ed5bcd3c785b658572e296b61c603026655166bf",
+          "bytes": 4589,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\java_original_001\\summary.json"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/python_regressions_001.xml",
+          "sha256": "7a739b33c8863ba70752a94fd6663680a029c254d5281c60f7475008e0106efd",
+          "bytes": 11863,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\python_regressions_001.xml"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/python_regressions_002.xml",
+          "sha256": "0f795638e48d5b2c3e4e76393515ea3fa5439f08f0baa308a2374a0fd5cc8919",
+          "bytes": 5048,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\python_regressions_002.xml"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/report_data_001/arm_table.csv",
+          "sha256": "c668883f3177e53dcb97db3992150c2147832281d7aa04d4e76a965c44c3a895",
+          "bytes": 3990,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\report_data_001\\arm_table.csv"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/report_data_001/report_data.json",
+          "sha256": "d78f42c64b31ebd448755894ecad5ae7e5b4324055f578df1c5b43b54f5cff7d",
+          "bytes": 265747,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\report_data_001\\report_data.json"
+        },
+        {
+          "path": "outputs/experiments/g31_feng_alignment_map2_20261023/request_audit_001/audit.json",
+          "sha256": "7898c83e579ea225c0eb3217ae16c39d96cabcc828acb6d48bc9bd0467e1fbc2",
+          "bytes": 9495,
+          "origin": "repository_relative_file",
+          "source_at_build": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_feng_alignment_map2_20261023\\request_audit_001\\audit.json"
+        }
+      ]
+    }
+  ],
+  "campaigns": [
+    {
+      "map": "nanning",
+      "canonical": "artifacts/tasks/g4irsf31_nanning/nanning_1x_canonical.jsonl",
+      "report_data": "outputs/experiments/g31_feng_alignment_20261023/report_data_002/report_data.json",
+      "horizon": 98259.0,
+      "arms": [
+        {
+          "label": "Java",
+          "directory": "outputs/experiments/g31_feng_alignment_20261023/java_original_reused"
+        },
+        {
+          "label": "G31_legacy",
+          "directory": "outputs/experiments/g31_feng_alignment_20261023/g31_legacy_001"
+        },
+        {
+          "label": "G31_calendar",
+          "directory": "outputs/experiments/g31_feng_alignment_20261023/g31_eta_calendar_001"
+        },
+        {
+          "label": "G31_flow",
+          "directory": "outputs/experiments/g31_feng_alignment_20261023/g31_eta_flow_001"
+        },
+        {
+          "label": "G31_legacy_same_HCA",
+          "directory": "outputs/experiments/g31_feng_alignment_20261023/g31_legacy_same_hca_release_001"
+        },
+        {
+          "label": "G31_calendar_same_HCA",
+          "directory": "outputs/experiments/g31_feng_alignment_20261023/g31_eta_calendar_same_hca_release_001"
+        },
+        {
+          "label": "G31_flow_same_HCA",
+          "directory": "outputs/experiments/g31_feng_alignment_20261023/g31_eta_flow_same_hca_release_001"
+        }
+      ]
+    },
+    {
+      "map": "map2",
+      "canonical": "data/processed/tasks/inputdata.jsonl",
+      "report_data": "outputs/experiments/g31_feng_alignment_map2_20261023/report_data_001/report_data.json",
+      "horizon": 98259.0,
+      "arms": [
+        {
+          "label": "Java",
+          "directory": "outputs/experiments/g31_feng_alignment_map2_20261023/java_original_001"
+        },
+        {
+          "label": "G31_legacy",
+          "directory": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_legacy_001"
+        },
+        {
+          "label": "G31_calendar",
+          "directory": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_calendar_001"
+        },
+        {
+          "label": "G31_flow",
+          "directory": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_flow_001"
+        },
+        {
+          "label": "G31_legacy_same_HCA",
+          "directory": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_legacy_same_hca_release_001"
+        },
+        {
+          "label": "G31_calendar_same_HCA",
+          "directory": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_calendar_same_hca_release_001"
+        },
+        {
+          "label": "G31_flow_same_HCA",
+          "directory": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_flow_same_hca_release_001"
+        }
+      ]
+    }
+  ],
+  "omitted_native_payloads": [
+    {
+      "map": "nanning",
+      "path": "outputs/experiments/g31_feng_alignment_20261023/g31_legacy_001/native_payload.json.gz",
+      "sha256": "fbcb26c1a43b32ea72c051dca23fda6edad74f12b9397661df1c898c454ae96d",
+      "bytes": 31952489,
+      "included": false,
+      "reason": "large full native payload; full lifecycle rows, summary and request are included"
+    },
+    {
+      "map": "nanning",
+      "path": "outputs/experiments/g31_feng_alignment_20261023/g31_eta_calendar_001/native_payload.json.gz",
+      "sha256": "fd214e33bc0238700048f62763c64f6e946c07fc49ad58d03ec00eae1b2c414e",
+      "bytes": 29846356,
+      "included": false,
+      "reason": "large full native payload; full lifecycle rows, summary and request are included"
+    },
+    {
+      "map": "nanning",
+      "path": "outputs/experiments/g31_feng_alignment_20261023/g31_eta_flow_001/native_payload.json.gz",
+      "sha256": "95049212b39ae9ea98a32f755ee263f27ed15667ece9ae152ff96b737863b76b",
+      "bytes": 29857501,
+      "included": false,
+      "reason": "large full native payload; full lifecycle rows, summary and request are included"
+    },
+    {
+      "map": "nanning",
+      "path": "outputs/experiments/g31_feng_alignment_20261023/g31_legacy_same_hca_release_001/native_payload.json.gz",
+      "sha256": "4361b8a4cadc420eaee377345f2acc301d189eb3287834cf36c76c2e21a75a5f",
+      "bytes": 29850951,
+      "included": false,
+      "reason": "large full native payload; full lifecycle rows, summary and request are included"
+    },
+    {
+      "map": "nanning",
+      "path": "outputs/experiments/g31_feng_alignment_20261023/g31_eta_calendar_same_hca_release_001/native_payload.json.gz",
+      "sha256": "6c0c417673827a4d87640c21eecf76fb44b3199e3cff83bdc902222936d1aabf",
+      "bytes": 27958563,
+      "included": false,
+      "reason": "large full native payload; full lifecycle rows, summary and request are included"
+    },
+    {
+      "map": "nanning",
+      "path": "outputs/experiments/g31_feng_alignment_20261023/g31_eta_flow_same_hca_release_001/native_payload.json.gz",
+      "sha256": "642daa568ef6a0bd1110cee2fcf58e81bb547b6d208f244841bd03da0049b35c",
+      "bytes": 28009747,
+      "included": false,
+      "reason": "large full native payload; full lifecycle rows, summary and request are included"
+    },
+    {
+      "map": "map2",
+      "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_legacy_001/native_payload.json.gz",
+      "sha256": "dd93f0610b91c9aca04626bd0964d3b1b2538d7039cef5ef008b9aea9c83733c",
+      "bytes": 11007150,
+      "included": false,
+      "reason": "large full native payload; full lifecycle rows, summary and request are included"
+    },
+    {
+      "map": "map2",
+      "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_calendar_001/native_payload.json.gz",
+      "sha256": "fed77b52fed725234777645c9dbd1e1c069f9be80dd4c73f2341217296d7887a",
+      "bytes": 10589548,
+      "included": false,
+      "reason": "large full native payload; full lifecycle rows, summary and request are included"
+    },
+    {
+      "map": "map2",
+      "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_flow_001/native_payload.json.gz",
+      "sha256": "2ee56e6ab3363405aa0c03a259d4456a75b6586eccc47a5f0eb4332717fec6bb",
+      "bytes": 10610963,
+      "included": false,
+      "reason": "large full native payload; full lifecycle rows, summary and request are included"
+    },
+    {
+      "map": "map2",
+      "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_legacy_same_hca_release_001/native_payload.json.gz",
+      "sha256": "70d2f9bc09267b6bbe2b94a2eb5dc036b7e4c25ec5980cb72abf4020ccb070ad",
+      "bytes": 8627192,
+      "included": false,
+      "reason": "large full native payload; full lifecycle rows, summary and request are included"
+    },
+    {
+      "map": "map2",
+      "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_calendar_same_hca_release_001/native_payload.json.gz",
+      "sha256": "db7dd77d807aaeed2a016e86023395aa33e6272fa57361e4bd47e1b9bc181a13",
+      "bytes": 8390517,
+      "included": false,
+      "reason": "large full native payload; full lifecycle rows, summary and request are included"
+    },
+    {
+      "map": "map2",
+      "path": "outputs/experiments/g31_feng_alignment_map2_20261023/g31_eta_flow_same_hca_release_001/native_payload.json.gz",
+      "sha256": "33a6a4aff1dba3abd74dd22246b76dbfc476e25de8c0d90cb39d23a79a81e93d",
+      "bytes": 8394058,
+      "included": false,
+      "reason": "large full native payload; full lifecycle rows, summary and request are included"
+    }
+  ],
+  "scope": "two fixed-parameter maps; same underlying 1x workload; legacy remains default; no empty trays or added capacity",
+  "source_reconstruction": "base commit plus explicit published source changes; exact original Java snapshots in map2 ZIP",
+  "binary_sha256_shared_across_maps": "7260288ed0996ad01d445cbf906010faabba1a0bc531f8ba13d6c1d1dd63bb28"
+}
