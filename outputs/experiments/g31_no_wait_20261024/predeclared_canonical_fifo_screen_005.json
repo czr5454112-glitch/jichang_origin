@@ -1,0 +1,29 @@
+{
+  "schema": "g31.canonical_fifo.screen.v1",
+  "binary_sha256": "f2643e3657e7d9da4e25e403a396801125c533efaaa67b5599c3b49f768f9713",
+  "source_fifo_order": "canonical",
+  "purpose": "Matched source FIFO and first-planning-entry THT comparison against physical HCA; supersedes activation-order screen for fairness claims.",
+  "screen_order": [
+    "fixed1_w0_cap120",
+    "fixed1_w0_cap30",
+    "fixed1_w0"
+  ],
+  "cells": [
+    "map2_1x",
+    "nanning_1x"
+  ],
+  "heldout_validation": [
+    "map2_2x",
+    "nanning_2x"
+  ],
+  "selection": "Prefer a common configuration lowering Nanning user THT and keeping map2 user THT within assistant-announced3% of HCA, with full completion and companion queue/deadline metrics. Earlier004 results only motivate candidates;005 results determine matched-policy claims.",
+  "required_audits": [
+    "integer2s headway",
+    "no internal stopping",
+    "causal EBS",
+    "atomic rolling transactions",
+    "immutable firstplanning clock",
+    "canonical source ordering including unready EBS heads",
+    "fullpopulation THT"
+  ]
+}

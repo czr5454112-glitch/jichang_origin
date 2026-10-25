@@ -1,0 +1,20 @@
+--- adapter_identity_renamed015
++++ candidate016/continuous_adapter.py
+@@ -32,7 +32,7 @@
+     max_retries=100000,max_events=10000000,retry_mode="calendar_jump",retry_step=1.0,
+     audit_failed_calendar_hash=False,skip_scoring_single_choice=True,route_excess_retry_relaxation_rate=0.0,
+     future_source_reservation_horizon_seconds=0,future_source_reservation_min_wait_seconds=2.0,
+-    future_source_prefer_earlier_finish=False,**FIXED)
++    future_source_prefer_earlier_finish=False,future_source_prefer_only_without_ready_successor=False,**FIXED)
+ ALLOWED = set(DEFAULT_CONTROLS) | {"max_route_excess_seconds"}
+ 
+ 
+@@ -96,6 +96,8 @@
+         raise ValueError("future reservation horizon must be an integer in [0,60]")
+     if future and controls["congestion_weight"] not in (0,1):
+         raise ValueError("candidate016 future reservations support only congestion weight 0 or 1")
++    if controls["future_source_prefer_only_without_ready_successor"] and not controls["future_source_prefer_earlier_finish"]:
++        raise ValueError("ready-successor gate requires earlier-finish source preference")
+     if controls["future_source_prefer_earlier_finish"] and not future:
+         raise ValueError("earlier-finish source comparison requires enabled future reservation")
+     return controls

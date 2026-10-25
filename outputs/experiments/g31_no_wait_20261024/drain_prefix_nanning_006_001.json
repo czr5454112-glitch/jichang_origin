@@ -1,0 +1,57 @@
+{
+  "schema": "g31.nowait.original_drain_prefix.v1",
+  "passed": true,
+  "original_run": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_standard_cap120_relax1_006",
+  "drain_run": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_standard_cap120_relax1_drain200000_006",
+  "cutoff": 98259.0,
+  "drain_horizon": 200000,
+  "bags": {
+    "passed": true,
+    "records": 87206,
+    "changed_records": 0,
+    "examples": [],
+    "original_sha256": "6c1a6fa538d0164974e2b75eabad7ddf42d97d44d9340f7cacf81f5ac41e7ddc",
+    "drain_sha256": "030a6c9be05d6c59bfdacf7791958fcf17a1bfe14a44d35d2c36ab289928d699",
+    "original_admitted": 62544,
+    "original_first_attempted": 62544,
+    "original_completed": 62408
+  },
+  "rolling_events": {
+    "passed": true,
+    "prefix_records": 939523,
+    "changed_records": 0,
+    "serialized_prefix_bytes_exact": true,
+    "examples": [],
+    "original": {
+      "records": 939523,
+      "prefix_records": 939523,
+      "after_cutoff_records": 0,
+      "kinds": {
+        "source_commit": 62544,
+        "arrival": 814571,
+        "cleanup": 62408
+      },
+      "sha256": "c5702dbaeec195804fc340ffae8b8ce2b296f13322ae4018ba5c0d736bd70243",
+      "prefix_sha256": "c5702dbaeec195804fc340ffae8b8ce2b296f13322ae4018ba5c0d736bd70243"
+    },
+    "drain": {
+      "records": 1353657,
+      "prefix_records": 939523,
+      "after_cutoff_records": 414134,
+      "kinds": {
+        "source_commit": 62544,
+        "arrival": 814571,
+        "cleanup": 62408
+      },
+      "sha256": "641fbe6d2b0676e37d35fa139f291571825d6a32cd555207c69127f1d6887f21",
+      "prefix_sha256": "c5702dbaeec195804fc340ffae8b8ce2b296f13322ae4018ba5c0d736bd70243"
+    }
+  },
+  "tool_sha256": "b7f825a9f112635fe43db9156accb99519046c186c803cb947c35f0d7bca23ae",
+  "allowed_contract_metadata_difference": "observation_window_extension with registered 8260/98259/200000, no new arrivals/deadline changes; ignored by native controls",
+  "manifest_sha256": {
+    "original": "c8334c7da776693cb728e9e5578f9fc8674511d9d82b04c2c1f02a59daefd2ac",
+    "drain": "bef0273f390692f4c69417bb0a7eda5e0ee7588bdb83ba271e752b55eade55c9"
+  },
+  "boundary": "Both are real independent runs. Exact executed ledger prefix includes cutoff-time events. Immutable activation/first-attempt/admission clocks and actual completions through cutoff must agree. Final future routes, planned finishes and cumulative attempts/retries from the drain are never substituted for original-window observations."
+}

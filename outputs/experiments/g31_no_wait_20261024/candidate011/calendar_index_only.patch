@@ -1,0 +1,55 @@
+--- frozen010c/core.cpp
++++ candidate011/core.cpp
+@@ -300,6 +300,7 @@
+     double simulation_time = 0;
+     bool event_budget_exhausted = false;
+     double preprocessing_seconds = 0;
++    bool fixed_two_second_calendars = false;
+ 
+     bool half_open() const {return cfg.interval_mode=="half_open";}
+     double add_time(double a,double b) const {
+@@ -339,7 +340,13 @@
+             if (earliest_cleanup) *earliest_cleanup=cleanup;
+             return false;
+         }
+-        auto it = c.begin();
++        // Every stored window is at most 2s under this validated tuple.
++        // S < A-2s implies E < A, so these entries cannot contribute to
++        // overlap, latest_end, or earliest_cleanup. Keep the original
++        // upper loop and all exact tests; legacy/mixed durations fall back.
++        auto it = use_half_open && fixed_two_second_calendars
++            ? c.lower_bound(seconds(std::max<std::int64_t>(0,tick(arrival)-2000000LL)))
++            : c.begin();
+         for (; it != c.end() && it->first <= departure; ++it) {
+             if (it->second.task==ignore_owner) continue;
+             const bool overlap=use_half_open
+@@ -741,7 +748,14 @@
+         auto intersect_resource=[&](const Calendar& calendar,std::int64_t lo,std::int64_t hi) {
+             if (lo==hi) return;
+             ++future_calendar_queries;
+-            for (const auto& entry:calendar) {
++            // For all candidate launches R>=lower, an old window ending
++            // before lower+lo cannot clear any mask bit. Integer ticks
++            // avoid subtracting rounded doubles or skipping equal keys.
++            auto it=fixed_two_second_calendars
++                ? calendar.lower_bound(seconds(std::max<std::int64_t>(0,lower+lo-2000000LL)))
++                : calendar.begin();
++            for (;it!=calendar.end();++it) {
++                const auto& entry=*it;
+                 if (tick(entry.first)>=upper+hi) break;
+                 ++future_calendar_entries_scanned;++t.future_calendar_entries_scanned;
+                 // Half-open overlap excludes both touching endpoints. Clip
+@@ -1107,6 +1121,13 @@
+             require_grid_value(cfg.edge_entry_headway_seconds,"edge_entry_headway_seconds");
+             if (std::isfinite(cfg.max_route_excess_seconds)) require_grid_value(cfg.max_route_excess_seconds,"max_route_excess_seconds");
+         }
++        // All insertion paths use each node service or the edge-entry
++        // headway; zero node windows are omitted in half-open mode.
++        fixed_two_second_calendars=half_open() && cfg.strict_endpoint_resources
++            && cfg.edge_entry_headway_seconds==2.0
++            && std::all_of(nodes.begin(),nodes.end(),[](const Node& n) {
++                return n.service==0.0 || n.service==2.0;
++            });
+         if (cfg.enable_ebs_predecessor_gate) {
+             std::map<std::int64_t,int> inbound,outbound;
+             for (std::size_t i=0;i<tasks.size();++i) {

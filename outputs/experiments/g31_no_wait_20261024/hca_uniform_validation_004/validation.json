@@ -1,0 +1,100 @@
+{
+  "pass": true,
+  "adapter_freeze_sha256": "8e89758d3c4d4383247e8b153d0240cca6704edc8133f893ea6cc59af2f08885",
+  "native": {
+    "pass": true,
+    "assertions": 30,
+    "time_grid_seconds": 1e-06,
+    "source_goal_strict": true,
+    "same_business_id_no_exemption": true,
+    "short_edge_persistent": true
+  },
+  "reparent": {
+    "pass": true,
+    "all_service_seconds": 2,
+    "exact_distance_heuristic": true,
+    "planned_node_intervals": [
+      [
+        0,
+        0.0,
+        2.0
+      ],
+      [
+        1,
+        3.0,
+        5.0
+      ],
+      [
+        3,
+        6.0,
+        8.0
+      ],
+      [
+        4,
+        10.0,
+        12.0
+      ]
+    ],
+    "edge_1_to_3_expected_travel": 1,
+    "positive_schedule_residual": 0.0,
+    "actual_node_report_epochs": [
+      [
+        1,
+        3
+      ],
+      [
+        3,
+        6
+      ],
+      [
+        4,
+        10
+      ]
+    ],
+    "actual_finish_epoch": 10,
+    "continuous_same_route_goal_arrival": 10,
+    "delay_not_localized_to_node_or_edge": true
+  },
+  "full_analysis": {
+    "full_population": 5,
+    "unreleased_retained": 1,
+    "business_denominator": 4,
+    "missing_route_telemetry_rejected": true,
+    "headway_audit_passed": true
+  },
+  "wrapper": {
+    "chronological_stable_ties": true,
+    "pending_source_blocks_next": true,
+    "strict_ceil": true,
+    "causal_ebs": true,
+    "source_releases": [
+      {
+        "ordinal": "1",
+        "task_id": "2",
+        "start": "0",
+        "goal": "3",
+        "release_epoch": "11.0"
+      },
+      {
+        "ordinal": "2",
+        "task_id": "3",
+        "start": "0",
+        "goal": "3",
+        "release_epoch": "12.0"
+      },
+      {
+        "ordinal": "3",
+        "task_id": "1",
+        "start": "0",
+        "goal": "2",
+        "release_epoch": "14.0"
+      }
+    ],
+    "inbound_reported_finish": 40.0,
+    "outbound_release": 40.0,
+    "routes": 4,
+    "independent_integer_replay_node_conflicts": 0,
+    "independent_integer_replay_edge_conflicts": 0,
+    "route_timing_residuals": 0
+  }
+}

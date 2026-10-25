@@ -1,0 +1,29 @@
+{
+  "schema": "g31.candidate022.independent_readonly_review.v1",
+  "utc": "2026-10-24T14:11:43.774075+00:00",
+  "status": "no_blocker_in_reviewed_prepared_source",
+  "source_sha256": "02e6ca5f8a92fd656dd2209ca10ce3cee2574fbd37e73b445eac189b97bcbc8b",
+  "patch_sha256": "f8ca477d374ac24e72c3844c8a0463a471ac52796deace3c9db0d9aea035947c",
+  "execution": "Only small prepared source/patch read; no build/native/full-data scan.",
+  "verified": [
+    "At limit1, removing the single dispatch-if restores the exact original020 construct_one_alternative body. Other native behavior still requires planned differential tests.",
+    "Bounded ordering is nearest eligible upstream fork first, then local service+edge travel+H, physical target ID, edge ID; node-clear excludes its own exit and edge-clear includes it.",
+    "Only cycle/missing cached successor/frozen route-cap invalidity proceeds to another static candidate. First static-valid chain exits helper; its one complete mask is computed by existing caller. Empty calendar mask returns false rather than trying a second valid chain.",
+    "Static helper reads topology/goal table/current cap, not calendars or unreleased tasks; it does not touch the immediate retry recommendation or mutate confirmed reservations.",
+    "Per-task last witness resets per invocation and distinguishes selected-for-single-mask from actual precommit. Original019 bucket semantics remain original-chain outcomes."
+  ],
+  "counter_requirements": [
+    "invocations = no_eligible_candidates + first_valid_chains + static_limit_exhausted + all_candidates_invalid",
+    "static_candidates_checked = rejected_cycle + rejected_successor + rejected_cap + first_valid_chains",
+    "first_valid_chains = complete_mask_queries = alternative_future_chain.complete_masks",
+    "candidate checks <= limit * invocations; original020 considered=no_fork+constructed no longer applies when limit>1",
+    "original mask-empty remains original outcome even if alternative succeeds; original precommits = total precommits - alternative precommits"
+  ],
+  "cost_boundary": "The limit4 bounds suffix construction/validation attempts. Current implementation first enumerates and sorts all cheap eligible fork-neighbor choices; this work is not O(4). The existing cheap_eligible_candidates count and source timing should retain it.",
+  "targeted_tests_suggested": [
+    "First static-valid candidate has empty calendar mask while later valid candidate would be feasible: no second mask allowed.",
+    "Nearest fork all static-invalid then earlier fork valid within cap: precisely nearest-first enumeration.",
+    "Candidate4 invalid with further eligible candidates gives limit_exhausted, not all_candidates_invalid.",
+    "Default omitted/explicit1 all old logical output and ledger exact."
+  ]
+}

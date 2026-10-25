@@ -1,0 +1,91 @@
+{
+  "schema": "g31.standard.selection.v2",
+  "execution_model": "continuous_headway_2s",
+  "map": "map2",
+  "scale": 1,
+  "standard_id": "g31_continuous_010c_future_source_reservation",
+  "is_standard_selection": false,
+  "selection_label": "isolated_future_reservation_candidate010",
+  "historical_default_modified": false,
+  "contract": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate010\\registered_contracts_010c\\physical_contract_original_window.json",
+    "sha256": "dcc5db6f8721559c25fb235a5ce1f494ecf24c5ed402dff027c492b2ddd59fd5",
+    "bytes": 7036
+  },
+  "controls": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate010\\controls_original_window.json",
+    "sha256": "9f1340686423d5a0a4c6d45c56e51da6037d477fc578903105fafb1fcab222ff",
+    "bytes": 914
+  },
+  "binary": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build\\g31_no_wait_010c\\python\\g31_nowait.cp311-win_amd64.pyd",
+    "sha256": "493ffb54331e6f0010b1fea524a64d74d1fe8d04896f1d2e6927d92628c5c0f5",
+    "bytes": 338432
+  },
+  "canonical": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\tasks\\inputdata.jsonl",
+    "sha256": "968d2c876fcbf03c5b25c8e865ccd469431af3ddbf59dc9ebe073752bd93678f",
+    "bytes": 12252445
+  },
+  "profile": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\g31_continuous\\map2_service2.json",
+    "sha256": "e404313b75b86477050915b643ad9cc11d8ef25a346805d18d4c7bfc71b00903",
+    "bytes": 105551
+  },
+  "build_receipt": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build\\g31_no_wait_010c\\build_receipt.json",
+    "sha256": "39e0105221aae2c6a30742f8597c7d1f927da8378ec61c93ed7ec7887182263f",
+    "bytes": 866
+  },
+  "native_source": {
+    "path": "build\\g31_no_wait_010c\\source\\core.cpp",
+    "bytes": 96188,
+    "sha256": "01e3289e7934ae164fd0014c34878657027cff7811186384080cf885d68523e3"
+  },
+  "effective_controls": {
+    "end_time": 98259,
+    "min_depth": 1,
+    "max_depth": 1,
+    "adaptive": false,
+    "congestion_weight": 0,
+    "pressure_window": 30,
+    "max_expansions": 256,
+    "max_score_expansions": 64,
+    "max_retries": 100000,
+    "max_events": 10000000,
+    "retry_mode": "calendar_jump",
+    "retry_step": 1.0,
+    "audit_failed_calendar_hash": false,
+    "skip_scoring_single_choice": true,
+    "route_excess_retry_relaxation_rate": 1,
+    "future_source_reservation_horizon_seconds": 60,
+    "future_source_reservation_min_wait_seconds": 2,
+    "interval_mode": "half_open",
+    "strict_endpoint_resources": true,
+    "edge_entry_headway_seconds": 2,
+    "time_grid_seconds": 1e-06,
+    "terminal_reservation_service": true,
+    "enable_inroute_replanning": true,
+    "enable_ebs_predecessor_gate": true,
+    "release_quantum": 1,
+    "completion_quantum": 1,
+    "source_fifo": true,
+    "source_generation_interval": 1,
+    "source_fifo_order": "canonical",
+    "max_route_excess_seconds": 120
+  },
+  "business_denominator": 28506,
+  "segment_denominator": 43603,
+  "paper_tht_definition": "per original task_id: sum over its transport legs of finish-admission; full population only when all bags complete",
+  "user_primary_tht_definition": "per original task_id: sum over its transport legs of actual goal arrival minus first_planning_attempt_time; failed search/retry time included; source activation/FIFO preplanning hold and canonical elapsed reported separately",
+  "user_primary_tht_status": "explicit_first_planning_attempt_time; admission-based paper/network values are diagnostic",
+  "source_order_contract": "stable canonical nominal release; input row order for ties; an unreleased or predecessor-blocked head blocks later tasks",
+  "source_wait_separately_reported": true,
+  "claim_boundary": "Explicit continuous-motion model with in-route local next-hop decisions and full continuation certificates. No standard winner selected; real network latency, faults and empty trays unsupported.",
+  "entrypoint": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate010\\run_candidate.py",
+    "sha256": "b524519677ed2ce235bf398b152402f017d135e189ac6ee38f020367f3fd3c5d",
+    "bytes": 2077
+  },
+  "execution_status": "complete"
+}

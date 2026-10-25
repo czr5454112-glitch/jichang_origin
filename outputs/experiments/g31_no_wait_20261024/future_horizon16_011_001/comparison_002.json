@@ -1,0 +1,1440 @@
+{
+  "schema": "g31.future_horizon16_011.small_comparison.v1",
+  "passed": true,
+  "runs": [
+    {
+      "label": "2x_horizon16_minwait2",
+      "kind": "native",
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future16_minwait2_cap120_relax1_drain200000_011",
+      "status": "complete",
+      "metrics": {
+        "business_denominator": 57012,
+        "segment_denominator": 87206,
+        "completed_businesses": 57012,
+        "completed_segments": 87206,
+        "full_population_available": true,
+        "user_tht": {
+          "status": "available",
+          "count": 57012,
+          "sum": 21033758.860000044,
+          "mean": 368.935642671719,
+          "min": 59.0,
+          "p50": 406.88999999999214,
+          "p95": 586.9052499999993,
+          "p99": 660.2050000000017,
+          "max": 7718.625
+        },
+        "preplanning": {
+          "status": "available",
+          "count": 57012,
+          "sum": 2572343747.426106,
+          "mean": 45119.3388659599,
+          "min": 9.999999747378752e-06,
+          "p50": 68889.43388,
+          "p95": 103022.24805499999,
+          "p99": 137683.7580649,
+          "max": 141775.46126
+        },
+        "planning_retry_wait": {
+          "status": "available",
+          "count": 57012,
+          "sum": 497635.0,
+          "mean": 8.728600996281484,
+          "min": 0.0,
+          "p50": 2.0,
+          "p95": 34.0,
+          "p99": 56.0,
+          "max": 7336.0
+        },
+        "canonical_elapsed": {
+          "status": "available",
+          "count": 57012,
+          "sum": 2593377506.286106,
+          "mean": 45488.27450863162,
+          "min": 59.0147300000026,
+          "p50": 69400.48504999999,
+          "p95": 103453.589297,
+          "p99": 138050.408758,
+          "max": 142181.29207
+        },
+        "network_elapsed": {
+          "status": "available",
+          "count": 57012,
+          "sum": 20536123.860000044,
+          "mean": 360.20704167543755,
+          "min": 59.0,
+          "p50": 395.8850000000057,
+          "p95": 577.935000000005,
+          "p99": 641.2850000000035,
+          "max": 729.5499999999993
+        },
+        "original_window_end": 98259.0,
+        "original_window_completed_businesses": 31709,
+        "original_window_unfinished_businesses": 25303,
+        "original_window_source": "All transport legs completed; final actual goal arrival at or before the common original cutoff. Derived from this run, not a separate short execution.",
+        "original_window_state_split": null,
+        "original_window_state_split_status": "not_computed_from_small_summaries",
+        "STD": {
+          "count": 17624,
+          "denominator": 57012,
+          "rate": 0.3091279028976356,
+          "status": "available"
+        },
+        "STD_minus_2700": {
+          "count": 12309,
+          "denominator": 57012,
+          "rate": 0.2159019153862345,
+          "status": "available"
+        }
+      },
+      "audit_gates": {
+        "headway": {
+          "status": "passed",
+          "passed": true,
+          "source": "headway_audit.json"
+        },
+        "rolling": {
+          "status": "passed",
+          "passed": true,
+          "source": "rolling_replay.json"
+        },
+        "source_policy": {
+          "status": "passed",
+          "passed": true,
+          "source": "source_policy_audit.json"
+        },
+        "tht": {
+          "status": "passed",
+          "passed": true,
+          "source": "tht_audit.json"
+        },
+        "business": {
+          "status": "passed",
+          "passed": true,
+          "source": "business_audit.json"
+        }
+      },
+      "all_five_passed": true,
+      "identity_issues": [],
+      "usable_reported_result": true,
+      "controls": {
+        "end_time": 200000,
+        "min_depth": 1,
+        "max_depth": 1,
+        "adaptive": false,
+        "congestion_weight": 0,
+        "pressure_window": 30,
+        "max_expansions": 256,
+        "max_score_expansions": 64,
+        "max_retries": 100000,
+        "max_events": 10000000,
+        "retry_mode": "calendar_jump",
+        "retry_step": 1.0,
+        "audit_failed_calendar_hash": false,
+        "skip_scoring_single_choice": true,
+        "route_excess_retry_relaxation_rate": 1,
+        "future_source_reservation_horizon_seconds": 16,
+        "future_source_reservation_min_wait_seconds": 2,
+        "interval_mode": "half_open",
+        "strict_endpoint_resources": true,
+        "edge_entry_headway_seconds": 2,
+        "time_grid_seconds": 1e-06,
+        "terminal_reservation_service": true,
+        "enable_inroute_replanning": true,
+        "enable_ebs_predecessor_gate": true,
+        "release_quantum": 1,
+        "completion_quantum": 1,
+        "source_fifo": true,
+        "source_generation_interval": 1,
+        "source_fifo_order": "canonical",
+        "max_route_excess_seconds": 120
+      },
+      "identity": {
+        "binary": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build\\g31_no_wait_011\\python\\g31_nowait.cp311-win_amd64.pyd",
+          "sha256": "e0b0d90a486b119cfcce70bf539501b96d08ac6d9d0a56aca21c72a7002f61c1",
+          "bytes": 338944
+        },
+        "native_source": {
+          "path": "build\\g31_no_wait_011\\source\\core.cpp",
+          "bytes": 98964,
+          "sha256": "c03b54db9ff7756ca90bbf5fe22fd64ea3117dde0493dd60850ed16162a1866c"
+        },
+        "canonical": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\g31_continuous\\nanning_2x_canonical.jsonl.gz",
+          "sha256": "5e0d3feef7b3f94aae2f3ec3c445720bc971599c82252383ab1ebc44fa46491b",
+          "bytes": 2299529
+        },
+        "profile": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\g31_continuous\\nanning_service2.json",
+          "sha256": "9b1a78344ec89aaac377feb05afccd48d9b957174286b29eedfe57a73a93c426",
+          "bytes": 714420
+        },
+        "build_receipt": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build\\g31_no_wait_011\\build_receipt.json",
+          "sha256": "d78c6dae09cd88a0bfdbfdc2bc862a098814168644fc28dc0703797a5aebcef0",
+          "bytes": 865
+        }
+      },
+      "compute": {
+        "native_event_loop_cpu_seconds": 5.484375,
+        "native_event_loop_wall_seconds": 5.665689,
+        "native_api_process_cpu_seconds": 13.765625,
+        "native_api_wall_seconds": 14.159156300011091,
+        "end_to_end_wall_seconds": null,
+        "source_decision_wall_seconds": 3.2568689000000877,
+        "inroute_decision_wall_seconds": 1.2519718999995548,
+        "scope": "Windows GetProcessTimes kernel+user; std::clock on non-Windows; event loop only",
+        "end_to_end_status": "not_measured_in_available_small_summary"
+      },
+      "telemetry": {
+        "planning_attempts": 286869,
+        "failed_attempts": 207581,
+        "search_expansions": 3951790,
+        "score_expansions": 0,
+        "local_scoring_calendar_queries": 0,
+        "search_decision_k_histogram": {
+          "1": 4199585
+        },
+        "search_actual_calendar_query_depth_histogram": {
+          "0": 4199585
+        },
+        "committed_route_hop_k_histogram": {
+          "1": 1091800
+        },
+        "max_observation_depth": 1,
+        "scored_neighbor_candidates": 7112898,
+        "local_score_budget_exhausted_decisions": 0,
+        "score_budget_exhaustions": 0,
+        "search_budget_failures": 4065,
+        "inroute_decisions": 1080576,
+        "inroute_replacement_attempts": 32708,
+        "inroute_replacement_successes": 0,
+        "inroute_fallbacks": 32708,
+        "inroute_search_expansions": 274381,
+        "inroute_scoring_queries": 0,
+        "future_source_precommits": 7918,
+        "future_source_pending_at_horizon": 0,
+        "future_calendar_entries_scanned": 892529
+      }
+    },
+    {
+      "label": "2x_horizon60_minwait2",
+      "kind": "native",
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_cap120_relax1_drain200000_011",
+      "status": "complete",
+      "metrics": {
+        "business_denominator": 57012,
+        "segment_denominator": 87206,
+        "completed_businesses": 57012,
+        "completed_segments": 87206,
+        "full_population_available": true,
+        "user_tht": {
+          "status": "available",
+          "count": 57012,
+          "sum": 21322026.20000003,
+          "mean": 373.99189995088807,
+          "min": 59.0,
+          "p50": 411.9350000000122,
+          "p95": 607.1922499999979,
+          "p99": 677.3399999999997,
+          "max": 1497.3349999999991
+        },
+        "preplanning": {
+          "status": "available",
+          "count": 57012,
+          "sum": 1873513609.426106,
+          "mean": 32861.74155311348,
+          "min": 9.999999747378752e-06,
+          "p50": 31556.156665000002,
+          "p95": 84552.39515299998,
+          "p99": 97744.64934709998,
+          "max": 103644.04099000001
+        },
+        "planning_retry_wait": {
+          "status": "available",
+          "count": 57012,
+          "sum": 648115.0,
+          "mean": 11.368045323791483,
+          "min": 0.0,
+          "p50": 2.0,
+          "p95": 49.0,
+          "p99": 87.0,
+          "max": 1048.0
+        },
+        "canonical_elapsed": {
+          "status": "available",
+          "count": 57012,
+          "sum": 1894835635.626106,
+          "mean": 33235.73345306437,
+          "min": 59.0147300000026,
+          "p50": 31883.188544999997,
+          "p95": 85028.56999999998,
+          "p99": 98169.07797229997,
+          "max": 104014.58098999999
+        },
+        "network_elapsed": {
+          "status": "available",
+          "count": 57012,
+          "sum": 20673911.20000003,
+          "mean": 362.62385462709653,
+          "min": 59.0,
+          "p50": 396.6025000000009,
+          "p95": 588.0399999999972,
+          "p99": 653.2050000000017,
+          "max": 807.2699999999895
+        },
+        "original_window_end": 98259,
+        "original_window_completed_businesses": 41722,
+        "original_window_unfinished_businesses": 15290,
+        "original_window_source": "Actual independent short run; exact short/drain prefix receipt passed.",
+        "original_window_state_split": null,
+        "original_window_state_split_status": "not_computed_from_small_summaries",
+        "STD": {
+          "count": 14762,
+          "denominator": 57012,
+          "rate": 0.2589279449940363,
+          "status": "available"
+        },
+        "STD_minus_2700": {
+          "count": 8996,
+          "denominator": 57012,
+          "rate": 0.1577913421735775,
+          "status": "available"
+        }
+      },
+      "audit_gates": {
+        "headway": {
+          "status": "passed",
+          "passed": true,
+          "source": "headway_audit.json"
+        },
+        "rolling": {
+          "status": "passed",
+          "passed": true,
+          "source": "rolling_replay.json"
+        },
+        "source_policy": {
+          "status": "passed",
+          "passed": true,
+          "source": "source_policy_audit.json"
+        },
+        "tht": {
+          "status": "passed",
+          "passed": true,
+          "source": "tht_audit.json"
+        },
+        "business": {
+          "status": "passed",
+          "passed": true,
+          "source": "business_audit.json"
+        }
+      },
+      "all_five_passed": true,
+      "identity_issues": [],
+      "usable_reported_result": true,
+      "controls": {
+        "end_time": 200000,
+        "min_depth": 1,
+        "max_depth": 1,
+        "adaptive": false,
+        "congestion_weight": 0,
+        "pressure_window": 30,
+        "max_expansions": 256,
+        "max_score_expansions": 64,
+        "max_retries": 100000,
+        "max_events": 10000000,
+        "retry_mode": "calendar_jump",
+        "retry_step": 1.0,
+        "audit_failed_calendar_hash": false,
+        "skip_scoring_single_choice": true,
+        "route_excess_retry_relaxation_rate": 1,
+        "future_source_reservation_horizon_seconds": 60,
+        "future_source_reservation_min_wait_seconds": 2,
+        "interval_mode": "half_open",
+        "strict_endpoint_resources": true,
+        "edge_entry_headway_seconds": 2,
+        "time_grid_seconds": 1e-06,
+        "terminal_reservation_service": true,
+        "enable_inroute_replanning": true,
+        "enable_ebs_predecessor_gate": true,
+        "release_quantum": 1,
+        "completion_quantum": 1,
+        "source_fifo": true,
+        "source_generation_interval": 1,
+        "source_fifo_order": "canonical",
+        "max_route_excess_seconds": 120
+      },
+      "identity": {
+        "binary": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build\\g31_no_wait_011\\python\\g31_nowait.cp311-win_amd64.pyd",
+          "sha256": "e0b0d90a486b119cfcce70bf539501b96d08ac6d9d0a56aca21c72a7002f61c1",
+          "bytes": 338944
+        },
+        "native_source": {
+          "path": "build\\g31_no_wait_011\\source\\core.cpp",
+          "bytes": 98964,
+          "sha256": "c03b54db9ff7756ca90bbf5fe22fd64ea3117dde0493dd60850ed16162a1866c"
+        },
+        "canonical": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\g31_continuous\\nanning_2x_canonical.jsonl.gz",
+          "sha256": "5e0d3feef7b3f94aae2f3ec3c445720bc971599c82252383ab1ebc44fa46491b",
+          "bytes": 2299529
+        },
+        "profile": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\g31_continuous\\nanning_service2.json",
+          "sha256": "9b1a78344ec89aaac377feb05afccd48d9b957174286b29eedfe57a73a93c426",
+          "bytes": 714420
+        },
+        "build_receipt": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build\\g31_no_wait_011\\build_receipt.json",
+          "sha256": "d78c6dae09cd88a0bfdbfdc2bc862a098814168644fc28dc0703797a5aebcef0",
+          "bytes": 865
+        }
+      },
+      "compute": {
+        "native_event_loop_cpu_seconds": 7.859375,
+        "native_event_loop_wall_seconds": 8.030331,
+        "native_api_process_cpu_seconds": 18.625,
+        "native_api_wall_seconds": 19.05762840004172,
+        "end_to_end_wall_seconds": null,
+        "source_decision_wall_seconds": 4.680301899999959,
+        "inroute_decision_wall_seconds": 1.7300368999993676,
+        "scope": "Windows GetProcessTimes kernel+user; std::clock on non-Windows; event loop only",
+        "end_to_end_status": "not_measured_in_available_small_summary"
+      },
+      "telemetry": {
+        "planning_attempts": 293354,
+        "failed_attempts": 217399,
+        "search_expansions": 4470155,
+        "score_expansions": 0,
+        "local_scoring_calendar_queries": 0,
+        "search_decision_k_histogram": {
+          "1": 4575200
+        },
+        "search_actual_calendar_query_depth_histogram": {
+          "0": 4575200
+        },
+        "committed_route_hop_k_histogram": {
+          "1": 1073915
+        },
+        "max_observation_depth": 1,
+        "scored_neighbor_candidates": 7812637,
+        "local_score_budget_exhausted_decisions": 0,
+        "score_budget_exhaustions": 0,
+        "search_budget_failures": 4020,
+        "inroute_decisions": 1092376,
+        "inroute_replacement_attempts": 40926,
+        "inroute_replacement_successes": 0,
+        "inroute_fallbacks": 40926,
+        "inroute_search_expansions": 304340,
+        "inroute_scoring_queries": 0,
+        "future_source_precommits": 11251,
+        "future_source_pending_at_horizon": 0,
+        "future_calendar_entries_scanned": 4130318
+      },
+      "real_short_drain_prefix": {
+        "passed": true,
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate011_prefix_001\\nanning_2x_prefix_001.json",
+        "original_run": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_cap120_relax1_original98259_011",
+        "receipt_sha256": "5229511ab1ae4cecaea4e3e3f6b02ab267dc957e68e4d5e632550022ad8bc92f"
+      }
+    },
+    {
+      "label": "2x_horizon60_minwait0",
+      "kind": "native",
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait0_cap120_relax1_drain200000_011",
+      "status": "complete",
+      "metrics": {
+        "business_denominator": 57012,
+        "segment_denominator": 87206,
+        "completed_businesses": 57012,
+        "completed_segments": 87206,
+        "full_population_available": true,
+        "user_tht": {
+          "status": "available",
+          "count": 57012,
+          "sum": 20680935.180000063,
+          "mean": 362.74705640917813,
+          "min": 59.0,
+          "p50": 401.4399999999878,
+          "p95": 582.2700000000041,
+          "p99": 658.3199999999997,
+          "max": 3248.290000000001
+        },
+        "preplanning": {
+          "status": "available",
+          "count": 57012,
+          "sum": 2543880891.426106,
+          "mean": 44620.09561892419,
+          "min": 0.00035000000207219273,
+          "p50": 43716.567855,
+          "p95": 104157.52700449999,
+          "p99": 119777.31720659998,
+          "max": 123803.5054
+        },
+        "planning_retry_wait": {
+          "status": "available",
+          "count": 57012,
+          "sum": 744775.0,
+          "mean": 13.063477864309268,
+          "min": 0.0,
+          "p50": 5.0,
+          "p95": 50.0,
+          "p99": 83.0,
+          "max": 2815.0
+        },
+        "canonical_elapsed": {
+          "status": "available",
+          "count": 57012,
+          "sum": 2564561826.6061063,
+          "mean": 44982.84267533338,
+          "min": 59.0150300000023,
+          "p50": 43954.330025,
+          "p95": 104605.90592349999,
+          "p99": 120179.14930119998,
+          "max": 124180.58098999999
+        },
+        "network_elapsed": {
+          "status": "available",
+          "count": 57012,
+          "sum": 19936160.180000063,
+          "mean": 349.68357854486885,
+          "min": 59.0,
+          "p50": 376.8399999999965,
+          "p95": 569.7900000000009,
+          "p99": 623.939999999995,
+          "max": 743.2400000000016
+        },
+        "original_window_end": 98259.0,
+        "original_window_completed_businesses": 35046,
+        "original_window_unfinished_businesses": 21966,
+        "original_window_source": "All transport legs completed; final actual goal arrival at or before the common original cutoff. Derived from this run, not a separate short execution.",
+        "original_window_state_split": null,
+        "original_window_state_split_status": "not_computed_from_small_summaries",
+        "STD": {
+          "count": 9425,
+          "denominator": 57012,
+          "rate": 0.16531607380902266,
+          "status": "available"
+        },
+        "STD_minus_2700": {
+          "count": 5628,
+          "denominator": 57012,
+          "rate": 0.09871605977688908,
+          "status": "available"
+        }
+      },
+      "audit_gates": {
+        "headway": {
+          "status": "passed",
+          "passed": true,
+          "source": "headway_audit.json"
+        },
+        "rolling": {
+          "status": "passed",
+          "passed": true,
+          "source": "rolling_replay.json"
+        },
+        "source_policy": {
+          "status": "passed",
+          "passed": true,
+          "source": "source_policy_audit.json"
+        },
+        "tht": {
+          "status": "passed",
+          "passed": true,
+          "source": "tht_audit.json"
+        },
+        "business": {
+          "status": "passed",
+          "passed": true,
+          "source": "business_audit.json"
+        }
+      },
+      "all_five_passed": true,
+      "identity_issues": [],
+      "usable_reported_result": true,
+      "controls": {
+        "end_time": 200000,
+        "min_depth": 1,
+        "max_depth": 1,
+        "adaptive": false,
+        "congestion_weight": 0,
+        "pressure_window": 30,
+        "max_expansions": 256,
+        "max_score_expansions": 64,
+        "max_retries": 100000,
+        "max_events": 10000000,
+        "retry_mode": "calendar_jump",
+        "retry_step": 1.0,
+        "audit_failed_calendar_hash": false,
+        "skip_scoring_single_choice": true,
+        "route_excess_retry_relaxation_rate": 1,
+        "future_source_reservation_horizon_seconds": 60,
+        "future_source_reservation_min_wait_seconds": 0,
+        "interval_mode": "half_open",
+        "strict_endpoint_resources": true,
+        "edge_entry_headway_seconds": 2,
+        "time_grid_seconds": 1e-06,
+        "terminal_reservation_service": true,
+        "enable_inroute_replanning": true,
+        "enable_ebs_predecessor_gate": true,
+        "release_quantum": 1,
+        "completion_quantum": 1,
+        "source_fifo": true,
+        "source_generation_interval": 1,
+        "source_fifo_order": "canonical",
+        "max_route_excess_seconds": 120
+      },
+      "identity": {
+        "binary": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build\\g31_no_wait_011\\python\\g31_nowait.cp311-win_amd64.pyd",
+          "sha256": "e0b0d90a486b119cfcce70bf539501b96d08ac6d9d0a56aca21c72a7002f61c1",
+          "bytes": 338944
+        },
+        "native_source": {
+          "path": "build\\g31_no_wait_011\\source\\core.cpp",
+          "bytes": 98964,
+          "sha256": "c03b54db9ff7756ca90bbf5fe22fd64ea3117dde0493dd60850ed16162a1866c"
+        },
+        "canonical": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\g31_continuous\\nanning_2x_canonical.jsonl.gz",
+          "sha256": "5e0d3feef7b3f94aae2f3ec3c445720bc971599c82252383ab1ebc44fa46491b",
+          "bytes": 2299529
+        },
+        "profile": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\g31_continuous\\nanning_service2.json",
+          "sha256": "9b1a78344ec89aaac377feb05afccd48d9b957174286b29eedfe57a73a93c426",
+          "bytes": 714420
+        },
+        "build_receipt": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build\\g31_no_wait_011\\build_receipt.json",
+          "sha256": "d78c6dae09cd88a0bfdbfdc2bc862a098814168644fc28dc0703797a5aebcef0",
+          "bytes": 865
+        }
+      },
+      "compute": {
+        "native_event_loop_cpu_seconds": 4.96875,
+        "native_event_loop_wall_seconds": 5.063795,
+        "native_api_process_cpu_seconds": 14.078125,
+        "native_api_wall_seconds": 14.357629999984056,
+        "end_to_end_wall_seconds": null,
+        "source_decision_wall_seconds": 2.612673499999962,
+        "inroute_decision_wall_seconds": 1.1484092999999598,
+        "scope": "Windows GetProcessTimes kernel+user; std::clock on non-Windows; event loop only",
+        "end_to_end_status": "not_measured_in_available_small_summary"
+      },
+      "telemetry": {
+        "planning_attempts": 150709,
+        "failed_attempts": 139656,
+        "search_expansions": 1282150,
+        "score_expansions": 0,
+        "local_scoring_calendar_queries": 0,
+        "search_decision_k_histogram": {
+          "1": 2014023
+        },
+        "search_actual_calendar_query_depth_histogram": {
+          "0": 2014023
+        },
+        "committed_route_hop_k_histogram": {
+          "1": 180080
+        },
+        "max_observation_depth": 1,
+        "scored_neighbor_candidates": 3492182,
+        "local_score_budget_exhausted_decisions": 0,
+        "score_budget_exhaustions": 0,
+        "search_budget_failures": 1817,
+        "inroute_decisions": 1046167,
+        "inroute_replacement_attempts": 9290,
+        "inroute_replacement_successes": 0,
+        "inroute_fallbacks": 9290,
+        "inroute_search_expansions": 68503,
+        "inroute_scoring_queries": 0,
+        "future_source_precommits": 76153,
+        "future_source_pending_at_horizon": 0,
+        "future_calendar_entries_scanned": 7785623
+      }
+    },
+    {
+      "label": "2x_horizon60_minwait30_historical010c",
+      "kind": "native",
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait30_cap120_relax1_drain200000_010c",
+      "status": "complete",
+      "metrics": {
+        "business_denominator": 57012,
+        "segment_denominator": 87206,
+        "completed_businesses": 57012,
+        "completed_segments": 87206,
+        "full_population_available": true,
+        "user_tht": {
+          "status": "available",
+          "count": 57012,
+          "sum": 21334277.29000003,
+          "mean": 374.20678611520435,
+          "min": 59.0,
+          "p50": 410.89500000000226,
+          "p95": 608.0050000000047,
+          "p99": 677.9049999999988,
+          "max": 1416.135000000002
+        },
+        "preplanning": {
+          "status": "available",
+          "count": 57012,
+          "sum": 1972397002.426106,
+          "mean": 34596.172778118744,
+          "min": 9.999999747378752e-06,
+          "p50": 33315.99864,
+          "p95": 91794.745945,
+          "p99": 105430.80606669998,
+          "max": 115928.64420000001
+        },
+        "planning_retry_wait": {
+          "status": "available",
+          "count": 57012,
+          "sum": 583497.0,
+          "mean": 10.234634813723426,
+          "min": 0.0,
+          "p50": 2.0,
+          "p95": 51.0,
+          "p99": 90.0,
+          "max": 858.0
+        },
+        "canonical_elapsed": {
+          "status": "available",
+          "count": 57012,
+          "sum": 1993731279.716106,
+          "mean": 34970.37956423395,
+          "min": 59.0147300000026,
+          "p50": 33691.918699999995,
+          "p95": 92222.25488349999,
+          "p99": 105869.2554033,
+          "max": 116346.2292
+        },
+        "network_elapsed": {
+          "status": "available",
+          "count": 57012,
+          "sum": 20750780.29000003,
+          "mean": 363.9721513014809,
+          "min": 59.0,
+          "p50": 398.43500000000495,
+          "p95": 591.3500000000058,
+          "p99": 654.6700000000019,
+          "max": 801.4700000000012
+        },
+        "original_window_end": 98259.0,
+        "original_window_completed_businesses": 39482,
+        "original_window_unfinished_businesses": 17530,
+        "original_window_source": "All transport legs completed; final actual goal arrival at or before the common original cutoff. Derived from this run, not a separate short execution.",
+        "original_window_state_split": null,
+        "original_window_state_split_status": "not_computed_from_small_summaries",
+        "STD": {
+          "count": 15186,
+          "denominator": 57012,
+          "rate": 0.2663649757945696,
+          "status": "available"
+        },
+        "STD_minus_2700": {
+          "count": 10173,
+          "denominator": 57012,
+          "rate": 0.17843611871185014,
+          "status": "available"
+        }
+      },
+      "audit_gates": {
+        "headway": {
+          "status": "passed",
+          "passed": true,
+          "source": "headway_audit.json"
+        },
+        "rolling": {
+          "status": "passed",
+          "passed": true,
+          "source": "rolling_replay.json"
+        },
+        "source_policy": {
+          "status": "passed",
+          "passed": true,
+          "source": "source_policy_audit.json"
+        },
+        "tht": {
+          "status": "passed",
+          "passed": true,
+          "source": "tht_audit.json"
+        },
+        "business": {
+          "status": "passed",
+          "passed": true,
+          "source": "business_audit.json"
+        }
+      },
+      "all_five_passed": true,
+      "identity_issues": [],
+      "usable_reported_result": true,
+      "controls": {
+        "end_time": 200000,
+        "min_depth": 1,
+        "max_depth": 1,
+        "adaptive": false,
+        "congestion_weight": 0,
+        "pressure_window": 30,
+        "max_expansions": 256,
+        "max_score_expansions": 64,
+        "max_retries": 100000,
+        "max_events": 10000000,
+        "retry_mode": "calendar_jump",
+        "retry_step": 1.0,
+        "audit_failed_calendar_hash": false,
+        "skip_scoring_single_choice": true,
+        "route_excess_retry_relaxation_rate": 1,
+        "future_source_reservation_horizon_seconds": 60,
+        "future_source_reservation_min_wait_seconds": 30,
+        "interval_mode": "half_open",
+        "strict_endpoint_resources": true,
+        "edge_entry_headway_seconds": 2,
+        "time_grid_seconds": 1e-06,
+        "terminal_reservation_service": true,
+        "enable_inroute_replanning": true,
+        "enable_ebs_predecessor_gate": true,
+        "release_quantum": 1,
+        "completion_quantum": 1,
+        "source_fifo": true,
+        "source_generation_interval": 1,
+        "source_fifo_order": "canonical",
+        "max_route_excess_seconds": 120
+      },
+      "identity": {
+        "binary": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build\\g31_no_wait_010c\\python\\g31_nowait.cp311-win_amd64.pyd",
+          "sha256": "493ffb54331e6f0010b1fea524a64d74d1fe8d04896f1d2e6927d92628c5c0f5",
+          "bytes": 338432
+        },
+        "native_source": {
+          "path": "build\\g31_no_wait_010c\\source\\core.cpp",
+          "bytes": 96188,
+          "sha256": "01e3289e7934ae164fd0014c34878657027cff7811186384080cf885d68523e3"
+        },
+        "canonical": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\g31_continuous\\nanning_2x_canonical.jsonl.gz",
+          "sha256": "5e0d3feef7b3f94aae2f3ec3c445720bc971599c82252383ab1ebc44fa46491b",
+          "bytes": 2299529
+        },
+        "profile": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\g31_continuous\\nanning_service2.json",
+          "sha256": "9b1a78344ec89aaac377feb05afccd48d9b957174286b29eedfe57a73a93c426",
+          "bytes": 714420
+        },
+        "build_receipt": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build\\g31_no_wait_010c\\build_receipt.json",
+          "sha256": "39e0105221aae2c6a30742f8597c7d1f927da8378ec61c93ed7ec7887182263f",
+          "bytes": 866
+        }
+      },
+      "compute": {
+        "native_event_loop_cpu_seconds": 11.328125,
+        "native_event_loop_wall_seconds": 11.9405618,
+        "native_api_process_cpu_seconds": 19.53125,
+        "native_api_wall_seconds": 20.28830339992419,
+        "end_to_end_wall_seconds": null,
+        "source_decision_wall_seconds": 8.862356499999967,
+        "inroute_decision_wall_seconds": 1.6534631999987628,
+        "scope": "Windows GetProcessTimes kernel+user; std::clock on non-Windows; event loop only",
+        "end_to_end_status": "not_measured_in_available_small_summary"
+      },
+      "telemetry": {
+        "planning_attempts": 311967,
+        "failed_attempts": 228471,
+        "search_expansions": 4780649,
+        "score_expansions": 0,
+        "local_scoring_calendar_queries": 0,
+        "search_decision_k_histogram": {
+          "1": 4856399
+        },
+        "search_actual_calendar_query_depth_histogram": {
+          "0": 4856399
+        },
+        "committed_route_hop_k_histogram": {
+          "1": 1157105
+        },
+        "max_observation_depth": 1,
+        "scored_neighbor_candidates": 8204320,
+        "local_score_budget_exhausted_decisions": 0,
+        "score_budget_exhaustions": 0,
+        "search_budget_failures": 4708,
+        "inroute_decisions": 1098069,
+        "inroute_replacement_attempts": 44269,
+        "inroute_replacement_successes": 0,
+        "inroute_fallbacks": 44269,
+        "inroute_search_expansions": 329438,
+        "inroute_scoring_queries": 0,
+        "future_source_precommits": 3710,
+        "future_source_pending_at_horizon": 0,
+        "future_calendar_entries_scanned": 9655601
+      }
+    },
+    {
+      "label": "HCA_repaired",
+      "kind": "hca",
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_repaired_uniform_profile_004_drain200000_001\\nanning_2x",
+      "status": "complete",
+      "metrics": {
+        "business_denominator": 57012,
+        "segment_denominator": 87206,
+        "completed_businesses": 57012,
+        "completed_segments": 87206,
+        "full_population_available": true,
+        "user_tht": {
+          "status": "available",
+          "count": 57012,
+          "sum": 27633103.72000005,
+          "mean": 484.68925349049414,
+          "min": 60.0,
+          "p50": 490.35499999999956,
+          "p95": 791.9000000000015,
+          "p99": 945.0872500000036,
+          "max": 4123.835000000006
+        },
+        "preplanning": {
+          "status": "available",
+          "count": 57012,
+          "sum": 2176495324.426106,
+          "mean": 38176.091426824285,
+          "min": 0.0,
+          "p50": 59915.46566,
+          "p95": 92856.24586099997,
+          "p99": 120558.5885198,
+          "max": 129211.46126
+        },
+        "planning_retry_wait": {
+          "status": "available",
+          "count": 57012,
+          "sum": 424294.0,
+          "mean": 7.4421876096260435,
+          "min": 0.0,
+          "p50": 2.0,
+          "p95": 22.0,
+          "p99": 106.0,
+          "max": 3741.0
+        },
+        "canonical_elapsed": {
+          "status": "available",
+          "count": 57012,
+          "sum": 2204128428.1461062,
+          "mean": 38660.78068031478,
+          "min": 60.40472999999474,
+          "p50": 60596.68945,
+          "p95": 93464.33675199999,
+          "p99": 120957.81234359997,
+          "max": 129617.29207
+        },
+        "network_elapsed": {
+          "status": "available",
+          "count": 57012,
+          "sum": 27208809.72000005,
+          "mean": 477.2470658808681,
+          "min": 59.0,
+          "p50": 483.4900000000198,
+          "p95": 780.0767500000132,
+          "p99": 928.9150000000081,
+          "max": 1334.8099999999977
+        },
+        "original_window_end": 98259,
+        "original_window_completed_businesses": 35397,
+        "original_window_unfinished_businesses": 21615,
+        "original_window_source": "Existing independently audited derived HCA prefix; not a separate short Java execution.",
+        "original_window_state_split": null,
+        "original_window_state_split_status": "not_computed_from_small_summaries",
+        "STD": {
+          "count": 21533,
+          "denominator": 57012,
+          "rate": 0.37769241563179684,
+          "status": "available"
+        },
+        "STD_minus_2700": {
+          "count": 16021,
+          "denominator": 57012,
+          "rate": 0.28101101522486494,
+          "status": "available"
+        }
+      },
+      "audit_gates": {
+        "headway": {
+          "status": "passed",
+          "passed": true,
+          "source": "physical_headway_audit.json"
+        },
+        "source_policy": {
+          "status": "passed",
+          "passed": true,
+          "source": "source_policy_audit_001.json"
+        },
+        "tht": {
+          "status": "passed",
+          "passed": true,
+          "source": "tht_metrics.json"
+        },
+        "rolling": {
+          "status": "not_applicable",
+          "passed": null,
+          "reason": "HCA commits an immutable full route; it has no rolling-replacement ledger."
+        },
+        "business": {
+          "status": "not_separately_exported",
+          "passed": null,
+          "reason": "Counts read from final_summary_001.json; no separate small business_audit.json exists here. No synthetic fifth PASS is asserted."
+        }
+      },
+      "all_five_passed": null,
+      "aggregate_physical_passed": true,
+      "frozen_identity_postrun_exact": true,
+      "usable_reported_result": true,
+      "original_prefix_bound": true,
+      "compute": {
+        "astar_thread_cpu_seconds": 9.3125,
+        "astar_wall_seconds": 10.1035406,
+        "java_window_thread_cpu_seconds": 898.625,
+        "java_window_wall_seconds": 937.5422884,
+        "end_to_end_wall_seconds": 938.3560456000268,
+        "whole_process_cpu_seconds": null,
+        "scopes_overlap": true,
+        "scope": "Profile CPU is current planner thread only, including kernel+user but excluding other JVM threads; scopes overlap. No whole-JVM process CPU was measured."
+      },
+      "telemetry": {
+        "astar_calls": 511500,
+        "search_success": 87206,
+        "search_failure": 424294,
+        "per_bag_retry_count": null,
+        "requested_k": null,
+        "actual_query_depth": null,
+        "missing_reason": "HCA does not export G31 k/local-score telemetry; aggregate search failures are not inferred per-bag retry counts."
+      }
+    }
+  ],
+  "controlled_pair": {
+    "passed": true,
+    "checks": {
+      "all_five_new": true,
+      "all_five_reference": true,
+      "same_binary": true,
+      "same_core": true,
+      "same_canonical": true,
+      "same_profile": true,
+      "only_horizon_changed": true,
+      "exact_horizon_values": true
+    },
+    "different_control_keys": [
+      "future_source_reservation_horizon_seconds"
+    ]
+  },
+  "comparisons": [
+    {
+      "label": "controlled horizon16 versus60, minwait2 unchanged",
+      "new": "2x_horizon16_minwait2",
+      "reference": "2x_horizon60_minwait2",
+      "inputs_usable": true,
+      "metrics": {
+        "tht_mean": {
+          "delta": -5.056257279169074,
+          "percent": -1.35196972978106,
+          "status": "available"
+        },
+        "tht_p95": {
+          "delta": -20.286999999998557,
+          "percent": -3.3411164256458523,
+          "status": "available"
+        },
+        "tht_p99": {
+          "delta": -17.134999999997945,
+          "percent": -2.529748722945338,
+          "status": "available"
+        },
+        "tht_max": {
+          "delta": 6221.290000000001,
+          "percent": 415.49085541979616,
+          "status": "available"
+        },
+        "preplanning_mean": {
+          "delta": 12257.597312846417,
+          "percent": 37.3005103610678,
+          "status": "available"
+        },
+        "canonical_elapsed_mean": {
+          "delta": 12252.54105556725,
+          "percent": 36.86556540980308,
+          "status": "available"
+        },
+        "cutoff_completed": {
+          "delta": -10013,
+          "percent": -23.999328891232445,
+          "status": "available"
+        },
+        "STD_count": {
+          "delta": 2862,
+          "percent": 19.38761685408481,
+          "status": "available"
+        },
+        "early_count": {
+          "delta": 3313,
+          "percent": 36.827478879502,
+          "status": "available"
+        }
+      },
+      "timing_ratio": null,
+      "timing_reason": "No cross-scope native-event-loop versus Java-thread/whole-window speed ratio is calculated."
+    },
+    {
+      "label": "horizon16 versus repairedHCA contextual",
+      "new": "2x_horizon16_minwait2",
+      "reference": "HCA_repaired",
+      "inputs_usable": true,
+      "metrics": {
+        "tht_mean": {
+          "delta": -115.75361081877514,
+          "percent": -23.88202543901571,
+          "status": "available"
+        },
+        "tht_p95": {
+          "delta": -204.9947500000021,
+          "percent": -25.88644399545419,
+          "status": "available"
+        },
+        "tht_p99": {
+          "delta": -284.8822500000018,
+          "percent": -30.14348675214915,
+          "status": "available"
+        },
+        "tht_max": {
+          "delta": 3594.7899999999936,
+          "percent": 87.171043458334,
+          "status": "available"
+        },
+        "preplanning_mean": {
+          "delta": 6943.247439135615,
+          "percent": 18.18742354084203,
+          "status": "available"
+        },
+        "canonical_elapsed_mean": {
+          "delta": 6827.493828316838,
+          "percent": 17.659999896984093,
+          "status": "available"
+        },
+        "cutoff_completed": {
+          "delta": -3688,
+          "percent": -10.418962058931548,
+          "status": "available"
+        },
+        "STD_count": {
+          "delta": -3909,
+          "percent": -18.153531788417776,
+          "status": "available"
+        },
+        "early_count": {
+          "delta": -3712,
+          "percent": -23.169589913238873,
+          "status": "available"
+        }
+      },
+      "timing_ratio": null,
+      "timing_reason": "No cross-scope native-event-loop versus Java-thread/whole-window speed ratio is calculated."
+    },
+    {
+      "label": "horizon16 versus 2x_horizon60_minwait0 contextual multi-control/implementation",
+      "new": "2x_horizon16_minwait2",
+      "reference": "2x_horizon60_minwait0",
+      "inputs_usable": true,
+      "metrics": {
+        "tht_mean": {
+          "delta": 6.188586262540866,
+          "percent": 1.706033488955497,
+          "status": "available"
+        },
+        "tht_p95": {
+          "delta": 4.635249999995267,
+          "percent": 0.7960653992126049,
+          "status": "available"
+        },
+        "tht_p99": {
+          "delta": 1.8850000000020373,
+          "percent": 0.2863349131124739,
+          "status": "available"
+        },
+        "tht_max": {
+          "delta": 4470.334999999999,
+          "percent": 137.62117914348772,
+          "status": "available"
+        },
+        "preplanning_mean": {
+          "delta": 499.2432470357089,
+          "percent": 1.118875341055905,
+          "status": "available"
+        },
+        "canonical_elapsed_mean": {
+          "delta": 505.4318332982439,
+          "percent": 1.123610255017077,
+          "status": "available"
+        },
+        "cutoff_completed": {
+          "delta": -3337,
+          "percent": -9.521771386178166,
+          "status": "available"
+        },
+        "STD_count": {
+          "delta": 8199,
+          "percent": 86.9920424403183,
+          "status": "available"
+        },
+        "early_count": {
+          "delta": 6681,
+          "percent": 118.71002132196162,
+          "status": "available"
+        }
+      },
+      "timing_ratio": null,
+      "timing_reason": "No cross-scope native-event-loop versus Java-thread/whole-window speed ratio is calculated."
+    },
+    {
+      "label": "horizon16 versus 2x_horizon60_minwait30_historical010c contextual multi-control/implementation",
+      "new": "2x_horizon16_minwait2",
+      "reference": "2x_horizon60_minwait30_historical010c",
+      "inputs_usable": true,
+      "metrics": {
+        "tht_mean": {
+          "delta": -5.271143443485357,
+          "percent": -1.4086178121480053,
+          "status": "available"
+        },
+        "tht_p95": {
+          "delta": -21.099750000005315,
+          "percent": -3.470325079564338,
+          "status": "available"
+        },
+        "tht_p99": {
+          "delta": -17.69999999999709,
+          "percent": -2.610985315051094,
+          "status": "available"
+        },
+        "tht_max": {
+          "delta": 6302.489999999998,
+          "percent": 445.0486712071934,
+          "status": "available"
+        },
+        "preplanning_mean": {
+          "delta": 10523.166087841157,
+          "percent": 30.41713936200714,
+          "status": "available"
+        },
+        "canonical_elapsed_mean": {
+          "delta": 10517.894944397674,
+          "percent": 30.07658216885607,
+          "status": "available"
+        },
+        "cutoff_completed": {
+          "delta": -7773,
+          "percent": -19.687452510004558,
+          "status": "available"
+        },
+        "STD_count": {
+          "delta": 2438,
+          "percent": 16.054260503094955,
+          "status": "available"
+        },
+        "early_count": {
+          "delta": 2136,
+          "percent": 20.996756119138897,
+          "status": "available"
+        }
+      },
+      "timing_ratio": null,
+      "timing_reason": "No cross-scope native-event-loop versus Java-thread/whole-window speed ratio is calculated."
+    }
+  ],
+  "decision": {
+    "run_1x": false,
+    "status": "screen_rejected_for_1x",
+    "reason": "Small THT and deadline gains do not justify severe fixed-window completion loss and larger preplanning backlog versus011 horizon60/minwait2. Negative2x retained;1x is not executed."
+  },
+  "evidence_files": {
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\future_horizon16_011_001\\PREDECLARED_PLAN_001.json": {
+      "sha256": "850bb19de04c6da69d72789d3c3fd21bee467305a7e6188db28a7dacfd87d423",
+      "bytes": 10795
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\future_horizon16_011_001\\controls_horizon16_drain200000.json": {
+      "sha256": "fed3ba9a4bcafb88120085d5cc6c79d4e1af85fb2cd01a33c2a7d51102f3db00",
+      "bytes": 915
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate011\\controls_drain200000.json": {
+      "sha256": "bb8073b1de5f24a11919380f02f029809ca8f010126e5e8b6435f68507849f78",
+      "bytes": 915
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future16_minwait2_cap120_relax1_drain200000_011\\manifest.json": {
+      "sha256": "e85f806c463518127b22d2d283d962465d9808498ba6dddfadef92569d2e8814",
+      "bytes": 6812
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future16_minwait2_cap120_relax1_drain200000_011\\headway_audit.json": {
+      "sha256": "aee3b79da2bf7a1dbd0b0e29f65fe8732dfc861574aa413435f127b7ff1e270e",
+      "bytes": 34111
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future16_minwait2_cap120_relax1_drain200000_011\\rolling_replay.json": {
+      "sha256": "71742779f09123d4f2d27086a7d6227e0a4720dbec7999ea8c5ac1557220bc77",
+      "bytes": 1778
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future16_minwait2_cap120_relax1_drain200000_011\\source_policy_audit.json": {
+      "sha256": "2199204bdafd8634614930eb49a71879fcb79deb0b30e3a7f0b16a898adff7bd",
+      "bytes": 1946
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future16_minwait2_cap120_relax1_drain200000_011\\tht_audit.json": {
+      "sha256": "6e32adfc6558faa225791f3a303a83e638c185bce073abd1eb07a7ab8b290f6f",
+      "bytes": 51032
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future16_minwait2_cap120_relax1_drain200000_011\\business_audit.json": {
+      "sha256": "caa441b779f42b7fd3ec5e3be6052ec805489ce1f04a90d5198bca265df7ea40",
+      "bytes": 603
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future16_minwait2_cap120_relax1_drain200000_011\\native_summary.json": {
+      "sha256": "55e71b415ffaaab1fff6914a830b200ff706afe1eee9fd4932eebd97b2189973",
+      "bytes": 16702
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build\\g31_no_wait_011\\build_receipt.json": {
+      "sha256": "d78c6dae09cd88a0bfdbfdc2bc862a098814168644fc28dc0703797a5aebcef0",
+      "bytes": 865
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_cap120_relax1_drain200000_011\\manifest.json": {
+      "sha256": "dc820f9e1cf69bfa0dd83dee3c79d681b3aef54dbfe36697371ce8948ede94f6",
+      "bytes": 6786
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_cap120_relax1_drain200000_011\\headway_audit.json": {
+      "sha256": "c30e95e6cf0592ab87444ba0d03d55d2d5198579f9f922cd0d1b9996b9f725eb",
+      "bytes": 35951
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_cap120_relax1_drain200000_011\\rolling_replay.json": {
+      "sha256": "7fb4615efbcce15a1449b86c43bafff55a057a42032d3a09cea8704840f87bfa",
+      "bytes": 1783
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_cap120_relax1_drain200000_011\\source_policy_audit.json": {
+      "sha256": "dd7f343903fe502dc8c3d23618f559fe4f335604878971bc808be8886c1a69a6",
+      "bytes": 1948
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_cap120_relax1_drain200000_011\\tht_audit.json": {
+      "sha256": "3e5483d44379b07fa931c78f0f226f8eca62f9abd1706216d96f31fa6c187e1d",
+      "bytes": 51219
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_cap120_relax1_drain200000_011\\business_audit.json": {
+      "sha256": "fda39d211278eb6dbf7d8bc9246e3f70cc356140c53e9eaab36d991f2c19e96c",
+      "bytes": 602
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_cap120_relax1_drain200000_011\\native_summary.json": {
+      "sha256": "957f866d581a13454b49f7adc5ab269777bfbace95dcc69c82c6ce125a2868ba",
+      "bytes": 17094
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate011_prefix_001\\nanning_2x_prefix_001.json": {
+      "sha256": "5229511ab1ae4cecaea4e3e3f6b02ab267dc957e68e4d5e632550022ad8bc92f",
+      "bytes": 6953
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_cap120_relax1_original98259_011\\manifest.json": {
+      "sha256": "8b473d03ee64e5d91785301febeb74efc269d2cf666588a182992d6c485d197b",
+      "bytes": 6796
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_cap120_relax1_original98259_011\\business_audit.json": {
+      "sha256": "2dcf8eb57524a0dbad049517c62814c6c3d18d96eca4012cb32dbe14354f4f80",
+      "bytes": 602
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait0_cap120_relax1_drain200000_011\\manifest.json": {
+      "sha256": "a89478025fbb8d03321c4b213edd270bd4d3d40411e83543dfb00e5f41bba877",
+      "bytes": 6810
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait0_cap120_relax1_drain200000_011\\headway_audit.json": {
+      "sha256": "0efd598f47270ed9b58f2c677ae363de770726d3b8147a7cac906e7d8920d4c6",
+      "bytes": 33167
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait0_cap120_relax1_drain200000_011\\rolling_replay.json": {
+      "sha256": "603b53aa92669c590ceae3b9ae9a69abd3131f3ba1a0da91e6df2e4d2c50449d",
+      "bytes": 1783
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait0_cap120_relax1_drain200000_011\\source_policy_audit.json": {
+      "sha256": "12b691158d22c0d48592d882afcc6df81818a63bc053f4209e5a172aa9f8c66e",
+      "bytes": 1948
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait0_cap120_relax1_drain200000_011\\tht_audit.json": {
+      "sha256": "93d38e66222c90aae23ecef729a850b84da529b3c45249bd32d5ffc53e49c626",
+      "bytes": 51048
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait0_cap120_relax1_drain200000_011\\business_audit.json": {
+      "sha256": "3ce3bcec28885cccccf542838a0dd3b0d88cac5bb13d33a1a346fca8b37b4efb",
+      "bytes": 601
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait0_cap120_relax1_drain200000_011\\native_summary.json": {
+      "sha256": "d46a4f08d457b55d4657981bb223d191616c27998f199e06b1ff1e1640a21493",
+      "bytes": 16230
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait30_cap120_relax1_drain200000_010c\\manifest.json": {
+      "sha256": "ceb6fb2e1b70e4de0ad6046ee62e1fc8a9ca270317d3acfbdca1f7c046455253",
+      "bytes": 6792
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait30_cap120_relax1_drain200000_010c\\headway_audit.json": {
+      "sha256": "550dae73ee290b2715dec860d0586553b6d5ccebe5345eb1fe72c0ea17823bdf",
+      "bytes": 35667
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait30_cap120_relax1_drain200000_010c\\rolling_replay.json": {
+      "sha256": "9f1b243326f7778c963f19f7dab11ef5e176d510d550c278b16a21cbb51af3ee",
+      "bytes": 1778
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait30_cap120_relax1_drain200000_010c\\source_policy_audit.json": {
+      "sha256": "6173934d61d348efbb9598e507fc6254f1284dea3c97eda6ef6fef63f8603171",
+      "bytes": 1946
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait30_cap120_relax1_drain200000_010c\\tht_audit.json": {
+      "sha256": "9da742ded63b432c6e4668f581149fec721aebe5723cab6be098dcdb50a3f4c2",
+      "bytes": 51231
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait30_cap120_relax1_drain200000_010c\\business_audit.json": {
+      "sha256": "50b1b78730e9adbcbfccf9936c80ace8b321215086f862861f7f4b70ee02d1c6",
+      "bytes": 603
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait30_cap120_relax1_drain200000_010c\\native_summary.json": {
+      "sha256": "ec8b50b006a78a9ab46319a3e302133edea4ac7526b26c6c3b09f3fad1ed971b",
+      "bytes": 17099
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build\\g31_no_wait_010c\\build_receipt.json": {
+      "sha256": "39e0105221aae2c6a30742f8597c7d1f927da8378ec61c93ed7ec7887182263f",
+      "bytes": 866
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_repaired_uniform_profile_004_drain200000_001\\nanning_2x\\final_summary_001.json": {
+      "sha256": "42f3913320c755c2f99f5b554447a14d8c7c60728cd3dc5011fff6f8af9f7b83",
+      "bytes": 3739
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_repaired_uniform_profile_004_drain200000_001\\nanning_2x\\tht_metrics.json": {
+      "sha256": "7a40bb56b485479f8e6f7febd3ef6be2def89bdf343e5761277b9a985203afe7",
+      "bytes": 49772
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_repaired_uniform_profile_004_drain200000_001\\nanning_2x\\source_policy_audit_001.json": {
+      "sha256": "6ad59fecd84eb6275513976b0587388490d7dd6f75e6e712eb87c7a9578d7338",
+      "bytes": 1331
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_repaired_uniform_profile_004_drain200000_001\\nanning_2x\\physical_headway_audit.json": {
+      "sha256": "3b0e140a6fc52f12da72f5de9ffecf0b607ea4a3d8d4b306786a43cc799a0c51",
+      "bytes": 31113
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_repaired_uniform_profile_004_drain200000_001\\nanning_2x\\run_01\\run_status.json": {
+      "sha256": "f6823075ddeafa62202efa7e7d357133fdf9b77119077becede627296ebce018",
+      "bytes": 2210
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_profile004_drain_prefix98259_001\\nanning_2x\\manifest.json": {
+      "sha256": "267601036c14f1bd67d52fce4095351bdc651258e9f87ce0521702ba61e4b1d4",
+      "bytes": 1929
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_profile004_drain_prefix98259_001\\nanning_2x\\tht_metrics.json": {
+      "sha256": "f6f043f9978b8a77ce65956b210d395127baea0d9384b9067517227aeffe5409",
+      "bytes": 48068
+    }
+  },
+  "tool_sha256": "06992eb16c867bf1f63d4b14eb568121e85b3747633c14ea895201efc2505da9",
+  "summary_helper_sha256": "19f5f475a0713b77c558db35c28faf17261643cceb97d7823d708dd6679977f2",
+  "boundaries": [
+    "Reads named small JSON only; no bags/ledger, native execution or new physical audit.",
+    "Horizon16 versus60/minwait2 is same011 binary/source, same canonical/profile and all other full controls exactly equal.",
+    "A horizon16 actual completion count at98259 is retrospective from this drain; it is not an independent short execution or runtime.",
+    "Horizon60/min2 reference has a passed real short/drain prefix receipt; min30 uses historical010c and timing is not a same-implementation contrast.",
+    "Full-population THT/network/retry/pre/canonical/tails and both deadline standards remain visible. No completed-only fallback or mixed CPU scope speed ratio.",
+    "Development exploration, not heldout. Shortening possible future launch search does not shorten full-to-goal safety certificates or relax physical constraints."
+  ]
+}

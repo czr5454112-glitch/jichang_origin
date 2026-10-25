@@ -1,0 +1,142 @@
+{
+  "schema": "g31.candidate023.interpretation.v1",
+  "utc": "2026-10-24T14:48:23.204422+00:00",
+  "scope": "Only completed same023binary Nanning1x pair plus reviewed source; no native or population scan performed for this memo.",
+  "evidence": {
+    "comparison": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate023_comparison_plan_001\\comparison_001.json",
+      "sha256": "d6bd299db093ba70a4aeffe266808f49b48c6937d16a80490ce5547b52ecdd63"
+    },
+    "findings": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate023_comparison_plan_001\\findings_001.json",
+      "sha256": "0419bc1a68e36259ed28424a0ffadcf01a00321c2c0fb5b5148bade15a897b5e"
+    },
+    "source_sha256": "e832bc62401e8612c14285a905476e531988a88c1967df239c23295babb68d0d"
+  },
+  "reviewable_explanation_zh": "同一023二进制、同一输入和物理规则、仅EDF开关不同的这组确定性1x运行，确认同刻源端EDF没有改善所列主指标：全部28506业务仍在窗口内完成，但平均THT增加0.143821秒、源前积压增加11.087666秒、STD净减少154件、提前2700秒完成净减少29件。尾部并非全面变坏：p95下降0.545秒、最大值下降341.68秒，而p99上升3.8945秒。平均规划重试等待反而下降0.099172秒，网络段历时上升0.242993秒，二者合成THT的小幅上升；不能据此说EDF普遍增加每袋重试等待。这里实测的是当前已排队、同物理时刻同phase2的源请求顺序，不是所有到达同一瓶颈的请求都按STD仲裁。它不会越过同源FIFO头，不会撤销先前确认的远期或在途预约，也不改后来phase3产生的EBS激活时序。上述限制是源码事实，但哪一种实际造成这次净退步，现有汇总尚不能识别。7055是逾期后的重复有效尝试次数，不是7055袋、更不是7055次抢占或退步原因。",
+  "confirmed": {
+    "same_binary_single_factor": true,
+    "all_businesses_completed": 28506,
+    "five_prior_gates_passed_both": true,
+    "metrics": {
+      "tht_mean": {
+        "delta": 0.143820599172102,
+        "percent": 0.03910777274607365,
+        "status": "available"
+      },
+      "tht_p95": {
+        "delta": -0.5450000000028012,
+        "percent": -0.09104824512907393,
+        "status": "available"
+      },
+      "tht_p99": {
+        "delta": 3.8945000000018126,
+        "percent": 0.580882413261302,
+        "status": "available"
+      },
+      "tht_max": {
+        "delta": -341.6800000000003,
+        "percent": -18.324721050528694,
+        "status": "available"
+      },
+      "preplanning_mean": {
+        "delta": 11.087665754577984,
+        "percent": 1.4034208408739248,
+        "status": "available"
+      },
+      "canonical_elapsed_mean": {
+        "delta": 11.231486353750142,
+        "percent": 0.970071209390331,
+        "status": "available"
+      },
+      "cutoff_completed": {
+        "delta": 0,
+        "percent": 0.0,
+        "status": "available"
+      },
+      "STD_count": {
+        "delta": -154,
+        "percent": -0.6038978863573977,
+        "status": "available"
+      },
+      "early_count": {
+        "delta": -29,
+        "percent": -0.2703962703962704,
+        "status": "available"
+      }
+    },
+    "clock_components": {
+      "network_elapsed": {
+        "off_mean": 358.2685801234829,
+        "on_mean": 358.51157282677343,
+        "delta_seconds": 0.2429927032905539,
+        "percent": 0.06782417347533033
+      },
+      "planning_retry_wait": {
+        "off_mean": 9.485932786080124,
+        "on_mean": 9.386760681961693,
+        "delta_seconds": -0.09917210411843058,
+        "percent": -1.0454649674933183
+      },
+      "preplanning": {
+        "off_mean": 790.0456820687925,
+        "on_mean": 801.1333478233705,
+        "delta_seconds": 11.087665754577984,
+        "percent": 1.4034208408739248
+      },
+      "canonical_elapsed": {
+        "off_mean": 1157.8001949783554,
+        "on_mean": 1169.0316813321056,
+        "delta_seconds": 11.231486353750142,
+        "percent": 0.970071209390331
+      },
+      "activation_to_first_planning": {
+        "off_mean": 738.661404616572,
+        "on_mean": 750.0687925349049,
+        "delta_seconds": 11.407387918332915,
+        "percent": 1.5443324704712735
+      },
+      "supplemental_ready_mean_derived": {
+        "off_mean": 1106.415917526135,
+        "on_mean": 1117.96712604364,
+        "delta_seconds": 11.551208517505074,
+        "percent": 1.0440204569121467
+      }
+    },
+    "counter": "valid128228, overdue7055; repeated guarded attempts only",
+    "causal_claim_scope": "On this deterministic instance, toggling the source-order policy changes the reported outcomes. This does not establish a universal EDF effect, statistical timing result, or attribution to a particular congestion mechanism."
+  },
+  "unresolved_hypotheses": [
+    {
+      "mechanism": "不同请求时刻与已确认的远期权利",
+      "code_fact": "EDF只排序当时已入队同刻同phase2请求；先前source_commit/source_reserve的权利不会撤销。",
+      "unproven": "未计算实际迟到件有多少被更早请求锁住、多少真正参与同刻竞争；不能声称此项是主因。"
+    },
+    {
+      "mechanism": "canonical FIFO前件",
+      "code_fact": "每source仅合格队首可尝试，EDF不暴露或越过后件。",
+      "unproven": "源前积压变多不等于已证明某个过期队首导致，尚缺成对业务与前件关联。"
+    },
+    {
+      "mechanism": "EBS两段与最终STD",
+      "code_fact": "现排序直接使用当前段的绝对STD，并未引入出库所需的剩余运输/因果缓冲、局部完成期限或静态laxity；实际入库完成仍控制出库就绪。",
+      "unproven": "可能存在局部入库优先与最终出库价值不一致，但未按direct/in/out及deadline cohort证明。"
+    },
+    {
+      "mechanism": "逾期请求占先",
+      "code_fact": "023逾期请求仍按更小绝对STD排前；024另行测试非逾期类优先。",
+      "unproven": "7055重复尝试未与shared-window争胜、有效后件受害或最终STD净损失连接；不能用此计数给024预报收益。"
+    }
+  ],
+  "minimal_next_diagnostic": {
+    "question": "实际首次改变预约顺序的同刻源竞争，是否确实涉及同一节点/边的重叠窗口，还是后续受既有远期权利/FIFO影响？",
+    "proposal": "仅在后续授权时，对这对已固定输入做动作中性的短前缀见证：先定位首个source_commit/source_reserve顺序差异；只记录该时刻当前有效phase2队首的task/source/STD/serial、预订资源窗口、冲突owner及其确认时刻。区分本批次竞争和更早确认权利，stale不算有效请求，后phase3新激活另标。可先只保留一例共享窗口顺序翻转及一例更早权利阻挡。",
+    "what_it_can_falsify": "若发生顺序变化但两请求没有共享重叠资源，它不是直接节点争权；若阻挡owner早于批次已确认，则本EDF规则本来不能改该权利。",
+    "what_it_cannot_prove": "单个局部见证不解释154的净损失或系统收益；需要之后再授权成对业务归因。当前不执行、不改算法、不重跑地图。"
+  },
+  "interpretation_limits": [
+    "净损154不能当作恰好154个独立受害业务；可能同时存在更多受害与获救。",
+    "派生ready均值增加11.551209秒是同人口sum恒等式；没有新逐段G/activation核验，尾部不可从分量相加。",
+    "不改变EBS ready-first延期决定、不引入新文献分支。"
+  ]
+}

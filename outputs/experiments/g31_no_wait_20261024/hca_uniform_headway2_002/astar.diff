@@ -1,0 +1,39 @@
+--- 
++++ 
+@@ -47,12 +47,21 @@
+ 	//寻找路径
+ 	public static ArrayList<Node> research(Node star, Node goal, Map map, 
+ 				HashMap<Integer, ArrayList<ArrayList<Double>>> constrain_Set, ArrayList<Edge> fault_Edges) {
++        return research(star,goal,map,constrain_Set,fault_Edges,null);
++    }
++    public static ArrayList<Node> research(Node star, Node goal, Map map,
++            HashMap<Integer, ArrayList<ArrayList<Double>>> constrain_Set, ArrayList<Edge> fault_Edges, PhysicalReservations physical) {
+ 		//首先创建开始节点为star,目标节点为goal,创建开启列表openList列表,关闭列表closeList列表,创建关闭列表时初始化为空
+ 		ArrayList<Node> openList = new ArrayList<>();
+ 		ArrayList<Node> closeList = new ArrayList<>();
+ 		ArrayList<Node>list=new ArrayList<Node>();
+ 		//将开始节点star加入openList中
+ 		star.t2=star.t1+findTime(star.getLocation(),map);
++        if (physical != null) {
++            star.t1=PhysicalReservations.seconds(PhysicalReservations.ticks(star.t1));
++            star.t2=PhysicalReservations.add(star.t1,findTime(star.getLocation(),map));
++            if (!physical.nodeFree(star.getLocation(),star.t1,star.t2)) return list;
++        }
+ 		openList.add(star);
+ 		//openList为空时结束循环
+ 		while (!openList.isEmpty()) {
+@@ -79,8 +88,13 @@
+ 				Edge edge = findEdge(currNode.getLocation(), i, map);
+ 				double t1=currNode.t2+edge.length/edge.v;
+ 				double t2=t1+findTime(i,map);
++                if (physical != null) {
++                    t1=PhysicalReservations.add(currNode.t2,edge.length/edge.v);
++                    t2=PhysicalReservations.add(t1,findTime(i,map));
++                    if (!physical.nodeFree(i,t1,t2) || !physical.edgeFree(currNode.getLocation(),i,currNode.t2)) continue;
++                }
+ 				//判断是否满足冲突条件 若会发送冲突继续下一次循环
+-				if (constrain_Set.containsKey(i)&&i!=goal.location) {
++				if (physical == null && constrain_Set.containsKey(i)&&i!=goal.location) {
+ 					for (ArrayList<Double>constrain:constrain_Set.get(i)) {
+ 						if (!(t1>constrain.get(2)||t2<constrain.get(1))) {
+ 							continue loop;

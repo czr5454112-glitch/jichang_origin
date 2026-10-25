@@ -1,0 +1,124 @@
+{
+  "schema": "g31.hca.completed_window_summary.v1",
+  "cell": "nanning_2x",
+  "horizon": 200000,
+  "completed_segments": 87206,
+  "segment_denominator": 87206,
+  "completed_businesses": 57012,
+  "business_denominator": 57012,
+  "all_completed_before_horizon": true,
+  "user_tht": {
+    "count": 57012,
+    "sum": 27633103.72000005,
+    "mean": 484.68925349049414,
+    "min": 60.0,
+    "p50": 490.35499999999956,
+    "p95": 791.9000000000015,
+    "p99": 945.0872500000036,
+    "max": 4123.835000000006
+  },
+  "preplanning": {
+    "count": 57012,
+    "sum": 2176495324.426106,
+    "mean": 38176.091426824285,
+    "min": 0.0,
+    "p50": 59915.46566,
+    "p95": 92856.24586099997,
+    "p99": 120558.5885198,
+    "max": 129211.46126
+  },
+  "planning_retry_wait": {
+    "count": 57012,
+    "sum": 424294.0,
+    "mean": 7.4421876096260435,
+    "min": 0.0,
+    "p50": 2.0,
+    "p95": 22.0,
+    "p99": 106.0,
+    "max": 3741.0
+  },
+  "canonical_elapsed": {
+    "count": 57012,
+    "sum": 2204128428.1461062,
+    "mean": 38660.78068031478,
+    "min": 60.40472999999474,
+    "p50": 60596.68945,
+    "p95": 93464.33675199999,
+    "p99": 120957.81234359997,
+    "max": 129617.29207
+  },
+  "network_elapsed": {
+    "count": 57012,
+    "sum": 27208809.72000005,
+    "mean": 477.2470658808681,
+    "min": 59.0,
+    "p50": 483.4900000000198,
+    "p95": 780.0767500000132,
+    "p99": 928.9150000000081,
+    "max": 1334.8099999999977
+  },
+  "STD": {
+    "count": 21533,
+    "denominator": 57012,
+    "rate": 0.37769241563179684
+  },
+  "STD_minus_2700": {
+    "count": 16021,
+    "denominator": 57012,
+    "rate": 0.28101101522486494
+  },
+  "last_continuous_goal_actual_finish": 141459.835,
+  "last_actual_goal_report": 141460.0,
+  "original_window_business_completion_preview": 35397,
+  "original_window_preview_note": "Direct all-segment actual report cutoff; complete independently audited derived prefix follows.",
+  "java_end_to_end_wall_seconds": 938.3560456000268,
+  "planning_profile": {
+    "schema": "g31.hca.planning_profile.v1",
+    "enabled": true,
+    "thread_cpu_available": true,
+    "thread_id": 1,
+    "search_success": 87206,
+    "search_failure": 424294,
+    "search_exceptions": 0,
+    "scopes_overlap_do_not_sum": true,
+    "cpu_scope": "Current planner thread total CPU; excludes other JVM/JIT/GC threads. Wall includes blocking and instrumentation overhead.",
+    "scopes": {
+      "window": {
+        "calls": 1,
+        "elapsed_ns": 937542288400,
+        "thread_cpu_ns": 898625000000
+      },
+      "astar_search": {
+        "calls": 511500,
+        "elapsed_ns": 10103540600,
+        "thread_cpu_ns": 9312500000
+      },
+      "controller_including_search_calendar_and_io": {
+        "calls": 191741,
+        "elapsed_ns": 352681313200,
+        "thread_cpu_ns": 332171875000
+      },
+      "generator_including_epoch_file_write_read": {
+        "calls": 191741,
+        "elapsed_ns": 571774600000,
+        "thread_cpu_ns": 555656250000
+      },
+      "calendar_prune": {
+        "calls": 191741,
+        "elapsed_ns": 7617158000,
+        "thread_cpu_ns": 8000000000
+      },
+      "calendar_commit": {
+        "calls": 87206,
+        "elapsed_ns": 1550953200,
+        "thread_cpu_ns": 1828125000
+      }
+    }
+  },
+  "whole_jvm_process_cpu_seconds": null,
+  "cpu_scope_note": "Profile CPU is current planner thread only, including kernel+user but excluding other JVM threads; scopes overlap. No whole-JVM process CPU was measured.",
+  "source_policy_passed": true,
+  "physical_passed": true,
+  "frozen_inputs_and_classes_postrun_exact": true,
+  "posthoc_source_and_tht_wall_seconds": 12.261924699996598
+}

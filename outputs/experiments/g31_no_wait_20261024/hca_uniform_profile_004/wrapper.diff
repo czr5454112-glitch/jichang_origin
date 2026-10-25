@@ -1,0 +1,40 @@
+--- 
++++ 
+@@ -236,6 +236,8 @@
+         double storageLeadSeconds
+     ) throws IOException {
+         prepareWorkingFiles();
++        App.HcaPlanningProfile.reset();
++        long[] profileWindow = App.HcaPlanningProfile.begin();
+         PhysicalSourceGate sourceGate = new PhysicalSourceGate();
+         if (sourceGate.causalEbs && (!schedule.isEmpty() || faultProbability != 0 || repairProbability != 0))
+             throw new IllegalArgumentException("causal source adapter is verified only for no-fault execution");
+@@ -273,7 +275,9 @@
+             applyScheduleEvents(schedule, startEpoch + epochIndex, ics, result);
+             Tasks newTasks = new Tasks();
+             HashMap<Integer, ArrayList<task>> held = sourceGate.mask(taskList, ics, epoch, storageInGoal, storageOutStart);
+-            newTasks.generate_tasks(taskList, newTasks, epoch, ics, faultProbability, repairProbability, 0.0);
++            long[] profileGenerator = App.HcaPlanningProfile.begin();
++            try { newTasks.generate_tasks(taskList, newTasks, epoch, ics, faultProbability, repairProbability, 0.0); }
++            finally { App.HcaPlanningProfile.end(App.HcaPlanningProfile.GENERATOR_IO,profileGenerator); }
+             for (int source : held.keySet()) taskList.put(source, held.get(source));
+             sourceGate.observeReports(newTasks, storageInGoal);
+             result.generatedFaultEdgeCount += newTasks.getFault_edges().size();
+@@ -285,7 +289,7 @@
+                 for (task completed : newTasks.getOnpath_tasks_list())
+                     if (completed.getPassed_vertex_location() == completed.getGoal()) beforeKeys.remove(completed.getTask_ID());
+             }
+-            ics.ICS_path_finding(newTasks, ics.getMap(), epoch, ics);
++            App.HcaPlanningProfile.controller(newTasks, ics.getMap(), epoch, ics);
+             recordNewRoutes(result, beforeKeys, ics, epoch);
+             if (maxNewTasks > 0 && result.generatedCount >= maxNewTasks) {
+                 break;
+@@ -294,6 +298,8 @@
+ 
+         System.out.println("physical_source_ceil=" + sourceGate.ceilRelease + ",physical_source_causal_ebs=" + sourceGate.causalEbs
+             + ",ceil_mask_ticks=" + sourceGate.ceilMaskTicks + ",ebs_mask_ticks=" + sourceGate.ebsMaskTicks);
++        App.HcaPlanningProfile.end(App.HcaPlanningProfile.WINDOW,profileWindow);
++        App.HcaPlanningProfile.write("planning_profile.json");
+         result.completedCount = countLines(new File("output.txt"));
+         result.plannedCount = result.plannedRoutes.size();
+         result.activeRouteCount = ics.getSaved_routes().size();

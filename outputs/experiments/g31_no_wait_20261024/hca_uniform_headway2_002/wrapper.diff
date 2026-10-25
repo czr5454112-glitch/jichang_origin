@@ -1,0 +1,11 @@
+--- 
++++ 
+@@ -503,7 +503,7 @@
+         Collections.sort(tasks, new Comparator<task>() {
+             @Override
+             public int compare(task left, task right) {
+-                return (int) (left.getPass_time() - right.getPass_time());
++                return Double.compare(left.getPass_time(), right.getPass_time());
+             }
+         });
+     }

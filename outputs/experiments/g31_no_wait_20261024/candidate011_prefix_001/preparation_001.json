@@ -1,0 +1,89 @@
+{
+  "schema": "g31.future_source.prefix_preparation.v1",
+  "passed": true,
+  "full_runs_scanned": false,
+  "native_or_build_executed": false,
+  "source_sha256": {
+    "verify.py": "29c556a44359afc4fd95ed8ea80d4a2c05478c8b2dfb6c86598bbf16c0a39743",
+    "legacy_prefix_base.py": "b7f825a9f112635fe43db9156accb99519046c186c803cb947c35f0d7bca23ae",
+    "test_verify.py": "9ffd74e2ef15dc4b029d2ca1e306f124826ee90254f8cc8fe47fb2a5c8e97363"
+  },
+  "synthetic_tests": {
+    "passed": true,
+    "count": 25,
+    "exit_code": 0,
+    "command": "C:/PROGRAMING/python3.11.9/python.exe -m pytest outputs/experiments/g31_no_wait_20261024/candidate011_prefix_001/test_verify.py -q --basetemp=C:/PROGRAMING/czr005/.g31_ics_circulation_worktree/outputs/experiments/g31_no_wait_20261024/candidate011_prefix_001/pytest_temp_001",
+    "prior_default_temp_attempt": "19 assertions passed; six setup errors due to denied default temp directory, then all 25 passed with new workspace temp"
+  },
+  "saved_native_output_validation": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate010\\features_010c_001.json",
+    "sha256": "57ad9938527085fa523818b28a717b530c28c464af61be4cfb751e50786b305d",
+    "records": [
+      {
+        "case": "future_launch_fifo_and_commit_order",
+        "passed": true,
+        "issues": {},
+        "events": 24,
+        "bags": 6
+      },
+      {
+        "case": "future_beyond_horizon_prefix",
+        "passed": true,
+        "issues": {},
+        "events": 7,
+        "bags": 6
+      },
+      {
+        "case": "future_inbound_does_not_activate_outbound",
+        "passed": true,
+        "issues": {},
+        "events": 22,
+        "bags": 6
+      },
+      {
+        "case": "positive_source_equals_goal",
+        "passed": true,
+        "issues": {},
+        "events": 18,
+        "bags": 5
+      },
+      {
+        "case": "mask_empty_read_only",
+        "passed": true,
+        "issues": {},
+        "events": 6,
+        "bags": 6
+      },
+      {
+        "case": "branch_failure_does_not_trigger",
+        "passed": true,
+        "issues": {},
+        "events": 11,
+        "bags": 7
+      },
+      {
+        "case": "microsecond_offset_exact_endpoint",
+        "passed": true,
+        "issues": {},
+        "events": 24,
+        "bags": 6
+      },
+      {
+        "case": "budget_failure_not_forced_denial",
+        "passed": true,
+        "issues": {},
+        "events": 0,
+        "bags": 6
+      }
+    ],
+    "scope": "Replayed existing small native outputs, no new native execution"
+  },
+  "cli": "C:/PROGRAMING/python3.11.9/python.exe C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate011_prefix_001\\verify.py --original <ACTUAL_SHORT_RUN> --drain <ACTUAL_DRAIN_RUN> --cutoff 98259 --output <NEW_RECEIPT.json>",
+  "accepted_censoring": "short complete + all five audits passed is sufficient; full_population_performance_available may be false",
+  "boundaries": [
+    "No final drain route projection; reconstruct short state from exact <=H ledger.",
+    "Full future rights recorded before H remain compared even when launch R > H.",
+    "Actual original and drain must be distinct completed runs with identical executable/input/audit identities except declared observation window.",
+    "This verifier complements saved independent physics/causal/source/THT/business audits; it does not rerun physics."
+  ]
+}

@@ -1,0 +1,54 @@
+{
+  "schema": "g31.candidate010.development_plan.v1",
+  "status": "predeclared_before_candidate010_native_results",
+  "hypothesis": "At a blocked forced prefix, committing a short-path future launch slot can reduce repeated source denial and later EBS/FIFO backlog while preserving continuous motion. Future booking can also delay others; system gains are not guaranteed.",
+  "parent": "006 fixed1_w0_cap120_relax1",
+  "same_controls_both_maps": true,
+  "future_policy": {
+    "horizon_seconds": 60,
+    "min_elapsed_first_attempt_seconds": 2,
+    "launch_grid_seconds": 1,
+    "trigger": "current immediate DFS failed with a calendar conflict before the first static optional branch; not a budget-only or bound-only failure",
+    "route": "deterministic static-H shortest-neighbor chain",
+    "certificate": "intersection of all device occupancy and directed-edge entrance windows on the complete chain; earliest legal integer launch on that chain, not globally earliest",
+    "cap": "freeze cap at actual attempt; future elapsed travel measured from proposed launch",
+    "admission": "reserve now, keep source FIFO head until actual launch; no internal waits; first clock unchanged",
+    "horizon_independence": "do not truncate future reservation search or reject planned launch merely because observation ends earlier"
+  },
+  "input_population": "unaltered canonical 1x/2x tasks, no faults or empty trays, 2m/s, originally positive nodes 2s, original zero nodes remain zero",
+  "prerequisites": [
+    "default-off deterministic parity against 006 on meaningful microcases",
+    "future reserve/launch physical and timing microcases, including observed-horizon crossing and exact 2s equality",
+    "independent rolling, headway, source-policy, THT and business audit gates",
+    "immutable build and source evidence"
+  ],
+  "execution_order": [
+    "nanning_2x_drain200000",
+    "map2_2x_drain200000",
+    "nanning_1x_original_window if the implementation remains physically valid",
+    "map2_1x_original_window if the implementation remains physically valid"
+  ],
+  "single_heavy_job_at_a_time": true,
+  "primary": "full-population business mean THT, sum of finish minus immutable first actual planning attempt over transport legs, excluding EBS storage",
+  "mandatory": [
+    "fixed original window completed businesses at 98259",
+    "preplanning hold and nominal summed leg elapsed",
+    "STD and STD-2700 separately",
+    "full-population p95/p99/max and incomplete counts",
+    "event-engine CPU/wall and source decision tail latency",
+    "future-search work, precommit/launch/pending counts and in-route work"
+  ],
+  "comparison": "same repaired HCA input/physics/source-policy baseline; no comparison of G31 event CPU to whole Java runtime",
+  "decision": "Do not promote from a single-bag benefit or lower completed-subset THT. Preserve every failed experiment and quantify tradeoffs versus 006 and HCA. Full short-versus-drain prefix parity required before any final promotion.",
+  "controls": {
+    "controls_drain200000.json": {
+      "sha256": "bb8073b1de5f24a11919380f02f029809ca8f010126e5e8b6435f68507849f78",
+      "bytes": 915
+    },
+    "controls_original_window.json": {
+      "sha256": "9f1340686423d5a0a4c6d45c56e51da6037d477fc578903105fafb1fcab222ff",
+      "bytes": 914
+    }
+  },
+  "claim_boundary": "Development experiment chosen after observing 006 failures, not an untouched held-out validation. Serial simulation safety negotiation, not deployed distributed mutual exclusion."
+}

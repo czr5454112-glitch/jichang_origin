@@ -1,0 +1,295 @@
+--- candidate019/source/core.cpp
++++ candidate021/source/core.cpp
+@@ -14,6 +14,7 @@
+ #include <cstring>
+ #include <ctime>
+ #include <functional>
++#include <iterator>
+ #include <limits>
+ #include <map>
+ #include <numeric>
+@@ -78,6 +79,7 @@
+     int future_source_reservation_horizon_seconds = 0;
+     double future_source_reservation_min_wait_seconds = 2.0;
+     bool enable_future_mask_diagnostics = false;
++    bool enable_future_gap_alignment = false;
+ };
+ struct Edge { int to; double travel; int id; };
+ struct Node { int id; double service; std::vector<Edge> out; int indegree = 0; };
+@@ -95,6 +97,24 @@
+ };
+ struct Reservation { double end; int task; std::uint64_t id; };
+ using Calendar = std::multimap<double, Reservation>;
++
++struct GapWitness {
++    int kind=0,from=-1,to=-1,index=-1;
++    std::int64_t arrival=0,left=0,right=0;
++    bool has_left=false,has_right=false;
++    int before=-1,after=-1;
++    std::uint64_t left_id=0,right_id=0;
++};
++struct GapDecision {
++    bool considered=false,adjacent=false,first_hit=false,delayed=false;
++    int original_offset=0,selected_offset=0,merge_index=-1;
++    std::int64_t origin=0;
++    std::uint64_t mask=0,nodes_examined=0,queries=0,neighbors=0,known=0,unknown=0,vetoes=0;
++    std::string reason="not_considered";
++    GapWitness first;
++    std::vector<GapWitness> resources;
++};
++
+ struct Task {
+     std::string segment_id, leg;
+     std::int64_t task_id = 0;
+@@ -129,6 +149,7 @@
+     std::vector<Step> reserved_route;
+     std::vector<std::uint64_t> reserved_node_ids,reserved_edge_ids;
+     std::vector<std::uint64_t> node_reservation_ids,edge_reservation_ids;
++    GapDecision gap_alignment;
+ };
+ struct RollingRecord {
+     std::string kind;
+@@ -214,7 +235,7 @@
+         "interval_mode","strict_endpoint_resources","edge_entry_headway_seconds","skip_scoring_single_choice",
+         "enable_inroute_replanning","time_grid_seconds","max_route_excess_seconds","source_fifo_order",
+         "route_excess_retry_relaxation_rate","future_source_reservation_horizon_seconds",
+-        "future_source_reservation_min_wait_seconds","enable_future_mask_diagnostics"};
++        "future_source_reservation_min_wait_seconds","enable_future_mask_diagnostics","enable_future_gap_alignment"};
+     for (auto item : d) if (!allowed.count(py::cast<std::string>(item.first)))
+         throw std::invalid_argument("unknown config key: "+py::cast<std::string>(item.first));
+ #define READ_OPTION(name) if (d.contains(#name)) c.name = py::cast<decltype(c.name)>(d[#name]);
+@@ -236,6 +257,11 @@
+         if (!PyBool_Check(value.ptr())) throw std::invalid_argument("enable_future_mask_diagnostics must be a boolean");
+         c.enable_future_mask_diagnostics=py::cast<bool>(value);
+     }
++    if (d.contains("enable_future_gap_alignment")) {
++        const auto value=d["enable_future_gap_alignment"];
++        if (!PyBool_Check(value.ptr())) throw std::invalid_argument("enable_future_gap_alignment must be a boolean");
++        c.enable_future_gap_alignment=py::cast<bool>(value);
++    }
+     if (d.contains("future_source_reservation_horizon_seconds")) {
+         const auto value=d["future_source_reservation_horizon_seconds"];
+         if (!PyLong_Check(value.ptr()) || PyBool_Check(value.ptr()))
+@@ -256,6 +282,8 @@
+         throw std::invalid_argument("future source reservation horizon must be 0..60 integer seconds");
+     if (c.enable_future_mask_diagnostics && c.future_source_reservation_horizon_seconds==0)
+         throw std::invalid_argument("future mask diagnostics require an enabled future reservation horizon");
++    if (c.enable_future_gap_alignment && c.future_source_reservation_horizon_seconds==0)
++        throw std::invalid_argument("future gap alignment requires an enabled future horizon");
+     if (c.future_source_reservation_horizon_seconds>0 &&
+         (c.interval_mode!="half_open" || !c.strict_endpoint_resources || c.edge_entry_headway_seconds!=2.0 ||
+          !c.enable_inroute_replanning || !c.enable_ebs_predecessor_gate || !c.source_fifo || c.source_fifo_order!="canonical" ||
+@@ -328,6 +356,9 @@
+     std::uint64_t future_validation_queries=0,future_mask_empty=0,future_chain_rejections=0;
+     std::uint64_t future_eligible_failures=0;
+     std::map<FutureMaskBucket,FutureMaskAggregate> future_mask_buckets;
++    std::uint64_t gap_considered=0,gap_adjacent=0,gap_no_adjacent=0,gap_no_merge=0,gap_first_unknown=0,gap_first_no_improvement=0,gap_first_hits=0;
++    std::uint64_t gap_known_resources=0,gap_unknown_resources=0,gap_veto_resources=0,gap_veto_decisions=0,gap_delayed=0;
++    std::uint64_t gap_merge_nodes_examined=0,gap_resource_queries=0,gap_neighbor_visits=0;
+     double simulation_time = 0;
+     bool event_budget_exhausted = false;
+     double preprocessing_seconds = 0;
+@@ -754,6 +785,101 @@
+ 
+     // One complete static shortest chain; temporal alternatives are a 61-bit
+     // integer-launch mask, not repeated DFS and not spatial lookahead depth.
++
++    // Inspect only the two existing neighbors of a free 3-second union.
++    // Full mask bits already certify both overlapping 2-second windows.
++    GapWitness inspect_alignment_gap(const Calendar& calendar,std::int64_t arrival,
++                                     int kind,int from,int to,int index,GapDecision& decision) {
++        constexpr std::int64_t duration=2000000,delta=1000000;
++        GapWitness w;w.kind=kind;w.from=from;w.to=to;w.index=index;w.arrival=arrival;
++        ++gap_resource_queries;++decision.queries;
++        auto right=calendar.lower_bound(seconds(arrival));
++        if (right!=calendar.end()) {
++            ++gap_neighbor_visits;++decision.neighbors;
++            w.has_right=true;w.right=tick(right->first);w.right_id=right->second.id;
++            if (w.right<arrival+duration+delta) throw std::logic_error("alignment mask contradicts right neighbor");
++        }
++        if (right!=calendar.begin()) {
++            const auto left=std::prev(right);
++            ++gap_neighbor_visits;++decision.neighbors;
++            w.has_left=true;w.left=tick(left->second.end);w.left_id=left->second.id;
++            if (w.left>arrival) throw std::logic_error("alignment mask contradicts left neighbor");
++        }
++        if (w.has_left && w.has_right) {
++            const auto capacity=(w.right-w.left)/duration;
++            w.before=static_cast<int>(capacity-(arrival-w.left)/duration-(w.right-arrival-duration)/duration-1);
++            const auto later=arrival+delta;
++            w.after=static_cast<int>(capacity-(later-w.left)/duration-(w.right-later-duration)/duration-1);
++            if (w.before<0 || w.before>1 || w.after<0 || w.after>1)
++                throw std::logic_error("invalid integer gap packing loss");
++        }
++        return w;
++    }
++    int choose_gap_aligned_offset(Task& task,const std::vector<Step>& path,
++                                  std::int64_t origin,std::uint64_t mask,int original_offset) {
++        constexpr std::int64_t q=1000000;
++        auto& decision=task.gap_alignment;
++        decision.considered=true;decision.origin=origin;decision.mask=mask;
++        decision.original_offset=decision.selected_offset=original_offset;
++        ++gap_considered;
++        if (original_offset>=cfg.future_source_reservation_horizon_seconds ||
++            !(mask&(std::uint64_t(1)<<(original_offset+1)))) {
++            decision.reason="next_bit_unavailable";++gap_no_adjacent;return original_offset;
++        }
++        decision.adjacent=true;++gap_adjacent;
++        for (std::size_t i=0;i<path.size();++i) {
++            ++gap_merge_nodes_examined;++decision.nodes_examined;
++            if (nodes[path[i].node].service==2.0 && nodes[path[i].node].indegree>1) {
++                decision.merge_index=static_cast<int>(i);break;
++            }
++        }
++        if (decision.merge_index<0) {decision.reason="no_positive_merge";++gap_no_merge;return original_offset;}
++        const auto& merge=path[decision.merge_index];
++        const auto launch=origin+original_offset*q;
++        decision.first=inspect_alignment_gap(calendars[merge.node],launch+tick(merge.arrival),
++            1,nodes[merge.node].id,-1,decision.merge_index,decision);
++        if (!decision.first.has_left || !decision.first.has_right) {
++            decision.reason="first_merge_unknown_gap";++gap_first_unknown;return original_offset;
++        }
++        if (decision.first.before!=1 || decision.first.after!=0) {
++            decision.reason="first_merge_no_improvement";++gap_first_no_improvement;return original_offset;
++        }
++        decision.first_hit=true;++gap_first_hits;
++        auto record=[&](GapWitness w) {
++            if (w.has_left && w.has_right) {
++                ++decision.known;++gap_known_resources;
++                if (w.after>w.before) {++decision.vetoes;++gap_veto_resources;}
++            } else {++decision.unknown;++gap_unknown_resources;}
++            decision.resources.push_back(std::move(w));
++        };
++        // Check every positive node and directed-edge entry resource exactly
++        // once; reuse the first merge witness rather than querying it twice.
++        for (std::size_t i=0;i<path.size();++i) {
++            const auto& step=path[i];
++            if (nodes[step.node].service>0) {
++                if (static_cast<int>(i)==decision.merge_index) record(decision.first);
++                else record(inspect_alignment_gap(calendars[step.node],launch+tick(step.arrival),
++                    1,nodes[step.node].id,-1,static_cast<int>(i),decision));
++            }
++            if (i+1<path.size()) record(inspect_alignment_gap(
++                edge_calendars[edge_ids.at({step.node,path[i+1].node})],launch+tick(step.departure),
++                2,nodes[step.node].id,nodes[path[i+1].node].id,static_cast<int>(i),decision));
++        }
++        if (decision.vetoes) {decision.reason="known_resource_veto";++gap_veto_decisions;return original_offset;}
++        decision.delayed=true;decision.selected_offset=original_offset+1;decision.reason="first_merge_improved_known_chain_not_worse";
++        ++gap_delayed;return original_offset+1;
++    }
++    py::dict gap_witness_dict(const GapWitness& w) const {
++        py::dict d;d["resource_kind"]=w.kind==1?"node":w.kind==2?"edge":"none";
++        d["from"]=w.kind?py::cast(w.from):py::none();d["to"]=w.kind==2?py::cast(w.to):py::none();
++        d["chain_index"]=w.kind?py::cast(w.index):py::none();d["original_arrival_us"]=w.kind?py::cast(w.arrival):py::none();
++        d["left_end_us"]=w.has_left?py::cast(w.left):py::none();d["right_start_us"]=w.has_right?py::cast(w.right):py::none();
++        d["left_reservation_id"]=w.has_left?py::cast(w.left_id):py::none();d["right_reservation_id"]=w.has_right?py::cast(w.right_id):py::none();
++        const bool known=w.has_left&&w.has_right;d["finite_known"]=known;
++        d["loss_before"]=known?py::cast(w.before):py::none();d["loss_after"]=known?py::cast(w.after):py::none();
++        return d;
++    }
++
+     bool reserve_future_source(int task,double time,const GoalData& gd) {
+         Task& t=tasks[task];
+         const auto origin=tick(time),q=std::int64_t(1000000);
+@@ -854,6 +980,7 @@
+         }
+         if (!mask) {++future_mask_empty;record_diagnostic(1,first_clear,mask);return false;}
+         int offset=1;while (!(mask&(std::uint64_t(1)<<offset))) ++offset;
++        if (cfg.enable_future_gap_alignment) offset=choose_gap_aligned_offset(t,path,origin,mask,offset);
+         const double launch=seconds(origin+offset*q);
+         for (auto& step:path) {step.arrival=add_time(launch,step.arrival);step.departure=add_time(launch,step.departure);}
+         // Defensive exact validation uses the same calendars without any event
+@@ -1389,6 +1516,24 @@
+                 if (i+1<t.route.size()) service+=step.departure-step.arrival;
+                 if (i>0) travel+=step.arrival-t.route[i-1].departure;
+             }
++
++            if (cfg.enable_future_gap_alignment) {
++                const auto& g=t.gap_alignment;
++                if (g.considered) {
++                    py::dict d;d["reason"]=g.reason;d["original_mask"]=g.mask;
++                    d["original_earliest_launch"]=seconds(g.origin+g.original_offset*1000000LL);
++                    d["selected_launch"]=seconds(g.origin+g.selected_offset*1000000LL);
++                    d["adjacent_bit_available"]=g.adjacent;d["delayed_one_second"]=g.delayed;
++                    d["first_merge_index"]=g.merge_index>=0?py::cast(g.merge_index):py::none();
++                    d["first_merge_hit"]=g.first_hit;d["first_merge"]=gap_witness_dict(g.first);
++                    d["known_resources"]=g.known;d["unknown_resources"]=g.unknown;d["veto_resources"]=g.vetoes;
++                    d["merge_nodes_examined"]=g.nodes_examined;d["resource_queries"]=g.queries;d["neighbor_visits"]=g.neighbors;
++                    py::list witnesses;for (const auto& w:g.resources) witnesses.append(gap_witness_dict(w));
++                    d["checked_resources"]=witnesses;
++                    d["scope"]="Reservation-time current-calendar witnesses; unknown endpoints skipped; not whole-network capacity or a causal performance guarantee.";
++                    b["future_gap_alignment"]=d;
++                } else b["future_gap_alignment"]=py::none();
++            }
+             b["route"]=route; b["travel_seconds"]=travel; b["service_seconds"]=service;
+             b["route_decisions"]=route_decisions;
+             b["node_resource_intervals"]=node_resources;b["edge_resource_intervals"]=edge_resources;
+@@ -1452,6 +1597,18 @@
+             diagnostic["aggregation_definition"]="Keys contain source/goal, outcome, resource, static chain/fork positions and offsets, never masks, task IDs or time. search_count counts all matching searches; mask fields retain only the first witness. Later different masks cannot create another bucket for that same resource key.";
+             diagnostic["interpretation"]="One aggregate bucket per repeated future search, not independent opportunities or causal delay. First clearing resource depends on scan order and jointly accumulated exclusions; avoiding it need not restore feasibility. A prior fork does not prove a usable alternative, and a longer prefix may change arrival at the same resource. No extra calendar query, changed intersection, early break or alternative path probe.";
+             stats["diagnostic_future_mask_aggregation"]=diagnostic;
++        }
++
++        if (cfg.enable_future_gap_alignment) {
++            py::dict g;g["original_chain_successes_considered"]=gap_considered;
++            g["adjacent_bit_available"]=gap_adjacent;g["next_bit_unavailable"]=gap_no_adjacent;
++            g["no_positive_merge"]=gap_no_merge;g["first_merge_unknown"]=gap_first_unknown;
++            g["first_merge_no_improvement"]=gap_first_no_improvement;g["first_merge_hits"]=gap_first_hits;
++            g["known_resources_checked"]=gap_known_resources;g["unknown_resources_checked"]=gap_unknown_resources;
++            g["veto_resources"]=gap_veto_resources;g["veto_decisions"]=gap_veto_decisions;g["delayed_precommits"]=gap_delayed;
++            g["merge_nodes_examined"]=gap_merge_nodes_examined;g["calendar_resource_queries"]=gap_resource_queries;g["calendar_neighbor_visits"]=gap_neighbor_visits;
++            g["scope"]="Additional bounded neighbor checks, timed inside source decision; no extra DFS/mask search. Known/unknown resource totals describe full-chain reviews after first-merge hit; query totals also include failed first-merge probes.";
++            stats["future_gap_alignment"]=g;
+         }
+         stats["planning_attempts"]=planning_attempts;stats["failed_attempts"]=failed_attempts;
+         stats["search_expansions"]=total_exp;stats["score_expansions"]=total_score_exp;stats["backtracks"]=total_back;
+@@ -1542,6 +1699,10 @@
+         }
+         if (cfg.enable_future_mask_diagnostics)
+             contract["future_mask_diagnostics"]="Observes before/after masks at the existing resource boundaries; aggregates one selected transition or rejection per future search. Does not change routes, rights, event order, masks, retry clocks or stopping conditions. Diagnostic-enabled wall/CPU measurements are not uninstrumented performance evidence.";
++        if (cfg.enable_future_gap_alignment) {
++            contract["future_source_policy"]="Original failed-rescue gate, shortest chain and complete mask unchanged. Earliest bit and adjacent+1 must both be feasible. First positive2s indegree>1 node must have a finite real-rights gap with packing loss1->0; every full-chain positive-node/edge2s finite known gap must not worsen. Unknown endpoints are counted and skipped. At most1s source delay; selected launch is not always earliest. Existing exact validation and atomic reserve/launch remain unchanged.";
++            contract["future_gap_alignment"]="Our single-resource packing heuristic with known-chain veto, not a queue-wait estimate or throughput guarantee. Source/goal may be the first merge; zero-service nodes are excluded. FIFO and immutable first-attempt clocks unchanged; original019 last_push describes original earliest mask bit, not the optional deliberate delay. All added bounded neighbor work is included in source timing.";
++        }
+         stats["contract"]=contract;
+         py::list ledger;
+         for (const auto& r:rolling_records) {
+--- candidate019/continuous_adapter.py
++++ candidate021/continuous_adapter.py
+@@ -1,4 +1,4 @@
+-"""Isolated candidate019 runner derived from the official continuous adapter.
++"""Isolated candidate021 runner derived from the official continuous adapter.
+ 
+ The registered model uses local next-hop scoring and a complete continuation
+ certificate. Registration is not a performance promotion or distributed-network
+@@ -31,7 +31,7 @@
+     congestion_weight=1.0,pressure_window=30.0,max_expansions=256,max_score_expansions=64,
+     max_retries=100000,max_events=10000000,retry_mode="calendar_jump",retry_step=1.0,
+     audit_failed_calendar_hash=False,skip_scoring_single_choice=True,route_excess_retry_relaxation_rate=0.0,
+-    future_source_reservation_horizon_seconds=0,future_source_reservation_min_wait_seconds=2.0,enable_future_mask_diagnostics=False,**FIXED)
++    future_source_reservation_horizon_seconds=0,future_source_reservation_min_wait_seconds=2.0,enable_future_mask_diagnostics=False,enable_future_gap_alignment=False,**FIXED)
+ ALLOWED = set(DEFAULT_CONTROLS) | {"max_route_excess_seconds"}
+ 
+ 
+@@ -94,9 +94,11 @@
+     if not 0<=future<=60:
+         raise ValueError("future reservation horizon must be an integer in [0,60]")
+     if future and controls["congestion_weight"] not in (0,1):
+-        raise ValueError("candidate019 future reservations support only congestion weight 0 or 1")
++        raise ValueError("candidate021 future reservations support only congestion weight 0 or 1")
+     if controls["enable_future_mask_diagnostics"] and not future:
+         raise ValueError("mask diagnostics require future reservations")
++    if controls["enable_future_gap_alignment"] and not future:
++        raise ValueError("future gap alignment requires future reservations")
+     return controls
+ 
+ 
+@@ -243,7 +245,7 @@
+ def verified_auditors(source_dir):
+     """Load the frozen audit package, checking every live source against it."""
+     names=("headway_audit","future_metadata","rolling_replay","tht_metrics","source_policy_audit")
+-    package_name="g31_candidate019_auditors_"+hashlib.sha256(str(source_dir.resolve()).encode()).hexdigest()[:16]
++    package_name="g31_candidate021_auditors_"+hashlib.sha256(str(source_dir.resolve()).encode()).hexdigest()[:16]
+     package=types.ModuleType(package_name)
+     package.__path__=[str(source_dir)]
+     sys.modules[package_name]=package

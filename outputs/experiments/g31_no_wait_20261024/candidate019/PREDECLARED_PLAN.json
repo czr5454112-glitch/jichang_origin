@@ -1,0 +1,30 @@
+{
+  "schema": "g31.candidate019.predeclared.v2",
+  "status": "prepared_not_built_or_executed",
+  "parent_source_sha256": "a024f859cf493b73c2d5b0789a318e8c99013c044b3b1782bc8d1a7b6f8fff27",
+  "source_sha256": "681b8b1fd1760bb59ed9b841bbf1d042de8d2d26bd32e2f309eaca376c3d8f11",
+  "control": {
+    "name": "enable_future_mask_diagnostics",
+    "type": "strict_bool",
+    "default": false,
+    "requires": "future horizon > 0"
+  },
+  "action": "Observation only. No route strategy, extra calendar queries, changed mask loop/arithmetic/order, early break, clock, event, ID or scheduling changes.",
+  "diagnostics": "One resource bucket per source/goal,outcome,kind,physical resource,chain/fork positions and static offsets. Masks are NOT keys. Value contains count and only the first before/after/initial/final mask witness. No task ID,time or event trace. Repeated searches for that resource cannot increase distinct bucket count.",
+  "selection": "Final mask empty selects first resource making a nonzero mask zero; final mask nonempty selects last resource advancing its lowest set bit, otherwise no selected resource. Early chain rejects separately counted.",
+  "interpretation": "Order-dependent joint exclusions, not unique causal blockers, independent opportunities or proof an alternative is feasible. A longer prefix can alter arrival at the same downstream resource. Node at first fork is before, outgoing edge after.",
+  "compatibility": {
+    "default_off": "All 48 inherited microcases: omitted/explicit false vs017 all non-time fields exact.",
+    "diagnostic_on": "Every inherited future-enabled case plus8 new cases: strip only summary.diagnostic_future_mask_aggregation and contract.future_mask_diagnostics (top-level and summary copy), and11 existing timing keys; every other field exact.",
+    "safety": "Use unchanged candidate010 five auditors on all applicable saved micro payloads, require_nonincreasing_finish=True.",
+    "guard": "Reject bool impostors and enabled diagnostics with horizon0; do not weaken existing future physics guards."
+  },
+  "tests": {
+    "inherited": 48,
+    "new_diagnostic": 8,
+    "mathematical_expectations_only_until_native_execution": true
+  },
+  "scope": "Nanning only for later real replay if authorized; no full run in this preparation. Instrumented timings are not performance evidence.",
+  "source_freeze": "Parent017 source verified; separate build and receipt required before execution. Formal006 and all prior candidates/auditors untouched.",
+  "review_revision": "Before first build, root requested masks removed from keys. V1 preparation preserved under preparation_v1_before_key_review."
+}

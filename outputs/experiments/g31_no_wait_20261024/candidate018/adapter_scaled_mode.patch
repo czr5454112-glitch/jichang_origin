@@ -1,0 +1,38 @@
+--- frozen014/continuous_adapter.py
++++ candidate018/continuous_adapter.py
+@@ -1,4 +1,4 @@
+-"""Isolated candidate014 runner derived from the official continuous adapter.
++"""Isolated candidate018 runner derived from the official continuous adapter.
+ 
+ The registered model uses local next-hop scoring and a complete continuation
+ certificate. Registration is not a performance promotion or distributed-network
+@@ -91,15 +91,17 @@
+     if controls["retry_mode"] not in ("calendar_jump","futurecalendar_jump","1s","fixed_step"):
+         raise ValueError("unknown retry mode")
+     signal=controls["pressure_signal"]
+-    if type(signal) is not str or signal not in ("union_occupied","slot_loss"):
+-        raise ValueError("pressure_signal must be union_occupied or slot_loss")
++    if type(signal) is not str or signal not in ("union_occupied","slot_loss","headway_scaled_occupancy"):
++        raise ValueError("pressure_signal must be union_occupied, slot_loss or headway_scaled_occupancy")
+     if signal=="slot_loss" and controls["pressure_window"]!=30:
+         raise ValueError("slot_loss requires unchanged 30-second pressure window")
++    if signal=="headway_scaled_occupancy" and controls["pressure_window"]!=30:
++        raise ValueError("headway_scaled_occupancy requires unchanged 30-second pressure window")
+     future=controls["future_source_reservation_horizon_seconds"]
+     if not 0<=future<=60:
+         raise ValueError("future reservation horizon must be an integer in [0,60]")
+     if future and controls["congestion_weight"] not in (0,1):
+-        raise ValueError("candidate014 future reservations support only congestion weight 0 or 1")
++        raise ValueError("candidate018 future reservations support only congestion weight 0 or 1")
+     return controls
+ 
+ 
+@@ -246,7 +248,7 @@
+ def verified_auditors(source_dir):
+     """Load the frozen audit package, checking every live source against it."""
+     names=("headway_audit","future_metadata","rolling_replay","tht_metrics","source_policy_audit")
+-    package_name="g31_candidate014_auditors_"+hashlib.sha256(str(source_dir.resolve()).encode()).hexdigest()[:16]
++    package_name="g31_candidate018_auditors_"+hashlib.sha256(str(source_dir.resolve()).encode()).hexdigest()[:16]
+     package=types.ModuleType(package_name)
+     package.__path__=[str(source_dir)]
+     sys.modules[package_name]=package

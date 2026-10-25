@@ -269,6 +269,22 @@ def test_goal_arrival_completion_is_final_append_only_default_off_tail(
     assert len(active) == len(omitted) + 7
 
 
+def test_wait_estimator_preserves_legacy_call_and_appends_explicit_mode(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    common, captured = _backend_capture(monkeypatch)
+    cpp_backend.g4irsf11_event_runtime_from_records(**common)
+    cpp_backend.g4irsf11_event_runtime_from_records(**common, s4_wait_estimator="legacy")
+    for mode in ("eta_calendar", "eta_flow"):
+        cpp_backend.g4irsf11_event_runtime_from_records(**common, s4_wait_estimator=mode)
+    assert captured[0] == captured[1]
+    assert captured[2][-5:] == ([52], False, False, False, "eta_calendar")
+    assert captured[3][-5:] == ([52], False, False, False, "eta_flow")
+    with pytest.raises(ValueError, match="s4_wait_estimator"):
+        cpp_backend.g4irsf11_event_runtime_from_records(**common, s4_wait_estimator="typo")
+    assert len(captured) == 4
+
+
 def test_storage_role_tail_rejects_negative_or_duplicate_ids(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:

@@ -1,0 +1,142 @@
+{
+  "schema": "g31.candidate023.nanning1x.findings.v1",
+  "passed": true,
+  "comparison": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate023_comparison_plan_001\\comparison_001.json",
+    "sha256": "d6bd299db093ba70a4aeffe266808f49b48c6937d16a80490ce5547b52ecdd63"
+  },
+  "primary_comparison": "same023binary EDF on versus off; onlyflag",
+  "full_population": {
+    "businesses": 28506,
+    "segments": 43603,
+    "both_completed": true,
+    "both_five_gates_passed": true
+  },
+  "primary_deltas": {
+    "tht_mean": {
+      "delta": 0.143820599172102,
+      "percent": 0.03910777274607365,
+      "status": "available"
+    },
+    "tht_p95": {
+      "delta": -0.5450000000028012,
+      "percent": -0.09104824512907393,
+      "status": "available"
+    },
+    "tht_p99": {
+      "delta": 3.8945000000018126,
+      "percent": 0.580882413261302,
+      "status": "available"
+    },
+    "tht_max": {
+      "delta": -341.6800000000003,
+      "percent": -18.324721050528694,
+      "status": "available"
+    },
+    "preplanning_mean": {
+      "delta": 11.087665754577984,
+      "percent": 1.4034208408739248,
+      "status": "available"
+    },
+    "canonical_elapsed_mean": {
+      "delta": 11.231486353750142,
+      "percent": 0.970071209390331,
+      "status": "available"
+    },
+    "cutoff_completed": {
+      "delta": 0,
+      "percent": 0.0,
+      "status": "available"
+    },
+    "STD_count": {
+      "delta": -154,
+      "percent": -0.6038978863573977,
+      "status": "available"
+    },
+    "early_count": {
+      "delta": -29,
+      "percent": -0.2703962703962704,
+      "status": "available"
+    }
+  },
+  "additional_clock_deltas": {
+    "network_elapsed": {
+      "off_mean": 358.2685801234829,
+      "on_mean": 358.51157282677343,
+      "delta_seconds": 0.2429927032905539,
+      "percent": 0.06782417347533033
+    },
+    "planning_retry_wait": {
+      "off_mean": 9.485932786080124,
+      "on_mean": 9.386760681961693,
+      "delta_seconds": -0.09917210411843058,
+      "percent": -1.0454649674933183
+    },
+    "preplanning": {
+      "off_mean": 790.0456820687925,
+      "on_mean": 801.1333478233705,
+      "delta_seconds": 11.087665754577984,
+      "percent": 1.4034208408739248
+    },
+    "canonical_elapsed": {
+      "off_mean": 1157.8001949783554,
+      "on_mean": 1169.0316813321056,
+      "delta_seconds": 11.231486353750142,
+      "percent": 0.970071209390331
+    },
+    "activation_to_first_planning": {
+      "off_mean": 738.661404616572,
+      "on_mean": 750.0687925349049,
+      "delta_seconds": 11.407387918332915,
+      "percent": 1.5443324704712735
+    },
+    "supplemental_ready_mean_derived": {
+      "off_mean": 1106.415917526135,
+      "on_mean": 1117.96712604364,
+      "delta_seconds": 11.551208517505074,
+      "percent": 1.0440204569121467
+    }
+  },
+  "EDF": {
+    "passed": true,
+    "counters": {
+      "valid_source_attempts": 128228,
+      "already_overdue_valid_attempts": 7055,
+      "count_scope": "Actual source attempts after admitted/reserved/head guards; not heap comparisons, competition victories, or stale events."
+    },
+    "boundary": "Counts repeated valid source attempts after guards, not distinct bags, competition victories, or proof that a request ordering changed."
+  },
+  "compute": {
+    "off": {
+      "native_event_loop_cpu_seconds": 2.984375,
+      "native_event_loop_wall_seconds": 3.0928057,
+      "native_api_process_cpu_seconds": 7.078125,
+      "native_api_wall_seconds": 7.315007700002752,
+      "end_to_end_wall_seconds": null,
+      "source_decision_wall_seconds": 1.8272265999999935,
+      "inroute_decision_wall_seconds": 0.6141607999998588,
+      "scope": "Windows GetProcessTimes kernel+user; std::clock on non-Windows; event loop only",
+      "end_to_end_status": "not_measured_in_available_small_summary"
+    },
+    "on": {
+      "native_event_loop_cpu_seconds": 3.234375,
+      "native_event_loop_wall_seconds": 3.2965635,
+      "native_api_process_cpu_seconds": 7.203125,
+      "native_api_wall_seconds": 7.363082899944857,
+      "end_to_end_wall_seconds": null,
+      "source_decision_wall_seconds": 1.9724008000000126,
+      "inroute_decision_wall_seconds": 0.6420253999997797,
+      "scope": "Windows GetProcessTimes kernel+user; std::clock on non-Windows; event loop only",
+      "end_to_end_status": "not_measured_in_available_small_summary"
+    },
+    "boundary": "One run perarm. Samebinary but not repeated timing evidence; preserve eventloop/API scopes, noJava ratio."
+  },
+  "assessment": "No net improvement on1x. MaxTHT improves341.68s andp95 improves0.545s; primarymean worsens0.143821s, preplanning increases11.087666s, p99 increases3.8945s, STD loses154 andSTD-2700 loses29. Originalwindowcompletion unchanged28506/28506. Do not promoteEDF023 or automatically extend2x on this result.",
+  "limits": [
+    "No per-bag EDF ordering/competition audit was performed here; prior fivegates establishphysical/source safety.",
+    "Overdue7055 counts repeated valid attempts, not7055distinctbags or prioritywins.",
+    "Readymean derived from fullpopulation sumidentity only, not a newperbagscan; readiness tails unavailable.",
+    "Historical010c performance values matchtheOFFsmallmetrics; nofullbag/ledgerparity is inferred from that."
+  ],
+  "next_authorized_preparation": "Root separatelyauthorized024 non-overdue class beforeEDF, build/micro/fivegates by14:52UTC; no024actualresult inthisartifact. EBSreadyfirstdeferred."
+}

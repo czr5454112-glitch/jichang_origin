@@ -1,0 +1,24 @@
+{
+  "schema": "g31.local_retry_relaxation.screen.v1",
+  "build": "006, immutable hash to be registered before first full run",
+  "order": [
+    "fixed1_w0_cap120",
+    "fixed1_w0_cap120_relax1",
+    "fixed1_w0_cap120_relax2"
+  ],
+  "screen_cells": [
+    "map2_1x",
+    "nanning_1x"
+  ],
+  "heldout_cells": [
+    "map2_2x",
+    "nanning_2x"
+  ],
+  "motivation": "005 cap120 lowers Nanning primary THT but increases canonical preplanning; cap30 strongly damages deadline attainment. Test local source-head aging to avoid persistent head-of-line blockage.",
+  "control": "rate0 with static-score fast path must preserve005 routes, timing, completion and reservation event ledger exactly; diagnostics and measured computation may differ.",
+  "candidate_rule": "effective_route_excess=120 + rate*(current_attempt_time-immutable_first_planning_attempt_time); rate1 or2. Used for source feasibility search only. No changes to FIFO, arrivals, deadline, service, safety certificate or search budget.",
+  "system_selection": "Prioritize lower Nanning aggregate user THT with full-cohort canonical elapsed/source preplanning and fixed-window throughput jointly reported; provisional map2 user-THT ratio <=1.03. No individual-bag dominance requirement and no completed-subset substitution.",
+  "safety": "All existing headway/continuous-motion/rolling/source-policy/EBS/full-population audits required.",
+  "heuristic_boundary": "Local retry aging is a proposed heuristic. Past waiting is not an estimate of future avoidable delay; no throughput optimality or completeness guarantee.",
+  "later_validation": "Freeze one common configuration before 2x validation. Original98259 window throughput and separate200000 drain THT must not be conflated."
+}

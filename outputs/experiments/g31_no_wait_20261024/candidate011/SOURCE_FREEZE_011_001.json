@@ -1,0 +1,42 @@
+{
+  "schema": "g31.candidate011.freeze.v1",
+  "passed": true,
+  "source_sha256": "c03b54db9ff7756ca90bbf5fe22fd64ea3117dde0493dd60850ed16162a1866c",
+  "binary_sha256": "e0b0d90a486b119cfcce70bf539501b96d08ac6d9d0a56aca21c72a7002f61c1",
+  "build_receipt": "build/g31_no_wait_011/build_receipt.json",
+  "files": {
+    "source/core.cpp": "c03b54db9ff7756ca90bbf5fe22fd64ea3117dde0493dd60850ed16162a1866c",
+    "calendar_index_only.patch": "9435ed8eba2d42f778c9aa3cc233a29fe980d6079728f2da140a48d490450259",
+    "build_isolated.py": "c3b29dceb73c5db65909d51c4f2f7a2c106a4627fa3aef6c96134caf82f37bed",
+    "prepare_source.py": "8cd3e1ae852f7f306c4a4717568446dec197c9a5d02f1b693ea8b22c1c37b814",
+    "micro.py": "b251e8d580c3e1704031a8dc13f0fec2f2af21c9ff7308c4359219ee923e7982",
+    "fixtures_v2.json": "7455907c429291e5571762ab29efeb36216b804bbe7b9106d119bbe606f1277d",
+    "fixtures_receipt_v2.json": "cc7aab2dfe4a1d271b53b32df050aa9960d6e0e5af7c961a1a8e6056af90b479",
+    "PREDECLARED_PLAN.json": "5ba72f8cd6512dca03571b9bf3e275fad63526b7191fcd861e9220714879ee22",
+    "micro_parity_002.json": "bb6c229c3cce5bf3073f5eb91674de844ec3963b13b934bf5c9eeb3576ee200f",
+    "reference_independent_audit_002.json": "35f3fd8cbd278078d43e59aefcc017ebc346bbde926208b61d59cc4f1cc3e7a7",
+    "candidate_independent_audit_002.json": "4786b6565ae32245ac8028346484e59d6d06c35852e03285e5d5462eee60a535",
+    "entrypoint_prepare_receipt.json": "b2f0eee3ad689bef221f8a23686c8e10e4778c6813563e05209fbf106353e7c7",
+    "registered_contracts_011/REGISTRATION_RECEIPT.json": "9957ee241d7be48a867dc490da01925d684441adc36bf718c1d8d7f5662b29f2"
+  },
+  "native_micro_cases": 28,
+  "independent_audit_cases_per_binary": 24,
+  "independent_gates_per_case": 5,
+  "reference": "frozen010c",
+  "allowed_differences": [
+    "11 named timing fields",
+    "summary.future_calendar_entries_scanned",
+    "bags[*].future_calendar_entries_scanned"
+  ],
+  "full_run_not_executed": true,
+  "formal_defaults_unchanged": true,
+  "sessions": {
+    "build47435": "exit0",
+    "native_micro_and_independent_audits": "all terminal exit0"
+  },
+  "preparation_correction": {
+    "original_fixtures_retained": "fixtures.json",
+    "failure": "reference010c rejected edge3 with rolling enabled; this is the existing intended input validation",
+    "correction": "fixtures_v2.json sets rolling false only for non2_edge_duration_fallback; native source unchanged and not rebuilt"
+  }
+}

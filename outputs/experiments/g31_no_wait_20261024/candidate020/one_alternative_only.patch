@@ -1,0 +1,286 @@
+--- candidate019/source/core.cpp
++++ candidate020/source/core.cpp
+@@ -78,6 +78,7 @@
+     int future_source_reservation_horizon_seconds = 0;
+     double future_source_reservation_min_wait_seconds = 2.0;
+     bool enable_future_mask_diagnostics = false;
++    bool enable_one_alternative_future_chain = false;
+ };
+ struct Edge { int to; double travel; int id; };
+ struct Node { int id; double service; std::vector<Edge> out; int indegree = 0; };
+@@ -129,6 +130,11 @@
+     std::vector<Step> reserved_route;
+     std::vector<std::uint64_t> reserved_node_ids,reserved_edge_ids;
+     std::vector<std::uint64_t> node_reservation_ids,edge_reservation_ids;
++    std::uint64_t alternative_future_considered=0;
++    bool alternative_future_reserved=false;
++    int alternative_fork_index=-1,alternative_original_next=-1,alternative_next=-1;
++    int original_clear_kind=0,original_clear_from=-1,original_clear_to=-1,original_clear_index=-1;
++    std::vector<Step> original_future_chain;
+ };
+ struct RollingRecord {
+     std::string kind;
+@@ -214,7 +220,7 @@
+         "interval_mode","strict_endpoint_resources","edge_entry_headway_seconds","skip_scoring_single_choice",
+         "enable_inroute_replanning","time_grid_seconds","max_route_excess_seconds","source_fifo_order",
+         "route_excess_retry_relaxation_rate","future_source_reservation_horizon_seconds",
+-        "future_source_reservation_min_wait_seconds","enable_future_mask_diagnostics"};
++        "future_source_reservation_min_wait_seconds","enable_future_mask_diagnostics","enable_one_alternative_future_chain"};
+     for (auto item : d) if (!allowed.count(py::cast<std::string>(item.first)))
+         throw std::invalid_argument("unknown config key: "+py::cast<std::string>(item.first));
+ #define READ_OPTION(name) if (d.contains(#name)) c.name = py::cast<decltype(c.name)>(d[#name]);
+@@ -236,6 +242,11 @@
+         if (!PyBool_Check(value.ptr())) throw std::invalid_argument("enable_future_mask_diagnostics must be a boolean");
+         c.enable_future_mask_diagnostics=py::cast<bool>(value);
+     }
++    if (d.contains("enable_one_alternative_future_chain")) {
++        const auto value=d["enable_one_alternative_future_chain"];
++        if (!PyBool_Check(value.ptr())) throw std::invalid_argument("enable_one_alternative_future_chain must be a boolean");
++        c.enable_one_alternative_future_chain=py::cast<bool>(value);
++    }
+     if (d.contains("future_source_reservation_horizon_seconds")) {
+         const auto value=d["future_source_reservation_horizon_seconds"];
+         if (!PyLong_Check(value.ptr()) || PyBool_Check(value.ptr()))
+@@ -256,6 +267,8 @@
+         throw std::invalid_argument("future source reservation horizon must be 0..60 integer seconds");
+     if (c.enable_future_mask_diagnostics && c.future_source_reservation_horizon_seconds==0)
+         throw std::invalid_argument("future mask diagnostics require an enabled future reservation horizon");
++    if (c.enable_one_alternative_future_chain && c.future_source_reservation_horizon_seconds==0)
++        throw std::invalid_argument("one alternative future chain requires an enabled future reservation horizon");
+     if (c.future_source_reservation_horizon_seconds>0 &&
+         (c.interval_mode!="half_open" || !c.strict_endpoint_resources || c.edge_entry_headway_seconds!=2.0 ||
+          !c.enable_inroute_replanning || !c.enable_ebs_predecessor_gate || !c.source_fifo || c.source_fifo_order!="canonical" ||
+@@ -328,6 +341,10 @@
+     std::uint64_t future_validation_queries=0,future_mask_empty=0,future_chain_rejections=0;
+     std::uint64_t future_eligible_failures=0;
+     std::map<FutureMaskBucket,FutureMaskAggregate> future_mask_buckets;
++    std::uint64_t alternative_considered=0,alternative_no_fork=0,alternative_constructed=0;
++    std::uint64_t alternative_cycle=0,alternative_missing_successor=0,alternative_cap=0,alternative_masks=0,alternative_empty=0;
++    std::uint64_t alternative_precommits=0,alternative_launches=0,alternative_chain_nodes=0;
++    std::uint64_t alternative_calendar_queries=0,alternative_calendar_entries_scanned=0,alternative_validation_queries=0;
+     double simulation_time = 0;
+     bool event_budget_exhausted = false;
+     double preprocessing_seconds = 0;
+@@ -754,6 +771,49 @@
+ 
+     // One complete static shortest chain; temporal alternatives are a 61-bit
+     // integer-launch mask, not repeated DFS and not spatial lookahead depth.
++    // One topology-guided candidate only. This helper never queries calendars,
++    // touches scheduling state, or modifies the immediate DFS retry suggestion.
++    bool construct_one_alternative(const std::vector<Step>& original,const FutureMaskTransition& clear,
++                                   const GoalData& gd,Task& task,std::vector<Step>& candidate,
++                                   int& fork,int& original_next,int& alternative_next) {
++        ++alternative_considered;++task.alternative_future_considered;
++        std::vector<int> position(nodes.size(),-1);
++        for (std::size_t i=0;i<original.size();++i) position[original[i].node]=static_cast<int>(i);
++        const int latest=std::min(static_cast<int>(original.size())-2,clear.chain_index-(clear.kind==1?1:0));
++        const Edge* chosen=nullptr;
++        for (int f=latest;f>=0;--f) {
++            const int u=original[f].node,next=original[f+1].node;
++            const Edge* best=nullptr;std::tuple<double,int,int> best_key;
++            for (const auto& edge:nodes[u].out) {
++                if (edge.to==next || !std::isfinite(gd.h[edge.to]) || (position[edge.to]>=0 && position[edge.to]<=f)) continue;
++                const auto key=std::make_tuple(nodes[u].service+edge.travel+gd.h[edge.to],nodes[edge.to].id,edge.id);
++                if (!best || key<best_key) {best=&edge;best_key=key;}
++            }
++            if (best) {fork=f;original_next=next;alternative_next=best->to;chosen=best;break;}
++        }
++        if (!chosen) {++alternative_no_fork;return false;}
++        ++alternative_constructed;
++        candidate.assign(original.begin(),original.begin()+fork+1);
++        alternative_chain_nodes+=candidate.size();future_chain_nodes+=candidate.size();
++        std::vector<unsigned char> seen(nodes.size(),0);
++        for (const auto& step:candidate) seen[step.node]=1;
++        int current=chosen->to;double arrival=add_time(candidate.back().departure,chosen->travel);
++        for (;;) {
++            if (current<0 || seen[current] || candidate.size()>=nodes.size()) {++alternative_cycle;return false;}
++            seen[current]=1;const double departure=add_time(arrival,nodes[current].service);
++            candidate.push_back({current,arrival,departure});++alternative_chain_nodes;++future_chain_nodes;
++            if (current==task.goal) break;
++            const int next=gd.shortest_successor[current];
++            const auto edge=std::find_if(nodes[current].out.begin(),nodes[current].out.end(),[&](const Edge& e){return e.to==next;});
++            if (edge==nodes[current].out.end()) {++alternative_missing_successor;return false;}
++            arrival=add_time(departure,edge->travel);current=next;
++        }
++        if (std::isfinite(task.last_effective_route_excess) &&
++            tick(candidate.back().arrival)>tick(gd.h[task.start])+tick(task.last_effective_route_excess)) {
++            ++alternative_cap;return false;
++        }
++        return true;
++    }
+     bool reserve_future_source(int task,double time,const GoalData& gd) {
+         Task& t=tasks[task];
+         const auto origin=tick(time),q=std::int64_t(1000000);
+@@ -834,7 +894,7 @@
+         };
+         auto observe_intersection=[&](std::uint64_t before,int kind,int from,int to,int position,
+                                       std::int64_t node_arrival,std::int64_t lo,std::int64_t hi) {
+-            if (!cfg.enable_future_mask_diagnostics || before==mask) return;
++            if ((!cfg.enable_future_mask_diagnostics && !cfg.enable_one_alternative_future_chain) || before==mask) return;
+             const FutureMaskTransition selected{kind,from,to,position,before,mask,node_arrival,lo,hi};
+             if (before && !mask && !first_clear.kind) first_clear=selected;
+             // The mask only loses bits. Compare its lowest set bit without
+@@ -852,12 +912,36 @@
+                 observe_intersection(before,2,nodes[step.node].id,nodes[path[i+1].node].id,static_cast<int>(i),tick(step.arrival),tick(step.departure),tick(step.departure)+tick(cfg.edge_entry_headway_seconds));
+             }
+         }
+-        if (!mask) {++future_mask_empty;record_diagnostic(1,first_clear,mask);return false;}
++        bool used_alternative=false;
++        int selected_fork=-1,original_next=-1,alternative_next=-1;
++        std::vector<Step> original_chain;
++        if (!mask) {
++            // Original-chain accounting and diagnostics remain original-chain
++            // outcomes even when the additional candidate later succeeds.
++            ++future_mask_empty;record_diagnostic(1,first_clear,mask);
++            if (!cfg.enable_one_alternative_future_chain) return false;
++            std::vector<Step> alternative;
++            if (!construct_one_alternative(path,first_clear,gd,t,alternative,selected_fork,original_next,alternative_next)) return false;
++            ++alternative_masks;
++            const auto queries_before=future_calendar_queries,entries_before=future_calendar_entries_scanned;
++            mask=((std::uint64_t(1)<<(horizon+1))-1)&~std::uint64_t(1);
++            for (std::size_t i=0;i<alternative.size();++i) {
++                const auto& step=alternative[i];
++                intersect_resource(calendars[step.node],tick(step.arrival),tick(step.departure));
++                if (i+1<alternative.size())
++                    intersect_resource(edge_calendars[edge_ids.at({step.node,alternative[i+1].node})],tick(step.departure),tick(step.departure)+tick(cfg.edge_entry_headway_seconds));
++            }
++            alternative_calendar_queries+=future_calendar_queries-queries_before;
++            alternative_calendar_entries_scanned+=future_calendar_entries_scanned-entries_before;
++            if (!mask) {++alternative_empty;return false;}
++            original_chain=std::move(path);path=std::move(alternative);used_alternative=true;
++        }
+         int offset=1;while (!(mask&(std::uint64_t(1)<<offset))) ++offset;
+         const double launch=seconds(origin+offset*q);
+         for (auto& step:path) {step.arrival=add_time(launch,step.arrival);step.departure=add_time(launch,step.departure);}
+         // Defensive exact validation uses the same calendars without any event
+         // interleaving. It is counted separately and never searches another path.
++        const auto validation_before=future_validation_queries;
+         for (std::size_t i=0;i<path.size();++i) {
+             const auto& step=path[i];
+             if (tick(step.arrival)!=tick(step.departure)) {
+@@ -872,7 +956,14 @@
+         }
+         // Entire certificate exists before the first calendar mutation. Its
+         // rights participate in all later checks even before physical admission.
+-        record_diagnostic(0,last_push,mask);
++        if (used_alternative) alternative_validation_queries+=future_validation_queries-validation_before;
++        else record_diagnostic(0,last_push,mask);
++        if (used_alternative) {
++            ++alternative_precommits;t.alternative_future_reserved=true;
++            t.alternative_fork_index=selected_fork;t.alternative_original_next=original_next;t.alternative_next=alternative_next;
++            t.original_clear_kind=first_clear.kind;t.original_clear_from=first_clear.from;t.original_clear_to=first_clear.to;t.original_clear_index=first_clear.chain_index;
++            t.original_future_chain=std::move(original_chain);
++        }
+         t.future_reserved=true;t.reservation_time=time;t.planned_admission=launch;
+         t.route=std::move(path);t.route_generation=1;t.arrived_index=-1;
+         t.max_certificate_depth=std::max(t.max_certificate_depth,static_cast<int>(t.route.size()));
+@@ -923,6 +1014,7 @@
+         RollingRecord r;r.kind="source_launch";r.order=next_ledger_order++;r.time=e.time;r.task=e.task;
+         r.new_generation=t.route_generation;r.index=0;r.node=t.start;r.reference_reservation_order=t.reservation_order;
+         rolling_records.push_back(std::move(r));++future_launches;
++        if (t.alternative_future_reserved) ++alternative_launches;
+         if (t.route.size()==1) finish_physically(e.task,e.time);else schedule_next_arrival(e.task);
+         push_event(t.cleanup,0,e.task,t.route_generation);
+         advance_source(t.start,e.time);
+@@ -1389,6 +1481,29 @@
+                 if (i+1<t.route.size()) service+=step.departure-step.arrival;
+                 if (i>0) travel+=step.arrival-t.route[i-1].departure;
+             }
++            if (cfg.enable_one_alternative_future_chain) {
++                b["alternative_future_considered"]=t.alternative_future_considered;
++                b["future_certificate_origin"]=t.future_reserved?py::cast(t.alternative_future_reserved?"one_alternative":"original_shortest"):py::none();
++                if (t.alternative_future_reserved) {
++                    py::dict provenance;py::list original;
++                    for (const auto& step:t.original_future_chain)
++                        original.append(py::make_tuple(nodes[step.node].id,tick(step.arrival),tick(step.departure)));
++                    provenance["original_chain_offset_us"]=original;
++                    provenance["fork_index"]=t.alternative_fork_index;
++                    provenance["fork_node"]=nodes[t.original_future_chain[t.alternative_fork_index].node].id;
++                    provenance["original_next"]=nodes[t.alternative_original_next].id;provenance["alternative_next"]=nodes[t.alternative_next].id;
++                    provenance["original_clear_kind"]=t.original_clear_kind==1?"node":"edge";
++                    provenance["original_clear_from"]=t.original_clear_from;
++                    provenance["original_clear_to"]=t.original_clear_kind==2?py::cast(t.original_clear_to):py::none();
++                    provenance["original_clear_chain_index"]=t.original_clear_index;
++                    provenance["original_static_duration_us"]=tick(t.original_future_chain.back().arrival);
++                    provenance["alternative_static_duration_us"]=tick(t.planned_finish)-tick(t.planned_admission);
++                    provenance["frozen_route_allowance_us"]=std::isfinite(t.admission_effective_route_excess)?py::cast(tick(t.admission_effective_route_excess)):py::none();
++                    provenance["source_static_remaining_us"]=tick(t.admission_static_remaining);
++                    provenance["scope"]="Immutable planned certificates, not causal improvement versus the parent policy. Actual rolling route may later be shorter.";
++                    b["alternative_future_provenance"]=provenance;
++                } else b["alternative_future_provenance"]=py::none();
++            }
+             b["route"]=route; b["travel_seconds"]=travel; b["service_seconds"]=service;
+             b["route_decisions"]=route_decisions;
+             b["node_resource_intervals"]=node_resources;b["edge_resource_intervals"]=edge_resources;
+@@ -1411,6 +1526,21 @@
+             stats["future_mask_empty"]=future_mask_empty;stats["future_chain_rejections"]=future_chain_rejections;
+             stats["source_decision_wall_seconds"]=std::accumulate(decision_microseconds.begin(),decision_microseconds.end(),0.0)*1e-6;
+             stats["inroute_decision_wall_seconds"]=std::accumulate(inroute_microseconds.begin(),inroute_microseconds.end(),0.0)*1e-6;
++        }
++        if (cfg.enable_one_alternative_future_chain) {
++            py::dict alternative;
++            alternative["considered_original_mask_empty"]=alternative_considered;
++            alternative["no_eligible_fork"]=alternative_no_fork;alternative["constructed_candidates"]=alternative_constructed;
++            alternative["rejected_cycle"]=alternative_cycle;alternative["rejected_successor"]=alternative_missing_successor;
++            alternative["rejected_cap"]=alternative_cap;alternative["complete_masks"]=alternative_masks;
++            alternative["mask_empty"]=alternative_empty;alternative["precommits"]=alternative_precommits;
++            alternative["launches"]=alternative_launches;alternative["pending_at_horizon"]=alternative_precommits-alternative_launches;
++            alternative["chain_nodes_constructed"]=alternative_chain_nodes;
++            alternative["calendar_queries"]=alternative_calendar_queries;alternative["calendar_entries_scanned"]=alternative_calendar_entries_scanned;
++            alternative["validation_queries"]=alternative_validation_queries;
++            alternative["original_chain_precommits"]=future_precommits-alternative_precommits;
++            alternative["counter_scope"]="future_source_searches and future_mask_empty describe original-chain invocations/outcomes; total precommits include both origins. Existing chain/calendar/validation work totals include additional work; these counters identify its subset. Original019 diagnostic buckets remain original-chain outcomes.";
++            stats["alternative_future_chain"]=alternative;
+         }
+         if (cfg.enable_future_mask_diagnostics) {
+             py::dict diagnostic;py::list buckets;std::uint64_t searches=0;
+@@ -1542,6 +1672,10 @@
+         }
+         if (cfg.enable_future_mask_diagnostics)
+             contract["future_mask_diagnostics"]="Observes before/after masks at the existing resource boundaries; aggregates one selected transition or rejection per future search. Does not change routes, rights, event order, masks, retry clocks or stopping conditions. Diagnostic-enabled wall/CPU measurements are not uninstrumented performance evidence.";
++        if (cfg.enable_one_alternative_future_chain) {
++            contract["future_source_policy"]="Original failed-DFS gate/minwait and original static-shortest-chain mask remain first. Only an empty original mask triggers at most one alternative: nearest prior eligible fork (node conflict excludes its own exit; edge conflict includes it), cheapest finite-H non-prefix alternative neighbor with stable physical-ID tie, then cached shortest successor. Reject repeated nodes/missing successor/frozen cap without another candidate. Recompute the complete launch mask and validate every resource before the existing atomic precommit. Original nonempty masks and all failed-rescue retry clocks remain unchanged.";
++            contract["one_alternative_future_chain"]="Opt-in topology-guided rescue, not an exhaustive route search or throughput guarantee. Additional work stays inside source decision timing and separate counters. No confirmed rights removed; no unreleased future tasks read. Source FIFO advances only at actual launch. Original-chain diagnostic outcomes and alternative actual precommits have separate accounting.";
++        }
+         stats["contract"]=contract;
+         py::list ledger;
+         for (const auto& r:rolling_records) {
+--- candidate019/continuous_adapter.py
++++ candidate020/continuous_adapter.py
+@@ -1,4 +1,4 @@
+-"""Isolated candidate019 runner derived from the official continuous adapter.
++"""Isolated candidate020 runner derived from the official continuous adapter.
+ 
+ The registered model uses local next-hop scoring and a complete continuation
+ certificate. Registration is not a performance promotion or distributed-network
+@@ -31,7 +31,7 @@
+     congestion_weight=1.0,pressure_window=30.0,max_expansions=256,max_score_expansions=64,
+     max_retries=100000,max_events=10000000,retry_mode="calendar_jump",retry_step=1.0,
+     audit_failed_calendar_hash=False,skip_scoring_single_choice=True,route_excess_retry_relaxation_rate=0.0,
+-    future_source_reservation_horizon_seconds=0,future_source_reservation_min_wait_seconds=2.0,enable_future_mask_diagnostics=False,**FIXED)
++    future_source_reservation_horizon_seconds=0,future_source_reservation_min_wait_seconds=2.0,enable_future_mask_diagnostics=False,enable_one_alternative_future_chain=False,**FIXED)
+ ALLOWED = set(DEFAULT_CONTROLS) | {"max_route_excess_seconds"}
+ 
+ 
+@@ -94,9 +94,11 @@
+     if not 0<=future<=60:
+         raise ValueError("future reservation horizon must be an integer in [0,60]")
+     if future and controls["congestion_weight"] not in (0,1):
+-        raise ValueError("candidate019 future reservations support only congestion weight 0 or 1")
++        raise ValueError("candidate020 future reservations support only congestion weight 0 or 1")
+     if controls["enable_future_mask_diagnostics"] and not future:
+         raise ValueError("mask diagnostics require future reservations")
++    if controls["enable_one_alternative_future_chain"] and not future:
++        raise ValueError("one alternative chain requires future reservations")
+     return controls
+ 
+ 
+@@ -243,7 +245,7 @@
+ def verified_auditors(source_dir):
+     """Load the frozen audit package, checking every live source against it."""
+     names=("headway_audit","future_metadata","rolling_replay","tht_metrics","source_policy_audit")
+-    package_name="g31_candidate019_auditors_"+hashlib.sha256(str(source_dir.resolve()).encode()).hexdigest()[:16]
++    package_name="g31_candidate020_auditors_"+hashlib.sha256(str(source_dir.resolve()).encode()).hexdigest()[:16]
+     package=types.ModuleType(package_name)
+     package.__path__=[str(source_dir)]
+     sys.modules[package_name]=package

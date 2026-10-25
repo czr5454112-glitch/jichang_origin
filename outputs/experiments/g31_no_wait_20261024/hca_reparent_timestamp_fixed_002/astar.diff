@@ -1,0 +1,11 @@
+--- original_Astar
++++ reparent_timestamp_fixed_Astar
+@@ -108,6 +108,8 @@
+ 					//如果子节点nextNode在openList中，并且gcost新值比旧值小，将新值作为节点nextNode的代价值
+ 					 if (gcost<n.gcost) {
+ 					    n.gcost=gcost;
++						n.t1=t1;
++						n.t2=t2;
+ 						n.hcost=hcost;
+ 						n.fcost=n.gcost+n.hcost;
+ 						n.parentNode=currNode;

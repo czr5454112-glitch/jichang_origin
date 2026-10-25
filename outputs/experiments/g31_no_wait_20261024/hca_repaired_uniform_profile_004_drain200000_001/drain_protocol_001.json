@@ -1,0 +1,90 @@
+{
+  "schema": "g31.hca.explicit_drain_protocol.v1",
+  "status": "prepared_not_run",
+  "planned_cells": [
+    "map2_2x",
+    "nanning_2x"
+  ],
+  "start_epoch": 8260,
+  "end_epoch": 200000,
+  "max_epochs_inclusive": 191741,
+  "reference_end_epoch": 98259,
+  "change": "Only observation horizon changes; all canonical releases, original arrivals, STD deadlines, routing, source FIFO and physical constraints remain fixed.",
+  "preserve_original_window": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_repaired_uniform_profile_004",
+  "original_window_result_must_remain_visible": true,
+  "completion_policy": "Report completion/STD at the original and extended horizon separately. Full-population THT and tails stay null unless all original businesses complete. Never select completed subset as the population result.",
+  "prefix_validation": "After the new run, verify all release/successful route records at epoch<=98259 and all goal reports through98259 match the original run exactly, ignoring profiling wall/CPU. No horizon-dependent planning policy is introduced.",
+  "input_evidence": {
+    "map2_2x": {
+      "canonical": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_service2_001\\inputs\\map2_2x_canonical.jsonl",
+      "canonical_sha256": "430534934c72ba441f5ca61b542a3f5ee5af5e12b5a6a417437cca9c7fac7890",
+      "raw_sha256": "c7dcc9310bab52c543d9421f43da4dbdaca6c6da8c6569d390f6fbadf8692ccc",
+      "business_denominator": 57012,
+      "segment_denominator": 87206,
+      "latest_canonical_release": 82800.0,
+      "latest_original_arrival": 82403.72582,
+      "latest_STD": 85500.0
+    },
+    "nanning_2x": {
+      "canonical": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_service2_001\\inputs\\nanning_2x_canonical.jsonl",
+      "canonical_sha256": "55538837011a1ed31eb272cc170fdc9fefb3b40ec14e2ae0574877a8c465a115",
+      "raw_sha256": "f7528ca4207d77ea96aca3bea0c6761d6a7a7656944f6a7e31256248f44fbc20",
+      "business_denominator": 57012,
+      "segment_denominator": 87206,
+      "latest_canonical_release": 82800.0,
+      "latest_original_arrival": 82403.72582,
+      "latest_STD": 85500.0
+    }
+  },
+  "map2_estimate": {
+    "at_horizon": 98259,
+    "unattempted_outbound": 11382,
+    "admitted_outbound_incomplete": 142,
+    "last_inbound_report": 92779,
+    "last_outbound_admission": 98259,
+    "all_remaining_nominal_releases_already_due": true,
+    "recent_outbound_admission_rates_per_second": {
+      "last5000": 0.5596,
+      "last10000": 0.5593,
+      "last20000": 0.53775
+    },
+    "constant_tail_rate_remaining_release_seconds": [
+      20339.52823445318,
+      20350.438047559448,
+      21165.969316596933
+    ],
+    "estimated_last_release_epoch_range": [
+      118598.52823445317,
+      119424.96931659694
+    ],
+    "extra_until200000_seconds": 101741,
+    "interpretation": "Empirical extrapolation of the observed tail only; does not guarantee completion or include the final route traversal. All inbound work already completed at98259. Other queue/calendar effects can change tail throughput."
+  },
+  "nanning_estimate": {
+    "original_2x_window_not_run_yet": true,
+    "same_canonical_release_bounds": true,
+    "completion_by200000_unproven": true
+  },
+  "frozen_profile_classes_unchanged": true,
+  "runner_source_identity": [
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_no_wait\\hca.py",
+      "sha256": "ba20f88c58ef6a415026cec15a0f7632bd750d1101c9a4b48a1ba67e5083ab4e"
+    },
+    {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_no_wait\\hca_physical.py",
+      "sha256": "1c3cf6c17c1305b3c8173daa4fe0b89fa86e2c9390a1deda88bc30aef829ee4b"
+    }
+  ],
+  "freeze_sha256": "d8131852ecb874b52912cdc7ecf65a39ca4714a1749af41cef8f19603634976e",
+  "validation": {
+    "pytest_files": [
+      "test_g31_hca_window.py",
+      "test_g31_hca_first_planning.py",
+      "test_g31_hca_source_phase.py"
+    ],
+    "passed": 23,
+    "new_full_run_started": false
+  },
+  "CLI": "C:/PROGRAMING/python3.11.9/python.exe scripts/experiments/g31_no_wait/hca_physical.py run --output outputs/experiments/g31_no_wait_20261024/hca_repaired_uniform_profile_004_drain200000_001 --cell map2_2x"
+}

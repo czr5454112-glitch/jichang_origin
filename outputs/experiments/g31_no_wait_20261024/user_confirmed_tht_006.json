@@ -1,0 +1,21 @@
+{
+  "schema": "g31.user_confirmed_tht.v1",
+  "user_priority": "THT才是最重要的指标",
+  "user_definition": "行李正式进入系统到到达目标为止的时间",
+  "user_EBS_answer": "入库、出库两段分别计时再相加，不含EBS存储时间",
+  "formula_direct": "goal_arrival - admission",
+  "formula_stored": "(in_goal_arrival - in_admission) + (out_goal_arrival - out_admission)",
+  "included": "All elapsed time during each leg, including device traversal, detours and any internal waiting. Under the new no-stop physical contract, additional internal waiting must be zero; positive device traversal remains2s.",
+  "excluded": "Pre-admission external hold and intermediate EBS storage; both are reported separately.",
+  "aggregation": "Per original business bag, then full-population mean/min/median/p95/p99/max. Do not replace original bag denominator by segment denominator.",
+  "required_companion_metrics": [
+    "full completion counts",
+    "external source hold",
+    "canonical release-to-delivery elapsed",
+    "STD",
+    "STD-minus-2700",
+    "measured implementation cost"
+  ],
+  "physical_contract": "headway_contract_002.json",
+  "validates_primary_definition_in": "objective_tht_definition_correction_005.json"
+}

@@ -1,0 +1,140 @@
+--- frozen015/core.cpp
++++ candidate016/core.cpp
+@@ -78,6 +78,7 @@
+     int future_source_reservation_horizon_seconds = 0;
+     double future_source_reservation_min_wait_seconds = 2.0;
+     bool future_source_prefer_earlier_finish = false;
++    bool future_source_prefer_only_without_ready_successor = false;
+ };
+ struct Edge { int to; double travel; int id; };
+ struct Node { int id; double service; std::vector<Edge> out; int indegree = 0; };
+@@ -127,6 +128,7 @@
+     std::uint64_t future_success_comparisons=0;
+     bool future_success_preferred=false;
+     double compared_immediate_finish=inf;
++    std::uint64_t ready_successor_checks=0,ready_successor_skips=0,ready_successor_activation_pending_skips=0;
+     double reservation_time=inf,planned_admission=inf,planned_finish=inf,planned_cleanup=inf;
+     std::uint64_t reservation_order=0,future_searches=0,future_calendar_entries_scanned=0;
+     std::vector<Step> reserved_route;
+@@ -195,7 +197,7 @@
+         "interval_mode","strict_endpoint_resources","edge_entry_headway_seconds","skip_scoring_single_choice",
+         "enable_inroute_replanning","time_grid_seconds","max_route_excess_seconds","source_fifo_order",
+         "route_excess_retry_relaxation_rate","future_source_reservation_horizon_seconds",
+-        "future_source_reservation_min_wait_seconds","future_source_prefer_earlier_finish"};
++        "future_source_reservation_min_wait_seconds","future_source_prefer_earlier_finish","future_source_prefer_only_without_ready_successor"};
+     for (auto item : d) if (!allowed.count(py::cast<std::string>(item.first)))
+         throw std::invalid_argument("unknown config key: "+py::cast<std::string>(item.first));
+ #define READ_OPTION(name) if (d.contains(#name)) c.name = py::cast<decltype(c.name)>(d[#name]);
+@@ -218,6 +220,12 @@
+             throw std::invalid_argument("future_source_prefer_earlier_finish must be a boolean");
+         c.future_source_prefer_earlier_finish=py::cast<bool>(value);
+     }
++    if (d.contains("future_source_prefer_only_without_ready_successor")) {
++        const auto value=d["future_source_prefer_only_without_ready_successor"];
++        if (!PyBool_Check(value.ptr()))
++            throw std::invalid_argument("future_source_prefer_only_without_ready_successor must be a boolean");
++        c.future_source_prefer_only_without_ready_successor=py::cast<bool>(value);
++    }
+     if (d.contains("future_source_reservation_horizon_seconds")) {
+         const auto value=d["future_source_reservation_horizon_seconds"];
+         if (!PyLong_Check(value.ptr()) || PyBool_Check(value.ptr()))
+@@ -243,6 +251,8 @@
+         throw std::invalid_argument("future source reservation requires canonical FIFO, causal rolling, strict half-open node/edge2 resources, q1 source/completion/feed and congestion weight exactly 0 or 1");
+     if (c.future_source_prefer_earlier_finish && c.future_source_reservation_horizon_seconds==0)
+         throw std::invalid_argument("earlier-finish source comparison requires enabled future source reservation");
++    if (c.future_source_prefer_only_without_ready_successor && !c.future_source_prefer_earlier_finish)
++        throw std::invalid_argument("ready-successor gate requires earlier-finish source preference");
+     if (c.time_grid_seconds!=0.000001) throw std::invalid_argument("time_grid_seconds must equal 1e-6");
+     if (c.source_fifo_order!="activation" && c.source_fifo_order!="canonical")
+         throw std::invalid_argument("source_fifo_order must be activation or canonical");
+@@ -311,6 +321,7 @@
+     std::uint64_t future_eligible_failures=0;
+     std::uint64_t future_success_comparisons=0,future_success_preferred=0,future_success_kept_immediate=0;
+     std::uint64_t future_success_finish_bound_rejections=0,future_success_mask_empty=0;
++    std::uint64_t ready_successor_checks=0,ready_successor_skips=0,ready_successor_activation_pending_skips=0;
+     double simulation_time = 0;
+     bool event_budget_exhausted = false;
+     double preprocessing_seconds = 0;
+@@ -662,6 +673,26 @@
+         auto q=source_queues.find(t.start);
+         auto h=source_heads.find(t.start);
+         return q!=source_queues.end() && h!=source_heads.end() && h->second<q->second.size() && q->second[h->second]==task;
++    }
++    bool source_successor_ready_now(int task,double time,bool& activation_pending) const {
++        activation_pending=false;
++        const Task& t=tasks[task];
++        const auto q=source_queues.find(t.start);
++        const auto h=source_heads.find(t.start);
++        if (q==source_queues.end() || h==source_heads.end() || h->second>=q->second.size() || q->second[h->second]!=task)
++            throw std::logic_error("ready-successor query requires current canonical source head");
++        if (h->second+1>=q->second.size()) return false;
++        const Task& next=tasks[q->second[h->second+1]];
++        if (!next.released) return false;
++        if (next.predecessor>=0) {
++            const Task& prior=tasks[next.predecessor];
++            if (!prior.physically_completed) return false;
++            if (tick(quantize(std::max(next.release,prior.finish),cfg.release_quantum))>tick(time)) return false;
++        }
++        // Actual arrival precedes attempts, but its EBS activation event can
++        // follow them at the same time. Do not use activated=false as unready.
++        activation_pending=!next.activated;
++        return true;
+     }
+     void advance_source(int node,double time) {
+         if (!cfg.source_fifo) return;
+@@ -906,8 +937,17 @@
+         t.max_certificate_depth=std::max(t.max_certificate_depth,a.max_depth);
+         t.max_observation_depth=std::max(t.max_observation_depth,a.max_observation_depth);
+         if (a.score_budget_exhausted) ++score_budget_exhaustions;
+-        bool preferred_future=false;
+-        if (success && cfg.future_source_prefer_earlier_finish) {
++        bool preferred_future=false,skip_for_ready_successor=false;
++        if (success && cfg.future_source_prefer_only_without_ready_successor) {
++            ++ready_successor_checks;++t.ready_successor_checks;
++            bool activation_pending=false;
++            skip_for_ready_successor=source_successor_ready_now(task,time,activation_pending);
++            if (skip_for_ready_successor) {
++                ++ready_successor_skips;++t.ready_successor_skips;
++                if (activation_pending) {++ready_successor_activation_pending_skips;++t.ready_successor_activation_pending_skips;}
++            }
++        }
++        if (success && cfg.future_source_prefer_earlier_finish && !skip_for_ready_successor) {
+             // The successful immediate DFS remains an uncommitted fallback.
+             // This comparison has no forced-prefix or failure-age requirement;
+             // the old failed-DFS rescue gate below remains unchanged.
+@@ -1324,6 +1364,11 @@
+                 b["planned_finish_advance_vs_immediate_certificate_seconds"]=t.future_success_preferred?
+                     py::cast(seconds(tick(t.compared_immediate_finish)-tick(t.planned_finish))):py::none();
+             }
++            if (cfg.future_source_prefer_only_without_ready_successor) {
++                b["ready_successor_checks"]=t.ready_successor_checks;
++                b["ready_successor_skips"]=t.ready_successor_skips;
++                b["ready_successor_activation_pending_skips"]=t.ready_successor_activation_pending_skips;
++            }
+             b["status"]=event_budget_exhausted&&!done?"event_budget_exhausted":t.reason;
+             b["attempts"]=t.attempts; b["retries"]=std::max(0,t.attempts-1);
+             b["source_wait_seconds"]=t.admitted?py::cast(t.admission-t.release):py::none();
+@@ -1378,6 +1423,11 @@
+             stats["future_success_kept_immediate"]=future_success_kept_immediate;
+             stats["future_success_finish_bound_rejections"]=future_success_finish_bound_rejections;
+             stats["future_success_mask_empty"]=future_success_mask_empty;
++        }
++        if (cfg.future_source_prefer_only_without_ready_successor) {
++            stats["ready_successor_checks"]=ready_successor_checks;
++            stats["ready_successor_skips"]=ready_successor_skips;
++            stats["ready_successor_activation_pending_skips"]=ready_successor_activation_pending_skips;
+         }
+         stats["planning_attempts"]=planning_attempts;stats["failed_attempts"]=failed_attempts;
+         stats["search_expansions"]=total_exp;stats["score_expansions"]=total_score_exp;stats["backtracks"]=total_back;
+@@ -1472,6 +1522,11 @@
+             contract["future_success_comparison"]="After successful immediate DFS and before any admission mutation, compare the complete static-chain future certificate. Choose only strictly earlier goal arrival on integer-us ticks; equal/later/no improving slot keeps the original immediate certificate. This success branch is independent of failure min-wait/forced-prefix; failed-DFS rescue remains unchanged. A finite finish bound removes only non-improving launch offsets, never uses observation end.";
+             contract["future_success_measurement"]="Comparisons are not failed_attempts or future_eligible_failures. Existing future searches/queries/scans also include these comparisons; an empty comparison mask means no improving slot in its finish-bounded window. All work remains inside the original source decision sample. Planned advance is relative only to this attempt's found immediate certificate, not a causal individual or system THT guarantee; later rerouting and other bags may change outcomes. FIFO remains blocked until actual future launch; preplanning and fixed-window completion must be reported.";
+         }
++        if (cfg.future_source_prefer_only_without_ready_successor) {
++            contract["future_source_prefer_only_without_ready_successor"]=true;
++            contract["ready_successor_policy"]="Before successful-DFS future comparison, inspect only the canonical adjacent source item. If actually released and predecessor absent or physically completed with q1 gate time reached, retain the immediate certificate. Same-time physical completion is ready even before its activation event. Failed-DFS rescue is unchanged. No extra calendar/graph queries; map lookups O(log sources), adjacent state access O(1).";
++            contract["ready_successor_boundary"]="Current business readiness is not route feasibility. Unreleased or not-yet-completed successors can become ready during source hold, so this gate does not guarantee throughput or eliminate head-of-line delay. Planning successes equal comparisons plus ready_successor_skips; skips are neither failed attempts nor unsuccessful future probes.";
++        }
+         stats["contract"]=contract;
+         py::list ledger;
+         for (const auto& r:rolling_records) {

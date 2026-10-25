@@ -1,0 +1,18 @@
+{
+  "schema": "g31.headway.contract.v2",
+  "user_confirmed": "Minimum time headway is at least 2 seconds; equality is allowed; no extra stopping while in transport.",
+  "time_grid_seconds": 0.000001,
+  "time_grid_reason": "Both maps' travel times at 2m/s are integer microseconds; maximum numerical residual before rounding is below 2e-9 microseconds. Integer comparisons avoid inconsistent equality tests after repeated floating additions.",
+  "service": "Original positive equipment traversal durations are 2 seconds; original zero-service virtual/connector points remain zero.",
+  "node_reservation": "All positive-service visits, including task source and task goal, reserve [arrival,arrival+2s). No endpoint query exemption. Zero-duration visits have empty occupancy.",
+  "edge_reservation": "Each directed edge reserves an entrance time window [departure_of_tail,departure_of_tail+2s). This represents temporal headway, not exclusive occupancy of the entire belt.",
+  "edge_kinematics_assumptions": "Same fixed speed and travel time on each directed edge; no overtaking, no entry partway along the edge, no opposite-direction shared lane inferred from graph.",
+  "motion": "arrival(next) = departure(current) + travel(current,next); departure(current) = arrival(current)+service(current). All calculations on integer microsecond grid.",
+  "source": "Only external holding allowed. Source arrival eligibility uses ceiling of unchanged canonical release to integer epoch. At most one new source head per second; failed predecessor at same source blocks the next item. Chronological stable source FIFO; no unseen future task may reserve resources.",
+  "ebs": "Storage-out cannot be admitted before corresponding storage-in actual reported completion; no change to nominal release or STD.",
+  "business_completion": "Goal physical arrival; report both continuous arrival and shared integer-epoch observation. Goal resource reservation survives business completion until its service ends.",
+  "cleanup": "A committed resource interval cannot be discarded while its end is still in the future, including after goal arrival or traversal of a short edge. Whole-owner cleanup may occur no earlier than max(goal departure, last edge-entry window end), optionally rounded upward to an epoch.",
+  "comparison": "Original Java HCA retained separately. Fair physical comparator explicitly labeled HCA timestamp-fixed + common headway/source/EBS adapter. Do not compare half-open candidate against closed original as if semantics were identical.",
+  "baseline_known_defects": ["Astar reparent changes g and parent but not t1/t2, producing implicit timing slack", "original generator may admit less than one second before nominal release", "original independent EBS legs can overlap and overwrite same-ID saved routes", "source and goal collision checks exempt", "closed intervals reject exact 2-second headway"],
+  "acceptance": "Independent full-population node and edge headway, route continuity, release, EBS causality and commit-order audits must pass before performance claims. Dynamic in-network next-hop replanning remains a separate implementation requirement."
+}

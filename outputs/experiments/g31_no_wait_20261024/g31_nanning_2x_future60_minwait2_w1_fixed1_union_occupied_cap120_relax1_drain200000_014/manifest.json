@@ -1,0 +1,127 @@
+{
+  "schema": "g31.continuous.run.v1",
+  "status": "complete",
+  "selection": {
+    "schema": "g31.standard.selection.v2",
+    "execution_model": "continuous_headway_2s",
+    "map": "nanning",
+    "scale": 2,
+    "standard_id": "g31_continuous_014_future_source_reservation_calendar_index_w1_scope_pressure_index_slot_signal",
+    "is_standard_selection": false,
+    "selection_label": "isolated_future_reservation_candidate014",
+    "historical_default_modified": false,
+    "contract": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate014\\registered_contracts_014\\physical_contract_drain200000.json",
+      "sha256": "a55d9c0bf2e0fed4beff84ea553a9371b70ab545d965e89c10183d46a8fd2869",
+      "bytes": 6149
+    },
+    "controls": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate014\\controls_union_occupied_drain200000.json",
+      "sha256": "b4a1a87559585744f81ddc8cbcb1022b585a9ae9fe5e9196e989f80ebb44b828",
+      "bytes": 924
+    },
+    "binary": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build\\g31_no_wait_014\\python\\g31_nowait.cp311-win_amd64.pyd",
+      "sha256": "ce6a438cfb2a7f461a2513d8a47c7f08a6881ede86f04ad62a52f4ccd6a1fa38",
+      "bytes": 343040
+    },
+    "canonical": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\g31_continuous\\nanning_2x_canonical.jsonl.gz",
+      "sha256": "5e0d3feef7b3f94aae2f3ec3c445720bc971599c82252383ab1ebc44fa46491b",
+      "bytes": 2299529
+    },
+    "profile": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\g31_continuous\\nanning_service2.json",
+      "sha256": "9b1a78344ec89aaac377feb05afccd48d9b957174286b29eedfe57a73a93c426",
+      "bytes": 714420
+    },
+    "build_receipt": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build\\g31_no_wait_014\\build_receipt.json",
+      "sha256": "ba2146299eb86a3c6a1892d9788962becee25e733fc0b235c88f60f32b78aef4",
+      "bytes": 865
+    },
+    "native_source": {
+      "path": "build\\g31_no_wait_014\\source\\core.cpp",
+      "bytes": 100765,
+      "sha256": "31baabe13b2f605d17b6e3938616f44a500255ffc89e8318ab8ff7f7abd31755"
+    },
+    "effective_controls": {
+      "end_time": 200000,
+      "min_depth": 1,
+      "max_depth": 1,
+      "adaptive": false,
+      "congestion_weight": 1,
+      "pressure_window": 30,
+      "pressure_signal": "union_occupied",
+      "max_expansions": 256,
+      "max_score_expansions": 64,
+      "max_retries": 100000,
+      "max_events": 10000000,
+      "retry_mode": "calendar_jump",
+      "retry_step": 1.0,
+      "audit_failed_calendar_hash": false,
+      "skip_scoring_single_choice": true,
+      "route_excess_retry_relaxation_rate": 1,
+      "future_source_reservation_horizon_seconds": 60,
+      "future_source_reservation_min_wait_seconds": 2,
+      "interval_mode": "half_open",
+      "strict_endpoint_resources": true,
+      "edge_entry_headway_seconds": 2,
+      "time_grid_seconds": 1e-06,
+      "terminal_reservation_service": true,
+      "enable_inroute_replanning": true,
+      "enable_ebs_predecessor_gate": true,
+      "release_quantum": 1,
+      "completion_quantum": 1,
+      "source_fifo": true,
+      "source_generation_interval": 1,
+      "source_fifo_order": "canonical",
+      "max_route_excess_seconds": 120
+    },
+    "business_denominator": 57012,
+    "segment_denominator": 87206,
+    "paper_tht_definition": "per original task_id: sum over its transport legs of finish-admission; full population only when all bags complete",
+    "user_primary_tht_definition": "per original task_id: sum over its transport legs of actual goal arrival minus first_planning_attempt_time; failed search/retry time included; source activation/FIFO preplanning hold and canonical elapsed reported separately",
+    "user_primary_tht_status": "explicit_first_planning_attempt_time; admission-based paper/network values are diagnostic",
+    "source_order_contract": "stable canonical nominal release; input row order for ties; an unreleased or predecessor-blocked head blocks later tasks",
+    "source_wait_separately_reported": true,
+    "claim_boundary": "Explicit continuous-motion model with in-route local next-hop decisions and full continuation certificates. No standard winner selected; real network latency, faults and empty trays unsupported.",
+    "entrypoint": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate014\\run_candidate.py",
+      "sha256": "55a5d5b5aa2a9329ee4a6d93c6feaa2d1c53caabcba2bd87ae85562fb1469f01",
+      "bytes": 2070
+    }
+  },
+  "source_sha256": {
+    "build_receipt.json": "ba2146299eb86a3c6a1892d9788962becee25e733fc0b235c88f60f32b78aef4",
+    "contract.json": "a55d9c0bf2e0fed4beff84ea553a9371b70ab545d965e89c10183d46a8fd2869",
+    "controls.json": "b4a1a87559585744f81ddc8cbcb1022b585a9ae9fe5e9196e989f80ebb44b828",
+    "core.cpp": "31baabe13b2f605d17b6e3938616f44a500255ffc89e8318ab8ff7f7abd31755",
+    "future_metadata.py": "9169d15ac8417afd1f905533e7501e157e6d32fe0b4c3cc96612a69cb0169765",
+    "g31_continuous_adapter.py": "d04e0cab8bc5740c8395acb0eddc8f4c52f8947e3b134e490a0e396141758778",
+    "headway_audit.py": "d20feff736045fa6390c61b3547c32e4b10e52c838ee21b1b67f22afc699383b",
+    "memory_snapshot_provider.py": "c905edfac91730289e59edc0284d2f9785cd5a022a00a859678c6530e320673d",
+    "profile.json": "9b1a78344ec89aaac377feb05afccd48d9b957174286b29eedfe57a73a93c426",
+    "rolling_replay.py": "a30fab90b44ce1108d50b09958fc8f9c1c96e0f73088de6043269122e0cfd043",
+    "source_policy_audit.py": "1da93b1fa09886c34a6b649ad5d3fe3e0ced20fa38bd634d7aa7610e74695d6b",
+    "tht_metrics.py": "8b96c640df9e54583446147bfef200ca4987475852f979a1880b7ed6aa23e815",
+    "__init__.py": "18795c9e83fa2f1f2af4d05bdb027952e1db87e7db34cd57b5c23ad00500aef4"
+  },
+  "native_wall_seconds": 19.3647079000948,
+  "native_process_cpu_seconds": 18.828125,
+  "bags_sha256": "149de98c6325c6c51b3ec7cd38d303d9b7af7f041d7cdb05b2f7db9eb268996e",
+  "audits_passed": true,
+  "memory_after_native": {
+    "peak_working_set_bytes": 4446416896,
+    "current_working_set_bytes": 3760144384,
+    "peak_pagefile_usage_bytes": 4491841536,
+    "scope": "Entire Python worker process since creation, including native payload conversion."
+  },
+  "memory_after_audit": {
+    "peak_working_set_bytes": 4687949824,
+    "current_working_set_bytes": 3918585856,
+    "peak_pagefile_usage_bytes": 4691935232,
+    "scope": "Entire Python worker process since creation, including native payload conversion."
+  },
+  "full_population_performance_available": true
+}

@@ -1,0 +1,36 @@
+{
+  "schema": "g31.candidate011.nanning_only_paired_timing_plan.v2",
+  "status": "prepared_not_executed",
+  "reason": "User restricts new experiments to Nanning1x/2x. Retain original frozen two-map timing tool and plan unchanged.",
+  "maps": [
+    "nanning"
+  ],
+  "scale": 2,
+  "end_time": 200000,
+  "arms": {
+    "A": "frozen010c",
+    "B": "frozen011"
+  },
+  "order": "ABBAAB",
+  "repetitions_per_arm": 3,
+  "fresh_python_process_per_sample": true,
+  "python": "C:/PROGRAMING/python3.11.9/python.exe",
+  "prerequisite": "Nanning2x/drain actual five-gate full pipelines and strict010c/011 full parity receipt PASS; no map2 prerequisite.",
+  "frozen_worker_tool_sha256": "864cdf7a57df36e7f09a9c909d3768449dd8515044b1a5befab63cc02c789ef1",
+  "frozen_two_map_plan_sha256": "79d3f7914345e865a0971a997a65600b3aa52fce85f0e67d4f544bef783046b3",
+  "wrapper_sha256": "32f59968d74ae9b1e3b492c0a61d00cd64362a856baed7d91183451deae19c7f",
+  "cost_scope": "Reuses exact frozen worker: native event CPU measured by GetProcessTimes; preparation/import and logical trajectory hashing outside event timer. Whole-plan CPU/wall separate; one plan then child exits.",
+  "correctness": "Same frozen inputs/controls, each sample matches prior audited bags and ledger hashes, all non-time/non-scan summary fields exact. No giant files.",
+  "reporting": "All three samples, median/min/max each arm; no one-shot speed claim or Java whole-runtime comparison.",
+  "deadline": "No new heavy child at or after 2026-10-24T23:00:00+08:00",
+  "execution": "Only parent may grant heavy slot. This preparation does not execute native or full scans.",
+  "created_utc": "2026-10-24T14:14:32.001354+00:00",
+  "parent_worker_sha256": "beec2853d29e1f347bab0e68ea43c99d78b5f7a50e319005ce7bc89a18c0db8c",
+  "parent_wrapper_sha256": "a6baaa04fa291de49608746537ccad974369aab62056f47400e7d2ec83b16b1a",
+  "parent_plan_sha256": "ba562455979cf77faa99899822e3ce2f52655483ccbd21c138c8e0ef97352214",
+  "summary_comparator_sha256": "e5478902c98e5d1d9fbf41026d1e36d30445ca7372aa6403ba3bfd7aeaf21e8c",
+  "source_diff_sha256": "479d80af2c56e4ab45c93b0d881542cf5add03f5fa7ef07c4d7017790a510d4f",
+  "revised_comparison": "Only three proven integer-key histogram maps normalize keys to canonical decimal strings. Counts, all other fields and the original 11 timing + single scan exclusions remain unchanged. Invalid/colliding keys reject. Mismatches preserve a compact JSON diagnostic before fail-stop.",
+  "restart": "Complete new ABBAAB from A. Do not splice the failed old A attempt into results. No extra diagnostic native execution.",
+  "old_failed_execution": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate011_paired_timing_nanning_001"
+}

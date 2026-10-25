@@ -1,0 +1,58 @@
+{
+  "schema": "g31.candidate021.plan.v1",
+  "status": "prepared_not_native_executed",
+  "scope": "Nanning 1x/2x only; candidate019 parent; no020 alternative-chain combination",
+  "parent_source": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate019\\source\\core.cpp",
+    "sha256": "681b8b1fd1760bb59ed9b841bbf1d042de8d2d26bd32e2f309eaca376c3d8f11",
+    "bytes": 108882
+  },
+  "source": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate021\\source\\core.cpp",
+    "sha256": "bde93a263eada8844136662a2308908db15624d4a4d0de4f5dd99262e3f9a2e2",
+    "bytes": 121738
+  },
+  "patch": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate021\\gap_alignment_only.patch",
+    "sha256": "08bdeeacebe6e786f58cc48ac9334fa0581b6147633a6aa245d943063c1d1960",
+    "bytes": 20057
+  },
+  "design": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate021_design_001\\DESIGN_002.json",
+    "sha256": "8653e44a6f467184f9deffe89a495254262a2a8286d7b5da7fd19514e4239864",
+    "bytes": 12744
+  },
+  "flag": "enable_future_gap_alignment",
+  "default": false,
+  "single_factor": "After original complete fixed-chain mask succeeds, optionally choose original earliest+1 second, only when both bits are valid, first positive merge finite-gap J is 1->0 and no known finite chain resource increases J.",
+  "formula": {
+    "D_us": 2000000,
+    "delta_us": 1000000,
+    "J": "(U-L)//D - (A-L)//D - (U-A-D)//D - 1",
+    "bounds": "Both sides must be real currently confirmed rights. Missing endpoints are unknown, never zero/infinity/horizon substitutes."
+  },
+  "first_merge": "First path node with service2 and structural indegree>1, including source/goal; zero-service nodes excluded. Unknown or nonimproving first merge keeps earliest, never searches later merges.",
+  "known_chain_veto": "All positive nodes and directed-edge-entry2s resources; first witness reused. Unknown endpoints counted/skipped. At most two neighbor visits per queried calendar; no new path or temporal search.",
+  "unchanged": [
+    "original mask construction/intersection",
+    "failed rescue minwait2 and forced-prefix gate",
+    "source FIFO advances only on actual launch",
+    "immutable first-planning clock",
+    "all physical2s/no-stop constraints",
+    "exact full-certificate validation and rights",
+    "inroute no-later requirement",
+    "source q1 and EBS actual-completion gate",
+    "original019 diagnostic first-clear/last-push meaning"
+  ],
+  "risk": "Local gap packing can include already-past space and is not real-time network capacity. Unknown resources, source HOL, new competitors, deadlines and EBS propagation may all worsen. No throughput/THT dominance claim.",
+  "telemetry": "Original earliest and selected launch, original mask, first merge and known-chain witnesses with reservation IDs, unknown/veto counts and query/neighbor costs. Original019 diagnostics describe original earliest mask, not deliberate delay.",
+  "comparison": "Default omitted/false all old non-time output including scans/ledger exact; on/off diagnostic toggles cannot change actions or new-policy statistics.",
+  "micro_plan": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate021\\FIXTURE_PLAN_021_003.json",
+    "sha256": "ba5811eed6b564df832aaabc8c75e68026f29a86bb72e34c81a3035cc709091f",
+    "bytes": 2494
+  },
+  "five_audits": "Unmodified candidate010 headway, rolling(require_nonincreasing_finish=True), source FIFO/clocks, THT, business. No relaxed auditor.",
+  "policy_audit_boundary": "Micro helper verifies integer witness formulas/selected mask bits/counter conservation and expected scenarios; does not independently replay each neighbor lookup at source_reserve. Original five audits remain required.",
+  "native_results": "Not yet executed; expected fixture outcomes are not observed results. Preserve failed outputs and fix only demonstrated fixture/harness/implementation mistakes; substantive policy change requires root review."
+}

@@ -1,0 +1,33 @@
+{
+  "schema": "g31.candidate016.ready_successor_gate_plan.v1",
+  "status": "prepared_only_before_build_native",
+  "time": "2026-10-24T12:12:36.866929+00:00",
+  "parent_source_sha256": "602d39a4f2b42a9cfbe7e2f6fd1b34b025c9370ac3f9b0584a5f348c5a344561",
+  "source_sha256": "778bc2322989ca9283e853aaef07f07a4e27e952d26602db4e46115757c379c6",
+  "new_key": "future_source_prefer_only_without_ready_successor",
+  "default": false,
+  "requires": "future_source_prefer_earlier_finish=true;existingfuturetuple unchanged",
+  "change": "Successful DFS only: adjacent canonical next released and actual predecessor complete/q1 ready skips comparison and commits original immediate. No failed-rescue,calendar,path,clock,FIFO orphysics change.",
+  "no_future_information": "Only actual released/physically_completed state. Never predicted planned_finish. Adjacent unready and no adjacent both allow comparison; do not scan past an unready head.",
+  "cost": "Two existing map lookups O(log sourcecount), adjacent vector+state O(1), no new probes.",
+  "counter_equations": [
+    "planning_attempts-failed_attempts=ready_successor_checks=future_success_comparisons+ready_successor_skips",
+    "ready_successor_activation_pending_skips<=ready_successor_skips",
+    "all three perbag sums equal global",
+    "comparisons=preferred+kept; old failed rescue accounting unchanged"
+  ],
+  "tests": [
+    "Defaultfalse all39 inherited+15 preference/4rejectrefs oldnon-timeexact",
+    "Knownready HOL prevented with current head delayed; future-unreleased HOL stillpossible andmustremain visible",
+    "No next/unreleased next/actual-predecessor incomplete allow comparison",
+    "Same-time actual EBScomplete butactivatedfalse blocks; zero-service source included",
+    "Short/drain ledgerprefix and exact2s boundaries",
+    "Strictbool/dependency negative cases; unchangedfiveauditors"
+  ],
+  "limits": [
+    "Ready next may itself be infeasible,so suppressing headpreference can be wasteful.",
+    "Future arrivals can still be delayed;no throughput guarantee.",
+    "Gate only successbranch;existingfailed-rescue may reserve with readyfollowers."
+  ],
+  "scope": "No build/native/fullscan untilroot grants. OnlyNanning experiments;formal006 andfrozen015 unchanged."
+}

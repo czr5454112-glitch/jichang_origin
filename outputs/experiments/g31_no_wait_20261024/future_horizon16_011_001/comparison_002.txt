@@ -1,0 +1,24 @@
+南宁 2x：读取既有小型汇总；不重新扫描行李/事件。
+arm | THT mean/p95/p99/max (s) | preplanning mean (s) | completed<=98259 | STD / STD-2700 | audit result
+2x_horizon16_minwait2 | 368.936/586.905/660.205/7718.625 | 45119.339 | 31709 | 17624 / 12309 | headway:passed,rolling:passed,source_policy:passed,tht:passed,business:passed
+2x_horizon60_minwait2 | 373.992/607.192/677.340/1497.335 | 32861.742 | 41722 | 14762 / 8996 | headway:passed,rolling:passed,source_policy:passed,tht:passed,business:passed
+2x_horizon60_minwait0 | 362.747/582.270/658.320/3248.290 | 44620.096 | 35046 | 9425 / 5628 | headway:passed,rolling:passed,source_policy:passed,tht:passed,business:passed
+2x_horizon60_minwait30_historical010c | 374.207/608.005/677.905/1416.135 | 34596.173 | 39482 | 15186 / 10173 | headway:passed,rolling:passed,source_policy:passed,tht:passed,business:passed
+HCA_repaired | 484.689/791.900/945.087/4123.835 | 38176.091 | 35397 | 21533 / 16021 | headway:passed,source_policy:passed,tht:passed,rolling:not_applicable,business:not_separately_exported
+
+计算代价（各自原始测量范围）：
+2x_horizon16_minwait2: event-loop CPU/wall=5.484/5.666s; native-API CPU/wall=13.766/14.159s; score queries=0; score-budget exhausted=0
+2x_horizon60_minwait2: event-loop CPU/wall=7.859/8.030s; native-API CPU/wall=18.625/19.058s; score queries=0; score-budget exhausted=0
+2x_horizon60_minwait0: event-loop CPU/wall=4.969/5.064s; native-API CPU/wall=14.078/14.358s; score queries=0; score-budget exhausted=0
+2x_horizon60_minwait30_historical010c: event-loop CPU/wall=11.328/11.941s; native-API CPU/wall=19.531/20.288s; score queries=0; score-budget exhausted=0
+HCA_repaired: A* thread CPU/wall=9.312/10.104s; whole-window thread CPU/wall=898.625/937.542s; end-to-end wall=938.356s; whole-JVM CPU=未算
+
+计时保持原范围；不输出 C++/Java 跨范围加速比。缺失数据标为未算。
+
+Decision: no1x; preserve2x negative throughput/backlog tradeoff.
+Reads named small JSON only; no bags/ledger, native execution or new physical audit.
+Horizon16 versus60/minwait2 is same011 binary/source, same canonical/profile and all other full controls exactly equal.
+A horizon16 actual completion count at98259 is retrospective from this drain; it is not an independent short execution or runtime.
+Horizon60/min2 reference has a passed real short/drain prefix receipt; min30 uses historical010c and timing is not a same-implementation contrast.
+Full-population THT/network/retry/pre/canonical/tails and both deadline standards remain visible. No completed-only fallback or mixed CPU scope speed ratio.
+Development exploration, not heldout. Shortening possible future launch search does not shorten full-to-goal safety certificates or relax physical constraints.

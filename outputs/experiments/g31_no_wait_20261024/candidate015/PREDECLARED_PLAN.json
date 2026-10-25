@@ -1,0 +1,47 @@
+{
+  "schema": "g31.candidate015.earlier_source_plan.v1",
+  "prepared_at": "2026-10-24T11:44:52.142348+00:00",
+  "status": "before_build_native_or_results",
+  "parent_core_sha256": "7c0ef237a0816091f8d851cc7f8b0574e72a36c5f6a726ba6e3ebba3b80c7ea5",
+  "source_sha256": "ddc59d60b9dd08e23d074b74282c56bf9f44aa29c8c7b1ad1d5fcfbc6eb5d50e",
+  "new_control": {
+    "name": "future_source_prefer_earlier_finish",
+    "type": "strict bool",
+    "default": false,
+    "requires": "existing enabled future/strict2/canonical/rolling/EBS/q1 tuple"
+  },
+  "decision": "Successful immediate DFS retains uncommitted a.path. Build same static shortest chain and exact launch mask, with strict future finish bound equal to immediate goal arrival. Prefer only strict earlier; equality/later/no feasible improving slot commit original immediate path. Failed-DFS branch is unchanged.",
+  "exact_bound": "chain_duration is accumulated integer-us travel/service,excluding goal service from finish. For integer launch t+j seconds,keep only j<=floor((F_immediate_tick−1−t_tick−duration_tick)/1e6). If numerator<1e6 reject before scanning; cap at existing horizon60. No observation-horizon clipping.",
+  "clocks": "No new first-attempt clock or reset. Successful comparison adds no failed_attempts/future_eligible_failures. Reservation not admission;canonical source advances only at actual launch. Actual EBS completion and inroute finish-nonincreasing remain hard.",
+  "metadata": "Only enabled mode adds comparison/choice counters and per-bag discarded immediate-certificate finish/planned advance. Defaultfalse leaves old output/contract byte-equivalent excepttiming. Generic future searches/queries/scans include new comparisons;bounded-mask emptiness is not no-route proof.",
+  "limits": [
+    "Per-attempt planned earlier arrival is not a causal true-THT guarantee: immediate fallback may reroute later andother traffic changes.",
+    "Delayed source launch holds the FIFO head andmay increase later preplanning/backlog orreduce original-window throughput.",
+    "Static shortestfuture chains may concentrate load, harm other deadlines,or cost moreCPU;fullNanning evidence required.",
+    "No source policy jumpahead,internalstop,resourceweakening,unreleasedtasklookahead,014slot-signal integration,or newmodeldefault."
+  ],
+  "mandatory_metrics": [
+    "Fullpopulation userTHT mean/p95/p99 onlyifcomplete",
+    "Original98259 business completion/backlog",
+    "Canonicalpreplanning,planningwait andsumlegcanonicalelapsed",
+    "STD/early fullpopulation rates",
+    "ActualCPU/sourcewall andall extra futurequery/scancosts",
+    "Comparison planned advance vsfound immediate certificate, nevercalledcausalsaving"
+  ],
+  "required_tests": [
+    "013→015 all28inherited+11combination defaultfalse non-timeexact, oldfiveaudits unchanged.",
+    "Newearlier/equal/later/no-slot/otherpendingowner/FIFO/EBS/shortprefix/inroutefallback fixtures.",
+    "Rejected comparison calendarhash unchanged; no reservationID/ledger orphysical route changes before immediate commit.",
+    "Strictbool,enabledfuture dependency,1us inequality boundary,goalservice excluded from finish."
+  ],
+  "scope": "Preparation only;root owns heavy slot;onlyNanning1x/2x subsequent graph work. No newheavy after2026-10-24T23:00:00+08:00.",
+  "comparison_evidence_fields": [
+    "future_success_comparisons",
+    "future_success_preferred",
+    "immediate_candidate_finish",
+    "selected_future_finish",
+    "planned_finish_advance_vs_immediate_certificate_seconds"
+  ],
+  "comparison_evidence_clock": "For selectedfuture certificate,reservation_time isactual comparison/commit time;firstattempt neverresets. Selectedfuturefinish nullwhen notselected; plannedadvance isnot causalTHT saving.",
+  "hol_regression": "Prepared paired sameinputs micro:head immediateF12 vs futureR2/F8; following source headfirst1→3 andgoal4→6;cutoff5completion1→0. Tests mustretain thisloss withcorrect fullpopulationcensoring; passing means truthfulphysical/counter evidence,not throughput improvement."
+}

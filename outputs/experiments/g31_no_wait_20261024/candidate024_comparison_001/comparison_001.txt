@@ -1,0 +1,22 @@
+南宁 1x：读取既有小型汇总；不重新扫描行李/事件。
+arm | THT mean/p95/p99/max (s) | preplanning mean (s) | completed<=98259 | STD / STD-2700 | audit result
+024_nonexpired_EDF_on_1x | 368.027/598.323/674.318/1784.495 | 802.065 | 28506 | 25269 / 10702 | headway:passed,rolling:passed,source_policy:passed,tht:passed,business:passed
+023_EDF_on_1x | 367.898/598.039/674.340/1522.905 | 801.133 | 28506 | 25347 / 10696 | headway:passed,rolling:passed,source_policy:passed,tht:passed,business:passed
+023_EDF_off_1x | 367.755/598.584/670.446/1864.585 | 790.046 | 28506 | 25501 / 10725 | headway:passed,rolling:passed,source_policy:passed,tht:passed,business:passed
+HCA_repaired_1x | 469.796/822.343/988.286/2959.515 | 1376.670 | 28506 | 22224 / 10666 | physical_headway:passed,annotation_original_fields_exact:passed,causal_ebs:passed,recomputed_tht:passed,recomputed_source_policy:passed
+
+计算代价（各自原始测量范围）：
+024_nonexpired_EDF_on_1x: event-loop CPU/wall=2.906/2.977s; native-API CPU/wall=6.719/7.043s; score queries=0; score-budget exhausted=0
+023_EDF_on_1x: event-loop CPU/wall=3.234/3.297s; native-API CPU/wall=7.203/7.363s; score queries=0; score-budget exhausted=0
+023_EDF_off_1x: event-loop CPU/wall=2.984/3.093s; native-API CPU/wall=7.078/7.315s; score queries=0; score-budget exhausted=0
+HCA_repaired_1x: A* thread CPU/wall=未算/未算s; whole-window thread CPU/wall=未算/未算s; end-to-end wall=451.090s; whole-JVM CPU=未算
+
+计时保持原范围；不输出 C++/Java 跨范围加速比。缺失数据标为未算。
+
+FullpopulationTHT remains primary; preplanning/derivedready/throughput/tails/STD andSTD-2700 are retained. No completed-subset fallback.
+Unless an actual024classOFF run is supplied, the023 references use a different binary/source. Defaultfalse micro parity is not a real-population samebinary contrast.
+Compare024 to023EDFON for the additional class rule;023EDFOFF differs in bothEDF andclass ordering. Neither comparison proves per-request causation.
+EDFvalid/overdue counters are repeated valid attempts, not distinct bags or wins. No extra class competition telemetry is invented.
+Readymean is only the unchangedactivation/fullpop sum identity; no new per-bag causal-ready audit or derived tail quantiles.
+Existing fiveaudits establish physical/source safety. No bags/ledger/native execution occurs in this helper.
+CPU/wall scopes remain separate single-run observations, without statistical or cross-language speed claims. EBSreadyfirst,022realmap and011timingv2 remain deferred.

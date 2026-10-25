@@ -1,5 +1,7 @@
 # czr005
 
+Current G31 continuous-motion release (2026-10-25): see [the no-stop G31 entrypoint, Nanning inputs and research results](docs/g31_continuous_motion/README.md). Positive devices and edge entries keep at least 2 seconds of separation. 006 remains the formal physical default; 011 is the separate research baseline; 023/024 are retained negative experiments. STD here is a delivery deadline, not a standard deviation.
+
 JunctionShield-MARL for airport Individual Carrier System baggage routing.
 
 This repository starts from the legacy Java/Eclipse ICS simulator and builds a faithful headless research stack:

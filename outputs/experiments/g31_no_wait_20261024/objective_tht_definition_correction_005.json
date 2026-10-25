@@ -1,0 +1,25 @@
+{
+  "schema": "g31.objective.correction.v1",
+  "supersedes_primary_definition": "objective_update_tht_004.json",
+  "reason": "Subsequent source audit distinguished the paper THT table from the engineering canonical-elapsed table; user has been explicitly informed of the correction.",
+  "primary": "Full-population original-business-bag THT: sum over its transport legs of physical goal arrival minus physical admission. EBS in/out legs are summed; intentional storage and external source hold are excluded. Lower is better.",
+  "primary_source": [
+    "scripts/eval/g4irsf12_reproducible_harness.py:1119",
+    "scripts/eval/g4irsf12_reproducible_harness.py:1213",
+    "scripts/eval/run_g4irsf26_paper_experiments.py:496",
+    "scripts/eval/run_g4irsf31_nanning_native.py:920"
+  ],
+  "denominator": "28506 original business bags at1x;57012 at2x. A full-population mean is not published if any original business bag is incomplete.",
+  "mandatory_parallel_metrics": [
+    "Business sum of admission minus canonical release (external hold)",
+    "Business sum of finish minus canonical release (transport plus external hold)",
+    "Full population per-segment canonical elapsed",
+    "Completion counts and restricted-horizon elapsed for all offered tasks",
+    "STD and STD-minus-2700 separately",
+    "True finalfinish-originalentry including intentional storage",
+    "Implementation CPU/wall and source/inroute work counts"
+  ],
+  "observation": "Physical continuous goal arrival as paper THT, plus ceil goal arrival for shared Java-epoch sensitivity. Do not substitute runtime generated-release or successful-plan timestamps for canonical release in external-hold metrics.",
+  "selection": "THT is primary; never describe a network-only improvement as overall acceleration without showing external-hold changes and full completion. Prefer one common configuration for both maps.",
+  "unchanged": "2-second safety contract, source data, release policy, deadlines, physical HCA comparator."
+}

@@ -1,0 +1,23 @@
+{
+  "schema": "g31.candidate024.independent_readonly_review.v1",
+  "utc": "2026-10-24T14:44:55.285236+00:00",
+  "status": "no_blocker_found_in_reviewed_source",
+  "source_sha256": "60ab9b2438659791c9df6581205a1fe7ba591f3988aa91e37922d0a65b01b44c",
+  "patch_sha256": "be04ef912e9905c186e16f4e0349f6ebb315def6d8dfe7302f2dbea309b4a99b",
+  "execution": "Read-only small source and patch; no build/native/data scan or comparator execution claimed.",
+  "findings": [
+    "Strict boolean parsing rejects nonbool impostors; true requires existing enable_source_attempt_edf=true.",
+    "The unique push_event site filters nonfinite event time and freezes overdue_class only for kind2 using finite immutable task STD < final scheduled event time. Deadline finiteness remains enforced by inherited task parser.",
+    "Lexicographic (time, original phase, immutable class, absolute STD, serial) on finite values is a strict weak order. With false every class0 so parent023 ordering exactly reduces; nonattempt phases also use class0.",
+    "Equality STD==event time is nonexpired, matching the inherited already_overdue counter strict< definition. This is not a static-remaining-feasibility test.",
+    "Patch changes configuration, queue key and true-mode contract description only; no mutation to confirmed reservations, source FIFO, release/feed, EBS gate, complete-route safety validation or internal no-stop rules.",
+    "Inherited source-attempt counters remain after generation and head/admitted/reserved guards. They count repeated valid attempts, not admission wins or unique prioritized bags."
+  ],
+  "theoretical_limits": [
+    "Within a finite current timestamp queue, expired requests are still processed; the mechanism does not discard them or deny all planning attempts. Their access to future reservations can nevertheless be delayed across retries, with no bounded admission guarantee.",
+    "A nonexpired request can already be infeasible for its STD because remaining travel exceeds available time; the policy can prioritize it over useful expired work.",
+    "Expired inbound work can delay dependent outbound work and following canonical FIFO tasks. Improved current deadline allocation does not guarantee total THT/throughput or future deadline improvements.",
+    "Only currently queued equal-time equal-phase source attempts are reordered. Later EBS activation cannot revoke previously committed rights, and this is not a distributed node-local negotiation protocol.",
+    "Default equivalence and physical consequences require planned native differential/micro checks; this static review is not execution evidence."
+  ]
+}

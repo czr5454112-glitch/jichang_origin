@@ -1,0 +1,35 @@
+--- frozen013/core.cpp
++++ candidate017/core.cpp
+@@ -1039,11 +1039,30 @@
+         if (t.arrived_index+1==static_cast<int>(t.route.size())) {finish_physically(event.task,event.time);return;}
+         const auto started=std::chrono::steady_clock::now();++inroute_decisions;
+         const auto& gd=goal_data(t.goal);
++        const int current=t.route[t.arrived_index].node,old_next=t.route[t.arrived_index+1].node;
++        const double departure=t.route[t.arrived_index].departure;
++        if (nodes[current].out.size()==1) {
++            // The committed loop-free fallback contains old_next after the
++            // executed prefix. With one structural edge it is the sole legal
++            // choice. process_arrival already forces single-choice score skip;
++            // preserve its observable counters without allocating an Attempt,
++            // copying the prefix, or constructing a graph-sized visited array.
++            const auto& edge=nodes[current].out.front();
++            if (edge.to!=old_next || !std::isfinite(gd.h[edge.to]) ||
++                !std::isfinite(add_time(departure,edge.travel)))
++                throw std::logic_error("fallback next hop missing from legal choices");
++            const int depth=observation_depth(current,t.start,gd);
++            ++search_k_histogram[depth];++skipped_single_choice_scoring;
++            ++scored_neighbor_candidates;++actual_query_depth_histogram[0];
++            t.max_observation_depth=std::max(t.max_observation_depth,depth);
++            ++inroute_keep;
++            schedule_next_arrival(event.task);
++            inroute_microseconds.push_back(std::chrono::duration<double,std::micro>(std::chrono::steady_clock::now()-started).count());
++            return;
++        }
+         Attempt a;a.task=event.task;a.admission=t.admission;a.ignore_owner=event.task;a.finish_bound=t.finish;
+         a.visited.assign(nodes.size(),0);
+         for (int i=0;i<=t.arrived_index;++i) {a.visited[t.route[i].node]=1;a.path.push_back(t.route[i]);}
+-        const int current=t.route[t.arrived_index].node,old_next=t.route[t.arrived_index+1].node;
+-        const double departure=t.route[t.arrived_index].departure;
+         const auto choices=rank_choices(current,departure,gd,a,true);
+         const auto old=std::find_if(choices.begin(),choices.end(),[&](const Choice& c){return c.edge.to==old_next;});
+         if (old==choices.end()) throw std::logic_error("fallback next hop missing from legal choices");

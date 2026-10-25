@@ -1,0 +1,93 @@
+{
+  "pass_all": true,
+  "scope": "Native small cases; no full population rerun performed.",
+  "parent_freeze_sha256": "8e89758d3c4d4383247e8b153d0240cca6704edc8133f893ea6cc59af2f08885",
+  "profile_freeze_sha256": "64bc33e13c63e15eba197716252cc2ea3d29d6e3547109a4bdd519e9a4336a84",
+  "physical_probes": {
+    "parent002": {
+      "pass": true,
+      "assertions": 30,
+      "time_grid_seconds": 1e-06,
+      "source_goal_strict": true,
+      "same_business_id_no_exemption": true,
+      "short_edge_persistent": true
+    },
+    "profile_off": {
+      "pass": true,
+      "assertions": 30,
+      "time_grid_seconds": 1e-06,
+      "source_goal_strict": true,
+      "same_business_id_no_exemption": true,
+      "short_edge_persistent": true
+    },
+    "profile_on": {
+      "pass": true,
+      "assertions": 30,
+      "time_grid_seconds": 1e-06,
+      "source_goal_strict": true,
+      "same_business_id_no_exemption": true,
+      "short_edge_persistent": true
+    }
+  },
+  "semantic_files_byte_exact": {
+    "routes.csv": "86b958a12b07d63e45de0ce0ac623e4162fccb020ccb374efa18452454eb585a",
+    "release.csv": "6507b0f7b5992cfbfb789e8c7af413a55424f6c124371016323b0d0aba372104",
+    "summary.csv": "8fa6bcd035901991911e91375b9dfa2460e1b6263ec3fc3cc9f91776beab1d54",
+    "output.txt": "67f75380b6f0b679d69edf81da126d71e8a155bc72116f9b2324d84fbf56a405",
+    "outputstarttime.txt": "06dff6c1e1a37dbe51d4b0ffb306ecde258445099d6e7111f871508fe6bba0d5"
+  },
+  "semantic_file_count": 5,
+  "profiling": {
+    "schema": "g31.hca.planning_profile.v1",
+    "enabled": true,
+    "thread_cpu_available": true,
+    "thread_id": 1,
+    "search_success": 4,
+    "search_failure": 2,
+    "search_exceptions": 0,
+    "scopes_overlap_do_not_sum": true,
+    "cpu_scope": "Current planner thread total CPU; excludes other JVM/JIT/GC threads. Wall includes blocking and instrumentation overhead.",
+    "scopes": {
+      "window": {
+        "calls": 1,
+        "elapsed_ns": 425653600,
+        "thread_cpu_ns": 359375000
+      },
+      "astar_search": {
+        "calls": 6,
+        "elapsed_ns": 3013100,
+        "thread_cpu_ns": 0
+      },
+      "controller_including_search_calendar_and_io": {
+        "calls": 60,
+        "elapsed_ns": 41221300,
+        "thread_cpu_ns": 15625000
+      },
+      "generator_including_epoch_file_write_read": {
+        "calls": 60,
+        "elapsed_ns": 173444500,
+        "thread_cpu_ns": 171875000
+      },
+      "calendar_prune": {
+        "calls": 60,
+        "elapsed_ns": 2032700,
+        "thread_cpu_ns": 0
+      },
+      "calendar_commit": {
+        "calls": 4,
+        "elapsed_ns": 960000,
+        "thread_cpu_ns": 0
+      }
+    }
+  },
+  "calibration": {
+    "calls": 20000,
+    "warmup_calls": 10000,
+    "outer_elapsed_ns": 20109800,
+    "outer_thread_cpu_ns": 15625000,
+    "minimum_positive_observed_cpu_delta_ns": null,
+    "positive_cpu_clock_changes": 0,
+    "cpu_available": true
+  },
+  "caution": "CPU values have observed timer resolution, not nanosecond precision. Empty-scope overhead is measured, not a universal bound. Nested scopes must not be summed; CPU excludes other JVM threads."
+}

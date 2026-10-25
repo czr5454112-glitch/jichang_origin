@@ -1,0 +1,90 @@
+{
+  "schema": "g31.causal_ready.predeclared_preparation.v1",
+  "status": "prepared_no_real_population_scan",
+  "implementation": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\causal_ready_supplement_001\\analyze.py",
+  "implementation_sha256": "f7103d6d41c12b602fcb54e3912890897d438bb24d32a27305507e6c0e8c7729",
+  "tests": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\causal_ready_supplement_001\\test_analyze.py",
+    "sha256": "7bfd14f058beda81adae58d88588b1efac4d3d6246be167fbf7bc7640fcbc7cd",
+    "passed": 21,
+    "failed": 0
+  },
+  "scope": [
+    "nanning_2x"
+  ],
+  "definition": "Common precomputed nominal-feed/causal-ready to actual continuous goal arrival, summed over each business transport leg. Supplemental only.",
+  "G": "stable canonical raw release/input row order within source; G_i=max(ceil_q1(pass_time_i),G_previous+1s)",
+  "ready": "direct/in G; out max(G_out,ceil_q1(actual completed inbound finish))",
+  "native_source_proof": {
+    "source": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate016\\source\\core.cpp",
+    "sha256": "778bc2322989ca9283e853aaef07f07a4e27e952d26602db4e46115757c379c6",
+    "static_feed_lines": "1237-1257",
+    "activate_before_head_check_lines": "703-714",
+    "actual_predecessor_gate_lines": "743-748,1289-1306"
+  },
+  "execution_order": [
+    {
+      "label": "hca",
+      "argv": [
+        "C:/PROGRAMING/python3.11.9/python.exe",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\causal_ready_supplement_001\\analyze.py",
+        "--run",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_repaired_uniform_profile_004_drain200000_001\\nanning_2x",
+        "--canonical",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\g31_continuous\\nanning_2x_canonical.jsonl.gz",
+        "--kind",
+        "hca",
+        "--horizon",
+        "200000",
+        "--output",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\causal_ready_supplement_001\\hca_2x_002.json"
+      ]
+    },
+    {
+      "label": "011w0min2",
+      "argv": [
+        "C:/PROGRAMING/python3.11.9/python.exe",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\causal_ready_supplement_001\\analyze.py",
+        "--run",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_cap120_relax1_drain200000_011",
+        "--canonical",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\g31_continuous\\nanning_2x_canonical.jsonl.gz",
+        "--kind",
+        "native",
+        "--horizon",
+        "200000",
+        "--output",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\causal_ready_supplement_001\\011w0min2_2x_001.json"
+      ]
+    },
+    {
+      "label": "015prefer",
+      "argv": [
+        "C:/PROGRAMING/python3.11.9/python.exe",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\causal_ready_supplement_001\\analyze.py",
+        "--run",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_prefer_earlier_w0_fixed1_drain200000_015",
+        "--canonical",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\g31_continuous\\nanning_2x_canonical.jsonl.gz",
+        "--kind",
+        "native",
+        "--horizon",
+        "200000",
+        "--output",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\causal_ready_supplement_001\\015prefer_2x_001.json"
+      ]
+    }
+  ],
+  "main_tht_unchanged": true,
+  "heavy_slot_required": true,
+  "supersedes": "PREPARATION_002.json, retained unchanged",
+  "revision": "Frozen HCA physical bags omit leg: allow only absent leg in kind=hca, bind canonical leg by exact SID and required task/start/goal. Present wrong/null leg fails; native leg stays required. Fail-closed all groups retained.",
+  "prior_failed_scan": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\causal_ready_supplement_001\\hca_2x_001.json",
+    "sha256": "dd4df8f4ca6a4a94c66b2ed3b3c270315a26d84c3f0acbb3ac4f0de63e6667ee",
+    "reported_exec_exit_code": 1,
+    "wall_seconds": 9.0423382,
+    "root_cause": "New helper wrongly required an absent HCA leg field. All original physical audit and actual input/bag hash gates passed. No physical invalidity inference.",
+    "subsequent_cells_not_started": true
+  }
+}

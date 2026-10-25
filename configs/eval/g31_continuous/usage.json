@@ -1,0 +1,63 @@
+{
+  "schema": "g31.continuous.usage.v1",
+  "status": "physical_default_performance_not_promoted",
+  "default_execution_model": "continuous_headway_2s",
+  "selected_performance_controls": null,
+  "inspect_example": "python scripts/eval/run_g31_standard.py inspect --map nanning",
+  "run_example": "python scripts/eval/run_g31_standard.py run --map nanning --scale 1 --output outputs/experiments/g31_continuous_new_run",
+  "historical_example": "python scripts/eval/run_g31_standard.py inspect --map nanning --execution-model legacy_waiting",
+  "build_example": "python scripts/eval/build_g31_continuous.py --name new_build",
+  "build_requirements": "CMake, a working C++17 compiler toolchain, Python and pybind11. The registered 006 binary is usable without rebuilding. New builds require --binary and an immutable matching-source build receipt.",
+  "example_controls_are_not_a_winner": true,
+  "physical_contract": {
+    "positive_devices_seconds": 2,
+    "original_zero_connectors_seconds": 0,
+    "directed_edge_entry_headway_seconds": 2,
+    "exactly_two_seconds_allowed": true,
+    "time_grid_seconds": 1e-06,
+    "constant_speed_mps": 2,
+    "extra_internal_stops": false,
+    "strict_source_and_goal_resources": true,
+    "ebs_actual_predecessor_gate": true
+  },
+  "primary_metric": "For each original business bag, add finish minus first_planning_attempt_time over its transport legs. Every failed search and retry remains in the clock. EBS storage between legs is excluded. Device passage and any internal elapsed time are included.",
+  "mandatory_companion_metrics": [
+    "activation_to_first_planning: source FIFO preplanning hold",
+    "canonical_to_first_planning: all delay before the first planning attempt",
+    "admission_minus_first_planning: failed-search/retry wait",
+    "finish_minus_admission: physical network elapsed, auxiliary only",
+    "finish_minus_canonical_pass_time: all scheduled-release delay"
+  ],
+  "result_files": [
+    "standard_selection.json",
+    "manifest.json",
+    "summary.json",
+    "tht_audit.json",
+    "business_audit.json",
+    "headway_audit.json",
+    "rolling_replay.json",
+    "source_policy_audit.json",
+    "bags.jsonl",
+    "rolling_events.jsonl",
+    "request.json.gz",
+    "standard_sources/"
+  ],
+  "boundaries": [
+    "Local adaptive-k scores choose a next hop at physical internal arrival. Safety negotiation may extend to the goal and retains a full fallback certificate.",
+    "This is a sequential transaction simulation; it does not measure real network communication latency or concurrent distributed deployment.",
+    "All unfinished segments remain in the denominator. Full-population THT is unavailable until all businesses complete with first-attempt telemetry.",
+    "Faults, empty-tray circulation and checkpoint restoration are outside this execution model.",
+    "The legacy G31 model and its archived requests remain separately reproducible. The continuous physical model is the default; this registration does not claim a performance winner.",
+    "The former activation-ordered 004 runs are diagnostic and do not establish matched nominal-FIFO performance. Registered006 controls use canonical source FIFO and are not promoted as a performance winner.",
+    "006 adds a route-excess relaxation rate defaulting to zero, measured from the immutable first source planning attempt; it changes no wake schedule or in-route fallback bound. Static zero-weight one-hop scores omit unused calendar probes while preserving route choices and logical score budgets."
+  ],
+  "source_order_contract": "Stable nominal-release FIFO per source, including a not-yet-ready EBS head. Ties preserve canonical input order. At most one next source attempt per second after the previous successful admission.",
+  "physics_default": true,
+  "performance_promoted": false,
+  "registered_default_controls": {
+    "path": "configs/eval/g31_continuous/default_controls.json",
+    "sha256": "fa8db33741bdb2dadb0a13f02e9b9597f8044cb459bf4f38431d9c70fcfb0a9a",
+    "bytes": 810
+  },
+  "explicit_controls_example": "python scripts/eval/run_g31_standard.py inspect --map map2 --controls configs/eval/g31_continuous/example_fixed1.json"
+}

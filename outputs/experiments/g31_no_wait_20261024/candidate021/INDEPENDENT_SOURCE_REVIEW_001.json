@@ -1,0 +1,62 @@
+{
+  "schema": "g31.candidate021.independent_read_only_review.v1",
+  "reviewed_at_utc": "2026-10-24T13:46:54Z",
+  "reviewer": "code_diagnosis",
+  "status": "no_blocker_found_in_reviewed_draft",
+  "execution": "No compilation, native execution, benchmark, or full-data scan was performed.",
+  "identity": {
+    "source_sha256": "4d1051e698ecb5d48df4daf374ce3b20ca33ab977520eeef49ba025094aa5c9f",
+    "patch_sha256": "d381e093e75e5299f60789041f225c5c433f374d8a7b8a656a0889c95a73cede",
+    "design_002_sha256": "8653e44a6f467184f9deffe89a495254262a2a8286d7b5da7fd19514e4239864",
+    "parent": "candidate019; candidate020 alternative-chain policy is not included",
+    "pending_source_edit": "Author indicated an explicit <iterator> include will be added for std::prev. This receipt pins the draft before that include."
+  },
+  "findings": [
+    {
+      "anchor": "source/core.cpp:284 and :1336",
+      "finding": "New flag requires an enabled future horizon. Existing future guards plus constructor validation enforce half-open strict resources, node service 0 or 2 seconds, edge headway 2 seconds, q1 source clocks, canonical FIFO and actual EBS predecessor completion. The gap calculation does not silently accept heterogeneous durations."
+    },
+    {
+      "anchor": "source/core.cpp:788",
+      "finding": "Both original adjacent mask bits are feasible for the complete same chain. Their overlapping two-second windows form one free three-second union. On these fixed-duration calendars, lower_bound(A) and its predecessor give the nearest real right start and left end. Touching endpoints remain legal; the two consistency checks reject a contradiction rather than relaxing a collision."
+    },
+    {
+      "anchor": "source/core.cpp:817",
+      "finding": "The first positive-service static merge is selected once, including source or goal when applicable. Missing finite endpoints or failure of J:1->0 keeps the original launch; the implementation does not search later merges for a more favorable witness."
+    },
+    {
+      "anchor": "source/core.cpp:844",
+      "finding": "After the first-merge improvement, all positive node windows and every directed edge-entry window are checked. The first witness is reused once. Any known finite-gap increase vetoes the delay; unknown endpoints are counted and skipped. No horizon, current-time, zero, or infinity endpoint is fabricated."
+    },
+    {
+      "anchor": "source/core.cpp:979",
+      "finding": "Only the offset is changed, by exactly one integer second to an already-set bit. Existing exact whole-certificate validation precedes all calendar, reservation-ID, event, and task-lifecycle mutations. The original mask, last_push, first_clear, retry recommendation and diagnostic bucket meaning remain unchanged."
+    },
+    {
+      "anchor": "source/core.cpp:1519, :1601 and :1701",
+      "finding": "New witnesses, counters and policy wording are emitted only when enabled. Original earliest and selected launch are separate. Existing source decision timing includes the new work; added counts expose first-merge scans, resource lookups and actual neighbor visits. This read-only conclusion is not yet a default-off execution parity result."
+    }
+  ],
+  "recommended_counter_checks": [
+    "original_chain_successes_considered = next_bit_unavailable + adjacent_bit_available",
+    "adjacent_bit_available = no_positive_merge + first_merge_unknown + first_merge_no_improvement + first_merge_hits",
+    "first_merge_hits = veto_decisions + delayed_precommits",
+    "For a successful complete native invocation, original_chain_successes_considered = future_source_precommits, including unlaunched pending reservations.",
+    "Sum the recorded per-bag resource/query/neighbor counters and delayed flags to the matching global counters; do not equate first-merge query failures with full-chain known/unknown totals."
+  ],
+  "microcases_to_retain": [
+    "Omitted flag and explicit false versus parent019, all non-time payload fields exact.",
+    "First merge unknown or non-improving while a later merge has J:1->0: original launch must remain.",
+    "Original mask's adjacent bit unavailable, and earliest bit at temporal horizon: no delay.",
+    "Positive node veto and directed-edge veto independently; finite known non-increase plus unknown resources.",
+    "Confirmed future-pending reservations provide real finite endpoints; no physical admission inferred from those rights.",
+    "Selected launch beyond observation end preserves pending rights and short/drain ledger-prefix behavior.",
+    "Positive source and goal inclusion, zero nodes skipped, exact touching and one-microsecond overlap behavior.",
+    "Diagnostic enabled versus disabled: original mask observations retain their meaning and the policy result is unchanged."
+  ],
+  "limits": [
+    "J is finite-gap packing loss for one local resource, not a count of feasible whole-route or q1 business slots. A finite gap may include elapsed time; the calculation does not establish actionable future capacity.",
+    "Known-gap non-increase does not cover unknown boundaries, future unannounced demand, source-head blocking, deadlines, or EBS release propagation. No throughput or THT improvement follows from this review.",
+    "New per-precommit witness vectors add memory and serialization work proportional to the checked chain. Native microcases and unchanged five physical audits are still required before execution claims."
+  ]
+}

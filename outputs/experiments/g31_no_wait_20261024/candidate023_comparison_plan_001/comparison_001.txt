@@ -1,0 +1,22 @@
+南宁 1x：读取既有小型汇总；不重新扫描行李/事件。
+arm | THT mean/p95/p99/max (s) | preplanning mean (s) | completed<=98259 | STD / STD-2700 | audit result
+023_EDF_off_1x | 367.755/598.584/670.446/1864.585 | 790.046 | 28506 | 25501 / 10725 | headway:passed,rolling:passed,source_policy:passed,tht:passed,business:passed
+023_EDF_on_1x | 367.898/598.039/674.340/1522.905 | 801.133 | 28506 | 25347 / 10696 | headway:passed,rolling:passed,source_policy:passed,tht:passed,business:passed
+1x_w0_future60_min2_historical010c | 367.755/598.584/670.446/1864.585 | 790.046 | 28506 | 25501 / 10725 | headway:passed,rolling:passed,source_policy:passed,tht:passed,business:passed
+HCA_repaired_1x | 469.796/822.343/988.286/2959.515 | 1376.670 | 28506 | 22224 / 10666 | physical_headway:passed,annotation_original_fields_exact:passed,causal_ebs:passed,recomputed_tht:passed,recomputed_source_policy:passed
+
+计算代价（各自原始测量范围）：
+023_EDF_off_1x: event-loop CPU/wall=2.984/3.093s; native-API CPU/wall=7.078/7.315s; score queries=0; score-budget exhausted=0
+023_EDF_on_1x: event-loop CPU/wall=3.234/3.297s; native-API CPU/wall=7.203/7.363s; score queries=0; score-budget exhausted=0
+1x_w0_future60_min2_historical010c: event-loop CPU/wall=5.828/6.115s; native-API CPU/wall=10.797/11.257s; score queries=0; score-budget exhausted=0
+HCA_repaired_1x: A* thread CPU/wall=未算/未算s; whole-window thread CPU/wall=未算/未算s; end-to-end wall=451.090s; whole-JVM CPU=未算
+
+计时保持原范围；不输出 C++/Java 跨范围加速比。缺失数据标为未算。
+
+Only named small summaries read after both runs complete. Existing physical/source/rolling/THT/business audits remain authoritative; this is not a new bag/ledger EDF-order audit.
+Primary THT includes first-attempt retries but excludes preplanning; preplanning, derived-ready mean, actual fixed-window throughput, full tails, and both deadline standards remain visible.
+Same-binary on/off isolates the configured scheduling policy. One deterministic run per arm is not a statistical runtime study; CPU/wall scopes stay separate.
+Historical010c/HCA are contextual references. No native-event/API versus Java whole-run speed ratio is computed.
+EDF telemetry counts repeated actual valid source attempts, including already-overdue attempts. It cannot identify distinct prioritized bags or wins.
+EBS ready-first remains deferred. Canonical FIFO, feed, predecessor gates and existing reservation rights remain unchanged.
+If either arm is censored or any gate/identity fails, this full-population paired report is rejected; do not substitute completed-only means.

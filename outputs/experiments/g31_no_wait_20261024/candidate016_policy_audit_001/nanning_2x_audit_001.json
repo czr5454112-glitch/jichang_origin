@@ -1,0 +1,244 @@
+{
+  "schema": "g31.candidate016.policy_telemetry_audit.v1",
+  "passed": true,
+  "mode": "enabled",
+  "core_sha256": "778bc2322989ca9283e853aaef07f07a4e27e952d26602db4e46115757c379c6",
+  "ready_successor_gate_enabled": true,
+  "violations": 0,
+  "examples": [],
+  "population": {
+    "segments": 87206,
+    "unique_segments": 87206,
+    "businesses": 57012,
+    "expected_segments": 87206,
+    "expected_businesses": 57012,
+    "exact_saved_request_ids_checked": true
+  },
+  "counts": {
+    "records": 87206,
+    "attempts": 296902,
+    "admitted": 87206,
+    "completed": 87206,
+    "reserved": 12827,
+    "launches": 12827,
+    "pending": 0,
+    "future_searches": 39172,
+    "ready_checks": 76232,
+    "ready_skips": 68808,
+    "activation_pending_skips": 0,
+    "comparisons": 7424,
+    "preferred": 1853,
+    "kept": 5571
+  },
+  "equalities": {
+    "tasks=sum bag population": {
+      "left": 87206,
+      "right": 87206,
+      "passed": true
+    },
+    "admitted=sum actual admitted": {
+      "left": 87206,
+      "right": 87206,
+      "passed": true
+    },
+    "completed=sum actual completed": {
+      "left": 87206,
+      "right": 87206,
+      "passed": true
+    },
+    "planning_attempts=sum bag attempts": {
+      "left": 296902,
+      "right": 296902,
+      "passed": true
+    },
+    "future_searches=sum bag searches": {
+      "left": 39172,
+      "right": 39172,
+      "passed": true
+    },
+    "precommits=sum ever future_reserved": {
+      "left": 12827,
+      "right": 12827,
+      "passed": true
+    },
+    "launches=sum future_reserved and actual admitted": {
+      "left": 12827,
+      "right": 12827,
+      "passed": true
+    },
+    "pending=precommit-launches": {
+      "left": 0,
+      "right": 0,
+      "passed": true
+    },
+    "success comparisons=sum bag comparisons": {
+      "left": 7424,
+      "right": 7424,
+      "passed": true
+    },
+    "success preferred=sum bag preferred": {
+      "left": 1853,
+      "right": 1853,
+      "passed": true
+    },
+    "kept immediate=sum compared not preferred": {
+      "left": 5571,
+      "right": 5571,
+      "passed": true
+    },
+    "comparisons=preferred+kept": {
+      "left": 7424,
+      "right": 7424,
+      "passed": true
+    },
+    "future_searches=failed eligible+successful comparisons": {
+      "left": 39172,
+      "right": 39172,
+      "passed": true
+    },
+    "planning-failed=successful comparisons+ready skips": {
+      "left": 76232,
+      "right": 76232,
+      "passed": true
+    },
+    "successful DFS=admitted-future launches+preferred including pending": {
+      "left": 76232,
+      "right": 76232,
+      "passed": true
+    },
+    "ready checks=sum bag checks": {
+      "left": 76232,
+      "right": 76232,
+      "passed": true
+    },
+    "ready skips=sum bag skips": {
+      "left": 68808,
+      "right": 68808,
+      "passed": true
+    },
+    "activation-pending skips=sum bag activation-pending skips": {
+      "left": 0,
+      "right": 0,
+      "passed": true
+    },
+    "ready checks=successful comparisons+ready skips": {
+      "left": 76232,
+      "right": 76232,
+      "passed": true
+    },
+    "planning-failed=ready checks": {
+      "left": 76232,
+      "right": 76232,
+      "passed": true
+    }
+  },
+  "selected_plan_advance": {
+    "sum_ticks": 96499890000,
+    "maximum_ticks": 165500000,
+    "mean_seconds": 52.077652455477605,
+    "selected_by_leg": {
+      "storage_in": 1314,
+      "direct": 532,
+      "storage_out": 7
+    },
+    "causal_savings": false
+  },
+  "boundaries": [
+    "New-policy telemetry consistency only; existing five independent audits remain responsible for physical/causal safety.",
+    "The discarded successful immediate route is not saved. Its scalar finish cannot independently prove that counterfactual certificate was feasible.",
+    "Advance is against that attempt's found immediate certificate, not actual per-bag or system THT benefit. Future FIFO holding and effects on other bags remain.",
+    "Initial reserved route/planned finish may differ from later rolling route/finish; only immutable initial evidence is compared.",
+    "Count identities distinguish successful comparisons and ready-successor skips from failed DFS at aggregate level; no per-failure cause or timing trace is reconstructed.",
+    "Ready checks/skips are scalar telemetry; this helper does not independently replay the canonical adjacent item's released/predecessor/activation state at the exact decision event.",
+    "A ready-successor skip does no future comparison, has no immediate-candidate scalar, immediately admits the current bag, and is not a future-mask rejection."
+  ],
+  "run": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_ready_gate_w0_fixed1_drain200000_016",
+  "manifest_status": "complete",
+  "five_physical_gates": {
+    "headway_audit": true,
+    "rolling_replay": true,
+    "source_policy_audit": true,
+    "tht_audit": true,
+    "business_audit": true
+  },
+  "input_identity": {
+    "map": "nanning",
+    "scale": 2,
+    "canonical": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\g31_continuous\\nanning_2x_canonical.jsonl.gz",
+      "sha256": "5e0d3feef7b3f94aae2f3ec3c445720bc971599c82252383ab1ebc44fa46491b",
+      "bytes": 2299529
+    },
+    "profile": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\g31_continuous\\nanning_service2.json",
+      "sha256": "9b1a78344ec89aaac377feb05afccd48d9b957174286b29eedfe57a73a93c426",
+      "bytes": 714420
+    },
+    "binary": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build\\g31_no_wait_016\\python\\g31_nowait.cp311-win_amd64.pyd",
+      "sha256": "37372977e0faf9adf567a0be705b7419aae7fb1a7ec79798cd988f5f275276e1",
+      "bytes": 337408
+    },
+    "native_source": {
+      "path": "build\\g31_no_wait_016\\source\\core.cpp",
+      "bytes": 108221,
+      "sha256": "778bc2322989ca9283e853aaef07f07a4e27e952d26602db4e46115757c379c6"
+    },
+    "contract": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate016\\registered_contracts_016\\physical_contract_drain200000.json",
+      "sha256": "6f76441260c6c62e1021f26b4708e8b829876244c9993cb1b4be02e77c08cb79",
+      "bytes": 7398
+    },
+    "build_receipt": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build\\g31_no_wait_016\\build_receipt.json",
+      "sha256": "19b419d859ca3d227a66769b2ba5ccd4d0fcc326f9d7ce0189100294abe89c23",
+      "bytes": 865
+    }
+  },
+  "input_identity_scope": "Registered canonical/profile identity recorded from completed five-gate manifest; this helper hashes saved actual request and matches all its task identities, not a fresh canonical/profile rehash.",
+  "actual_request_content_sha256": "6b384ab2a079c8abdc34cc9b8b6b123e71f692242748eb6c4d1c399a29f12247",
+  "evidence_files": {
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_ready_gate_w0_fixed1_drain200000_016\\manifest.json": {
+      "sha256": "216e90c1d28f16963c9c9c12aaed7e8c56663fafcc846a9c96fac47342eabac6",
+      "bytes": 6981
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_ready_gate_w0_fixed1_drain200000_016\\headway_audit.json": {
+      "sha256": "38fab61cbc771e77d07d4eafabd8e78e095754d8ecf2e82d7b69a507b67a6181",
+      "bytes": 35966
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_ready_gate_w0_fixed1_drain200000_016\\rolling_replay.json": {
+      "sha256": "ce6ace6d5c1449f27e2aae24d7de6ed321d09aa6c6989fc0f3236184c12a2346",
+      "bytes": 1783
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_ready_gate_w0_fixed1_drain200000_016\\source_policy_audit.json": {
+      "sha256": "5c1e303d1526d4fbcf714d2ba70c9d4de05a425bc001df61e5f5456a1c5c0ccd",
+      "bytes": 1948
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_ready_gate_w0_fixed1_drain200000_016\\tht_audit.json": {
+      "sha256": "8d12f920b82d0b0e26be3d82b7349a5e3060cfbfe05f84620dc875e50547b391",
+      "bytes": 51005
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_ready_gate_w0_fixed1_drain200000_016\\business_audit.json": {
+      "sha256": "7b1044770e8fe1bbc388a67911157f5766290ba280c174ffd1b5eb899c8beb9e",
+      "bytes": 602
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_ready_gate_w0_fixed1_drain200000_016\\standard_sources\\core.cpp": {
+      "sha256": "778bc2322989ca9283e853aaef07f07a4e27e952d26602db4e46115757c379c6",
+      "bytes": 108221
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_ready_gate_w0_fixed1_drain200000_016\\native_summary.json": {
+      "sha256": "0307414a8de08b5f923f1e27f5c2ba8787164194b13027de6782f276eeef00a6",
+      "bytes": 19548
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_ready_gate_w0_fixed1_drain200000_016\\request.json.gz": {
+      "sha256": "939457b214fb1194b6b3e37cd375ad4ec562dd1ee193bf9f34029966a57ba76e",
+      "bytes": 1160166
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_ready_gate_w0_fixed1_drain200000_016\\bags.jsonl": {
+      "sha256": "cf0747d76400b4a73b88c9526a281a4cbd21504aaf9477c72031b9df6677ee58",
+      "bytes": 379820355,
+      "records": 87206
+    }
+  },
+  "tool_sha256": "3a2247848d401aee733e79fa0e1045c4049d79f48dba61b905f2b5ef00bd63ee"
+}

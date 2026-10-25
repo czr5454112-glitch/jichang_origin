@@ -1,0 +1,235 @@
+{
+  "schema": "g31.candidate020.nanning1x.regression_plan.v1",
+  "status": "prepared_not_dispatched",
+  "development_not_heldout": true,
+  "purpose": "Regression check of the one-alternative future-certificate strategy on Nanning1x after a small partial2x improvement, not an independent heldout confirmation.",
+  "hypothesis": "A single alternate complete chain may improve some source admissions but can change global competition, lengthen routes and worsen tails. No improvement is presumed.",
+  "candidate_source_freeze": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate020\\SOURCE_FREEZE_020_001.json",
+    "sha256": "d73c9f34e30ad9818c720ad9d19ff5a6d694d210fd71b3f9cb736eae3da247d5",
+    "bytes": 6357
+  },
+  "source_sha256": "6883e77e5c16fbec077e4fbd3fd9879dd68ea9dfed4ff0b87d29403e8b9e9397",
+  "binary_identity": {
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build\\g31_no_wait_020\\python\\g31_nowait.cp311-win_amd64.pyd": "529ed355d4427e453d5fd3f5f7a248839c5a2fdeb4f978256d99c0be479bfb92"
+  },
+  "runner": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate020\\run_candidate.py",
+    "sha256": "a35778114463f3438d47529075147126a7f833baa0ca80139d6956747c644b6f",
+    "bytes": 2123
+  },
+  "adapter": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate020\\continuous_adapter.py",
+    "sha256": "ab80c5f3dcc9e1dce10b2e16322618151d6884b53b4ce97cea0d69dce34ceeb7",
+    "bytes": 21750
+  },
+  "controls": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate020\\controls_alternative_original_window.json",
+    "sha256": "d377fa3ce38071e8dee0d12620639ce35009e35d6b3f3810077c33f64517f6cc",
+    "bytes": 1006
+  },
+  "effective_controls": {
+    "end_time": 98259,
+    "min_depth": 1,
+    "max_depth": 1,
+    "adaptive": false,
+    "congestion_weight": 0,
+    "pressure_window": 30,
+    "max_expansions": 256,
+    "max_score_expansions": 64,
+    "max_retries": 100000,
+    "max_events": 10000000,
+    "retry_mode": "calendar_jump",
+    "retry_step": 1.0,
+    "audit_failed_calendar_hash": false,
+    "skip_scoring_single_choice": true,
+    "route_excess_retry_relaxation_rate": 1,
+    "future_source_reservation_horizon_seconds": 60,
+    "future_source_reservation_min_wait_seconds": 2,
+    "enable_future_mask_diagnostics": false,
+    "enable_one_alternative_future_chain": true,
+    "interval_mode": "half_open",
+    "strict_endpoint_resources": true,
+    "edge_entry_headway_seconds": 2,
+    "time_grid_seconds": 1e-06,
+    "terminal_reservation_service": true,
+    "enable_inroute_replanning": true,
+    "enable_ebs_predecessor_gate": true,
+    "release_quantum": 1,
+    "completion_quantum": 1,
+    "source_fifo": true,
+    "source_generation_interval": 1,
+    "source_fifo_order": "canonical",
+    "max_route_excess_seconds": 120
+  },
+  "physical_contract": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate020\\registered_contracts_020\\physical_contract_original_window.json",
+    "sha256": "3022fa72a4e5eda44b101c44442f601c1f7df4e2e830054d4f2acec4ae0785f6",
+    "bytes": 7125
+  },
+  "map": "nanning",
+  "scale": 1,
+  "end_time": 98259,
+  "business_denominator": 28506,
+  "segment_denominator": 43603,
+  "canonical_identity_from_registered_contract": {
+    "path": "data/processed/g31_continuous/nanning_1x_canonical.jsonl.gz",
+    "sha256": "3f2cc8d8e5e2934e2568b299d2d3321eec07f1f47e5fa0750537993eaee1340d",
+    "bytes": 1117468,
+    "encoding": "gzip_jsonl",
+    "content_sha256": "f167648ca524770b48465c66eaa7a548390f31e35815fb9c73accff68520c3a1"
+  },
+  "profile_identity_from_registered_contract": {
+    "path": "data/processed/g31_continuous/nanning_service2.json",
+    "sha256": "9b1a78344ec89aaac377feb05afccd48d9b957174286b29eedfe57a73a93c426",
+    "bytes": 714420
+  },
+  "population_scan_performed": false,
+  "frozen_validate_controls_passed": true,
+  "only_control_difference_vs_historical010c": {
+    "enable_one_alternative_future_chain": {
+      "reference": false,
+      "candidate": true
+    }
+  },
+  "primary_comparisons": [
+    {
+      "label": "historical010c1x w0future60min2",
+      "run": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_1x_future60_cap120_relax1_010c",
+      "manifest": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_1x_future60_cap120_relax1_010c\\manifest.json",
+        "sha256": "53e78d9055642a9fba73dc3bc576ffb3b2145c8a0f3ca3fa25ae4538811d7b29",
+        "bytes": 6787
+      },
+      "boundary": "Same registered population/physical controls, but historical010c binary; it is not a fresh same-binary disabled arm or same-session timing comparison."
+    },
+    {
+      "label": "repaired uniform physical HCA002 Nanning1x",
+      "run": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_repaired_uniform_headway2_002\\nanning_1x",
+      "small_metric_reference": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\nanning_campaign_snapshot_001\\snapshot_003.json",
+        "sha256": "974a9db89a2f238b148ba3e0eb21f175d43cc2e8cdc62b065fcf3d95d1869d1e",
+        "bytes": 362738
+      },
+      "previously_reported_metrics": {
+        "business_denominator": 28506,
+        "segment_denominator": 43603,
+        "completed_businesses": 28506,
+        "completed_segments": 43603,
+        "full_population_available": true,
+        "original_window_end": 98259,
+        "original_window_completed_businesses": 28506,
+        "original_window_unfinished_businesses": 0,
+        "original_window_source": "Previously audited actual original-window HCA run; reused small comparison receipt, no bag rescan.",
+        "STD": {
+          "count": 22224,
+          "denominator": 28506,
+          "rate": 0.7796253420332562,
+          "status": "available"
+        },
+        "STD_minus_2700": {
+          "count": 10666,
+          "denominator": 28506,
+          "rate": 0.3741668420683365,
+          "status": "available"
+        },
+        "user_tht": {
+          "status": "available",
+          "count": 28506,
+          "sum": 13391995.745000001,
+          "mean": 469.795683189504,
+          "min": 59.0,
+          "p50": 471.22000000000116,
+          "p95": 822.3425000000007,
+          "p99": 988.2859999999995,
+          "max": 2959.5149999999994
+        },
+        "preplanning": {
+          "status": "available",
+          "count": 28506,
+          "sum": 39243360.213053,
+          "mean": 1376.6701821740337,
+          "min": 0.0,
+          "p50": 116.06606500000271,
+          "p95": 6238.273327499997,
+          "p99": 10169.89358700001,
+          "max": 14926.79782
+        },
+        "planning_retry_wait": {
+          "status": "available",
+          "count": 28506,
+          "sum": 187274.0,
+          "mean": 6.569634462920087,
+          "min": 0.0,
+          "p50": 1.0,
+          "p95": 20.0,
+          "p99": 76.0,
+          "max": 2724.0
+        },
+        "canonical_elapsed": {
+          "status": "available",
+          "count": 28506,
+          "sum": 52635355.958053,
+          "mean": 1846.4658653635374,
+          "min": 59.0147300000026,
+          "p50": 684.6884999999966,
+          "p95": 6881.266304999998,
+          "p99": 10660.580568500012,
+          "max": 15625.21282
+        },
+        "network_elapsed": {
+          "status": "available",
+          "count": 28506,
+          "sum": 13204721.745000001,
+          "mean": 463.22604872658394,
+          "min": 59.0,
+          "p50": 465.24000000000524,
+          "p95": 813.0550000000003,
+          "p99": 976.8037500000033,
+          "max": 1407.234999999997
+        }
+      },
+      "boundary": "Uses corrected physical HCA and first-planning THT from prior audit evidence; never compare to original unsafe timestamp baseline."
+    }
+  ],
+  "required_result_fields": [
+    "complete/unfinished population",
+    "primary full-business THT mean,p95,p99,max",
+    "network elapsed and planning retry wait",
+    "preplanning,activation-to-first,canonical elapsed",
+    "actual business completed by98259 and backlog",
+    "STD andSTD-2700 counts/rates",
+    "alternative work partitions and total added calendar scans",
+    "event-loop CPU/wall and nativeAPI CPU/wall as distinct scopes",
+    "five physical/source/THT/business gates"
+  ],
+  "decision_rule": "Retain all outcomes, including negatives and missing/censored rows. Do not promote on a tiny mean reduction if backlog/throughput or tails materially regress. Root decides subsequent scope and23:00 checkpoint.",
+  "execution_authorization": "Prepared only; root must explicitly dispatch when the single heavy slot is available. This script never starts native execution.",
+  "output": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_1x_future60_minwait2_w0_fixed1_onealternative_original98259_020",
+  "command_argv": [
+    "C:/PROGRAMING/python3.11.9/python.exe",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate020\\run_candidate.py",
+    "--map",
+    "nanning",
+    "--scale",
+    "1",
+    "--controls",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate020\\controls_alternative_original_window.json",
+    "--physical-contract",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate020\\registered_contracts_020\\physical_contract_original_window.json",
+    "--output",
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_1x_future60_minwait2_w0_fixed1_onealternative_original98259_020"
+  ],
+  "prior2x_evidence": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate020_comparison_001\\comparison_001.json",
+    "sha256": "40583ce2a46fc8df9fd3d2c79271783c151a3833a7a1257c0d0ec10015337ba0",
+    "bytes": 62650
+  },
+  "safety": "Fixed original0/positive2s devices,2s directed-entry gaps,1us half-open grid, no internal waiting, canonical sourceFIFO,actual EBS gate and complete immutable rights remain unchanged.",
+  "claim_limits": [
+    "Alternative precommits are not net saved bags.",
+    "One run is not a statistical timing study.",
+    "Original-window1x completion does not establish2x short/drain prefix equivalence.",
+    "A new supplemental readiness mean may be derived from same-population sums; it is not a new per-bag readiness audit and tails cannot be added."
+  ]
+}

@@ -1,0 +1,125 @@
+{
+  "schema": "g31.candidate011.full_parity.v1",
+  "passed": true,
+  "reference_run": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_map2_2x_future60_cap120_relax1_drain200000_010c",
+  "candidate_run": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_map2_2x_future60_minwait2_cap120_relax1_drain200000_011",
+  "bags": {
+    "passed": true,
+    "records": 87206,
+    "candidate_records": 87206,
+    "changed_nonallowed_records": 0,
+    "examples": [],
+    "serialized_bytes_exact": false,
+    "reference_sha256": "74e7e8220b86a95de14d6db15f776c34eb6dca7445da1a2e694bbe13b839f596",
+    "candidate_sha256": "cf02a735779536ec6e45f1910e0702301a107949217550e7ed7ea2c6def17b94",
+    "reference_bytes": 302464601,
+    "candidate_bytes": 302459563,
+    "reference_logical_sha256": "c6eb8f5dc18d0034180953b6e3c0e547ba74e60f32437323a77b53111d2ee0f9",
+    "candidate_logical_sha256": "c6eb8f5dc18d0034180953b6e3c0e547ba74e60f32437323a77b53111d2ee0f9",
+    "reference_scan_sum": 3580356,
+    "candidate_scan_sum": 150181
+  },
+  "rolling_events": {
+    "passed": true,
+    "serialized_bytes_exact": true,
+    "records": 1115302,
+    "candidate_records": 1115302,
+    "reference_sha256": "ae6053bb77bedd7c481055e76e3c433cb73443e882124e487ca87e4e48aebc56",
+    "candidate_sha256": "ae6053bb77bedd7c481055e76e3c433cb73443e882124e487ca87e4e48aebc56",
+    "reference_bytes": 227451965,
+    "candidate_bytes": 227451965
+  },
+  "native_nonallowed_difference": null,
+  "standard_summary_difference": null,
+  "independent_audits": [
+    {
+      "headway_audit": true,
+      "rolling_replay": true,
+      "source_policy_audit": true,
+      "tht_audit": true,
+      "business_audit": true
+    },
+    {
+      "headway_audit": true,
+      "rolling_replay": true,
+      "source_policy_audit": true,
+      "tht_audit": true,
+      "business_audit": true
+    }
+  ],
+  "allowed_time_fields": [
+    "decision_microseconds_p50",
+    "decision_microseconds_p95",
+    "decision_microseconds_p99",
+    "inroute_decision_microseconds_p50",
+    "inroute_decision_microseconds_p95",
+    "inroute_decision_microseconds_p99",
+    "inroute_decision_wall_seconds",
+    "preprocessing_seconds",
+    "run_cpu_seconds",
+    "run_wall_seconds",
+    "source_decision_wall_seconds"
+  ],
+  "allowed_work_fields": [
+    "summary.future_calendar_entries_scanned",
+    "bags[*].future_calendar_entries_scanned"
+  ],
+  "execution_identity_differences": "Only registered source/binary/build, candidate/entrypoint labels, controls path with identical bytes, adapter candidate name/auditor path.",
+  "source_sha256": {
+    "reference": "01e3289e7934ae164fd0014c34878657027cff7811186384080cf885d68523e3",
+    "candidate": "c03b54db9ff7756ca90bbf5fe22fd64ea3117dde0493dd60850ed16162a1866c",
+    "parity_tool": "b289d610191304e230a02a932a2af2cf20cc156cd64ca14d29acd4d6c446c50e",
+    "micro_helper": "b251e8d580c3e1704031a8dc13f0fec2f2af21c9ff7308c4359219ee923e7982"
+  },
+  "manifest_sha256": {
+    "reference": "3883ae0b06ea2fea32e6693ddd376c965919034c7226a1d3eeb840fb3f22c495",
+    "candidate": "8e0c31939f21972337ece276280d10e1f2cc7b3e91b0f2dd15e46397e1a503d6"
+  },
+  "timing": {
+    "decision_microseconds_p50": {
+      "reference": 9.5,
+      "candidate": 4.7
+    },
+    "decision_microseconds_p95": {
+      "reference": 67.6,
+      "candidate": 28.7
+    },
+    "decision_microseconds_p99": {
+      "reference": 109.4,
+      "candidate": 41.5
+    },
+    "inroute_decision_microseconds_p50": {
+      "reference": 0.8,
+      "candidate": 0.9
+    },
+    "inroute_decision_microseconds_p95": {
+      "reference": 2.5,
+      "candidate": 1.9
+    },
+    "inroute_decision_microseconds_p99": {
+      "reference": 6.0,
+      "candidate": 3.7
+    },
+    "inroute_decision_wall_seconds": {
+      "reference": 0.8811388999995431,
+      "candidate": 0.9447534999993081
+    },
+    "preprocessing_seconds": {
+      "reference": 0.0024993,
+      "candidate": 0.0021833
+    },
+    "run_cpu_seconds": {
+      "reference": 7.328125,
+      "candidate": 4.609375
+    },
+    "run_wall_seconds": {
+      "reference": 7.6822706,
+      "candidate": 4.6881347
+    },
+    "source_decision_wall_seconds": {
+      "reference": 5.599255199999988,
+      "candidate": 2.400425300000001
+    }
+  },
+  "boundary": "No full-run speed or parity conclusion until this actual receipt passes. Bag equality excludes only real scan count; ledger must be byte exact."
+}

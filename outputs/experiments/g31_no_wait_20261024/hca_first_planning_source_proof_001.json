@@ -1,0 +1,447 @@
+{
+  "schema": "g31.hca.first_planning_source_proof.v1",
+  "scope": "No-fault sequential integer-epoch Java controller, uniform HCA002 and observation-only profile004.",
+  "proof": [
+    "Wrapper records every new task generated at epoch before invoking controller at the same epoch.",
+    "Controller appends all new tasks to unfinished planning list, snapshots the full count, and removes exactly that many heads; failure appends to tail while remaining tasks still execute.",
+    "Consequently each newly generated task is attempted exactly once in that epoch. release_epoch equals first planning attempt, regardless of later successful admission.",
+    "Source taskList entries blocked by pending same-source tasks have not yet joined unfinished planning list; their time is separate preplanning source hold.",
+    "outputstarttime fourth column is written only on path success; third column is default-zero pass_time after reading new-task four-field epoch records, not canonical release."
+  ],
+  "source_model": [
+    "Stable original nominal pass_time order, preserving raw input row order for equal keys. Ceil is a release gate, not the sorting key.",
+    "An unavailable EBS head masks the whole source queue, blocking later ready bags.",
+    "Every source generates at most one task per integer epoch. A pending unsuccessful source task prevents generating the next. Generation precedes controller success, so success at e allows next head no earlier than e+1.",
+    "Although generation precedes goal report processing, causal mask predicts the report from saved route.size()==2 and epoch>=goal.t1, allowing outbound at that same epoch."
+  ],
+  "versions": {
+    "hca_uniform_headway2_002": [
+      {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_uniform_headway2_002\\source\\benchmarks\\LegacyIcsNoFaultWindowBenchmark.java",
+        "sha256": "978c68b0713cf9cc0f8897b4b9c4a2c2daa7aec39d57baa9180669a60b93d4d0",
+        "facts": [
+          {
+            "needle": "newTasks.generate_tasks(taskList",
+            "matches": [
+              {
+                "line": 276,
+                "text": "newTasks.generate_tasks(taskList, newTasks, epoch, ics, faultProbability, repairProbability, 0.0);"
+              }
+            ]
+          },
+          {
+            "needle": "recordReleases(result, newTasks, epoch);",
+            "matches": [
+              {
+                "line": 282,
+                "text": "recordReleases(result, newTasks, epoch);"
+              }
+            ]
+          },
+          {
+            "needle": "newTasks, ics.getMap(), epoch, ics);",
+            "matches": [
+              {
+                "line": 288,
+                "text": "ics.ICS_path_finding(newTasks, ics.getMap(), epoch, ics);"
+              }
+            ]
+          },
+          {
+            "needle": "for (task released : newTasks.getNew_tasks_list())",
+            "matches": [
+              {
+                "line": 381,
+                "text": "for (task released : newTasks.getNew_tasks_list()) {"
+              }
+            ]
+          },
+          {
+            "needle": "return Double.compare(left.getPass_time(), right.getPass_time());",
+            "matches": [
+              {
+                "line": 506,
+                "text": "return Double.compare(left.getPass_time(), right.getPass_time());"
+              }
+            ]
+          },
+          {
+            "needle": "task head = queue.get(0);",
+            "matches": [
+              {
+                "line": 325,
+                "text": "task head = queue.get(0);"
+              }
+            ]
+          },
+          {
+            "needle": "queues.put(source, new ArrayList<task>());",
+            "matches": [
+              {
+                "line": 334,
+                "text": "queues.put(source, new ArrayList<task>());"
+              }
+            ]
+          },
+          {
+            "needle": "private boolean inboundReportsThisTick",
+            "matches": [
+              {
+                "line": 314,
+                "text": "private boolean inboundReportsThisTick(ICS_PathFinding ics, int id, int goal, double epoch) {"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_uniform_headway2_002\\source\\src\\App\\ICS_PathFinding.java",
+        "sha256": "f1339175b4d34cdf91ebf29aaf10150ff3a1fd34d3ba6a3494db330c6f96cfe7",
+        "facts": [
+          {
+            "needle": "ICS.getUnfinishTasks().addAll(tasks.new_tasks_list);",
+            "matches": [
+              {
+                "line": 142,
+                "text": "ICS.getUnfinishTasks().addAll(tasks.new_tasks_list);"
+              }
+            ]
+          },
+          {
+            "needle": "int numbers=ICS.getUnfinishTasks().size();",
+            "matches": [
+              {
+                "line": 143,
+                "text": "int numbers=ICS.getUnfinishTasks().size();"
+              }
+            ]
+          },
+          {
+            "needle": "numbers--;",
+            "matches": [
+              {
+                "line": 145,
+                "text": "numbers--;"
+              }
+            ]
+          },
+          {
+            "needle": "task curTask=ICS.getUnfinishTasks().remove(0);",
+            "matches": [
+              {
+                "line": 146,
+                "text": "task curTask=ICS.getUnfinishTasks().remove(0);"
+              }
+            ]
+          },
+          {
+            "needle": "star.setT1(tasks.cur_time);",
+            "matches": [
+              {
+                "line": 149,
+                "text": "star.setT1(tasks.cur_time);"
+              }
+            ]
+          },
+          {
+            "needle": "ArrayList<Node>path=",
+            "matches": [
+              {
+                "line": 150,
+                "text": "ArrayList<Node>path=Astar.research(star, end, map, constrains, ICS.getFault_edges(), ICS.physicalReservations);"
+              },
+              {
+                "line": 239,
+                "text": "//\t\t\t\tArrayList<Node>path=Astar.research(star, end, map, constrains, iCS.getFault_edges());"
+              },
+              {
+                "line": 381,
+                "text": "ArrayList<Node>path=Astar.research(starNode, endNode, map, constrains,E1);"
+              }
+            ]
+          },
+          {
+            "needle": "ICS.getUnfinishTasks().add(curTask);",
+            "matches": [
+              {
+                "line": 152,
+                "text": "ICS.getUnfinishTasks().add(curTask);"
+              }
+            ]
+          },
+          {
+            "needle": "bw.write(curTask.task_ID+",
+            "matches": [
+              {
+                "line": 158,
+                "text": "bw.write(curTask.task_ID+\"   \"+curTask.star+\"  \"+curTask.getPass_time()+\"  \"+epoch);"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_uniform_headway2_002\\source\\src\\App\\Tasks.java",
+        "sha256": "dd4505e495fd3c0fa737923dca83c9d404fc3b1e3a7ce979e7dd384a57d0948b",
+        "facts": [
+          {
+            "needle": "taskinfo.cur_time=Double.valueOf(line1[1]);",
+            "matches": [
+              {
+                "line": 25,
+                "text": "taskinfo.cur_time=Double.valueOf(line1[1]);"
+              }
+            ]
+          },
+          {
+            "needle": "else if (line2.length==4)",
+            "matches": [
+              {
+                "line": 45,
+                "text": "else if (line2.length==4) {"
+              }
+            ]
+          },
+          {
+            "needle": "if (!contains(ics_pf.getUnfinishTasks()",
+            "matches": [
+              {
+                "line": 151,
+                "text": "if (!contains(ics_pf.getUnfinishTasks(),ics_pf.getMap().star.get(i).getLocation())"
+              }
+            ]
+          },
+          {
+            "needle": "task_List.get(ics_pf.getMap().star.get(i).getLocation()).remove(0);",
+            "matches": [
+              {
+                "line": 160,
+                "text": "task_List.get(ics_pf.getMap().star.get(i).getLocation()).remove(0);"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "hca_uniform_profile_004": [
+      {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_uniform_profile_004\\source\\benchmarks\\LegacyIcsNoFaultWindowBenchmark.java",
+        "sha256": "22397656988fabe658cbb490fc62a660bf2c1fe0a7aaa05b9919420fbda77878",
+        "facts": [
+          {
+            "needle": "newTasks.generate_tasks(taskList",
+            "matches": [
+              {
+                "line": 279,
+                "text": "try { newTasks.generate_tasks(taskList, newTasks, epoch, ics, faultProbability, repairProbability, 0.0); }"
+              }
+            ]
+          },
+          {
+            "needle": "recordReleases(result, newTasks, epoch);",
+            "matches": [
+              {
+                "line": 286,
+                "text": "recordReleases(result, newTasks, epoch);"
+              }
+            ]
+          },
+          {
+            "needle": "newTasks, ics.getMap(), epoch, ics);",
+            "matches": [
+              {
+                "line": 292,
+                "text": "App.HcaPlanningProfile.controller(newTasks, ics.getMap(), epoch, ics);"
+              }
+            ]
+          },
+          {
+            "needle": "for (task released : newTasks.getNew_tasks_list())",
+            "matches": [
+              {
+                "line": 387,
+                "text": "for (task released : newTasks.getNew_tasks_list()) {"
+              }
+            ]
+          },
+          {
+            "needle": "return Double.compare(left.getPass_time(), right.getPass_time());",
+            "matches": [
+              {
+                "line": 512,
+                "text": "return Double.compare(left.getPass_time(), right.getPass_time());"
+              }
+            ]
+          },
+          {
+            "needle": "task head = queue.get(0);",
+            "matches": [
+              {
+                "line": 331,
+                "text": "task head = queue.get(0);"
+              }
+            ]
+          },
+          {
+            "needle": "queues.put(source, new ArrayList<task>());",
+            "matches": [
+              {
+                "line": 340,
+                "text": "queues.put(source, new ArrayList<task>());"
+              }
+            ]
+          },
+          {
+            "needle": "private boolean inboundReportsThisTick",
+            "matches": [
+              {
+                "line": 320,
+                "text": "private boolean inboundReportsThisTick(ICS_PathFinding ics, int id, int goal, double epoch) {"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_uniform_profile_004\\source\\src\\App\\ICS_PathFinding.java",
+        "sha256": "a8b4ea2809fb72699172a97563fc9d38099cb3fee31387fa427aa557fc150c6a",
+        "facts": [
+          {
+            "needle": "ICS.getUnfinishTasks().addAll(tasks.new_tasks_list);",
+            "matches": [
+              {
+                "line": 142,
+                "text": "ICS.getUnfinishTasks().addAll(tasks.new_tasks_list);"
+              }
+            ]
+          },
+          {
+            "needle": "int numbers=ICS.getUnfinishTasks().size();",
+            "matches": [
+              {
+                "line": 143,
+                "text": "int numbers=ICS.getUnfinishTasks().size();"
+              }
+            ]
+          },
+          {
+            "needle": "numbers--;",
+            "matches": [
+              {
+                "line": 145,
+                "text": "numbers--;"
+              }
+            ]
+          },
+          {
+            "needle": "task curTask=ICS.getUnfinishTasks().remove(0);",
+            "matches": [
+              {
+                "line": 146,
+                "text": "task curTask=ICS.getUnfinishTasks().remove(0);"
+              }
+            ]
+          },
+          {
+            "needle": "star.setT1(tasks.cur_time);",
+            "matches": [
+              {
+                "line": 149,
+                "text": "star.setT1(tasks.cur_time);"
+              }
+            ]
+          },
+          {
+            "needle": "ArrayList<Node>path=",
+            "matches": [
+              {
+                "line": 150,
+                "text": "ArrayList<Node>path=HcaPlanningProfile.search(star, end, map, constrains, ICS.getFault_edges(), ICS.physicalReservations);"
+              },
+              {
+                "line": 239,
+                "text": "//\t\t\t\tArrayList<Node>path=Astar.research(star, end, map, constrains, iCS.getFault_edges());"
+              },
+              {
+                "line": 381,
+                "text": "ArrayList<Node>path=Astar.research(starNode, endNode, map, constrains,E1);"
+              }
+            ]
+          },
+          {
+            "needle": "ICS.getUnfinishTasks().add(curTask);",
+            "matches": [
+              {
+                "line": 152,
+                "text": "ICS.getUnfinishTasks().add(curTask);"
+              }
+            ]
+          },
+          {
+            "needle": "bw.write(curTask.task_ID+",
+            "matches": [
+              {
+                "line": 158,
+                "text": "bw.write(curTask.task_ID+\"   \"+curTask.star+\"  \"+curTask.getPass_time()+\"  \"+epoch);"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_uniform_profile_004\\source\\src\\App\\Tasks.java",
+        "sha256": "dd4505e495fd3c0fa737923dca83c9d404fc3b1e3a7ce979e7dd384a57d0948b",
+        "facts": [
+          {
+            "needle": "taskinfo.cur_time=Double.valueOf(line1[1]);",
+            "matches": [
+              {
+                "line": 25,
+                "text": "taskinfo.cur_time=Double.valueOf(line1[1]);"
+              }
+            ]
+          },
+          {
+            "needle": "else if (line2.length==4)",
+            "matches": [
+              {
+                "line": 45,
+                "text": "else if (line2.length==4) {"
+              }
+            ]
+          },
+          {
+            "needle": "if (!contains(ics_pf.getUnfinishTasks()",
+            "matches": [
+              {
+                "line": 151,
+                "text": "if (!contains(ics_pf.getUnfinishTasks(),ics_pf.getMap().star.get(i).getLocation())"
+              }
+            ]
+          },
+          {
+            "needle": "task_List.get(ics_pf.getMap().star.get(i).getLocation()).remove(0);",
+            "matches": [
+              {
+                "line": 160,
+                "text": "task_List.get(ics_pf.getMap().star.get(i).getLocation()).remove(0);"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "micro_evidence": {
+    "release": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_uniform_validation_004\\wrapper\\release.csv",
+    "successful_admission": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_uniform_validation_004\\wrapper\\outputstarttime.txt",
+    "goal_report": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_uniform_validation_004\\wrapper\\output.txt",
+    "task_3_source_0_first_attempt": 12.0,
+    "task_3_source_0_successful_admission": 13.0,
+    "task_1_source_0_first_attempt": 14.0,
+    "task_1_source_0_successful_admission": 15.0,
+    "task_1_inbound_report_and_outbound_first_attempt": 40.0
+  },
+  "unreleased_policy": "Preserve full canonical record with first_planning_attempt_time null; never fall back to successful admission.",
+  "full_population_policy": "If any business incomplete or first attempt missing, full-population THT remains null; completed subset is diagnostic only."
+}

@@ -1,0 +1,420 @@
+--- frozen006/core.cpp
++++ candidate010/core.cpp
+@@ -75,6 +75,8 @@
+     double time_grid_seconds = 0.000001;
+     double max_route_excess_seconds = inf;
+     double route_excess_retry_relaxation_rate = 0.0;
++    int future_source_reservation_horizon_seconds = 0;
++    double future_source_reservation_min_wait_seconds = 2.0;
+ };
+ struct Edge { int to; double travel; int id; };
+ struct Node { int id; double service; std::vector<Edge> out; int indegree = 0; };
+@@ -120,20 +122,26 @@
+     std::uint64_t route_generation = 0;
+     int arrived_index = 0;
+     bool physically_completed = false;
++    bool future_reserved=false;
++    double reservation_time=inf,planned_admission=inf,planned_finish=inf,planned_cleanup=inf;
++    std::uint64_t reservation_order=0,future_searches=0,future_calendar_entries_scanned=0;
++    std::vector<Step> reserved_route;
++    std::vector<std::uint64_t> reserved_node_ids,reserved_edge_ids;
+     std::vector<std::uint64_t> node_reservation_ids,edge_reservation_ids;
+ };
+ struct RollingRecord {
+     std::string kind;
+     std::uint64_t order=0,old_generation=0,new_generation=0,event_generation=0;
+     int task=-1,index=0,node=-1;
+-    double time=0,finish=0,cleanup=0;
++    double time=0,finish=0,cleanup=0,planned_admission=0;
++    std::uint64_t reference_reservation_order=0;
+     bool valid=true;
+     std::vector<Step> route;
+     std::vector<std::uint64_t> node_ids,edge_ids,removed;
+ };
+ struct GoalData {
+     std::vector<double> h;
+-    std::vector<int> hops, decision_nodes;
++    std::vector<int> hops, decision_nodes, shortest_successor;
+ };
+ struct Event {
+     double time;
+@@ -145,7 +153,7 @@
+ };
+ struct EventAfter {
+     bool operator()(const Event& a, const Event& b) const {
+-        const int ap=a.kind==4?-1:a.kind,bp=b.kind==4?-1:b.kind;
++        const int ap=(a.kind==4 || a.kind==5)?-1:a.kind,bp=(b.kind==4 || b.kind==5)?-1:b.kind;
+         return std::tie(a.time,ap,a.serial) > std::tie(b.time,bp,b.serial);
+     }
+ };
+@@ -162,6 +170,7 @@
+     int ignore_owner=-1;
+     double finish_bound=inf;
+     std::uint64_t route_bound_prunes=0;
++    bool forced_prefix=true,forced_prefix_denial=false;
+ };
+ struct Choice { Edge edge; double arrival,score; };
+ 
+@@ -181,7 +190,8 @@
+         "audit_failed_calendar_hash","pressure_window","enable_ebs_predecessor_gate","source_generation_interval",
+         "interval_mode","strict_endpoint_resources","edge_entry_headway_seconds","skip_scoring_single_choice",
+         "enable_inroute_replanning","time_grid_seconds","max_route_excess_seconds","source_fifo_order",
+-        "route_excess_retry_relaxation_rate"};
++        "route_excess_retry_relaxation_rate","future_source_reservation_horizon_seconds",
++        "future_source_reservation_min_wait_seconds"};
+     for (auto item : d) if (!allowed.count(py::cast<std::string>(item.first)))
+         throw std::invalid_argument("unknown config key: "+py::cast<std::string>(item.first));
+ #define READ_OPTION(name) if (d.contains(#name)) c.name = py::cast<decltype(c.name)>(d[#name]);
+@@ -197,6 +207,13 @@
+     READ_OPTION(enable_inroute_replanning) READ_OPTION(time_grid_seconds) READ_OPTION(max_route_excess_seconds)
+     READ_OPTION(source_fifo_order)
+     READ_OPTION(route_excess_retry_relaxation_rate)
++    READ_OPTION(future_source_reservation_min_wait_seconds)
++    if (d.contains("future_source_reservation_horizon_seconds")) {
++        const auto value=d["future_source_reservation_horizon_seconds"];
++        if (!PyLong_Check(value.ptr()) || PyBool_Check(value.ptr()))
++            throw std::invalid_argument("future_source_reservation_horizon_seconds must be an integer, not bool");
++        c.future_source_reservation_horizon_seconds=py::cast<int>(value);
++    }
+ #undef READ_OPTION
+     finite_nonnegative(c.end_time,"end_time");
+     finite_nonnegative(c.congestion_weight,"congestion_weight");
+@@ -206,6 +223,14 @@
+     finite_nonnegative(c.source_generation_interval,"source_generation_interval");
+     finite_nonnegative(c.edge_entry_headway_seconds,"edge_entry_headway_seconds");
+     finite_nonnegative(c.route_excess_retry_relaxation_rate,"route_excess_retry_relaxation_rate");
++    finite_nonnegative(c.future_source_reservation_min_wait_seconds,"future_source_reservation_min_wait_seconds");
++    if (c.future_source_reservation_horizon_seconds<0 || c.future_source_reservation_horizon_seconds>60)
++        throw std::invalid_argument("future source reservation horizon must be 0..60 integer seconds");
++    if (c.future_source_reservation_horizon_seconds>0 &&
++        (c.interval_mode!="half_open" || !c.strict_endpoint_resources || c.edge_entry_headway_seconds!=2.0 ||
++         !c.enable_inroute_replanning || !c.enable_ebs_predecessor_gate || !c.source_fifo || c.source_fifo_order!="canonical" ||
++         c.release_quantum!=1.0 || c.completion_quantum!=1.0 || c.source_generation_interval!=1.0 || c.congestion_weight!=0.0))
++        throw std::invalid_argument("future source reservation requires canonical FIFO, causal rolling, strict half-open node/edge2 resources, q1 source/completion/feed and zero congestion weight");
+     if (c.time_grid_seconds!=0.000001) throw std::invalid_argument("time_grid_seconds must equal 1e-6");
+     if (c.source_fifo_order!="activation" && c.source_fifo_order!="canonical")
+         throw std::invalid_argument("source_fifo_order must be activation or canonical");
+@@ -268,6 +293,10 @@
+     std::uint64_t stale_arrivals=0,stale_cleanups=0,route_bound_prunes=0;
+     std::map<int,std::uint64_t> source_node_conflicts,source_edge_conflicts,inroute_node_conflicts,inroute_edge_conflicts;
+     std::vector<double> decision_microseconds;
++    std::uint64_t future_searches=0,future_precommits=0,future_launches=0;
++    std::uint64_t future_chain_nodes=0,future_calendar_queries=0,future_calendar_entries_scanned=0;
++    std::uint64_t future_validation_queries=0,future_mask_empty=0,future_chain_rejections=0;
++    std::uint64_t future_eligible_failures=0;
+     double simulation_time = 0;
+     bool event_budget_exhausted = false;
+     double preprocessing_seconds = 0;
+@@ -336,6 +365,7 @@
+         if (found != goal_cache.end()) return found->second;
+         GoalData data;
+         data.h.assign(nodes.size(),inf);
++        if (cfg.future_source_reservation_horizon_seconds>0) data.shortest_successor.assign(nodes.size(),-1);
+         data.hops.assign(nodes.size(),0);
+         data.decision_nodes.assign(nodes.size(),0);
+         using Entry = std::pair<double,int>;
+@@ -347,7 +377,12 @@
+             if (dist != data.h[v]) continue;
+             for (const auto& [u,travel] : reverse[v]) {
+                 const double proposal = dist + nodes[u].service + travel;
+-                if (proposal < data.h[u]) { data.h[u]=proposal; queue.push({proposal,u}); }
++                if (proposal < data.h[u]) {
++                    data.h[u]=proposal; queue.push({proposal,u});
++                    // Successor points to the popped Dijkstra node. Strict
++                    // improvement preserves an acyclic shortest-path tree.
++                    if (cfg.future_source_reservation_horizon_seconds>0) data.shortest_successor[u]=v;
++                }
+             }
+         }
+         std::vector<int> order(nodes.size());
+@@ -533,6 +568,8 @@
+             double end=-inf,cleanup=inf;
+             if (conflicts(node,arrival,departure,&end,&cleanup,a.ignore_owner)) {
+                 ++(a.ignore_owner>=0?inroute_node_conflicts:source_node_conflicts)[node];
++                if (cfg.future_source_reservation_horizon_seconds>0 && a.ignore_owner<0 && a.forced_prefix)
++                    a.forced_prefix_denial=true;
+                 record_conflict_retry(arrival,end,cleanup,a,!half_open()); return false;
+             }
+         }
+@@ -541,9 +578,17 @@
+         a.max_depth=std::max(a.max_depth,static_cast<int>(a.path.size()));
+         if (terminal) return true;
+         const auto choices=rank_choices(node,departure,gd,a);
++        // Calendar-blocked alternatives do not turn a branch into a forced
++        // prefix. The gate closes at the first static reachable choice.
++        if (cfg.future_source_reservation_horizon_seconds>0 && a.ignore_owner<0 && choices.size()!=1)
++            a.forced_prefix=false;
+         for (const auto& choice:choices) {
+             const int next=choice.edge.to;
+-            if (!choice_feasible(choice,departure,a)) continue;
++            if (!choice_feasible(choice,departure,a)) {
++                if (cfg.future_source_reservation_horizon_seconds>0 && a.ignore_owner<0 && a.forced_prefix)
++                    a.forced_prefix_denial=true;
++                continue;
++            }
+             if (dfs(next,choice.arrival,gd,a)) return true;
+             if (a.budget_exhausted) break;
+         }
+@@ -574,7 +619,7 @@
+     }
+     void schedule_attempt(int task, double time) {
+         Task& t=tasks[task];
+-        if (t.admitted || !t.released) return;
++        if (t.admitted || t.future_reserved || !t.released) return;
+         if (cfg.source_fifo) {
+             auto previous=last_source_admission.find(t.start);
+             if (previous!=last_source_admission.end())
+@@ -662,9 +707,138 @@
+             throw std::invalid_argument("effective source route budget exceeds integer microsecond range");
+         return seconds(static_cast<std::int64_t>(total));
+     }
++
++    // One complete static shortest chain; temporal alternatives are a 61-bit
++    // integer-launch mask, not repeated DFS and not spatial lookahead depth.
++    bool reserve_future_source(int task,double time,const GoalData& gd) {
++        Task& t=tasks[task];
++        const auto origin=tick(time),q=std::int64_t(1000000);
++        if (origin%q) throw std::logic_error("future source attempt must be on the integer-second grid");
++        ++future_searches;++t.future_searches;
++        std::vector<Step> path;
++        std::vector<unsigned char> seen(nodes.size(),0);
++        int current=t.start;double arrival=0;
++        for (;;) {
++            if (current<0 || seen[current] || path.size()>=nodes.size()) {++future_chain_rejections;return false;}
++            seen[current]=1;
++            const double departure=add_time(arrival,nodes[current].service);
++            path.push_back({current,arrival,departure});++future_chain_nodes;
++            if (current==t.goal) break;
++            const int next=gd.shortest_successor[current];
++            const auto edge=std::find_if(nodes[current].out.begin(),nodes[current].out.end(),[&](const Edge& e){return e.to==next;});
++            if (edge==nodes[current].out.end()) {++future_chain_rejections;return false;}
++            arrival=add_time(departure,edge->travel);current=next;
++        }
++        // Freeze extra-distance allowance at the actual attempt, but move the
++        // absolute finish bound with the proposed launch, not with attempt time.
++        if (std::isfinite(t.last_effective_route_excess) &&
++            tick(path.back().arrival)>tick(gd.h[t.start])+tick(t.last_effective_route_excess)) {
++            ++future_chain_rejections;return false;
++        }
++        const int horizon=cfg.future_source_reservation_horizon_seconds;
++        std::uint64_t mask=((std::uint64_t(1)<<(horizon+1))-1)&~std::uint64_t(1);
++        const auto lower=origin+q,upper=origin+horizon*q;
++        auto intersect_resource=[&](const Calendar& calendar,std::int64_t lo,std::int64_t hi) {
++            if (lo==hi) return;
++            ++future_calendar_queries;
++            for (const auto& entry:calendar) {
++                if (tick(entry.first)>=upper+hi) break;
++                ++future_calendar_entries_scanned;++t.future_calendar_entries_scanned;
++                // Half-open overlap excludes both touching endpoints. Clip
++                // before division so every quotient below is nonnegative.
++                const auto a=std::max(lower,tick(entry.first)-hi+1);
++                const auto b=std::min(upper,tick(entry.second.end)-lo-1);
++                if (a>b) continue;
++                const int first=static_cast<int>((a-origin+q-1)/q);
++                const int last=static_cast<int>((b-origin)/q);
++                if (first>last) continue;
++                const auto bits=((std::uint64_t(1)<<(last-first+1))-1)<<first;
++                mask&=~bits;
++            }
++        };
++        for (std::size_t i=0;i<path.size();++i) {
++            const auto& step=path[i];
++            intersect_resource(calendars[step.node],tick(step.arrival),tick(step.departure));
++            if (i+1<path.size())
++                intersect_resource(edge_calendars[edge_ids.at({step.node,path[i+1].node})],tick(step.departure),tick(step.departure)+tick(cfg.edge_entry_headway_seconds));
++        }
++        if (!mask) {++future_mask_empty;return false;}
++        int offset=1;while (!(mask&(std::uint64_t(1)<<offset))) ++offset;
++        const double launch=seconds(origin+offset*q);
++        for (auto& step:path) {step.arrival=add_time(launch,step.arrival);step.departure=add_time(launch,step.departure);}
++        // Defensive exact validation uses the same calendars without any event
++        // interleaving. It is counted separately and never searches another path.
++        for (std::size_t i=0;i<path.size();++i) {
++            const auto& step=path[i];
++            if (tick(step.arrival)!=tick(step.departure)) {
++                ++future_validation_queries;
++                if (conflicts(step.node,step.arrival,step.departure)) throw std::logic_error("future launch mask missed a node conflict");
++            }
++            if (i+1<path.size()) {
++                ++future_validation_queries;
++                if (calendar_conflicts(edge_calendars[edge_ids.at({step.node,path[i+1].node})],step.departure,add_time(step.departure,cfg.edge_entry_headway_seconds),true))
++                    throw std::logic_error("future launch mask missed an edge-entry conflict");
++            }
++        }
++        // Entire certificate exists before the first calendar mutation. Its
++        // rights participate in all later checks even before physical admission.
++        t.future_reserved=true;t.reservation_time=time;t.planned_admission=launch;
++        t.route=std::move(path);t.route_generation=1;t.arrived_index=-1;
++        refresh_finish(t);
++        t.planned_finish=t.finish;t.planned_cleanup=t.cleanup;
++        t.admission_effective_route_excess=t.last_effective_route_excess;
++        t.admission_static_remaining=gd.h[t.start];
++        t.admission_route_excess=seconds(tick(t.finish)-tick(launch)-tick(gd.h[t.start]));
++        t.node_reservation_ids.assign(t.route.size(),0);t.edge_reservation_ids.assign(t.route.size()-1,0);
++        for (std::size_t i=0;i<t.route.size();++i) {
++            const auto& step=t.route[i];
++            if (tick(step.arrival)==tick(step.departure)) continue;
++            const auto id=next_reservation_id++;
++            auto it=calendars[step.node].emplace(step.arrival,Reservation{step.departure,task,id});
++            t.node_reservation_ids[i]=id;t.reservations.push_back({step.node,it});++calendar_entries;
++        }
++        for (std::size_t i=0;i+1<t.route.size();++i) {
++            const int edge=edge_ids.at({t.route[i].node,t.route[i+1].node});
++            const auto id=next_reservation_id++;
++            auto it=edge_calendars[edge].emplace(t.route[i].departure,Reservation{add_time(t.route[i].departure,cfg.edge_entry_headway_seconds),task,id});
++            t.edge_reservation_ids[i]=id;t.edge_reservations.push_back({edge,it});++edge_calendar_entries;
++        }
++        peak_calendar_entries=std::max(peak_calendar_entries,calendar_entries);
++        peak_edge_calendar_entries=std::max(peak_edge_calendar_entries,edge_calendar_entries);
++        t.reserved_route=t.route;t.reserved_node_ids=t.node_reservation_ids;t.reserved_edge_ids=t.edge_reservation_ids;
++        RollingRecord r;r.kind="source_reserve";r.order=next_ledger_order++;r.time=time;r.task=task;
++        r.new_generation=1;r.index=-1;r.node=-1;r.finish=t.finish;r.cleanup=t.cleanup;r.planned_admission=launch;
++        r.route=t.route;r.node_ids=t.node_reservation_ids;r.edge_ids=t.edge_reservation_ids;
++        t.reservation_order=r.order;rolling_records.push_back(std::move(r));
++        ++future_precommits;++t.generation;
++        // Never trim the temporal mask or this launch event at end_time: the
++        // short run must retain the same pre-horizon rights as a drain run.
++        push_event(launch,5,task,t.generation);
++        t.reason="source_future_reserved";
++        return true;
++    }
++    void launch_future_source(const Event& e) {
++        Task& t=tasks[e.task];
++        if (e.generation!=t.generation || t.admitted) return;
++        if (!t.future_reserved || !t.released || !t.activated || !is_source_head(e.task) ||
++            tick(e.time)!=tick(t.planned_admission) || t.route_generation!=1 || t.arrived_index!=-1 ||
++            (t.predecessor>=0 && (!tasks[t.predecessor].physically_completed || tick(tasks[t.predecessor].finish)>tick(e.time))))
++            throw std::logic_error("invalid future source launch state");
++        t.admitted=true;t.admission=e.time;t.arrived_index=0;t.commit_order=++next_commit;
++        last_source_admission[t.start]=e.time;
++        t.reason=t.finish<=cfg.end_time?"completed":"in_network_at_horizon";
++        if (t.admission_effective_route_excess>cfg.max_route_excess_seconds) ++relaxed_source_admissions;
++        RollingRecord r;r.kind="source_launch";r.order=next_ledger_order++;r.time=e.time;r.task=e.task;
++        r.new_generation=t.route_generation;r.index=0;r.node=t.start;r.reference_reservation_order=t.reservation_order;
++        rolling_records.push_back(std::move(r));++future_launches;
++        if (t.route.size()==1) finish_physically(e.task,e.time);else schedule_next_arrival(e.task);
++        push_event(t.cleanup,0,e.task,t.route_generation);
++        advance_source(t.start,e.time);
++    }
++
+     void attempt(int task,double time) {
+         Task& t=tasks[task];
+-        if (t.admitted || !is_source_head(task)) return;
++        if (t.admitted || t.future_reserved || !is_source_head(task)) return;
+         if (t.first_planning_attempt_time<0) t.first_planning_attempt_time=time;
+         const auto started=std::chrono::steady_clock::now();
+         const auto& gd=goal_data(t.goal);
+@@ -741,7 +915,14 @@
+                 if (calendar_hash()!=before) throw std::logic_error("failed DFS mutated a calendar");
+             }
+             if (a.budget_exhausted) ++search_budget_failures;
+-            if (!std::isfinite(gd.h[t.start])) t.reason="statically_unreachable";
++            bool reserved=false;
++            if (cfg.future_source_reservation_horizon_seconds>0 && a.forced_prefix_denial &&
++                !a.budget_exhausted && a.route_bound_prunes==0 && t.attempts<=cfg.max_retries &&
++                tick(time)-tick(t.first_planning_attempt_time)>=tick(cfg.future_source_reservation_min_wait_seconds)) {
++                ++future_eligible_failures;reserved=reserve_future_source(task,time,gd);
++            }
++            if (reserved) { /* An actual launch event now owns the source head. */ }
++            else if (!std::isfinite(gd.h[t.start])) t.reason="statically_unreachable";
+             else if (t.attempts>cfg.max_retries) t.reason="retry_budget_exhausted";
+             else {
+                 double retry=add_time(time,(cfg.retry_mode=="1s"?1.0:cfg.retry_step));
+@@ -914,6 +1095,10 @@
+         if (half_open()) {
+             require_grid_value(cfg.end_time,"end_time");
+             require_grid_value(cfg.pressure_window,"pressure_window");
++            require_grid_value(cfg.future_source_reservation_min_wait_seconds,"future_source_reservation_min_wait_seconds");
++            if (cfg.future_source_reservation_horizon_seconds>0)
++                for (const auto& node:nodes) if (node.service!=0.0 && node.service!=2.0)
++                    throw std::invalid_argument("future source reservation supports only original zero or normalized 2-second node service");
+             require_grid_value(cfg.retry_step,"retry_step");
+             require_grid_value(cfg.source_generation_interval,"source_generation_interval");
+             require_grid_value(cfg.release_quantum,"release_quantum");
+@@ -1001,7 +1186,8 @@
+                         if (ready<=e.time) activate(e.task,e.time);
+                         else {t.reason="predecessor_in_network";push_event(ready,3,e.task,tasks[t.predecessor].route_generation);}
+                     }
+-                } else if (e.kind==4) process_arrival(e);
++                } else if (e.kind==5) launch_future_source(e);
++                else if (e.kind==4) process_arrival(e);
+                 else if (e.kind==3) {
+                     if (cfg.enable_inroute_replanning && t.predecessor>=0) {
+                         const auto& prior=tasks[t.predecessor];
+@@ -1047,7 +1233,19 @@
+             b["commit_time"]=t.admitted?py::cast(t.admission):py::none();
+             b["route_generation"]=t.route_generation;b["actual_arrived_index"]=t.arrived_index;
+             b["actual_finish"]=done?py::cast(t.finish):py::none();
+-            b["node_reservation_ids"]=t.node_reservation_ids;b["edge_reservation_ids"]=t.edge_reservation_ids;
++            b["node_reservation_ids"]=t.future_reserved&&!t.admitted?std::vector<std::uint64_t>{}:t.node_reservation_ids;
++            b["edge_reservation_ids"]=t.future_reserved&&!t.admitted?std::vector<std::uint64_t>{}:t.edge_reservation_ids;
++            if (cfg.future_source_reservation_horizon_seconds>0) {
++                b["future_reserved"]=t.future_reserved;b["future_pending"]=t.future_reserved&&!t.admitted;
++                b["reservation_time"]=t.future_reserved?py::cast(t.reservation_time):py::none();
++                b["reservation_order"]=t.future_reserved?py::cast(t.reservation_order):py::none();
++                b["planned_admission"]=t.future_reserved?py::cast(t.planned_admission):py::none();
++                b["planned_finish"]=t.future_reserved?py::cast(t.planned_finish):py::none();
++                b["planned_resource_cleanup_epoch"]=t.future_reserved?py::cast(t.planned_cleanup):py::none();
++                py::list reserved;for (const auto& step:t.reserved_route) reserved.append(py::make_tuple(nodes[step.node].id,step.arrival,step.departure));
++                b["reserved_route"]=reserved;b["reserved_node_reservation_ids"]=t.reserved_node_ids;b["reserved_edge_reservation_ids"]=t.reserved_edge_ids;
++                b["future_source_searches"]=t.future_searches;b["future_calendar_entries_scanned"]=t.future_calendar_entries_scanned;
++            }
+             b["status"]=event_budget_exhausted&&!done?"event_budget_exhausted":t.reason;
+             b["attempts"]=t.attempts; b["retries"]=std::max(0,t.attempts-1);
+             b["source_wait_seconds"]=t.admitted?py::cast(t.admission-t.release):py::none();
+@@ -1058,7 +1256,7 @@
+             b["backtracks"]=t.backtracks; b["max_certificate_nodes"]=t.max_certificate_depth;
+             b["max_observation_depth"]=t.max_observation_depth;
+             py::list route,route_decisions,node_resources,edge_resources; double service=0,travel=0;
+-            for (std::size_t i=0;i<t.route.size();++i) {
++            for (std::size_t i=0;i<(t.future_reserved&&!t.admitted?0:t.route.size());++i) {
+                 const auto& step=t.route[i]; route.append(py::make_tuple(nodes[step.node].id,step.arrival,step.departure));
+                 const bool first=i==0,last=i+1==t.route.size();
+                 const std::string role=first&&last?"source_goal":first?"source":last?"goal":"internal";
+@@ -1086,6 +1284,15 @@
+         auto percentile=[&](double q) {return decision_microseconds.empty()?0.0:decision_microseconds[static_cast<std::size_t>(std::ceil(q*decision_microseconds.size()))-1];};
+         py::dict stats;
+         stats["tasks"]=tasks.size();stats["admitted"]=admitted;stats["completed"]=completed;stats["on_time"]=ontime;
++        if (cfg.future_source_reservation_horizon_seconds>0) {
++            stats["future_source_eligible_failures"]=future_eligible_failures;stats["future_source_searches"]=future_searches;
++            stats["future_source_precommits"]=future_precommits;stats["future_source_launches"]=future_launches;
++            stats["future_source_pending_at_horizon"]=future_precommits-future_launches;
++            stats["future_chain_nodes"]=future_chain_nodes;stats["future_calendar_queries"]=future_calendar_queries;
++            stats["future_calendar_entries_scanned"]=future_calendar_entries_scanned;stats["future_validation_queries"]=future_validation_queries;
++            stats["future_mask_empty"]=future_mask_empty;stats["future_chain_rejections"]=future_chain_rejections;
++            stats["future_logical_request_reply_messages"]=2*(future_calendar_queries+future_validation_queries);
++        }
+         stats["planning_attempts"]=planning_attempts;stats["failed_attempts"]=failed_attempts;
+         stats["search_expansions"]=total_exp;stats["score_expansions"]=total_score_exp;stats["backtracks"]=total_back;
+         stats["local_scoring_calendar_queries"]=total_scoring;stats["safety_neighbor_queries"]=total_safety;
+@@ -1165,17 +1372,29 @@
+         contract["source_generation"]="precomputed eligibility uses stable nominal order and source interval; source_fifo additionally paces successful admissions by that interval; no early release; not an exact reproduction of Java generation/comparator quirks";
+         contract["source_fifo_order"]=cfg.source_fifo_order;
+         contract["canonical_source_order"]="when explicitly enabled: stable original nominal release order, input row order for ties; an unreleased or predecessor-blocked head blocks every later source item, activation does not append/reorder";
++        if (cfg.future_source_reservation_horizon_seconds>0) {
++            contract["future_source_reservation_horizon_seconds"]=cfg.future_source_reservation_horizon_seconds;
++            contract["future_source_reservation_min_wait_seconds"]=cfg.future_source_reservation_min_wait_seconds;
++            contract["future_source_policy"]="After failed immediate DFS before first static branch, and minimum immutable-first-attempt age: intersect integer launch mask along one static shortest chain. All positive node and directed-edge entry rights are atomically precommitted. Earliest only for this chain/current snapshot, not all paths. Window independent of observation end. Additional route allowance freezes at actual attempt, not future launch.";
++            contract["future_source_lifecycle"]="source_reserve is not physical admission; source_launch consumes the same IDs at planned_admission, then advances canonical FIFO and schedules physical arrivals/cleanup. EBS remains gated by actual goal arrival. Failed immediate DFS still counts failed_attempts even if future rescue succeeds; launch is not another planning attempt.";
++            contract["future_source_measurement"]="Fixed-chain construction, calendar-entry scanning and exact validation are included in existing source decision wall samples; separate counters expose extra work. No independent clock calls, no real network timing or global throughput guarantee.";
++            contract["rolling_event_order"]="at equal time: physical arrival or reserved source launch by event serial, resource cleanup, source release, source attempt, EBS activation; ledger_order is global";
++        }
+         stats["contract"]=contract;
+         py::list ledger;
+         for (const auto& r:rolling_records) {
+             py::dict event;event["ledger_order"]=r.order;event["time"]=r.time;event["kind"]=r.kind;
+             event["segment_id"]=tasks[r.task].segment_id;
+-            if (r.kind=="source_commit" || r.kind=="replace_commit") {
++            if (r.kind=="source_commit" || r.kind=="replace_commit" || r.kind=="source_reserve") {
+                 event["old_generation"]=r.old_generation;event["new_generation"]=r.new_generation;
+                 event["current_index"]=r.index;event["goal_arrival"]=r.finish;event["resource_cleanup_epoch"]=r.cleanup;
+                 event["node_reservation_ids"]=r.node_ids;event["edge_reservation_ids"]=r.edge_ids;event["removed_ids"]=r.removed;
+                 py::list route;for (const auto& step:r.route) route.append(py::make_tuple(nodes[step.node].id,step.arrival,step.departure));
+                 event["committed_route"]=route;
++                if (r.kind=="source_reserve") {event["current_node"]=py::none();event["planned_admission"]=r.planned_admission;}
++            } else if (r.kind=="source_launch") {
++                event["generation"]=r.new_generation;event["index"]=0;event["node"]=nodes[r.node].id;
++                event["reference_reservation_order"]=r.reference_reservation_order;
+             } else if (r.kind=="arrival") {
+                 event["generation"]=r.new_generation;event["index"]=r.index;event["node"]=nodes[r.node].id;
+             } else {

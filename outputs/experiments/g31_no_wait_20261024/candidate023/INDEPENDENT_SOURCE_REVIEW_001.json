@@ -1,0 +1,50 @@
+{
+  "schema": "g31.candidate023.independent_readonly_review.v1",
+  "utc": "2026-10-24T14:28:19.078851+00:00",
+  "status": "no_blocker_found_in_reviewed_source",
+  "source_sha256": "e832bc62401e8612c14285a905476e531988a88c1967df239c23295babb68d0d",
+  "patch_sha256": "6579f684a9e228dd25e5687c9521db0837572bdf839242a4196552db356cd6ae",
+  "execution": "Read-only source/patch review plus static text identity assertions; no native/build/benchmark or population scan.",
+  "findings": [
+    {
+      "anchor": "Config/parse_config",
+      "finding": "Default false; explicit PyBool_Check rejects integer/string impostors. Existing task-deadline parser finite_nonnegative excludes NaN/infinity; negative deadlines also reject."
+    },
+    {
+      "anchor": "EventAfter/push_event",
+      "finding": "The only events.push site copies immutable absolute deadline only for kind2 with feature enabled; all other keys zero. Complete lexicographic (finite time, original phase, finite immutable key, original serial) is a strict weak order. No mutable task state is accessed by the comparator."
+    },
+    {
+      "anchor": "EventAfter",
+      "finding": "At false all keys equal0, so old (time,phase,serial) ordering is unchanged. Arrival/source-launch phase-1, cleanup0, release1, sourceattempt2, EBSactivate3 mapping is unchanged; equal deadlines retain serial."
+    },
+    {
+      "anchor": "run/attempt",
+      "finding": "Generation mismatch is rejected before attempt dispatch. New valid counter increments only after admitted/future_reserved/current-head guards. In a successful complete native return, valid_source_attempts equals planning_attempts; overdue count cannot exceed it."
+    },
+    {
+      "anchor": "attempt overdue classification",
+      "finding": "Already overdue means absolute STD strictly less than actual attempt time. Equality is excluded. This counts repeated valid attempts, not distinct bags, contention wins, feasibility by remaining travel, or successful deliveries."
+    },
+    {
+      "anchor": "source/rights scope",
+      "finding": "Same-time queued source attempts compete by which full certificate is committed first. No source FIFO reordering, release advance, internal waiting, confirmed-rights preemption, or change to safety tests is introduced."
+    }
+  ],
+  "scope_limits": [
+    "This is shared serial source-planning arbitration, not an implemented distributed resource-local EDF protocol.",
+    "Later phase3 EBS activation can enqueue a same-time phase2 attempt after earlier phase2 attempts executed. The policy cannot retroactively arbitrate or revoke those confirmed rights, and entire-tick deadline monotonicity is not guaranteed.",
+    "Deadline-time ordering equals absolute-deadline ordering only within equal physical time; implementation correctly keeps physical time first.",
+    "Expired heads keep highest EDF priority and can reduce other deadline hits; no deadline/throughput monotonic improvement claim.",
+    "Default logical equivalence and actual common-merge winner changes still require planned native micro tests; this review does not claim execution evidence."
+  ],
+  "recommended_micro_checks": [
+    "Two sources same-time same-ETA common merge: reverse serial by STD and inspect resource owner/commit order.",
+    "Different ETA overlapping two-second windows: urgent owner must win without creating an internal wait.",
+    "Earlier confirmed/inflight and reserved-not-launched owner cannot be preempted by later urgent source.",
+    "Equal STD tie retains serial; time equal to STD does not increment already_overdue.",
+    "Same-source urgent tail cannot pass canonical head; stale pops do not increment valid_source_attempts.",
+    "Later same-time EBS activation remains outside already-executed arbitration; preserve original phase order.",
+    "Already overdue first head can harm another feasible deadline; retain this negative outcome."
+  ]
+}

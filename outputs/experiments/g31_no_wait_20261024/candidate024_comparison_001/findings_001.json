@@ -1,0 +1,270 @@
+{
+  "schema": "g31.candidate024.nanning1x.closeout_findings.v1",
+  "passed": true,
+  "time_utc": "2026-10-24T14:52:10.250754+00:00",
+  "status": "read_existing_completed_outputs_after_explicit_stop_authorization",
+  "comparison": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate024_comparison_001\\comparison_001.json",
+    "sha256": "769b7c0d533511c7c242ec9e6a865e65bf695bd20db059895625e18e7b5aa185"
+  },
+  "population": {
+    "businesses": 28506,
+    "segments": 43603,
+    "complete": true,
+    "all_five_gates_passed": true
+  },
+  "candidate_metrics": {
+    "business_denominator": 28506,
+    "segment_denominator": 43603,
+    "completed_businesses": 28506,
+    "completed_segments": 43603,
+    "full_population_available": true,
+    "user_tht": {
+      "status": "available",
+      "count": 28506,
+      "sum": 10490967.825000003,
+      "mean": 368.0266549147549,
+      "min": 59.0,
+      "p50": 404.73499999999876,
+      "p95": 598.3225000000011,
+      "p99": 674.3182500000004,
+      "max": 1784.4950000000026
+    },
+    "preplanning": {
+      "status": "available",
+      "count": 28506,
+      "sum": 22863666.213053,
+      "mean": 802.0650464131411,
+      "min": 0.0,
+      "p50": 130.6523649999981,
+      "p95": 4343.846027500001,
+      "p99": 6906.647870000006,
+      "max": 11186.20561
+    },
+    "planning_retry_wait": {
+      "status": "available",
+      "count": 28506,
+      "sum": 267365.0,
+      "mean": 9.37925349049323,
+      "min": 0.0,
+      "p50": 2.0,
+      "p95": 45.0,
+      "p99": 84.0,
+      "max": 1085.0
+    },
+    "canonical_elapsed": {
+      "status": "available",
+      "count": 28506,
+      "sum": 33354634.038053002,
+      "mean": 1170.0917013278959,
+      "min": 59.0150300000023,
+      "p50": 585.4284399999997,
+      "p95": 4813.705912500002,
+      "p99": 7280.89860300001,
+      "max": 11727.79061
+    },
+    "network_elapsed": {
+      "status": "available",
+      "count": 28506,
+      "sum": 10223602.825000003,
+      "mean": 358.64740142426166,
+      "min": 59.0,
+      "p50": 390.8899999999994,
+      "p95": 583.8400000000038,
+      "p99": 652.9049999999988,
+      "max": 1019.4950000000026
+    },
+    "original_window_end": 98259.0,
+    "original_window_completed_businesses": 28506,
+    "original_window_unfinished_businesses": 0,
+    "original_window_source": "All transport legs completed; final actual goal arrival at or before the common original cutoff. Derived from this run, not a separate short execution.",
+    "original_window_state_split": null,
+    "original_window_state_split_status": "not_computed_from_small_summaries",
+    "STD": {
+      "count": 25269,
+      "denominator": 28506,
+      "rate": 0.8864449589560093,
+      "status": "available"
+    },
+    "STD_minus_2700": {
+      "count": 10702,
+      "denominator": 28506,
+      "rate": 0.37542973409106856,
+      "status": "available"
+    },
+    "activation_to_first_planning": {
+      "status": "available",
+      "count": 28506,
+      "sum": 21401098.0,
+      "mean": 750.7576650529713,
+      "min": 0.0,
+      "p50": 94.0,
+      "p95": 4272.5,
+      "p99": 6538.950000000001,
+      "max": 9172.0
+    },
+    "canonical_to_activation": {
+      "status": "available",
+      "count": 28506,
+      "sum": 1462568.2130530002,
+      "mean": 51.30738136016979,
+      "min": 0.0,
+      "p50": 5.228035000000091,
+      "p95": 157.05128499999955,
+      "p99": 304.1874560000011,
+      "max": 4470.205610000001
+    },
+    "supplemental_ready_mean_derived": {
+      "status": "derived_same_full_population_no_new_bag_scan",
+      "count": 28506,
+      "mean": 1118.784319967726,
+      "sum": 31892065.825000003,
+      "p95": null,
+      "p99": null,
+      "max": null,
+      "boundary": "Native finish-minus-activation mean is primaryTHT+activation-to-first under unchanged activation semantics. This is a sum identity, not a new per-bag common-G/causal-ready validation; component quantiles cannot be added."
+    }
+  },
+  "candidate_compute": {
+    "native_event_loop_cpu_seconds": 2.90625,
+    "native_event_loop_wall_seconds": 2.9770628,
+    "native_api_process_cpu_seconds": 6.71875,
+    "native_api_wall_seconds": 7.042855800013058,
+    "end_to_end_wall_seconds": null,
+    "source_decision_wall_seconds": 1.7727690999999894,
+    "inroute_decision_wall_seconds": 0.5762767000000779,
+    "scope": "Windows GetProcessTimes kernel+user; std::clock on non-Windows; event loop only",
+    "end_to_end_status": "not_measured_in_available_small_summary"
+  },
+  "EDF_repeated_attempt_counters": {
+    "passed": true,
+    "counters": {
+      "valid_source_attempts": 127896,
+      "already_overdue_valid_attempts": 7363,
+      "count_scope": "Actual source attempts after admitted/reserved/head guards; not heap comparisons, competition victories, or stale events."
+    },
+    "boundary": "Counts repeated valid source attempts after guards, not distinct bags, competition victories, or proof that a request ordering changed."
+  },
+  "comparisons_to023": [
+    {
+      "label": "024 classON versus023 EDFON; different binary/source, default-false micro inheritance only",
+      "new": "024_nonexpired_EDF_on_1x",
+      "reference": "023_EDF_on_1x",
+      "inputs_usable": true,
+      "metrics": {
+        "tht_mean": {
+          "delta": 0.12832140601977926,
+          "percent": 0.03487958338814614,
+          "status": "available"
+        },
+        "tht_p95": {
+          "delta": 0.2837500000059663,
+          "percent": 0.04744675825871962,
+          "status": "available"
+        },
+        "tht_p99": {
+          "delta": -0.021750000003180503,
+          "percent": -0.003225375923596463,
+          "status": "available"
+        },
+        "tht_max": {
+          "delta": 261.5900000000038,
+          "percent": 17.177039933548315,
+          "status": "available"
+        },
+        "preplanning_mean": {
+          "delta": 0.9316985897705763,
+          "percent": 0.116297566728678,
+          "status": "available"
+        },
+        "canonical_elapsed_mean": {
+          "delta": 1.0600199957902987,
+          "percent": 0.09067504437368296,
+          "status": "available"
+        },
+        "cutoff_completed": {
+          "delta": 0,
+          "percent": 0.0,
+          "status": "available"
+        },
+        "STD_count": {
+          "delta": -78,
+          "percent": -0.3077287252929341,
+          "status": "available"
+        },
+        "early_count": {
+          "delta": 6,
+          "percent": 0.05609573672400898,
+          "status": "available"
+        }
+      },
+      "timing_ratio": null,
+      "timing_reason": "No cross-scope native-event-loop versus Java-thread/whole-window speed ratio is calculated."
+    },
+    {
+      "label": "024 classON+EDFON versus023 EDFOFF main reference; two ordering controls differ",
+      "new": "024_nonexpired_EDF_on_1x",
+      "reference": "023_EDF_off_1x",
+      "inputs_usable": true,
+      "metrics": {
+        "tht_mean": {
+          "delta": 0.27214200519188125,
+          "percent": 0.07400099676242601,
+          "status": "available"
+        },
+        "tht_p95": {
+          "delta": -0.26124999999683496,
+          "percent": -0.043644686311119514,
+          "status": "available"
+        },
+        "tht_p99": {
+          "delta": 3.872749999998632,
+          "percent": 0.5776383016962038,
+          "status": "available"
+        },
+        "tht_max": {
+          "delta": -80.08999999999651,
+          "percent": -4.2953257695410265,
+          "status": "available"
+        },
+        "preplanning_mean": {
+          "delta": 12.01936434434856,
+          "percent": 1.5213505518915025,
+          "status": "available"
+        },
+        "canonical_elapsed_mean": {
+          "delta": 12.291506349540441,
+          "percent": 1.061625866263585,
+          "status": "available"
+        },
+        "cutoff_completed": {
+          "delta": 0,
+          "percent": 0.0,
+          "status": "available"
+        },
+        "STD_count": {
+          "delta": -232,
+          "percent": -0.9097682443825732,
+          "status": "available"
+        },
+        "early_count": {
+          "delta": -23,
+          "percent": -0.21445221445221446,
+          "status": "available"
+        }
+      },
+      "timing_ratio": null,
+      "timing_reason": "No cross-scope native-event-loop versus Java-thread/whole-window speed ratio is calculated."
+    }
+  ],
+  "assessment": "No net mainline gain. Against023OFF primarymean+0.272142s, preplanning+12.019364s, STD-232, early-23 andp99+3.87275s; max improves80.09s. Against023EDFON mean/pre/STD/max worsen, whileearly+6 andp99 improves0.02175s. Originalwindowcompletion remainsall28506.",
+  "causal_and_timing_boundary": "024OFFsamebinary fullrun was not executed. References023ON/OFF use differentbinary/source;388defaultfalsemicroparity isnotfullgraphparity. EventCPU/API areone sample atdifferentcompiledidentity, notpurepolicycost/statisticalspeedproof.",
+  "deferred_without_auto_resume": [
+    "EBSreadyfirst",
+    "022realmap",
+    "011timingv2",
+    "all2xextensions",
+    "024classOFF"
+  ],
+  "native_or_fullscan_started_by_this_closeout": false
+}

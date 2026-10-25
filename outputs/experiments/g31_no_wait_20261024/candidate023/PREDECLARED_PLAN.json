@@ -1,0 +1,45 @@
+{
+  "schema": "g31.candidate023.predeclared.v1",
+  "prepared_at_utc": "2026-10-24T14:28:10.543573+00:00",
+  "parent_source": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate019\\source\\core.cpp",
+  "parent_source_sha256": "681b8b1fd1760bb59ed9b841bbf1d042de8d2d26bd32e2f309eaca376c3d8f11",
+  "strategy": "Immutable event key (time, phase, absolute STD only for EV_TRY when enabled, original serial). Same-time currently queued attempts only.",
+  "control": "enable_source_attempt_edf",
+  "default": false,
+  "first_population": "Nanning 1x original window98259; root dispatch only; 2x deferred",
+  "invariants": [
+    "canonical FIFO and EBS actual-completion gate unchanged",
+    "all event phases unchanged",
+    "confirmed rights never revoked",
+    "no added internal waiting or future task knowledge",
+    "absolute overdue STD still prioritized",
+    "first planning clocks never reset"
+  ],
+  "limitations": [
+    "Phase3 activation may enqueue a source attempt after earlier phase2 already executed; no retroactive reorder",
+    "Serial source planning arbitration, not distributed node bidding",
+    "EDF can harm feasible jobs when an already-overdue FIFO head wins",
+    "THT/preplanning/throughput/STD all required; no net-win guaranteed"
+  ],
+  "validation": {
+    "default_saved019_records": [
+      "candidate019_omitted_micro_002.json",
+      "candidate019_on_micro_002.json"
+    ],
+    "default_modes": [
+      "omitted",
+      "explicit_false"
+    ],
+    "cases": 13,
+    "guards": [
+      "strict bool values",
+      "finite deadline",
+      "unknown config"
+    ],
+    "unchanged_five_auditors": true
+  },
+  "allowed_default_differences": [
+    "11 existing timing fields only"
+  ],
+  "source_sha256": "e832bc62401e8612c14285a905476e531988a88c1967df239c23295babb68d0d"
+}

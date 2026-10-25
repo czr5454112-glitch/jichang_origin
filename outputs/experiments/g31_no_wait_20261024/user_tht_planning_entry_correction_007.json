@@ -1,0 +1,23 @@
+{
+  "schema": "g31.user_tht.planning_entry.v1",
+  "supersedes_start_clock": "user_confirmed_tht_006.json",
+  "user_correction": "A bag already in the planning list must start its system clock even if it has not yet found a feasible path. Starting only at successful planning hides failed-attempt/retry delay.",
+  "primary_formula": "For each original business bag, sum each transport leg goal arrival minus first entry to the active planning list (equal to first actual planning attempt in the fixed no-fault comparator).",
+  "EBS": "Keep the explicit user-confirmed sum of inbound and outbound leg elapsed times; exclude the interval between the two active legs.",
+  "clocks": [
+    "source_queue_activation_time",
+    "first_planning_attempt_time, immutable across retries",
+    "physical_admission, successful certificate",
+    "physical_goal_arrival"
+  ],
+  "HCA_evidence": "Frozen ICS appends new_tasks to unfinish then attempts every newly-added item in that epoch; wrapper release.csv release_epoch records this entry. Failed research re-appends the bag; outputstarttime column4 is later success and cannot be the primary THT origin.",
+  "G31_change": "Native004 records first attempt explicitly. Native003 does not provide this timestamp and cannot be backfilled with generated_release or admission. Source activation is separately recorded because source queues and active planning lists are distinct.",
+  "mandatory_components": [
+    "planning retry hold: admission minus first planning entry",
+    "physical in-network elapsed: finish minus admission",
+    "preplanning source hold: first planning entry minus canonical release",
+    "complete canonical release-to-finish elapsed"
+  ],
+  "reporting": "All components preserve full canonical population and EBS grouping. A reduced network elapsed alone is not called a THT win.",
+  "physics_unchanged": "At least2s headway, no internal transport stop, all wait for a certificate occurs before physical conveyor admission. Control-system entry and physical conveyor entry are distinct timestamps."
+}

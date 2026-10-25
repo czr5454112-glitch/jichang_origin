@@ -1,0 +1,457 @@
+{
+  "schema": "g31.nowait.independent_runner_contract_review.v1",
+  "source_path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\scripts\\experiments\\g31_no_wait\\run.py",
+  "source_sha256": "ea5337b45be1075bea0be7057f5e4d8df39a21dad734bc0acd92eddfbf91cd72",
+  "boundary": "Negative audit fixtures only. Third fixture assumes earlier plan committed at 0, later plan at 90; terminal cleanup at ceil(100), so reservation still exists at the second plan. This probes HCA reservation semantics, not physical terminal occupancy after removal.",
+  "results": {
+    "storage_out_precedes_completed_inbound": {
+      "rows": [
+        {
+          "segment_id": "in",
+          "task_id": 1,
+          "start": 0,
+          "goal": 1,
+          "leg": "storage_in",
+          "pass_time": 0.0,
+          "std": 1000.0
+        },
+        {
+          "segment_id": "out",
+          "task_id": 1,
+          "start": 1,
+          "goal": 2,
+          "leg": "storage_out",
+          "pass_time": 0.0,
+          "std": 1000.0
+        }
+      ],
+      "bags": [
+        {
+          "segment_id": "in",
+          "route": [
+            [
+              0,
+              0,
+              2
+            ],
+            [
+              1,
+              20,
+              22
+            ]
+          ],
+          "admission": 0,
+          "finish": 20,
+          "completed": true
+        },
+        {
+          "segment_id": "out",
+          "route": [
+            [
+              1,
+              0,
+              2
+            ],
+            [
+              2,
+              3,
+              5
+            ]
+          ],
+          "admission": 0,
+          "finish": 3,
+          "completed": true
+        }
+      ],
+      "profile": {
+        "nodes": [
+          {
+            "location": 0,
+            "service_time": 2.0
+          },
+          {
+            "location": 1,
+            "service_time": 2.0
+          },
+          {
+            "location": 2,
+            "service_time": 2.0
+          }
+        ],
+        "edges": [
+          {
+            "start": 0,
+            "end": 1,
+            "length": 36.0
+          },
+          {
+            "start": 1,
+            "end": 2,
+            "length": 2.0
+          }
+        ]
+      },
+      "audit": {
+        "schema": "g31.nowait.independent_audit.v1",
+        "horizon": 98259.0,
+        "segments": {
+          "denominator": 2,
+          "planned": 2,
+          "completed": 2,
+          "unfinished": 0
+        },
+        "business": {
+          "denominator": 1,
+          "counts": {
+            "completed": 1,
+            "causally_invalid_completed": 1,
+            "std": 1,
+            "std_strict_causal": 0,
+            "std_integer_observed_strict_causal": 0,
+            "std_minus_2700": 0,
+            "std_minus_2700_strict_causal": 0,
+            "std_minus_2700_integer_observed_strict_causal": 0
+          },
+          "rates": {
+            "completed": 1.0,
+            "causally_invalid_completed": 1.0,
+            "std": 1.0,
+            "std_strict_causal": 0.0,
+            "std_integer_observed_strict_causal": 0.0,
+            "std_minus_2700": 0.0,
+            "std_minus_2700_strict_causal": 0.0,
+            "std_minus_2700_integer_observed_strict_causal": 0.0
+          }
+        },
+        "safety": {
+          "route_violations": 0,
+          "violation_examples": [],
+          "internal_internal_closed_interval_overlaps": 0,
+          "overlap_examples": [],
+          "endpoint_exempt_overlaps": 0,
+          "internal_extra_wait_max_seconds": 0.0,
+          "internal_extra_wait_sum_seconds": 0.0,
+          "routes_with_repeated_nodes": 0,
+          "boundary": "Node service calendars only; original HCA endpoint exemption explicitly retained; conveyor geometric headway not modeled."
+        },
+        "external_source_wait_seconds": {
+          "count": 2,
+          "mean": 0.0,
+          "p50": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        },
+        "in_network_seconds": {
+          "count": 2,
+          "mean": 11.5,
+          "p50": 11.5,
+          "p95": 19.15,
+          "p99": 19.83,
+          "max": 20.0
+        }
+      },
+      "original_two_field_hard_gate_accepts": true
+    },
+    "loop_without_any_extra_stop": {
+      "rows": [
+        {
+          "segment_id": "cycle",
+          "task_id": 1,
+          "start": 0,
+          "goal": 2,
+          "leg": "direct",
+          "pass_time": 0.0,
+          "std": 1000.0
+        }
+      ],
+      "bags": [
+        {
+          "segment_id": "cycle",
+          "route": [
+            [
+              0,
+              0,
+              2
+            ],
+            [
+              1,
+              3,
+              5
+            ],
+            [
+              0,
+              6,
+              8
+            ],
+            [
+              2,
+              9,
+              11
+            ]
+          ],
+          "admission": 0,
+          "finish": 9,
+          "completed": true
+        }
+      ],
+      "profile": {
+        "nodes": [
+          {
+            "location": 0,
+            "service_time": 2.0
+          },
+          {
+            "location": 1,
+            "service_time": 2.0
+          },
+          {
+            "location": 2,
+            "service_time": 2.0
+          }
+        ],
+        "edges": [
+          {
+            "start": 0,
+            "end": 1,
+            "length": 2.0
+          },
+          {
+            "start": 1,
+            "end": 0,
+            "length": 2.0
+          },
+          {
+            "start": 0,
+            "end": 2,
+            "length": 2.0
+          }
+        ]
+      },
+      "audit": {
+        "schema": "g31.nowait.independent_audit.v1",
+        "horizon": 98259.0,
+        "segments": {
+          "denominator": 1,
+          "planned": 1,
+          "completed": 1,
+          "unfinished": 0
+        },
+        "business": {
+          "denominator": 1,
+          "counts": {
+            "completed": 1,
+            "causally_invalid_completed": 0,
+            "std": 1,
+            "std_strict_causal": 1,
+            "std_integer_observed_strict_causal": 1,
+            "std_minus_2700": 0,
+            "std_minus_2700_strict_causal": 0,
+            "std_minus_2700_integer_observed_strict_causal": 0
+          },
+          "rates": {
+            "completed": 1.0,
+            "causally_invalid_completed": 0.0,
+            "std": 1.0,
+            "std_strict_causal": 1.0,
+            "std_integer_observed_strict_causal": 1.0,
+            "std_minus_2700": 0.0,
+            "std_minus_2700_strict_causal": 0.0,
+            "std_minus_2700_integer_observed_strict_causal": 0.0
+          }
+        },
+        "safety": {
+          "route_violations": 0,
+          "violation_examples": [],
+          "internal_internal_closed_interval_overlaps": 0,
+          "overlap_examples": [],
+          "endpoint_exempt_overlaps": 0,
+          "internal_extra_wait_max_seconds": 0.0,
+          "internal_extra_wait_sum_seconds": 0.0,
+          "routes_with_repeated_nodes": 1,
+          "boundary": "Node service calendars only; original HCA endpoint exemption explicitly retained; conveyor geometric headway not modeled."
+        },
+        "external_source_wait_seconds": {
+          "count": 1,
+          "mean": 0.0,
+          "p50": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        },
+        "in_network_seconds": {
+          "count": 1,
+          "mean": 9.0,
+          "p50": 9.0,
+          "p95": 9.0,
+          "p99": 9.0,
+          "max": 9.0
+        }
+      },
+      "original_two_field_hard_gate_accepts": true
+    },
+    "earlier_goal_reservation_vs_later_internal_request": {
+      "rows": [
+        {
+          "segment_id": "earlier",
+          "task_id": 1,
+          "start": 0,
+          "goal": 1,
+          "leg": "direct",
+          "pass_time": 0.0,
+          "std": 1000.0
+        },
+        {
+          "segment_id": "later",
+          "task_id": 2,
+          "start": 2,
+          "goal": 3,
+          "leg": "direct",
+          "pass_time": 90,
+          "std": 1000.0
+        }
+      ],
+      "bags": [
+        {
+          "segment_id": "earlier",
+          "route": [
+            [
+              0,
+              0,
+              2
+            ],
+            [
+              1,
+              100,
+              102
+            ]
+          ],
+          "admission": 0,
+          "finish": 100,
+          "completed": true
+        },
+        {
+          "segment_id": "later",
+          "route": [
+            [
+              2,
+              90,
+              92
+            ],
+            [
+              1,
+              101,
+              103
+            ],
+            [
+              3,
+              104,
+              106
+            ]
+          ],
+          "admission": 90,
+          "finish": 104,
+          "completed": true
+        }
+      ],
+      "profile": {
+        "nodes": [
+          {
+            "location": 0,
+            "service_time": 2.0
+          },
+          {
+            "location": 1,
+            "service_time": 2.0
+          },
+          {
+            "location": 2,
+            "service_time": 2.0
+          },
+          {
+            "location": 3,
+            "service_time": 2.0
+          }
+        ],
+        "edges": [
+          {
+            "start": 0,
+            "end": 1,
+            "length": 196.0
+          },
+          {
+            "start": 2,
+            "end": 1,
+            "length": 18.0
+          },
+          {
+            "start": 1,
+            "end": 3,
+            "length": 2.0
+          }
+        ]
+      },
+      "audit": {
+        "schema": "g31.nowait.independent_audit.v1",
+        "horizon": 98259.0,
+        "segments": {
+          "denominator": 2,
+          "planned": 2,
+          "completed": 2,
+          "unfinished": 0
+        },
+        "business": {
+          "denominator": 2,
+          "counts": {
+            "completed": 2,
+            "causally_invalid_completed": 0,
+            "std": 2,
+            "std_strict_causal": 2,
+            "std_integer_observed_strict_causal": 2,
+            "std_minus_2700": 0,
+            "std_minus_2700_strict_causal": 0,
+            "std_minus_2700_integer_observed_strict_causal": 0
+          },
+          "rates": {
+            "completed": 1.0,
+            "causally_invalid_completed": 0.0,
+            "std": 1.0,
+            "std_strict_causal": 1.0,
+            "std_integer_observed_strict_causal": 1.0,
+            "std_minus_2700": 0.0,
+            "std_minus_2700_strict_causal": 0.0,
+            "std_minus_2700_integer_observed_strict_causal": 0.0
+          }
+        },
+        "safety": {
+          "route_violations": 0,
+          "violation_examples": [],
+          "internal_internal_closed_interval_overlaps": 0,
+          "overlap_examples": [],
+          "endpoint_exempt_overlaps": 1,
+          "internal_extra_wait_max_seconds": 0.0,
+          "internal_extra_wait_sum_seconds": 0.0,
+          "routes_with_repeated_nodes": 0,
+          "boundary": "Node service calendars only; original HCA endpoint exemption explicitly retained; conveyor geometric headway not modeled."
+        },
+        "external_source_wait_seconds": {
+          "count": 2,
+          "mean": 0.0,
+          "p50": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        },
+        "in_network_seconds": {
+          "count": 2,
+          "mean": 57.0,
+          "p50": 57.0,
+          "p95": 95.7,
+          "p99": 99.14,
+          "max": 100.0
+        }
+      },
+      "original_two_field_hard_gate_accepts": true
+    }
+  }
+}

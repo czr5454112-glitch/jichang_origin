@@ -1,0 +1,13 @@
+--- frozen011/core.cpp
++++ candidate012/core.cpp
+@@ -229,8 +229,8 @@
+     if (c.future_source_reservation_horizon_seconds>0 &&
+         (c.interval_mode!="half_open" || !c.strict_endpoint_resources || c.edge_entry_headway_seconds!=2.0 ||
+          !c.enable_inroute_replanning || !c.enable_ebs_predecessor_gate || !c.source_fifo || c.source_fifo_order!="canonical" ||
+-         c.release_quantum!=1.0 || c.completion_quantum!=1.0 || c.source_generation_interval!=1.0 || c.congestion_weight!=0.0))
+-        throw std::invalid_argument("future source reservation requires canonical FIFO, causal rolling, strict half-open node/edge2 resources, q1 source/completion/feed and zero congestion weight");
++         c.release_quantum!=1.0 || c.completion_quantum!=1.0 || c.source_generation_interval!=1.0 || (c.congestion_weight!=0.0 && c.congestion_weight!=1.0)))
++        throw std::invalid_argument("future source reservation requires canonical FIFO, causal rolling, strict half-open node/edge2 resources, q1 source/completion/feed and congestion weight exactly 0 or 1");
+     if (c.time_grid_seconds!=0.000001) throw std::invalid_argument("time_grid_seconds must equal 1e-6");
+     if (c.source_fifo_order!="activation" && c.source_fifo_order!="canonical")
+         throw std::invalid_argument("source_fifo_order must be activation or canonical");

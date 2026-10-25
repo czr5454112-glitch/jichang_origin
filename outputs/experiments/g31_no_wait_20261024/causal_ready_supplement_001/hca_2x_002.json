@@ -1,0 +1,1366 @@
+{
+  "schema": "g31.nanning.causal_ready_supplement.v1",
+  "passed": true,
+  "kind": "hca",
+  "horizon": 200000.0,
+  "definition": "Common nominal-feed/causal-ready to actual continuous goal arrival: sum per business transport leg of finish-ready; supplemental, not replacement primary THT.",
+  "common_supply": "Per source, stable raw canonical pass_time/input row order; G_i=max(ceil_q1(pass_i),G_previous+1s). This is precomputed nominal-feed eligibility, not actual HCA generation or first planning.",
+  "readiness": "direct/storage_in ready=G; storage_out ready=max(G_out,ceil_q1(actual completed inbound finish)). Pending/planned inbound finish never supplies readiness.",
+  "leg_identity_source": "Exact canonical segment_id plus required task_id/start/goal; HCA may omit leg, but any present leg must match. Native leg is required.",
+  "segment_denominator": 87206,
+  "business_denominator": 57012,
+  "completed_segments": 87206,
+  "completed_businesses": 57012,
+  "full_population_available": true,
+  "metrics": {
+    "causal_ready_elapsed": {
+      "denominator": 57012,
+      "observed_count": 57012,
+      "censored_or_unavailable_count": 0,
+      "full_population": {
+        "count": 57012,
+        "sum": 2013651126.72,
+        "mean": 35319.77700694591,
+        "min": 60.26,
+        "p50": 59789.5125,
+        "p95": 69576.79225,
+        "p99": 71829.80535,
+        "max": 76996.94
+      }
+    },
+    "raw_predecessor_ready_elapsed": {
+      "denominator": 57012,
+      "observed_count": 57012,
+      "censored_or_unavailable_count": 0,
+      "full_population": {
+        "count": 57012,
+        "sum": 2013656182.11,
+        "mean": 35319.865679330665,
+        "min": 60.26,
+        "p50": 59789.6875,
+        "p95": 69577.20125,
+        "p99": 71830.46895,
+        "max": 76997.69
+      }
+    },
+    "ready_to_first_planning": {
+      "denominator": 57012,
+      "observed_count": 57012,
+      "censored_or_unavailable_count": 0,
+      "full_population": {
+        "count": 57012,
+        "sum": 1986018023.0,
+        "mean": 34835.08775345542,
+        "min": 0.0,
+        "p50": 59150.5,
+        "p95": 69024.0,
+        "p99": 71268.0,
+        "max": 76221.0
+      }
+    },
+    "first_planning_tht": {
+      "denominator": 57012,
+      "observed_count": 57012,
+      "censored_or_unavailable_count": 0,
+      "full_population": {
+        "count": 57012,
+        "sum": 27633103.72,
+        "mean": 484.68925349049323,
+        "min": 60.0,
+        "p50": 490.355,
+        "p95": 791.9,
+        "p99": 945.0872499999997,
+        "max": 4123.835
+      }
+    },
+    "network_elapsed": {
+      "denominator": 57012,
+      "observed_count": 57012,
+      "censored_or_unavailable_count": 0,
+      "full_population": {
+        "count": 57012,
+        "sum": 27208809.72,
+        "mean": 477.2470658808672,
+        "min": 59.0,
+        "p50": 483.49,
+        "p95": 780.07675,
+        "p99": 928.915,
+        "max": 1334.81
+      }
+    },
+    "planning_retry_wait": {
+      "denominator": 57012,
+      "observed_count": 57012,
+      "censored_or_unavailable_count": 0,
+      "full_population": {
+        "count": 57012,
+        "sum": 424294.0,
+        "mean": 7.4421876096260435,
+        "min": 0.0,
+        "p50": 2.0,
+        "p95": 22.0,
+        "p99": 106.0,
+        "max": 3741.0
+      }
+    },
+    "canonical_elapsed": {
+      "denominator": 57012,
+      "observed_count": 57012,
+      "censored_or_unavailable_count": 0,
+      "full_population": {
+        "count": 57012,
+        "sum": 2204128428.146106,
+        "mean": 38660.780680314776,
+        "min": 60.40473,
+        "p50": 60596.68945,
+        "p95": 93464.33675199999,
+        "p99": 120957.81234359997,
+        "max": 129617.29207
+      }
+    },
+    "nominal_feed_delay": {
+      "denominator": 57012,
+      "observed_count": 57012,
+      "censored_or_unavailable_count": 0,
+      "full_population": {
+        "count": 57012,
+        "sum": 3130363.426106,
+        "mean": 54.90709720946467,
+        "min": 0.0,
+        "p50": 6.949915,
+        "p95": 258.7654714999999,
+        "p99": 410.3165962,
+        "max": 578.35982
+      }
+    },
+    "canonical_release_q1_rounding": {
+      "denominator": 57012,
+      "observed_count": 57012,
+      "censored_or_unavailable_count": 0,
+      "full_population": {
+        "count": 57012,
+        "sum": 28302.426106,
+        "mean": 0.4964292799059847,
+        "min": 0.0,
+        "p50": 0.50081,
+        "p95": 0.94941,
+        "p99": 0.99016,
+        "max": 0.99988
+      }
+    },
+    "source_nominal_feed_queue": {
+      "denominator": 57012,
+      "observed_count": 57012,
+      "censored_or_unavailable_count": 0,
+      "full_population": {
+        "count": 57012,
+        "sum": 3102061.0,
+        "mean": 54.410667929558684,
+        "min": 0.0,
+        "p50": 6.0,
+        "p95": 258.0,
+        "p99": 410.0,
+        "max": 578.0
+      }
+    },
+    "own_predecessor_gate_delay": {
+      "denominator": 57012,
+      "observed_count": 57012,
+      "censored_or_unavailable_count": 0,
+      "full_population": {
+        "count": 57012,
+        "sum": 187346938.0,
+        "mean": 3286.0965761594052,
+        "min": 0.0,
+        "p50": 0.0,
+        "p95": 25135.34999999999,
+        "p99": 51705.229999999996,
+        "max": 61039.0
+      }
+    },
+    "q1_rounding_excluded": {
+      "denominator": 57012,
+      "observed_count": 57012,
+      "censored_or_unavailable_count": 0,
+      "full_population": {
+        "count": 57012,
+        "sum": 5055.39,
+        "mean": 0.08867238476110292,
+        "min": 0.0,
+        "p50": 0.0,
+        "p95": 0.69,
+        "p99": 0.87,
+        "max": 0.985
+      }
+    },
+    "ebs_storage_excluded": {
+      "denominator": 57012,
+      "observed_count": 57012,
+      "censored_or_unavailable_count": 0,
+      "full_population": {
+        "count": 57012,
+        "sum": 76371210.37,
+        "mean": 1339.5637825370097,
+        "min": 0.0,
+        "p50": 0.0,
+        "p95": 6391.3502499999895,
+        "p99": 10081.8329,
+        "max": 11628.35
+      }
+    }
+  },
+  "by_business_kind": {
+    "direct": {
+      "causal_ready_elapsed": {
+        "denominator": 26818,
+        "observed_count": 26818,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 26818,
+          "sum": 76657042.54,
+          "mean": 2858.4175755089864,
+          "min": 60.26,
+          "p50": 513.2825,
+          "p95": 11654.264,
+          "p99": 40282.51004999997,
+          "max": 63779.835
+        }
+      },
+      "raw_predecessor_ready_elapsed": {
+        "denominator": 26818,
+        "observed_count": 26818,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 26818,
+          "sum": 76657042.54,
+          "mean": 2858.4175755089864,
+          "min": 60.26,
+          "p50": 513.2825,
+          "p95": 11654.264,
+          "p99": 40282.51004999997,
+          "max": 63779.835
+        }
+      },
+      "ready_to_first_planning": {
+        "denominator": 26818,
+        "observed_count": 26818,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 26818,
+          "sum": 67234565.0,
+          "mean": 2507.06857334626,
+          "min": 0.0,
+          "p50": 6.0,
+          "p95": 11283.0,
+          "p99": 39920.919999999955,
+          "max": 63452.0
+        }
+      },
+      "first_planning_tht": {
+        "denominator": 26818,
+        "observed_count": 26818,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 26818,
+          "sum": 9422477.54,
+          "mean": 351.34900216272655,
+          "min": 60.0,
+          "p50": 344.695,
+          "p95": 656.78,
+          "p99": 776.5221499999998,
+          "max": 1424.195
+        }
+      },
+      "network_elapsed": {
+        "denominator": 26818,
+        "observed_count": 26818,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 26818,
+          "sum": 9297572.54,
+          "mean": 346.69149601014243,
+          "min": 59.0,
+          "p50": 339.465,
+          "p95": 649.99,
+          "p99": 765.685,
+          "max": 1180.98
+        }
+      },
+      "planning_retry_wait": {
+        "denominator": 26818,
+        "observed_count": 26818,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 26818,
+          "sum": 124905.0,
+          "mean": 4.6575061525840855,
+          "min": 0.0,
+          "p50": 1.0,
+          "p95": 17.0,
+          "p99": 51.0,
+          "max": 951.0
+        }
+      },
+      "canonical_elapsed": {
+        "denominator": 26818,
+        "observed_count": 26818,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 26818,
+          "sum": 76671767.59762,
+          "mean": 2858.9666491766725,
+          "min": 60.40473,
+          "p50": 513.58228,
+          "p95": 11654.812419,
+          "p99": 40283.222302999966,
+          "max": 63780.51641
+        }
+      },
+      "nominal_feed_delay": {
+        "denominator": 26818,
+        "observed_count": 26818,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 26818,
+          "sum": 14725.05762,
+          "mean": 0.5490736676858826,
+          "min": 0.0,
+          "p50": 0.52932,
+          "p95": 1.0234894999999993,
+          "p99": 1.6666783,
+          "max": 3.23068
+        }
+      },
+      "canonical_release_q1_rounding": {
+        "denominator": 26818,
+        "observed_count": 26818,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 26818,
+          "sum": 13262.05762,
+          "mean": 0.4945207554627489,
+          "min": 0.0,
+          "p50": 0.49801,
+          "p95": 0.9494,
+          "p99": 0.98909,
+          "max": 0.99988
+        }
+      },
+      "source_nominal_feed_queue": {
+        "denominator": 26818,
+        "observed_count": 26818,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 26818,
+          "sum": 1463.0,
+          "mean": 0.054552912223133715,
+          "min": 0.0,
+          "p50": 0.0,
+          "p95": 1.0,
+          "p99": 1.0,
+          "max": 3.0
+        }
+      },
+      "own_predecessor_gate_delay": {
+        "denominator": 26818,
+        "observed_count": 26818,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 26818,
+          "sum": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "p50": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        }
+      },
+      "q1_rounding_excluded": {
+        "denominator": 26818,
+        "observed_count": 26818,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 26818,
+          "sum": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "p50": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        }
+      },
+      "ebs_storage_excluded": {
+        "denominator": 26818,
+        "observed_count": 26818,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 26818,
+          "sum": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "p50": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        }
+      }
+    },
+    "ebs": {
+      "causal_ready_elapsed": {
+        "denominator": 30194,
+        "observed_count": 30194,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 30194,
+          "sum": 1936994084.18,
+          "mean": 64151.622315029475,
+          "min": 425.895,
+          "p50": 65127.415,
+          "p95": 70519.8435,
+          "p99": 72591.36445,
+          "max": 76996.94
+        }
+      },
+      "raw_predecessor_ready_elapsed": {
+        "denominator": 30194,
+        "observed_count": 30194,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 30194,
+          "sum": 1936999139.57,
+          "mean": 64151.78974531364,
+          "min": 425.895,
+          "p50": 65127.6725,
+          "p95": 70520.412,
+          "p99": 72591.475,
+          "max": 76997.69
+        }
+      },
+      "ready_to_first_planning": {
+        "denominator": 30194,
+        "observed_count": 30194,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 30194,
+          "sum": 1918783458.0,
+          "mean": 63548.50162283897,
+          "min": 0.0,
+          "p50": 64534.5,
+          "p95": 69971.0,
+          "p99": 72021.35,
+          "max": 76221.0
+        }
+      },
+      "first_planning_tht": {
+        "denominator": 30194,
+        "observed_count": 30194,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 30194,
+          "sum": 18210626.18,
+          "mean": 603.1206921905015,
+          "min": 308.445,
+          "p50": 608.19,
+          "p95": 842.045,
+          "p99": 985.7942,
+          "max": 4123.835
+        }
+      },
+      "network_elapsed": {
+        "denominator": 30194,
+        "observed_count": 30194,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 30194,
+          "sum": 17911237.18,
+          "mean": 593.2051791746704,
+          "min": 307.445,
+          "p50": 597.07,
+          "p95": 827.235,
+          "p99": 968.7326499999999,
+          "max": 1334.81
+        }
+      },
+      "planning_retry_wait": {
+        "denominator": 30194,
+        "observed_count": 30194,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 30194,
+          "sum": 299389.0,
+          "mean": 9.91551301583096,
+          "min": 1.0,
+          "p50": 2.0,
+          "p95": 30.0,
+          "p99": 154.0,
+          "max": 3741.0
+        }
+      },
+      "canonical_elapsed": {
+        "denominator": 30194,
+        "observed_count": 30194,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 30194,
+          "sum": 2127456660.548486,
+          "mean": 70459.58337909804,
+          "min": 443.90273,
+          "p50": 65318.23573,
+          "p95": 108216.58504399998,
+          "p99": 126234.3409194,
+          "max": 129617.29207
+        }
+      },
+      "nominal_feed_delay": {
+        "denominator": 30194,
+        "observed_count": 30194,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 30194,
+          "sum": 3115638.368486,
+          "mean": 103.18733418844805,
+          "min": 0.01192,
+          "p50": 68.751235,
+          "p95": 322.50551099999996,
+          "p99": 476.2309621999998,
+          "max": 578.35982
+        }
+      },
+      "canonical_release_q1_rounding": {
+        "denominator": 30194,
+        "observed_count": 30194,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 30194,
+          "sum": 15040.368486,
+          "mean": 0.498124411671193,
+          "min": 0.0,
+          "p50": 0.5029,
+          "p95": 0.9494549999999999,
+          "p99": 0.9930606999999999,
+          "max": 0.99984
+        }
+      },
+      "source_nominal_feed_queue": {
+        "denominator": 30194,
+        "observed_count": 30194,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 30194,
+          "sum": 3100598.0,
+          "mean": 102.68920977677685,
+          "min": 0.0,
+          "p50": 68.0,
+          "p95": 322.0,
+          "p99": 476.0,
+          "max": 578.0
+        }
+      },
+      "own_predecessor_gate_delay": {
+        "denominator": 30194,
+        "observed_count": 30194,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 30194,
+          "sum": 187346938.0,
+          "mean": 6204.7737298801085,
+          "min": 0.0,
+          "p50": 0.0,
+          "p95": 38302.44999999996,
+          "p99": 56758.77,
+          "max": 61039.0
+        }
+      },
+      "q1_rounding_excluded": {
+        "denominator": 30194,
+        "observed_count": 30194,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 30194,
+          "sum": 5055.39,
+          "mean": 0.1674302841624164,
+          "min": 0.0,
+          "p50": 0.0,
+          "p95": 0.79,
+          "p99": 0.87,
+          "max": 0.985
+        }
+      },
+      "ebs_storage_excluded": {
+        "denominator": 30194,
+        "observed_count": 30194,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 30194,
+          "sum": 76371210.37,
+          "mean": 2529.3505454726105,
+          "min": 0.0,
+          "p50": 2297.07,
+          "p95": 8295.306999999999,
+          "p99": 10405.36435,
+          "max": 11628.35
+        }
+      }
+    }
+  },
+  "by_leg": {
+    "direct": {
+      "causal_ready_elapsed": {
+        "denominator": 26818,
+        "observed_count": 26818,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 26818,
+          "sum": 76657042.54,
+          "mean": 2858.4175755089864,
+          "min": 60.26,
+          "p50": 513.2825,
+          "p95": 11654.264,
+          "p99": 40282.51004999997,
+          "max": 63779.835
+        }
+      },
+      "raw_predecessor_ready_elapsed": {
+        "denominator": 26818,
+        "observed_count": 26818,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 26818,
+          "sum": 76657042.54,
+          "mean": 2858.4175755089864,
+          "min": 60.26,
+          "p50": 513.2825,
+          "p95": 11654.264,
+          "p99": 40282.51004999997,
+          "max": 63779.835
+        }
+      },
+      "ready_to_first_planning": {
+        "denominator": 26818,
+        "observed_count": 26818,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 26818,
+          "sum": 67234565.0,
+          "mean": 2507.06857334626,
+          "min": 0.0,
+          "p50": 6.0,
+          "p95": 11283.0,
+          "p99": 39920.919999999955,
+          "max": 63452.0
+        }
+      },
+      "first_planning_tht": {
+        "denominator": 26818,
+        "observed_count": 26818,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 26818,
+          "sum": 9422477.54,
+          "mean": 351.34900216272655,
+          "min": 60.0,
+          "p50": 344.695,
+          "p95": 656.78,
+          "p99": 776.5221499999998,
+          "max": 1424.195
+        }
+      },
+      "network_elapsed": {
+        "denominator": 26818,
+        "observed_count": 26818,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 26818,
+          "sum": 9297572.54,
+          "mean": 346.69149601014243,
+          "min": 59.0,
+          "p50": 339.465,
+          "p95": 649.99,
+          "p99": 765.685,
+          "max": 1180.98
+        }
+      },
+      "planning_retry_wait": {
+        "denominator": 26818,
+        "observed_count": 26818,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 26818,
+          "sum": 124905.0,
+          "mean": 4.6575061525840855,
+          "min": 0.0,
+          "p50": 1.0,
+          "p95": 17.0,
+          "p99": 51.0,
+          "max": 951.0
+        }
+      },
+      "canonical_elapsed": {
+        "denominator": 26818,
+        "observed_count": 26818,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 26818,
+          "sum": 76671767.59762,
+          "mean": 2858.9666491766725,
+          "min": 60.40473,
+          "p50": 513.58228,
+          "p95": 11654.812419,
+          "p99": 40283.222302999966,
+          "max": 63780.51641
+        }
+      },
+      "nominal_feed_delay": {
+        "denominator": 26818,
+        "observed_count": 26818,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 26818,
+          "sum": 14725.05762,
+          "mean": 0.5490736676858826,
+          "min": 0.0,
+          "p50": 0.52932,
+          "p95": 1.0234894999999993,
+          "p99": 1.6666783,
+          "max": 3.23068
+        }
+      },
+      "canonical_release_q1_rounding": {
+        "denominator": 26818,
+        "observed_count": 26818,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 26818,
+          "sum": 13262.05762,
+          "mean": 0.4945207554627489,
+          "min": 0.0,
+          "p50": 0.49801,
+          "p95": 0.9494,
+          "p99": 0.98909,
+          "max": 0.99988
+        }
+      },
+      "source_nominal_feed_queue": {
+        "denominator": 26818,
+        "observed_count": 26818,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 26818,
+          "sum": 1463.0,
+          "mean": 0.054552912223133715,
+          "min": 0.0,
+          "p50": 0.0,
+          "p95": 1.0,
+          "p99": 1.0,
+          "max": 3.0
+        }
+      },
+      "own_predecessor_gate_delay": {
+        "denominator": 26818,
+        "observed_count": 26818,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 26818,
+          "sum": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "p50": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        }
+      },
+      "q1_rounding_excluded": {
+        "denominator": 26818,
+        "observed_count": 26818,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 26818,
+          "sum": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "p50": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        }
+      },
+      "ebs_storage_excluded": {
+        "denominator": 26818,
+        "observed_count": 26818,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 26818,
+          "sum": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "p50": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        }
+      }
+    },
+    "storage_in": {
+      "causal_ready_elapsed": {
+        "denominator": 30194,
+        "observed_count": 30194,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 30194,
+          "sum": 241888880.24,
+          "mean": 8011.157191494999,
+          "min": 137.75,
+          "p50": 527.8,
+          "p95": 43232.729999999996,
+          "p99": 61042.96,
+          "max": 63990.75
+        }
+      },
+      "raw_predecessor_ready_elapsed": {
+        "denominator": 30194,
+        "observed_count": 30194,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 30194,
+          "sum": 241888880.24,
+          "mean": 8011.157191494999,
+          "min": 137.75,
+          "p50": 527.8,
+          "p95": 43232.729999999996,
+          "p99": 61042.96,
+          "max": 63990.75
+        }
+      },
+      "ready_to_first_planning": {
+        "denominator": 30194,
+        "observed_count": 30194,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 30194,
+          "sum": 231585993.0,
+          "mean": 7669.934192223621,
+          "min": 0.0,
+          "p50": 21.0,
+          "p95": 43080.049999999996,
+          "p99": 60904.0,
+          "max": 63851.0
+        }
+      },
+      "first_planning_tht": {
+        "denominator": 30194,
+        "observed_count": 30194,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 30194,
+          "sum": 10302887.24,
+          "mean": 341.2229992713784,
+          "min": 137.75,
+          "p50": 336.425,
+          "p95": 544.1709999999999,
+          "p99": 696.88,
+          "max": 3877.75
+        }
+      },
+      "network_elapsed": {
+        "denominator": 30194,
+        "observed_count": 30194,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 30194,
+          "sum": 10038403.24,
+          "mean": 332.4635106312512,
+          "min": 137.75,
+          "p50": 330.425,
+          "p95": 531.355,
+          "p99": 695.88,
+          "max": 951.51
+        }
+      },
+      "planning_retry_wait": {
+        "denominator": 30194,
+        "observed_count": 30194,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 30194,
+          "sum": 264484.0,
+          "mean": 8.759488640127179,
+          "min": 0.0,
+          "p50": 1.0,
+          "p95": 29.0,
+          "p99": 152.0699999999997,
+          "max": 3740.0
+        }
+      },
+      "canonical_elapsed": {
+        "denominator": 30194,
+        "observed_count": 30194,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 30194,
+          "sum": 241905461.608486,
+          "mean": 8011.706352536464,
+          "min": 137.75773,
+          "p50": 528.2315,
+          "p95": 43232.926049999995,
+          "p99": 61043.6119705,
+          "max": 63991.21378
+        }
+      },
+      "nominal_feed_delay": {
+        "denominator": 30194,
+        "observed_count": 30194,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 30194,
+          "sum": 16581.368486,
+          "mean": 0.5491610414651917,
+          "min": 0.0,
+          "p50": 0.52934,
+          "p95": 0.99925,
+          "p99": 1.6472460999999998,
+          "max": 3.04099
+        }
+      },
+      "canonical_release_q1_rounding": {
+        "denominator": 30194,
+        "observed_count": 30194,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 30194,
+          "sum": 15040.368486,
+          "mean": 0.498124411671193,
+          "min": 0.0,
+          "p50": 0.5029,
+          "p95": 0.9494549999999999,
+          "p99": 0.9930606999999999,
+          "max": 0.99984
+        }
+      },
+      "source_nominal_feed_queue": {
+        "denominator": 30194,
+        "observed_count": 30194,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 30194,
+          "sum": 1541.0,
+          "mean": 0.051036629793998804,
+          "min": 0.0,
+          "p50": 0.0,
+          "p95": 0.0,
+          "p99": 1.0,
+          "max": 3.0
+        }
+      },
+      "own_predecessor_gate_delay": {
+        "denominator": 30194,
+        "observed_count": 30194,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 30194,
+          "sum": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "p50": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        }
+      },
+      "q1_rounding_excluded": {
+        "denominator": 30194,
+        "observed_count": 30194,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 30194,
+          "sum": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "p50": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        }
+      },
+      "ebs_storage_excluded": {
+        "denominator": 30194,
+        "observed_count": 30194,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 30194,
+          "sum": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "p50": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        }
+      }
+    },
+    "storage_out": {
+      "causal_ready_elapsed": {
+        "denominator": 30194,
+        "observed_count": 30194,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 30194,
+          "sum": 1695105203.94,
+          "mean": 56140.46512353448,
+          "min": 169.695,
+          "p50": 62691.0475,
+          "p95": 65877.77425,
+          "p99": 66992.02075,
+          "max": 67242.69
+        }
+      },
+      "raw_predecessor_ready_elapsed": {
+        "denominator": 30194,
+        "observed_count": 30194,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 30194,
+          "sum": 1695110259.33,
+          "mean": 56140.63255381864,
+          "min": 169.945,
+          "p50": 62691.0475,
+          "p95": 65877.77425,
+          "p99": 66992.02075,
+          "max": 67242.69
+        }
+      },
+      "ready_to_first_planning": {
+        "denominator": 30194,
+        "observed_count": 30194,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 30194,
+          "sum": 1687197465.0,
+          "mean": 55878.56743061536,
+          "min": 0.0,
+          "p50": 62451.5,
+          "p95": 65631.35,
+          "p99": 66748.07,
+          "max": 66939.0
+        }
+      },
+      "first_planning_tht": {
+        "denominator": 30194,
+        "observed_count": 30194,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 30194,
+          "sum": 7907738.94,
+          "mean": 261.897692919123,
+          "min": 169.695,
+          "p50": 266.175,
+          "p95": 325.69,
+          "p99": 503.877,
+          "max": 907.94
+        }
+      },
+      "network_elapsed": {
+        "denominator": 30194,
+        "observed_count": 30194,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 30194,
+          "sum": 7872833.94,
+          "mean": 260.7416685434192,
+          "min": 169.695,
+          "p50": 265.175,
+          "p95": 324.69,
+          "p99": 500.42,
+          "max": 898.94
+        }
+      },
+      "planning_retry_wait": {
+        "denominator": 30194,
+        "observed_count": 30194,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 30194,
+          "sum": 34905.0,
+          "mean": 1.1560243757037822,
+          "min": 0.0,
+          "p50": 1.0,
+          "p95": 1.0,
+          "p99": 6.0,
+          "max": 61.0
+        }
+      },
+      "canonical_elapsed": {
+        "denominator": 30194,
+        "observed_count": 30194,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 30194,
+          "sum": 1885551198.94,
+          "mean": 62447.87702656157,
+          "min": 215.145,
+          "p50": 63663.8025,
+          "p95": 66669.31825,
+          "p99": 67189.5561,
+          "max": 67389.69
+        }
+      },
+      "nominal_feed_delay": {
+        "denominator": 30194,
+        "observed_count": 30194,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 30194,
+          "sum": 3099057.0,
+          "mean": 102.63817314698285,
+          "min": 0.0,
+          "p50": 68.0,
+          "p95": 322.0,
+          "p99": 476.0,
+          "max": 578.0
+        }
+      },
+      "canonical_release_q1_rounding": {
+        "denominator": 30194,
+        "observed_count": 30194,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 30194,
+          "sum": 0.0,
+          "mean": 0.0,
+          "min": 0.0,
+          "p50": 0.0,
+          "p95": 0.0,
+          "p99": 0.0,
+          "max": 0.0
+        }
+      },
+      "source_nominal_feed_queue": {
+        "denominator": 30194,
+        "observed_count": 30194,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 30194,
+          "sum": 3099057.0,
+          "mean": 102.63817314698285,
+          "min": 0.0,
+          "p50": 68.0,
+          "p95": 322.0,
+          "p99": 476.0,
+          "max": 578.0
+        }
+      },
+      "own_predecessor_gate_delay": {
+        "denominator": 30194,
+        "observed_count": 30194,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 30194,
+          "sum": 187346938.0,
+          "mean": 6204.7737298801085,
+          "min": 0.0,
+          "p50": 0.0,
+          "p95": 38302.44999999996,
+          "p99": 56758.77,
+          "max": 61039.0
+        }
+      },
+      "q1_rounding_excluded": {
+        "denominator": 30194,
+        "observed_count": 30194,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 30194,
+          "sum": 5055.39,
+          "mean": 0.1674302841624164,
+          "min": 0.0,
+          "p50": 0.0,
+          "p95": 0.79,
+          "p99": 0.87,
+          "max": 0.985
+        }
+      },
+      "ebs_storage_excluded": {
+        "denominator": 30194,
+        "observed_count": 30194,
+        "censored_or_unavailable_count": 0,
+        "full_population": {
+          "count": 30194,
+          "sum": 76371210.37,
+          "mean": 2529.3505454726105,
+          "min": 0.0,
+          "p50": 2297.07,
+          "p95": 8295.306999999999,
+          "p99": 10405.36435,
+          "max": 11628.35
+        }
+      }
+    }
+  },
+  "native_activation_checks": 0,
+  "canonical_source_order_sha256": "0a50f5816adda5e0b01acdc158c8d1805d68d0876eac5135fb5a9c0313f35abb",
+  "violations": 0,
+  "violation_counts": {},
+  "examples": [],
+  "largest_observed_business_diagnostic": [
+    {
+      "task_id": "30908",
+      "kind": "ebs",
+      "seconds": 76996.94
+    },
+    {
+      "task_id": "9107",
+      "kind": "ebs",
+      "seconds": 76585.72
+    },
+    {
+      "task_id": "37450",
+      "kind": "ebs",
+      "seconds": 76583.305
+    },
+    {
+      "task_id": "2886",
+      "kind": "ebs",
+      "seconds": 76579.375
+    },
+    {
+      "task_id": "3097",
+      "kind": "ebs",
+      "seconds": 76399.085
+    },
+    {
+      "task_id": "9182",
+      "kind": "ebs",
+      "seconds": 76346.95
+    },
+    {
+      "task_id": "37613",
+      "kind": "ebs",
+      "seconds": 76157.89
+    },
+    {
+      "task_id": "8944",
+      "kind": "ebs",
+      "seconds": 76146.965
+    },
+    {
+      "task_id": "3264",
+      "kind": "ebs",
+      "seconds": 76110.395
+    },
+    {
+      "task_id": "37688",
+      "kind": "ebs",
+      "seconds": 76059.29
+    },
+    {
+      "task_id": "31603",
+      "kind": "ebs",
+      "seconds": 76028.485
+    },
+    {
+      "task_id": "3450",
+      "kind": "ebs",
+      "seconds": 76027.45
+    },
+    {
+      "task_id": "6578",
+      "kind": "ebs",
+      "seconds": 75883.62
+    },
+    {
+      "task_id": "3645",
+      "kind": "ebs",
+      "seconds": 75804.34
+    },
+    {
+      "task_id": "30659",
+      "kind": "ebs",
+      "seconds": 75705.34
+    },
+    {
+      "task_id": "31392",
+      "kind": "ebs",
+      "seconds": 75667.795
+    },
+    {
+      "task_id": "36946",
+      "kind": "ebs",
+      "seconds": 75567.8
+    },
+    {
+      "task_id": "32151",
+      "kind": "ebs",
+      "seconds": 75532.34
+    },
+    {
+      "task_id": "35084",
+      "kind": "ebs",
+      "seconds": 75519.62
+    },
+    {
+      "task_id": "31770",
+      "kind": "ebs",
+      "seconds": 75494.245
+    }
+  ],
+  "boundaries": [
+    "Full-population statistics remain null if any member is incomplete or readiness/clock evidence is unavailable. Tail examples alone are not full-population results.",
+    "EBS storage excluded=max(0,G_out-actual inbound finish); q1 causal readiness rounding is excluded separately. EBS leg intervals cannot overlap under this anchor.",
+    "G depends on common canonical supply and static feed; out readiness additionally depends on each algorithm actual inbound arrival, so this is not a shared fixed treatment start or a causal effect estimate.",
+    "HCA release_epoch is actual planning-list generation and may be delayed by a blocked canonical head. It is not substituted for G or causal ready.",
+    "Physical safety and original primary THT remain the responsibility of existing independent audits. This supplemental accounting changes no algorithm or frozen result."
+  ],
+  "run": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_repaired_uniform_profile_004_drain200000_001\\nanning_2x",
+  "prior_independent_gates": {
+    "physical_headway_audit": true,
+    "source_policy_audit_001": true,
+    "tht_metrics": true,
+    "final_physical": true,
+    "annotation_original_fields_exact": true
+  },
+  "evidence_files": {
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_repaired_uniform_profile_004_drain200000_001\\nanning_2x\\final_summary_001.json": {
+      "sha256": "42f3913320c755c2f99f5b554447a14d8c7c60728cd3dc5011fff6f8af9f7b83",
+      "bytes": 3739
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_repaired_uniform_profile_004_drain200000_001\\manifest.json": {
+      "sha256": "b2fa33f9899f53bc2eef83c36f556f3fc289d96c0686112c5b6752f9a125bc0e",
+      "bytes": 22566
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_repaired_uniform_profile_004_drain200000_001\\nanning_2x\\run_01\\run_status.json": {
+      "sha256": "f6823075ddeafa62202efa7e7d357133fdf9b77119077becede627296ebce018",
+      "bytes": 2210
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_repaired_uniform_profile_004_drain200000_001\\nanning_2x\\physical_headway_audit.json": {
+      "sha256": "3b0e140a6fc52f12da72f5de9ffecf0b607ea4a3d8d4b306786a43cc799a0c51",
+      "bytes": 31113
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_repaired_uniform_profile_004_drain200000_001\\nanning_2x\\source_policy_audit_001.json": {
+      "sha256": "6ad59fecd84eb6275513976b0587388490d7dd6f75e6e712eb87c7a9578d7338",
+      "bytes": 1331
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_repaired_uniform_profile_004_drain200000_001\\nanning_2x\\tht_metrics.json": {
+      "sha256": "7a40bb56b485479f8e6f7febd3ef6be2def89bdf343e5761277b9a985203afe7",
+      "bytes": 49772
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_repaired_uniform_profile_004_drain200000_001\\nanning_2x\\annotated_physical_bags_receipt.json": {
+      "sha256": "a69bef01c3f4bdbd25f48af8a78d1051528026ce9867877ea009862d4dc70d4c",
+      "bytes": 999
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\g31_continuous\\nanning_2x_canonical.jsonl.gz": {
+      "sha256": "5e0d3feef7b3f94aae2f3ec3c445720bc971599c82252383ab1ebc44fa46491b",
+      "content_sha256": "55538837011a1ed31eb272cc170fdc9fefb3b40ec14e2ae0574877a8c465a115",
+      "bytes": 2299529,
+      "records": 87206
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_repaired_uniform_profile_004_drain200000_001\\nanning_2x\\annotated_physical_bags.jsonl": {
+      "sha256": "e0715899b4246494019001459259be6c7f0262086b31a46652e156dbddb63034",
+      "content_sha256": "e0715899b4246494019001459259be6c7f0262086b31a46652e156dbddb63034",
+      "bytes": 87632325,
+      "records": 87206
+    }
+  },
+  "tool_sha256": "f7103d6d41c12b602fcb54e3912890897d438bb24d32a27305507e6c0e8c7729"
+}

@@ -1,0 +1,17 @@
+--- frozen012/core.cpp
++++ candidate013/core.cpp
+@@ -438,7 +438,13 @@
+         double occupied=0, union_start=0, union_end=0;
+         bool open=false;
+         const auto& c=calendars[node];
+-        auto it=c.begin();
++        // Under the validated fixed2 half-open tuple, S < A-2s implies
++        // E < A. These entries were empty after clipping to [A,until),
++        // so skipping them preserves the union operations and their order.
++        // Keep the boundary and every original test; other modes full-scan.
++        auto it=fixed_two_second_calendars
++            ? c.lower_bound(seconds(std::max<std::int64_t>(0,tick(arrival)-2000000LL)))
++            : c.begin();
+         for (;it!=c.end() && it->first<until;++it) {
+             if (it->second.task==ignore_owner) continue;
+             const double start=std::max(arrival,it->first), end=std::min(until,it->second.end);

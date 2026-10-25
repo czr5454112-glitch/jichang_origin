@@ -1,0 +1,38 @@
+--- frozen013/continuous_adapter.py
++++ candidate015/continuous_adapter.py
+@@ -1,4 +1,4 @@
+-"""Isolated candidate013 runner derived from the official continuous adapter.
++"""Isolated candidate015 runner derived from the official continuous adapter.
+ 
+ The registered model uses local next-hop scoring and a complete continuation
+ certificate. Registration is not a performance promotion or distributed-network
+@@ -31,7 +31,8 @@
+     congestion_weight=1.0,pressure_window=30.0,max_expansions=256,max_score_expansions=64,
+     max_retries=100000,max_events=10000000,retry_mode="calendar_jump",retry_step=1.0,
+     audit_failed_calendar_hash=False,skip_scoring_single_choice=True,route_excess_retry_relaxation_rate=0.0,
+-    future_source_reservation_horizon_seconds=0,future_source_reservation_min_wait_seconds=2.0,**FIXED)
++    future_source_reservation_horizon_seconds=0,future_source_reservation_min_wait_seconds=2.0,
++    future_source_prefer_earlier_finish=False,**FIXED)
+ ALLOWED = set(DEFAULT_CONTROLS) | {"max_route_excess_seconds"}
+ 
+ 
+@@ -94,7 +95,9 @@
+     if not 0<=future<=60:
+         raise ValueError("future reservation horizon must be an integer in [0,60]")
+     if future and controls["congestion_weight"] not in (0,1):
+-        raise ValueError("candidate013 future reservations support only congestion weight 0 or 1")
++        raise ValueError("candidate015 future reservations support only congestion weight 0 or 1")
++    if controls["future_source_prefer_earlier_finish"] and not future:
++        raise ValueError("earlier-finish source comparison requires enabled future reservation")
+     return controls
+ 
+ 
+@@ -241,7 +244,7 @@
+ def verified_auditors(source_dir):
+     """Load the frozen audit package, checking every live source against it."""
+     names=("headway_audit","future_metadata","rolling_replay","tht_metrics","source_policy_audit")
+-    package_name="g31_candidate013_auditors_"+hashlib.sha256(str(source_dir.resolve()).encode()).hexdigest()[:16]
++    package_name="g31_candidate015_auditors_"+hashlib.sha256(str(source_dir.resolve()).encode()).hexdigest()[:16]
+     package=types.ModuleType(package_name)
+     package.__path__=[str(source_dir)]
+     sys.modules[package_name]=package

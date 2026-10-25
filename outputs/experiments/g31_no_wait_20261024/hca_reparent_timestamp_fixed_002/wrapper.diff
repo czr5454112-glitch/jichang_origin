@@ -1,0 +1,89 @@
+--- original_telemetry_wrapper
++++ physical_source_gate_wrapper
+@@ -236,6 +236,9 @@
+         double storageLeadSeconds
+     ) throws IOException {
+         prepareWorkingFiles();
++        PhysicalSourceGate sourceGate = new PhysicalSourceGate();
++        if (sourceGate.causalEbs && (!schedule.isEmpty() || faultProbability != 0 || repairProbability != 0))
++            throw new IllegalArgumentException("causal source adapter is verified only for no-fault execution");
+         RunResult result = new RunResult();
+         result.startEpoch = startEpoch;
+         result.maxEpochs = maxEpochs;
+@@ -269,12 +272,19 @@
+             result.epochsRun = epochIndex + 1;
+             applyScheduleEvents(schedule, startEpoch + epochIndex, ics, result);
+             Tasks newTasks = new Tasks();
++            HashMap<Integer, ArrayList<task>> held = sourceGate.mask(taskList, ics, epoch, storageInGoal, storageOutStart);
+             newTasks.generate_tasks(taskList, newTasks, epoch, ics, faultProbability, repairProbability, 0.0);
++            for (int source : held.keySet()) taskList.put(source, held.get(source));
++            sourceGate.observeReports(newTasks, storageInGoal);
+             result.generatedFaultEdgeCount += newTasks.getFault_edges().size();
+             result.generatedRepairEdgeCount += newTasks.getRepaired_edges().size();
+             result.generatedCount += newTasks.getNew_tasks_list().size();
+             recordReleases(result, newTasks, epoch);
+             HashSet<Integer> beforeKeys = new HashSet<>(ics.getSaved_routes().keySet());
++            if (sourceGate.causalEbs) {
++                for (task completed : newTasks.getOnpath_tasks_list())
++                    if (completed.getPassed_vertex_location() == completed.getGoal()) beforeKeys.remove(completed.getTask_ID());
++            }
+             ics.ICS_path_finding(newTasks, ics.getMap(), epoch, ics);
+             recordNewRoutes(result, beforeKeys, ics, epoch);
+             if (maxNewTasks > 0 && result.generatedCount >= maxNewTasks) {
+@@ -282,12 +292,56 @@
+             }
+         }
+ 
++        System.out.println("physical_source_ceil=" + sourceGate.ceilRelease + ",physical_source_causal_ebs=" + sourceGate.causalEbs
++            + ",ceil_mask_ticks=" + sourceGate.ceilMaskTicks + ",ebs_mask_ticks=" + sourceGate.ebsMaskTicks);
+         result.completedCount = countLines(new File("output.txt"));
+         result.plannedCount = result.plannedRoutes.size();
+         result.activeRouteCount = ics.getSaved_routes().size();
+         result.unfinishedCount = ics.getUnfinishTasks().size();
+         result.activeFaultCount = ics.getFault_edges().size();
+         return result;
++    }
++
++
++    // Wrapper-only source admission adapter. It never changes the original task's nominal time.
++    private static final class PhysicalSourceGate {
++        final boolean ceilRelease = Boolean.getBoolean("g31.hca.ceilRelease");
++        final boolean causalEbs = Boolean.getBoolean("g31.hca.causalEbs");
++        final HashSet<Integer> completedInbound = new HashSet<>();
++        long ceilMaskTicks = 0;
++        long ebsMaskTicks = 0;
++
++        private boolean inboundReportsThisTick(ICS_PathFinding ics, int id, int goal, double epoch) {
++            ArrayList<Node> route = ics.getSaved_routes().get(id);
++            return route != null && route.size() == 2
++                && route.get(1).getLocation() == goal && epoch >= route.get(1).getT1();
++        }
++        HashMap<Integer, ArrayList<task>> mask(HashMap<Integer, ArrayList<task>> queues,
++                ICS_PathFinding ics, double epoch, int storageInGoal, int storageOutStart) {
++            HashMap<Integer, ArrayList<task>> held = new HashMap<>();
++            for (int source : queues.keySet()) {
++                ArrayList<task> queue = queues.get(source);
++                if (queue.isEmpty()) continue;
++                task head = queue.get(0);
++                boolean tooEarly = ceilRelease && head.getPass_time() > epoch;
++                boolean unavailable = causalEbs && source == storageOutStart
++                    && !completedInbound.contains(head.getTask_ID())
++                    && !inboundReportsThisTick(ics, head.getTask_ID(), storageInGoal, epoch);
++                if (tooEarly) ceilMaskTicks++;
++                if (unavailable) ebsMaskTicks++;
++                if (tooEarly || unavailable) {
++                    held.put(source, queue);
++                    queues.put(source, new ArrayList<task>());
++                }
++            }
++            return held;
++        }
++        void observeReports(Tasks tasks, int storageInGoal) {
++            for (task t : tasks.getOnpath_tasks_list()) {
++                if (t.getGoal() == storageInGoal && t.getPassed_vertex_location() == storageInGoal)
++                    completedInbound.add(t.getTask_ID());
++            }
++        }
+     }
+ 
+     private static void configureMapSpeed(ICS_PathFinding ics, double speedMps) {

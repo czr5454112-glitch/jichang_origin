@@ -1,0 +1,64 @@
+--- frozen014/core.cpp
++++ candidate018/core.cpp
+@@ -221,12 +221,16 @@
+         c.future_source_reservation_horizon_seconds=py::cast<int>(value);
+     }
+ #undef READ_OPTION
+-    if (c.pressure_signal!="union_occupied" && c.pressure_signal!="slot_loss")
+-        throw std::invalid_argument("pressure_signal must be union_occupied or slot_loss");
++    if (c.pressure_signal!="union_occupied" && c.pressure_signal!="slot_loss" && c.pressure_signal!="headway_scaled_occupancy")
++        throw std::invalid_argument("pressure_signal must be union_occupied, slot_loss or headway_scaled_occupancy");
+     if (c.pressure_signal=="slot_loss" &&
+         (c.interval_mode!="half_open" || !c.strict_endpoint_resources ||
+          c.edge_entry_headway_seconds!=2.0 || c.pressure_window!=30.0))
+         throw std::invalid_argument("slot_loss requires strict half-open fixed2 resources and a 30-second pressure window");
++    if (c.pressure_signal=="headway_scaled_occupancy" &&
++        (c.interval_mode!="half_open" || !c.strict_endpoint_resources ||
++         c.edge_entry_headway_seconds!=2.0 || c.pressure_window!=30.0))
++        throw std::invalid_argument("headway_scaled_occupancy requires strict half-open fixed2 resources and a 30-second pressure window");
+     finite_nonnegative(c.end_time,"end_time");
+     finite_nonnegative(c.congestion_weight,"congestion_weight");
+     finite_nonnegative(c.pressure_window,"pressure_window");
+@@ -488,6 +492,12 @@
+         if (open) occupied+=union_end-union_start;
+         return occupied;
+     }
++    // Occupancy risk price, not an estimate of queue waiting. The original
++    // union and slot computations and exact blocked-delay term stay unchanged.
++    double ranking_pressure_seconds(int node,double arrival,int ignore_owner) const {
++        const double occupancy=pressure_seconds(node,arrival,ignore_owner);
++        return cfg.pressure_signal=="headway_scaled_occupancy" ? occupancy*(2.0/30.0) : occupancy;
++    }
+     double score_suffix(int node, double arrival, int depth, const GoalData& gd,
+                         Attempt& a, std::vector<unsigned char>& seen, ScoreBudget& budget,
+                         int query_depth) {
+@@ -508,7 +518,7 @@
+         ++a.score_expansions; ++a.scoring_queries;
+         double blocked_end=-inf;
+         const bool blocked=conflicts(node,arrival,add_time(arrival,nodes[node].service),&blocked_end,nullptr,a.ignore_owner);
+-        const double penalty=(blocked ? std::max(0.0,blocked_end-arrival) : 0.0)+pressure_seconds(node,arrival,a.ignore_owner);
++        const double penalty=(blocked ? std::max(0.0,blocked_end-arrival) : 0.0)+ranking_pressure_seconds(node,arrival,a.ignore_owner);
+         if (depth<=1) return gd.h[node]+cfg.congestion_weight*penalty;
+         seen[node]=1;
+         double continuation=inf;
+@@ -1168,6 +1178,8 @@
+             });
+         if (cfg.pressure_signal=="slot_loss" && !fixed_two_second_calendars)
+             throw std::invalid_argument("slot_loss requires all node services to be zero or exactly 2 seconds");
++        if (cfg.pressure_signal=="headway_scaled_occupancy" && !fixed_two_second_calendars)
++            throw std::invalid_argument("headway_scaled_occupancy requires all node services to be zero or exactly 2 seconds");
+         if (cfg.enable_ebs_predecessor_gate) {
+             std::map<std::int64_t,int> inbound,outbound;
+             for (std::size_t i=0;i<tasks.size();++i) {
+@@ -1437,6 +1449,11 @@
+             contract["congestion_signal"]="unchanged exact-window blocking delay proxy plus 2*(15-sum floor(free_gap_us/2000000)) over the next 30 seconds; confirmed node rights including pending future owners, ignoring only self; ranking only, no internal waiting";
+             contract["slot_pressure_boundary"]="Single-node integer-us packing proxy, not whole-route feasible starts, source-q1 capacity, fairness or throughput guarantee. Zero-service node pressure remains zero; edge pressure is unchanged.";
+         }
++        if (cfg.pressure_signal=="headway_scaled_occupancy") {
++            contract["pressure_signal"]="headway_scaled_occupancy";
++            contract["congestion_signal"]="unchanged exact-window blocking delay proxy plus original 30-second node union occupancy multiplied by 2/30; only ranking changes";
++            contract["occupancy_risk_price_boundary"]="2*rho is a bounded occupancy risk-price heuristic, not expected queue waiting, a future source waiting prediction, whole-route capacity or a throughput guarantee. Fixed spatial k, physical certificates, FIFO, source clocks and budgets are unchanged. Zero-service node pressure remains zero.";
++        }
+         contract["source_generation"]="precomputed eligibility uses stable nominal order and source interval; source_fifo additionally paces successful admissions by that interval; no early release; not an exact reproduction of Java generation/comparator quirks";
+         contract["source_fifo_order"]=cfg.source_fifo_order;
+         contract["canonical_source_order"]="when explicitly enabled: stable original nominal release order, input row order for ties; an unreleased or predecessor-blocked head blocks every later source item, activation does not append/reorder";

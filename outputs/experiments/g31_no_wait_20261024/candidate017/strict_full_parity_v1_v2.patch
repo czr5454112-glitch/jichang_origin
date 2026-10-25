@@ -1,0 +1,45 @@
+--- strict_full_parity_013_017_v1.py
++++ strict_full_parity_013_017_v2.py
+@@ -104,6 +104,14 @@
+     if Path(next(iter(receipt['binaries']))).resolve()!=expected:
+         raise ValueError('candidate017 binary must come from its isolated build path')
+     return REFERENCE_BINARY,candidate_binary
++
++def validate_registered_controls(config):
++    # Fixed observation_depth initializes selected=max_depth and changes it only
++    # under cfg.adaptive (frozen core.cpp:416-433). Registered fixed2 controls
++    # retain min_depth=1; min_depth=2 was an erroneous v1 precondition.
++    actual=(config['congestion_weight'],config['min_depth'],config['max_depth'],config['adaptive'],config['end_time'])
++    if actual!=(1,1,2,False,200000):
++        raise ValueError('registered comparison requires w1/min1/max2/adaptiveFalse/drain200000')
+ 
+ def run(reference,candidate):
+     binaries=expected_binaries()
+@@ -156,8 +164,7 @@
+     require_same(configs[0],a['effective_controls'],'selection config ')
+     if (configs[0]['future_source_reservation_horizon_seconds'],configs[0]['future_source_reservation_min_wait_seconds'])!=(60,2):
+         raise ValueError('registered comparison requires future60/minwait2')
+-    if (configs[0]['congestion_weight'],configs[0]['min_depth'],configs[0]['max_depth'],configs[0]['adaptive'],configs[0]['end_time'])!=(1,2,2,False,200000):
+-        raise ValueError('registered comparison requires w1 fixed2 drain200000')
++    validate_registered_controls(configs[0])
+     statuses=[];audit_equality={} 
+     for d in dirs:
+         result={n:read(track(d/(n+'.json'))).get('passed') for n in AUDITS}
+@@ -184,7 +191,7 @@
+     if bags['records']!=a['segment_denominator'] or bags['candidate_records']!=b['segment_denominator']:raise ValueError('bag denominator mismatch')
+     if ledger['records']!=native[0]['rolling_ledger_records'] or ledger['candidate_records']!=native[1]['rolling_ledger_records']:raise ValueError('ledger count mismatch')
+     if any((p.stat().st_size,p.stat().st_mtime_ns)!=v for p,v in tracked.items()):raise ValueError('evidence changed during scan')
+-    return dict(schema='g31.candidate017.full_parity.v1',passed=bags['passed'] and ledger['passed'] and native_diff is None and std_diff is None,
++    return dict(schema='g31.candidate017.full_parity.v2',passed=bags['passed'] and ledger['passed'] and native_diff is None and std_diff is None,
+       reference_run=str(dirs[0]),candidate_run=str(dirs[1]),bags=bags,rolling_events=ledger,uncompressed_request=request,
+       native_nonallowed_difference=native_diff,standard_summary_difference=std_diff,independent_audits=statuses,independent_audit_results_exact=audit_equality,
+       allowed_time_fields=sorted(TIMES),allowed_work_fields=[],
+@@ -200,7 +207,7 @@
+     if a.output.exists():raise FileExistsError(a.output)
+     try:result=run(a.reference,a.candidate)
+     except Exception as exc:
+-        result=dict(schema='g31.candidate017.full_parity.v1',passed=False,failed_precondition=repr(exc),reference_run=str(Path(a.reference).resolve()),candidate_run=str(Path(a.candidate).resolve()),source_sha256=dict(parity_tool=sha(__file__)))
++        result=dict(schema='g31.candidate017.full_parity.v2',passed=False,failed_precondition=repr(exc),reference_run=str(Path(a.reference).resolve()),candidate_run=str(Path(a.candidate).resolve()),source_sha256=dict(parity_tool=sha(__file__)))
+     a.output.parent.mkdir(parents=True,exist_ok=True)
+     a.output.write_text(json.dumps(result,indent=2,allow_nan=False)+'\n',encoding='utf-8')
+     print(json.dumps({k:result.get(k) for k in ('passed','failed_precondition','native_nonallowed_difference','standard_summary_difference')}))

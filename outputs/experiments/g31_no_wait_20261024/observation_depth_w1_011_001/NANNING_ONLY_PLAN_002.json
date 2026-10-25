@@ -1,0 +1,358 @@
+{
+  "schema": "g31.observation_depth_w1_011.nanning_only.v2",
+  "status": "prepared_not_executed",
+  "date": "2026-10-24",
+  "objective": "Measure implemented fixed spatial lookahead k=1 versus k=2 under congestion_weight=1, with future source reservations disabled and the shared continuous-motion physical model unchanged.",
+  "hypothesis": "At a genuine upstream choice, k=2 may expose downstream merge pressure behind the next node and improve allocation or fixed-window completion. An improvement is not presumed.",
+  "frozen_implementation": {
+    "source_freeze": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate011\\SOURCE_FREEZE_011_001.json",
+    "source_freeze_sha256": "c04a12ab64c43d9f7bde8c920d105ff1b84889780352115fdce41bc53e9eb352",
+    "native_source_sha256": "c03b54db9ff7756ca90bbf5fe22fd64ea3117dde0493dd60850ed16162a1866c",
+    "binary": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build\\g31_no_wait_011\\python\\g31_nowait.cp311-win_amd64.pyd",
+    "binary_sha256": "e0b0d90a486b119cfcce70bf539501b96d08ac6d9d0a56aca21c72a7002f61c1",
+    "runner": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate011\\run_candidate.py",
+    "runner_sha256": "898766a9f1a3a727a25f3aa0030b78d3380c5c503b64bf88dc7660d171fb3517",
+    "adapter_sha256": "fc4b7ed6fcf25a01243f4e64d4e9fb9abea5d4a3fcc028b1417b7130aef2560d",
+    "physical_contract": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate011\\registered_contracts_011\\physical_contract_drain200000.json",
+    "physical_contract_sha256": "946ae9582adf59d4f21c2e3043a7139b8993809d69447a636ae392f9d8e925d2"
+  },
+  "independent_variable": {
+    "fixed1": {
+      "min_depth": 1,
+      "max_depth": 1,
+      "adaptive": false
+    },
+    "fixed2": {
+      "min_depth": 2,
+      "max_depth": 2,
+      "adaptive": false
+    }
+  },
+  "between_arm_control_differences": [
+    "min_depth",
+    "max_depth"
+  ],
+  "safety_hard_gates": [
+    "No internal waiting actions; continuous route timing.",
+    "Every original positive-service node remains 2s; original zero service remains zero.",
+    "Half-open positive source/internal/goal resource intervals, including diverters; touching exactly 2s is legal.",
+    "Directed-edge entry interval protection is 2s on the integer microsecond grid.",
+    "Canonical stable source FIFO, strict ceil release, actual predecessor completion gate, 1s source pacing.",
+    "All five independent runner audits must pass; budget/event exhaustion or identity mismatch prevents a valid comparison.",
+    "Future_source_reservation_horizon_seconds=0 in both arms; no reserve/launch events expected."
+  ],
+  "primary": [
+    "Full registered business-population user THT (1x:28506; 2x:57012): sum per business of each actual goal arrival minus immutable first planning attempt; null unless every business in that scale is complete.",
+    "Fixed-cutoff business completion at 98259 and corresponding unfinished/unreleased/pending/in-network population."
+  ],
+  "mandatory_companions": [
+    "Preplanning source hold, first-attempt retry wait, network time and canonical elapsed; distinguish EBS causal readiness from source FIFO blocking.",
+    "STD and STD-2700 strict full-population success counts/rates and direct/EBS cohorts.",
+    "Native event-loop CPU/wall, Python native-API CPU/wall, end-to-end audit/runtime separately; do not infer algorithm acceleration against Java whole-process wall.",
+    "Requested-k and actual calendar-query-depth histograms, scored candidates, local_scoring_calendar_queries, score_expansions, score-budget exhaustion, full search expansions/budget exhaustion, in-route replacement attempts/successes/fallbacks.",
+    "Source/node/edge safety query counts, retry counts, complete population and last actual goal finish; no deletion of difficult bags."
+  ],
+  "interpretation_limits": [
+    "Increasing k changes both accessible spatial information and the accumulated score_suffix congestion penalty; this is not a normalized pure-information experiment.",
+    "The same score expansion cap can bind differently for k=2; query depth and exhaustion must be reported rather than assuming all decisions observe two hops.",
+    "Forced prefixes without a routing alternative, including 136->137->112, cannot be bypassed merely by increasing observation depth.",
+    "More observations or successful replacements do not alone establish useful THT, throughput or deadline improvement.",
+    "Each cell is one deterministic execution; CPU measurements are implementation-specific and a single timing is not a statistical speed estimate."
+  ],
+  "excluded_arm": {
+    "name": "adaptive_1_to_2",
+    "reason": "Existing static topology review shows the merge-floor rule chooses fixed2 at all actually scored forks in these two graphs. No duplicate arm is registered.",
+    "evidence": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\variable_lookahead_static_011_001.json",
+    "sha256": "bffb46f8602770b88804bb7bbb8fd66526446fa7077b0b933b2ac8c180fe7dd8"
+  },
+  "execution_policy": "Only root launches after assigning the exclusive heavy slot. Nanning2x fixed1 -> fixed2 -> Nanning1x fixed1 -> fixed2. No map2 task is authorized by this plan. Report all outcomes and stop/unexecuted statuses; root enforces 23:00 Asia/Shanghai checkpoint.",
+  "unchanged_existing_files": true,
+  "full_population_or_native_run_executed": false,
+  "supersedes": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\observation_depth_w1_011_001\\PREDECLARED_PLAN.json",
+    "sha256": "34e855fad92b02557f601053426b036aa2885668775251979c090e4dd7dd5bb7",
+    "original_four_cell_plan_executed": false,
+    "reason": "User explicitly restricted active experiments to Nanning 1x/2x for faster validation. Original plan retained as unexecuted history."
+  },
+  "execution_order": [
+    {
+      "order": 1,
+      "map": "nanning",
+      "scale": 2,
+      "arm": "fixed1",
+      "output": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_observation_fixed1_w1_future0_cap120_relax1_drain200000_011",
+      "controls": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\observation_depth_w1_011_001\\controls_fixed1_drain200000.json",
+        "sha256": "bd428c4e50366e97594805a25ad9b94411e8a779b90681de6f3b4f2ab3bcfa5f",
+        "changes_from_frozen_reference": {
+          "congestion_weight": {
+            "reference": 0,
+            "candidate": 1
+          },
+          "future_source_reservation_horizon_seconds": {
+            "reference": 60,
+            "candidate": 0
+          }
+        }
+      },
+      "input_identity": {
+        "canonical": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\g31_continuous\\nanning_2x_canonical.jsonl.gz",
+          "sha256": "5e0d3feef7b3f94aae2f3ec3c445720bc971599c82252383ab1ebc44fa46491b",
+          "bytes": 2299529
+        },
+        "profile": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\g31_continuous\\nanning_service2.json",
+          "sha256": "9b1a78344ec89aaac377feb05afccd48d9b957174286b29eedfe57a73a93c426",
+          "bytes": 714420
+        }
+      },
+      "business_denominator": 57012,
+      "segment_denominator": 87206,
+      "command_argv": [
+        "C:/PROGRAMING/python3.11.9/python.exe",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate011\\run_candidate.py",
+        "--map",
+        "nanning",
+        "--scale",
+        "2",
+        "--controls",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\observation_depth_w1_011_001\\controls_fixed1_drain200000.json",
+        "--physical-contract",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate011\\registered_contracts_011\\physical_contract_drain200000.json",
+        "--output",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_observation_fixed1_w1_future0_cap120_relax1_drain200000_011"
+      ]
+    },
+    {
+      "order": 2,
+      "map": "nanning",
+      "scale": 2,
+      "arm": "fixed2",
+      "output": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_observation_fixed2_w1_future0_cap120_relax1_drain200000_011",
+      "controls": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\observation_depth_w1_011_001\\controls_fixed2_drain200000.json",
+        "sha256": "97010c68a1b8c01420b4dcd97de1b42fa426941d526f13fdb2dab205f4d36d96",
+        "changes_from_frozen_reference": {
+          "min_depth": {
+            "reference": 1,
+            "candidate": 2
+          },
+          "max_depth": {
+            "reference": 1,
+            "candidate": 2
+          },
+          "congestion_weight": {
+            "reference": 0,
+            "candidate": 1
+          },
+          "future_source_reservation_horizon_seconds": {
+            "reference": 60,
+            "candidate": 0
+          }
+        }
+      },
+      "input_identity": {
+        "canonical": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\g31_continuous\\nanning_2x_canonical.jsonl.gz",
+          "sha256": "5e0d3feef7b3f94aae2f3ec3c445720bc971599c82252383ab1ebc44fa46491b",
+          "bytes": 2299529
+        },
+        "profile": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\g31_continuous\\nanning_service2.json",
+          "sha256": "9b1a78344ec89aaac377feb05afccd48d9b957174286b29eedfe57a73a93c426",
+          "bytes": 714420
+        }
+      },
+      "business_denominator": 57012,
+      "segment_denominator": 87206,
+      "command_argv": [
+        "C:/PROGRAMING/python3.11.9/python.exe",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate011\\run_candidate.py",
+        "--map",
+        "nanning",
+        "--scale",
+        "2",
+        "--controls",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\observation_depth_w1_011_001\\controls_fixed2_drain200000.json",
+        "--physical-contract",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate011\\registered_contracts_011\\physical_contract_drain200000.json",
+        "--output",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_observation_fixed2_w1_future0_cap120_relax1_drain200000_011"
+      ]
+    },
+    {
+      "order": 3,
+      "map": "nanning",
+      "scale": 1,
+      "arm": "fixed1",
+      "output": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_1x_observation_fixed1_w1_future0_cap120_relax1_original98259_011",
+      "controls": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\observation_depth_w1_011_001\\controls_fixed1_original98259.json",
+        "sha256": "bf393b51c103229599de6ab1058f493f3ed7803367f449eb2809d604de728db4",
+        "changes_from_corresponding_drain": {
+          "end_time": {
+            "reference": 200000,
+            "candidate": 98259
+          }
+        }
+      },
+      "input_identity": {
+        "canonical": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\g31_continuous\\nanning_1x_canonical.jsonl.gz",
+          "sha256": "3f2cc8d8e5e2934e2568b299d2d3321eec07f1f47e5fa0750537993eaee1340d",
+          "bytes": 1117468
+        },
+        "profile": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\g31_continuous\\nanning_service2.json",
+          "sha256": "9b1a78344ec89aaac377feb05afccd48d9b957174286b29eedfe57a73a93c426",
+          "bytes": 714420
+        }
+      },
+      "business_denominator": 28506,
+      "segment_denominator": 43603,
+      "command_argv": [
+        "C:/PROGRAMING/python3.11.9/python.exe",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate011\\run_candidate.py",
+        "--map",
+        "nanning",
+        "--scale",
+        "1",
+        "--controls",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\observation_depth_w1_011_001\\controls_fixed1_original98259.json",
+        "--physical-contract",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate011\\registered_contracts_011\\physical_contract_original_window.json",
+        "--output",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_1x_observation_fixed1_w1_future0_cap120_relax1_original98259_011"
+      ]
+    },
+    {
+      "order": 4,
+      "map": "nanning",
+      "scale": 1,
+      "arm": "fixed2",
+      "output": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_1x_observation_fixed2_w1_future0_cap120_relax1_original98259_011",
+      "controls": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\observation_depth_w1_011_001\\controls_fixed2_original98259.json",
+        "sha256": "b72b99cd927b2af859660d686c8ccac0c1849b9bf2fcea6ff720a6c0e997eb66",
+        "changes_from_corresponding_drain": {
+          "end_time": {
+            "reference": 200000,
+            "candidate": 98259
+          }
+        }
+      },
+      "input_identity": {
+        "canonical": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\g31_continuous\\nanning_1x_canonical.jsonl.gz",
+          "sha256": "3f2cc8d8e5e2934e2568b299d2d3321eec07f1f47e5fa0750537993eaee1340d",
+          "bytes": 1117468
+        },
+        "profile": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\g31_continuous\\nanning_service2.json",
+          "sha256": "9b1a78344ec89aaac377feb05afccd48d9b957174286b29eedfe57a73a93c426",
+          "bytes": 714420
+        }
+      },
+      "business_denominator": 28506,
+      "segment_denominator": 43603,
+      "command_argv": [
+        "C:/PROGRAMING/python3.11.9/python.exe",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate011\\run_candidate.py",
+        "--map",
+        "nanning",
+        "--scale",
+        "1",
+        "--controls",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\observation_depth_w1_011_001\\controls_fixed2_original98259.json",
+        "--physical-contract",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate011\\registered_contracts_011\\physical_contract_original_window.json",
+        "--output",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_1x_observation_fixed2_w1_future0_cap120_relax1_original98259_011"
+      ]
+    }
+  ],
+  "scope": {
+    "maps": [
+      "nanning"
+    ],
+    "scales": [
+      2,
+      1
+    ],
+    "no_new_map2_native_benchmark_or_fullscan": true,
+    "prefix_validation_scope": "Nanning only; previously started map2 short lifecycle is managed separately by root, outside this plan."
+  },
+  "scale_schedule": "Run both 2x arms first, then both 1x arms, regardless of sign. This fixed small matrix does not conceal negative 2x results or introduce post-result arm selection; root may stop under the user 23:00 checkpoint and must mark unexecuted cells explicitly.",
+  "controls_by_scale": {
+    "2x": {
+      "1": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\observation_depth_w1_011_001\\controls_fixed1_drain200000.json",
+        "sha256": "bd428c4e50366e97594805a25ad9b94411e8a779b90681de6f3b4f2ab3bcfa5f"
+      },
+      "2": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\observation_depth_w1_011_001\\controls_fixed2_drain200000.json",
+        "sha256": "97010c68a1b8c01420b4dcd97de1b42fa426941d526f13fdb2dab205f4d36d96"
+      }
+    },
+    "1x": {
+      "1": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\observation_depth_w1_011_001\\controls_fixed1_original98259.json",
+        "sha256": "bf393b51c103229599de6ab1058f493f3ed7803367f449eb2809d604de728db4",
+        "changes_from_corresponding_drain": {
+          "end_time": {
+            "reference": 200000,
+            "candidate": 98259
+          }
+        }
+      },
+      "2": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\observation_depth_w1_011_001\\controls_fixed2_original98259.json",
+        "sha256": "b72b99cd927b2af859660d686c8ccac0c1849b9bf2fcea6ff720a6c0e997eb66",
+        "changes_from_corresponding_drain": {
+          "end_time": {
+            "reference": 200000,
+            "candidate": 98259
+          }
+        }
+      }
+    }
+  },
+  "physical_contracts": {
+    "2x": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate011\\registered_contracts_011\\physical_contract_drain200000.json",
+    "1x": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate011\\registered_contracts_011\\physical_contract_original_window.json",
+      "sha256": "6da1a08a358c92a2dc4136d0dba7bb98e5c4e1e28521d9dd554d27477830849a"
+    }
+  },
+  "observation_windows": {
+    "2x": {
+      "start": 8260,
+      "end": 200000,
+      "fixed_cutoff": 98259,
+      "status": "98259 completion and backlog are retrospectively read from actual drain events; no independent short execution/runtime is claimed for these new arms."
+    },
+    "1x": {
+      "start": 8260,
+      "end": 98259,
+      "fixed_cutoff": 98259,
+      "status": "Actual original-window execution. Full-population THT remains null if any business is unfinished."
+    }
+  },
+  "preserved_parameters": "Within each scale only min_depth/max_depth differ. Across scales only registered input cohort and end_time differ; every physical rule, budget, scoring weight1, future horizon0, cap120 and relaxation1 remains unchanged.",
+  "comparisons": {
+    "within_scale": "011 fixed1 versus fixed2 is the controlled contrast; compare 1x and 2x separately.",
+    "repaired_hca": {
+      "1x": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_repaired_uniform_headway2_002\\nanning_1x",
+      "2x": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_repaired_uniform_profile_004_drain200000_001\\nanning_2x"
+    },
+    "w0_future_reference": {
+      "1x": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_1x_future60_cap120_relax1_010c",
+      "2x": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_cap120_relax1_drain200000_011"
+    },
+    "old_006_fixed1_w1": {
+      "2x": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_standard_w1_cap120_relax1_drain200000_006"
+    },
+    "reference_limits": "HCA and w0+future are contextual references with more than k differing. 1x w0+future uses frozen010c historical result, explicitly labelled; no missing011 1x run is invented. Old006 fixed1 w1 is a regression reference, not a substitute for actual011 timing."
+  }
+}

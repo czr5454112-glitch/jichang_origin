@@ -1,0 +1,45 @@
+{
+  "scope": "Publication and cloud handoff only. No new training or optimization run.",
+  "map": "nanning",
+  "initial_scale": 1,
+  "available_scales": [
+    1,
+    2
+  ],
+  "primary_metric": "Mean across all original business bags of sum per leg(goal_arrival - first_planning_attempt); retry time included; EBS storage excluded.",
+  "secondary_metrics": [
+    "fraction with final goal arrival <= STD",
+    "fraction with final goal arrival <= STD - 2700 seconds"
+  ],
+  "STD_is": "Input delivery deadline; not the standard deviation of transport time.",
+  "guard_metrics": [
+    "pre-first-planning backlog",
+    "fixed-window completion count",
+    "uncompleted population",
+    "THT tails",
+    "search and CPU costs"
+  ],
+  "hard_constraints": [
+    "No internal stopping after admission",
+    "Positive device service time 2 seconds",
+    "Directed-edge entry separation at least 2 seconds",
+    "Do not preempt confirmed node/edge reservations",
+    "Complete continuous-motion certificate required before admission"
+  ],
+  "versions": {
+    "006": "Formal physics default",
+    "011": "Research baseline with finite future source reservations",
+    "023": "Absolute-deadline source-attempt priority: negative Nanning1x result",
+    "024": "Nonexpired-first source-attempt priority: negative Nanning1x result"
+  },
+  "research_direction_requested": "Investigate lightweight RL+MPC-style tuning or learned terminal/system cost, starting from frozen no-stop G31; preserve exact feasibility checks. Variable observation horizon is a candidate interface, not an established gain.",
+  "execution": "User requested future training on a cloud environment. This publication does not provision cloud compute or claim training has started.",
+  "comparison_requirements": [
+    "Compare with well-tuned deterministic G31 and equal-compute deeper lookahead",
+    "Do not shift entry clocks or discard hard bags to improve means",
+    "Separate training and independent demand evaluation",
+    "Report THT first and both deadline measures separately"
+  ],
+  "EBS": "Ready later bags may be allowed to leave first per user confirmation, but that source-policy change was deferred and is not applied to these frozen results.",
+  "distributed_boundary": "Current simulation is serial. Local scoring plus complete route certificates is not a verified device-level distributed transaction protocol."
+}

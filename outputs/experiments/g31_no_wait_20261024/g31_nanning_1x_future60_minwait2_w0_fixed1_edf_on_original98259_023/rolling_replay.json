@@ -1,0 +1,39 @@
+{
+  "schema": "g31.nowait.rolling_transaction_replay.v1",
+  "passed": true,
+  "segment_denominator": 43603,
+  "admitted_certificates": 43603,
+  "reserved_certificates": 4694,
+  "pending_certificates": 0,
+  "event_count": 672549,
+  "time_grid_seconds": 1e-06,
+  "require_nonincreasing_finish": true,
+  "edge_headway_ticks": 2000000,
+  "executed_horizon_ticks": 98259000000,
+  "violation_count": 0,
+  "violation_counts": {},
+  "violation_examples": [],
+  "stats": {
+    "source_commit_events": 38909,
+    "reservations_added": 1130961,
+    "reservations_removed_in_exchange": 0,
+    "arrival_events": 580649,
+    "cleanup_events": 43603,
+    "source_reserve_events": 4694,
+    "source_launch_events": 4694
+  },
+  "current_live_reservations": 0,
+  "boundary": "Replays published serial transactions and actual-arrival records on integer ticks. Future-source reserve publishes rights before launch; launch only activates the existing certificate and cannot publish/remove rights. Initial reserved provenance survives later rolling replacement. Old rights remain until the same atomic replacement publishes new rights. Does not observe unlogged speculative writes, prove asynchronous distributed locking, validate physical geometry, or replace full-population EBS/business accounting.",
+  "future_reservation_audit": {
+    "schema": "g31.nowait.future_metadata_audit.v1",
+    "passed": true,
+    "violation_count": 0,
+    "violation_counts": {},
+    "violation_examples": [],
+    "stats": {
+      "future_reserved_segments": 4694,
+      "future_launched_segments": 4694
+    },
+    "boundary": "Initial reserved certificate is persistent provenance. Pending plans are not actual admissions, routes, finishes or completed observations."
+  }
+}

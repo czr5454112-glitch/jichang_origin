@@ -1,0 +1,29 @@
+{
+  "schema": "g31.candidate017.single_out_arrival_plan.v1",
+  "status": "prepared_before_build_native",
+  "time": "2026-10-24T12:29:03.340821+00:00",
+  "parent_source_sha256": "7c0ef237a0816091f8d851cc7f8b0574e72a36c5f6a726ba6e3ebba3b80c7ea5",
+  "source_sha256": "a024f859cf493b73c2d5b0789a318e8c99013c044b3b1782bc8d1a7b6f8fff27",
+  "scope": "Only process_arrival structurallyoneoutedge fastpath beforeAttempt allocation;no newcontrol/counter/contractfield. No014/015/016mechanism.",
+  "proof": [
+    "Physicalarrival validation/arrival ledger/terminal completion run beforebranch unchanged.",
+    "Committed sourceDFS andexchange_suffix maintain full loop-free route;therefore old_next isnotinexecutedprefix. Immutablegraph meanssole outedge mustmatch fallback orsame existinglogicerror. H andeta finite checks retained.",
+    "rank_choices(...,true) forces singlechoice skip even ifcfg.skip_scoring_single_choice=false;onelegalchoice nevercalls score_suffix/conflicts/DFS.",
+    "Old localAttempt copy Step scoringfields are discarded onkeep;do notwrite them toTask.route.",
+    "Replicate search_k_histogram[depth],skipped_single_choice_scoring,scored_neighbor_candidates,actual_query_depth_histogram[0],Task.max_observation_depth,inroute_keep. Existinginroute_decisions alreadyincremented. AllotherAttemptcounterszero andmaxcertificate=max(old,0)unchanged.",
+    "schedule_next_arrival andoneinroutewall sample inoriginalorder preserveeventserial/ledger/IDs/clocks.",
+    "Allocationfailure/resource-exhaustion timing notclaimed identical;successfulnormalruns requireallnontimepayloadexact."
+  ],
+  "preserved": "Physics,sourcepolicies,futurecertificates,rank choicesatbranches,searchbudgets,alllogicaltelemetry andcontracts remain identical. No speedclaim beforefullpaired measurements.",
+  "tests": [
+    "013→017 existing28inherited+11combo allnontimeexact includingallscans,route_decisions,IDs,ledger andsummary.",
+    "Explicitcfg.skip_scoring_single_choice=false withk1/w1;force_single_skip stillmustapplyinroute.",
+    "k2/4 andscorebudget0/1;adaptivenearbymerge andallrequestedk counters.",
+    "Positive/zero-servicecorridors,terminalgoalwithoutgoingedge,structuraloutdegree2withonelegalchoiceunreachableorvisitedfallback untouched.",
+    "Long24nodecorridor;existingcombo true suffixexchange andstale cleanup path.",
+    "Everyapplicablepayload getsunchangedfiveauditors/nonincreasingfinishTrue.",
+    "PublicAPIcannotcreate soleedge!=committedold_next withoutcorruptingimmutablegraph;retainexactlogicerrortextanddocumentinvariant ratherthanexposing mutationhook."
+  ],
+  "allowed_differences": "Only existing11 timingfields. No scanning/score/globalcounter exceptions.",
+  "scheduling": "Preparationonly;root ownsheavy. No native/build/maprun until explicit slotgrant;Nanningonly futureexperiments."
+}

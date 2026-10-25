@@ -1,0 +1,19 @@
+{
+  "schema": "g31.candidate011.paired_timing_failure_diagnosis.v1",
+  "status": "old_execution_failed_no_timing_result",
+  "old_first_child": "A",
+  "old_log": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate011_paired_timing_nanning_001\\nanning_01_A.log",
+    "sha256": "574791f8d0bcce39d22674200dcba3aa0d86b4faafda918266da8f3e90462595"
+  },
+  "old_registration": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate011_paired_timing_nanning_001\\execution_registration.json",
+    "sha256": "4bf6f0ec10388b6fbd11471a3aa934480279cd714e6b53ebb427eb3bd0dcec62"
+  },
+  "sufficient_cause": "C++ std::map<int,uint64> produces int-key dictionaries at core.cpp:283-284,1304-1306; JSON persistence converts keys to strings. Old worker:47 directly compares native to parsed JSON, which rejects these nonempty maps even when counts are identical.",
+  "limits": "Failed native payload was not persisted. This is a verified sufficient rejection cause, not proof that every other value from that failed attempt matched. v2 retains full remaining comparison and must actually pass before timing is usable.",
+  "timing_validated": false,
+  "native_rerun_executed_by_preparation": false,
+  "implementation_fields_changed": [],
+  "new_plan_sha256": "a9a09208534592b9bed6bb37eb539baff9e48a2c5aa9f7da8ac28a84cf751d9b"
+}

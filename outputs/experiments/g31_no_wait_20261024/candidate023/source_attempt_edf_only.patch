@@ -1,0 +1,93 @@
+--- candidate019/source/core.cpp
++++ candidate023/source/core.cpp
+@@ -78,6 +78,7 @@
+     int future_source_reservation_horizon_seconds = 0;
+     double future_source_reservation_min_wait_seconds = 2.0;
+     bool enable_future_mask_diagnostics = false;
++    bool enable_source_attempt_edf = false;
+ };
+ struct Edge { int to; double travel; int id; };
+ struct Node { int id; double service; std::vector<Edge> out; int indegree = 0; };
+@@ -151,11 +152,13 @@
+     int task;
+     std::uint64_t generation;
+     int route_index=-1;
++    // Immutable finite key: only queued source attempts use their absolute STD.
++    double edf_deadline_key=0;
+ };
+ struct EventAfter {
+     bool operator()(const Event& a, const Event& b) const {
+         const int ap=(a.kind==4 || a.kind==5)?-1:a.kind,bp=(b.kind==4 || b.kind==5)?-1:b.kind;
+-        return std::tie(a.time,ap,a.serial) > std::tie(b.time,bp,b.serial);
++        return std::tie(a.time,ap,a.edf_deadline_key,a.serial) > std::tie(b.time,bp,b.edf_deadline_key,b.serial);
+     }
+ };
+ struct Attempt {
+@@ -214,7 +217,7 @@
+         "interval_mode","strict_endpoint_resources","edge_entry_headway_seconds","skip_scoring_single_choice",
+         "enable_inroute_replanning","time_grid_seconds","max_route_excess_seconds","source_fifo_order",
+         "route_excess_retry_relaxation_rate","future_source_reservation_horizon_seconds",
+-        "future_source_reservation_min_wait_seconds","enable_future_mask_diagnostics"};
++        "future_source_reservation_min_wait_seconds","enable_future_mask_diagnostics","enable_source_attempt_edf"};
+     for (auto item : d) if (!allowed.count(py::cast<std::string>(item.first)))
+         throw std::invalid_argument("unknown config key: "+py::cast<std::string>(item.first));
+ #define READ_OPTION(name) if (d.contains(#name)) c.name = py::cast<decltype(c.name)>(d[#name]);
+@@ -231,6 +234,11 @@
+     READ_OPTION(source_fifo_order)
+     READ_OPTION(route_excess_retry_relaxation_rate)
+     READ_OPTION(future_source_reservation_min_wait_seconds)
++    if (d.contains("enable_source_attempt_edf")) {
++        const auto value=d["enable_source_attempt_edf"];
++        if (!PyBool_Check(value.ptr())) throw std::invalid_argument("enable_source_attempt_edf must be a boolean");
++        c.enable_source_attempt_edf=py::cast<bool>(value);
++    }
+     if (d.contains("enable_future_mask_diagnostics")) {
+         const auto value=d["enable_future_mask_diagnostics"];
+         if (!PyBool_Check(value.ptr())) throw std::invalid_argument("enable_future_mask_diagnostics must be a boolean");
+@@ -305,6 +313,7 @@
+     std::uint64_t next_serial = 0;
+     std::uint64_t calendar_entries = 0, peak_calendar_entries = 0, peak_event_count = 0;
+     std::uint64_t event_count = 0, planning_attempts = 0, failed_attempts = 0;
++    std::uint64_t edf_valid_attempts=0,edf_overdue_valid_attempts=0;
+     std::uint64_t static_rank_fastpath_candidates=0,relaxed_source_attempts=0,relaxed_source_admissions=0;
+     std::uint64_t search_budget_failures = 0, score_budget_exhaustions = 0;
+     std::uint64_t source_ignored_conflicts = 0, goal_ignored_conflicts = 0;
+@@ -356,7 +365,8 @@
+     }
+     void push_event(double t, int kind, int task, std::uint64_t generation = 0,int route_index=-1) {
+         if (!std::isfinite(t)) return;
+-        events.push({t,kind,next_serial++,task,generation,route_index});
++        const double edf_key=cfg.enable_source_attempt_edf && kind==2?tasks[task].deadline:0.0;
++        events.push({t,kind,next_serial++,task,generation,route_index,edf_key});
+         peak_event_count = std::max<std::uint64_t>(peak_event_count,events.size());
+     }
+     // Closed endpoints are compared directly. Scan active entries by start rather
+@@ -931,6 +941,7 @@
+     void attempt(int task,double time) {
+         Task& t=tasks[task];
+         if (t.admitted || t.future_reserved || !is_source_head(task)) return;
++        if (cfg.enable_source_attempt_edf) {++edf_valid_attempts;if(t.deadline<time)++edf_overdue_valid_attempts;}
+         if (t.first_planning_attempt_time<0) t.first_planning_attempt_time=time;
+         const auto started=std::chrono::steady_clock::now();
+         const auto& gd=goal_data(t.goal);
+@@ -1402,6 +1413,11 @@
+         auto percentile=[&](double q) {return decision_microseconds.empty()?0.0:decision_microseconds[static_cast<std::size_t>(std::ceil(q*decision_microseconds.size()))-1];};
+         py::dict stats;
+         stats["tasks"]=tasks.size();stats["admitted"]=admitted;stats["completed"]=completed;stats["on_time"]=ontime;
++        if (cfg.enable_source_attempt_edf) {
++            py::dict edf;edf["valid_source_attempts"]=edf_valid_attempts;edf["already_overdue_valid_attempts"]=edf_overdue_valid_attempts;
++            edf["count_scope"]="Actual source attempts after admitted/reserved/head guards; not heap comparisons, competition victories, or stale events.";
++            stats["source_attempt_edf"]=edf;
++        }
+         if (cfg.future_source_reservation_horizon_seconds>0) {
+             stats["future_source_eligible_failures"]=future_eligible_failures;stats["future_source_searches"]=future_searches;
+             stats["future_source_precommits"]=future_precommits;stats["future_source_launches"]=future_launches;
+@@ -1542,6 +1558,8 @@
+         }
+         if (cfg.enable_future_mask_diagnostics)
+             contract["future_mask_diagnostics"]="Observes before/after masks at the existing resource boundaries; aggregates one selected transition or rejection per future search. Does not change routes, rights, event order, masks, retry clocks or stopping conditions. Diagnostic-enabled wall/CPU measurements are not uninstrumented performance evidence.";
++        if (cfg.enable_source_attempt_edf)
++            contract["source_attempt_edf"]="Only currently queued source-attempt events with equal time and phase are ordered by immutable absolute STD, then original event serial. Already overdue tasks retain EDF priority. All other phases and confirmed rights are unchanged. EBS activation can enqueue another same-time attempt after prior attempts have executed. This is serial cross-source planning arbitration, not a distributed node auction or a throughput/deadline guarantee.";
+         stats["contract"]=contract;
+         py::list ledger;
+         for (const auto& r:rolling_records) {

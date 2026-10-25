@@ -1,0 +1,133 @@
+{
+  "schema": "g31.continuous.physical_contract.v1",
+  "execution_model": "continuous_headway_2s",
+  "status": "explicit_candidate_not_promoted",
+  "selected_controls": null,
+  "default_binary": {
+    "path": "build\\g31_no_wait_018\\python\\g31_nowait.cp311-win_amd64.pyd",
+    "bytes": 345600,
+    "sha256": "446753064b2b7936ec8440dbea3d396120ca2a0c67d9efb117cd9db01ae594b9"
+  },
+  "native_source": {
+    "path": "build\\g31_no_wait_018\\source\\core.cpp",
+    "bytes": 102497,
+    "sha256": "f836fe653a0e1394ee8692a071e5b183c9b73f450a511358c7cafaeb1120f7c5"
+  },
+  "speed_mps": 2.0,
+  "fault_schedule": "none",
+  "empty_trays": false,
+  "time_grid_seconds": 1e-06,
+  "positive_node_service_seconds": 2.0,
+  "edge_entry_headway_seconds": 2.0,
+  "end_time": 200000,
+  "validated_performance_cells": [],
+  "maps": {
+    "nanning": {
+      "original_profile": {
+        "path": "data/processed/maps/nanning_airport_profile.json",
+        "sha256": "70aeeafe2c774d415fe9f922eedec36e8e35132bcba04596c2b1c486ffb3d1df",
+        "bytes": 713865
+      },
+      "profile": {
+        "path": "data/processed/g31_continuous/nanning_service2.json",
+        "sha256": "9b1a78344ec89aaac377feb05afccd48d9b957174286b29eedfe57a73a93c426",
+        "bytes": 714420
+      }
+    }
+  },
+  "cells": {
+    "nanning_1x": {
+      "canonical": {
+        "path": "data/processed/g31_continuous/nanning_1x_canonical.jsonl.gz",
+        "sha256": "3f2cc8d8e5e2934e2568b299d2d3321eec07f1f47e5fa0750537993eaee1340d",
+        "bytes": 1117468,
+        "encoding": "gzip_jsonl",
+        "content_sha256": "f167648ca524770b48465c66eaa7a548390f31e35815fb9c73accff68520c3a1"
+      },
+      "business_denominator": 28506,
+      "segment_denominator": 43603,
+      "temporal_identity_sha256": "c80f4a213b0418c1fa4c55f0e4d6c6e1d680771cc234e9021b55ba15fc795e1b",
+      "performance_status": "not_registered"
+    },
+    "nanning_2x": {
+      "canonical": {
+        "path": "data/processed/g31_continuous/nanning_2x_canonical.jsonl.gz",
+        "sha256": "5e0d3feef7b3f94aae2f3ec3c445720bc971599c82252383ab1ebc44fa46491b",
+        "bytes": 2299529,
+        "encoding": "gzip_jsonl",
+        "content_sha256": "55538837011a1ed31eb272cc170fdc9fefb3b40ec14e2ae0574877a8c465a115"
+      },
+      "business_denominator": 57012,
+      "segment_denominator": 87206,
+      "temporal_identity_sha256": "8b0419dfa96bcbfec8f58f7407fc756a9d7a1df1e0b39df517a3e268757538c1",
+      "performance_status": "not_registered"
+    }
+  },
+  "claim_boundary": "Explicit continuous-motion model with in-route local next-hop decisions and full continuation certificates. No standard winner selected; real network latency, faults and empty trays unsupported.",
+  "timing_contract": {
+    "primary": "sum_over_legs(finish-first_planning_attempt_time) per original business bag",
+    "first_attempt_never_resets_on_retry": true,
+    "preplanning_hold_and_canonical_elapsed_required": true,
+    "network_elapsed": "sum_over_legs(finish-admission), auxiliary only",
+    "ebs_storage_dwell": "excluded from the sum of separately timed legs"
+  },
+  "candidate_id": "g31_continuous_018_future_source_reservation_calendar_index_w1_scope_pressure_index_scaled_occupancy",
+  "source_order_contract": {
+    "mode": "canonical",
+    "ordering": "Stable raw nominal release-time order per source; ties retain canonical input row order.",
+    "unready_head": "An unreleased or EBS-predecessor-blocked head prevents later nominal tasks from attempting.",
+    "admission_pacing_seconds": 1,
+    "first_attempt": "Starts only at the actual eligible source-head planning attempt; activation is separate.",
+    "legacy_compatibility": "Native activation order retains historical transport behavior;006 static scoring changes observation counters only. Explicit standard mode requires canonical."
+  },
+  "pending_performance_criterion": {
+    "status": "not_validated",
+    "primary": "mean user THT per original business bag with all businesses completed",
+    "map2_mean_tht_max_ratio_to_matched_hca": 1.03,
+    "nanning_priority": "improve mean user THT relative to matched HCA",
+    "mandatory_reports": [
+      "p95",
+      "p99",
+      "completion count",
+      "STD",
+      "preplanning hold",
+      "canonical elapsed"
+    ],
+    "claim_boundary": "The 1.03 tolerance is a provisional root-thread interpretation of the user allowing a small map2 regression; no selected controls or winner is registered.",
+    "system_objective": "More completed original businesses in the fixed original window, less backlog, and lower overall mean user THT when the full population completes; canonical elapsed/preplanning and throughput curves required."
+  },
+  "source_route_budget_policy": {
+    "base": "max_route_excess_seconds; absent means unlimited",
+    "retry_relaxation_rate_default": 0,
+    "effective": "base + rate * elapsed since immutable first planning attempt, growth floors to integer microseconds",
+    "evaluation": "only at existing actual source attempts; no new wake event or earliest-admission guarantee",
+    "inroute": "the existing finish-nonincreasing fallback rule remains unchanged",
+    "status": "candidate controls, not a selected winner"
+  },
+  "observation_window_extension": {
+    "original_start": 8260,
+    "original_end": 98259,
+    "extended_end": 200000,
+    "new_arrivals_added": false,
+    "deadlines_changed": false,
+    "purpose": "Drain the identical finite cohort; original-window throughput is retained separately."
+  },
+  "future_source_policy": {
+    "status": "development_not_promoted",
+    "precommit_is_not_admission": true,
+    "source_fifo_advances_only_at_actual_launch": true,
+    "first_planning_clock_unchanged": true,
+    "search_horizon_independent_of_observation_end": true
+  },
+  "pressure_signal_policy": {
+    "default": "union_occupied",
+    "opt_in": [
+      "slot_loss",
+      "headway_scaled_occupancy"
+    ],
+    "window_seconds": 30,
+    "slot_seconds": 2,
+    "scope": "node-ranking only; scaled mode maps original union O to O*(2/30), retains exact blocked term; risk price not queue-delay estimate; unchanged clocks, FIFO and complete safety certificates",
+    "status": "development_not_promoted"
+  }
+}

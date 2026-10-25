@@ -1,0 +1,96 @@
+{
+  "schema": "g31.user_research_boundary.v1",
+  "user_instruction": "到今晚11点 如果还没有明显改善就先停止 总结",
+  "local_checkpoint": "2026-10-24T23:00:00+08:00",
+  "utc_checkpoint": "2026-10-24T15:00:00Z",
+  "timezone": "Asia/Shanghai",
+  "automation_id": "g31-23",
+  "automation_kind": "one-occurrence heartbeat in the current thread",
+  "current_work": "Stoppedbyexplicituserrequest.024ON hadcompletedbeforestop; onlyauthorizedsmallJSONcloseoutisnowfinished. No024OFF, newnative/fullscan orautomaticresume.",
+  "latest_scope_instruction": "实验目前只用在南宁1x 2x展开，方便更快验证是否有改进出现。",
+  "active_maps": [
+    "nanning"
+  ],
+  "active_scales": [
+    1,
+    2
+  ],
+  "scope_effect": "Research execution stopped. EBSreadyfirst,022realmap,011pairedtimingv2,2xextensions and024optionalclassOFF aredeferred withoutautomatic continuation.",
+  "safety_nonnegotiable": [
+    "No internal waiting or stopping after actual admission.",
+    "At least two-second directed-edge entry headway under the common fixed-speed model.",
+    "Two-second service device occupancy cannot overlap, including diverters; exact endpoint equality is legal.",
+    "A full continuous-motion certificate is required before admission; failed in-route replacement retains the existing valid certificate."
+  ],
+  "comparison_snapshot": "Formal006 and011 w0future60/minwait2 main reference unchanged. All earlier positive/negative evidence remains in snapshot006 and preserved older snapshots. 018 scaled occupancy actual2x complete5gates: THT374.272013/pre32615.048050/original41776/STD14721/early8765; no clear net main-line gain. 020 actual1x complete5gates: THT367.768789/pre791.933916/all28506/STD25506/early10759; versus historical010c mean/pre/p99 slightly worse, STD+5/early+34. 021 actual2x complete5gates: THT374.602969/pre32309.694528/original41916/STD14799/early8860; actual1x complete5gates: THT368.113807/pre780.057680/all28506/STD25579/early10786. Tradeoffs retained, no formal promotion. 019 actual strict parity to017w0 remains PASS.022 built/micro/unchanged five gates PASS but real-map execution now deferred. 011 timing firstA failed an int-key versus JSON-string-key histogram comparison; payload not persisted. Narrow v2 prepared with13 comparator+12 analysis tests but deferred, no repeated speed claim. Supplemental common nominal-feed/causal-ready accounting remains supplemental, not a replacement of primary first-planning THT. 023 preparation changes same-time same-phase source attempt priority only; EBS ready-first explicitly deferred and canonical sourceFIFO/actualEBS gate remain unchanged. Prior detailed status is preserved byte-for-byte in RESEARCH_CONTROL_BEFORE_DEADLINE_PRIORITY_001.json. 023 actualsamebinary1x OFF/ON complete5gates/fullpopulation: THT367.754513→367.898334(+0.0391%), pre790.045682→801.133348, derivedready1106.415918→1117.967126, original28506both, STD25501→25347(-154), early10725→10696(-29). p95598.58375→598.03875; p99670.4455→674.34, max1864.585→1522.905. EventCPU2.984375→3.234375/API7.078125→7.203125singlepair. EDFvalid128228=planningattempts;overdue7055repeatedattempts. No net improvement/no promotion/noautomatic2x.024classbeforeEDFpreparationauthorizedbyrootonly;EBS/022/timingstilldeferred. Authorizedcloseout024ON actual1x complete5gates/fullpopulation: THT368.026655,pre802.065046,derivedready1118.784320,STD25269/early10702,originalall28506. Relative023OFF THT+0.0740%,pre+12.019364,STD-232/early-23; no netgain.024OFFnotrun;023comparisonscrossbinary and388microparitynotfullgraphparity. Allworkstoppedbyuser; noautomaticcontinuation.",
+  "checkpoint_action": "Superseded by explicitearlystop. Do not dispatchnewexperiments, newarms, or resumeautomatically. Preservecompleted andinterrupted artifacts; root handles its024process andsummary.",
+  "claim_boundary": "Do not count a research memo, a single-bag gain, a completed-subset mean, constraint relaxation, changed clock origin, or one noisy timing sample as material success. Evaluate full-population THT first and retain throughput/backlog/deadline/cost tradeoffs.",
+  "status": "user_requested_stop_early",
+  "latest_lightweight_status_evidence": {
+    "016_policy_audit": "candidate016_policy_audit_001/nanning_2x_audit_001.json",
+    "horizon16_comparison": "future_horizon16_011_001/comparison_002.json",
+    "017_preparation": "candidate017/SOURCE_FREEZE_017_001.json",
+    "formal_default": "006 unchanged",
+    "017_real_full_parity": "candidate017/full_parity_nanning2x_002.json",
+    "017_timing": "single event-loop CPU01713.265625s/01311.875s; no speedup",
+    "causal_ready_three_scans": "causal_ready_supplement_001/comparison_001.json",
+    "campaign_snapshot": "nanning_campaign_snapshot_001/snapshot_009.json",
+    "primary_metric_unchanged": "sum actual leg goal arrival minus first planning attempt",
+    "019_real_full_parity": "candidate019/full_parity_nanning2x_001.json",
+    "019_mask_aggregation_analysis": "candidate019_mask_analysis_001/analysis_002.json",
+    "019_static_mandatory_context": "nanning_forced_prefix_load_001/mandatory_focus_001.json",
+    "020_preparation": "Superseded by actual1x and2x completed five-gate results; no real020short/drain prefix.",
+    "017_w0_clean_reference": "candidate017_w0_reference_check_001/receipt_001.json",
+    "020_real_comparison": "candidate020_comparison_001/comparison_001.json",
+    "020_tradeoff_and_gaps": "candidate020_comparison_001/findings_001.json",
+    "020_1x_predeclared_plan": "candidate020_nanning1x_001/PREDECLARED_PLAN_001.json",
+    "018_status": "Actual2x complete5gates; candidate018/comparison_nanning2x_001.json",
+    "021_preparation": "Superseded by actual1x/2x completed comparisons.",
+    "020_1x_actual_comparison": "candidate020_nanning1x_001/comparison_001.json",
+    "021_2x_actual_comparison": "candidate021_comparison_001/comparison_001.json",
+    "021_1x_actual_comparison": "candidate021_nanning1x_001/comparison_001.json",
+    "022_status": "SOURCE_FREEZE_022_001 built/microPASS; real-map deferred.",
+    "011_timing_failure": "candidate011_paired_timing_v2_001/FAILURE_DIAGNOSIS_001.json",
+    "011_timing_v2": "Prepared13 comparator+12 analyzer syntheticPASS; deferred, no actual timing claim.",
+    "023_comparison_plan": "candidate023_comparison_plan_001/PREDECLARED_COMPARISON_PLAN_001.json",
+    "023_samebinary1x_comparison": "candidate023_comparison_plan_001/comparison_001.json",
+    "023_actual_findings": "candidate023_comparison_plan_001/findings_001.json",
+    "023_status": "completefullpop5gatepair; negativeaggregate result; no2x",
+    "024_status": "ONcompletedbeforestop; authorizedsmallJSONcloseoutPASS; OFFnotrun; allfurtherworkdeferred",
+    "024_actual_comparison": "candidate024_comparison_001/comparison_001.json",
+    "024_actual_findings": "candidate024_comparison_001/findings_001.json"
+  },
+  "research_priority": {
+    "updated_utc": "2026-10-24T14:26:17.572952+00:00",
+    "current_trial": "Stoppedbyuser;024completedbeforestop andcloseoutfinished. Noactive researchdispatchauthorized.",
+    "first_cell": "Nanning1x original98259;2x only after root reviews useful1x evidence.",
+    "EBS_ready_first": "deferred_noautomaticresume",
+    "source_policy": "Existing canonical per-source FIFO,1s feed and actual-EBS-predecessor gate remain in force.",
+    "011_timing_v2": "deferred_noautomaticresume",
+    "022_real_map": "deferred_noautomaticresume",
+    "main_reference": "011 w0future60/minwait2;1x historical010c main line; formal006 unchanged.",
+    "comparison_plan": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate023_comparison_plan_001\\PREDECLARED_COMPARISON_PLAN_001.json",
+      "sha256": "f48b2da90b5caeb9f6b83fceeb7765a0e0a550996485e29fdda9a431f8613691"
+    }
+  },
+  "early_stop": {
+    "status": "user_requested_stop_early",
+    "recorded_utc": "2026-10-24T14:50:39.161965+00:00",
+    "instruction": "用户明确要求提前停止并总结，今天到此。",
+    "automatic_resume": false,
+    "new_experiments_allowed": false,
+    "new_comparison_preparation_allowed": false,
+    "deferred": [
+      "EBSreadyfirst",
+      "022realmap",
+      "011pairedtimingv2",
+      "all2xextensions",
+      "024optionalclassOFF"
+    ],
+    "completed_results_preserved": "023samebinaryOFF/ON Nanning1x actualfullpopulationandfivegatesPASS; allprior snapshot007 metricrowsunchanged.",
+    "024_classON_status": "Rootconfirmed53913 normalterminalexit0 beforestop; existingfullpopulation/fivegate outputs read once bylightcomparisonafterstopauthorization. No024OFFrun.",
+    "this_agent_active_native_processes": 0,
+    "owner_of024_process": "root"
+  }
+}

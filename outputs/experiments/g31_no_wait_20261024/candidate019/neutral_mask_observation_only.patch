@@ -1,0 +1,264 @@
+--- candidate017/source/core.cpp
++++ candidate019/source/core.cpp
+@@ -77,6 +77,7 @@
+     double route_excess_retry_relaxation_rate = 0.0;
+     int future_source_reservation_horizon_seconds = 0;
+     double future_source_reservation_min_wait_seconds = 2.0;
++    bool enable_future_mask_diagnostics = false;
+ };
+ struct Edge { int to; double travel; int id; };
+ struct Node { int id; double service; std::vector<Edge> out; int indegree = 0; };
+@@ -174,6 +175,28 @@
+ };
+ struct Choice { Edge edge; double arrival,score; };
+ 
++// Observations of the existing fixed-chain intersection, never a new query.
++// One key is accumulated per future search; no task/time/event trace is stored.
++struct FutureMaskTransition {
++    int kind=0, from=-1, to=-1, chain_index=-1;
++    std::uint64_t before=0,after=0;
++    std::int64_t node_arrival=0,lo=0,hi=0;
++};
++struct FutureMaskBucket {
++    int source,goal,outcome,kind,from,to,chain_index;
++    int first_fork_index,first_fork_node,first_structural_index,first_structural_node;
++    std::int64_t node_arrival,lo,hi;
++    bool operator<(const FutureMaskBucket& b) const {
++        return std::tie(source,goal,outcome,kind,from,to,chain_index,first_fork_index,first_fork_node,
++                        first_structural_index,first_structural_node,node_arrival,lo,hi)<
++               std::tie(b.source,b.goal,b.outcome,b.kind,b.from,b.to,b.chain_index,b.first_fork_index,b.first_fork_node,
++                        b.first_structural_index,b.first_structural_node,b.node_arrival,b.lo,b.hi);
++    }
++};
++struct FutureMaskAggregate {
++    std::uint64_t count=0,first_before=0,first_after=0,initial_mask=0,first_final=0;
++};
++
+ double finite_nonnegative(double x, const char* name) {
+     if (!std::isfinite(x) || x < 0) throw std::invalid_argument(std::string(name)+" must be finite and nonnegative");
+     return x;
+@@ -191,7 +214,7 @@
+         "interval_mode","strict_endpoint_resources","edge_entry_headway_seconds","skip_scoring_single_choice",
+         "enable_inroute_replanning","time_grid_seconds","max_route_excess_seconds","source_fifo_order",
+         "route_excess_retry_relaxation_rate","future_source_reservation_horizon_seconds",
+-        "future_source_reservation_min_wait_seconds"};
++        "future_source_reservation_min_wait_seconds","enable_future_mask_diagnostics"};
+     for (auto item : d) if (!allowed.count(py::cast<std::string>(item.first)))
+         throw std::invalid_argument("unknown config key: "+py::cast<std::string>(item.first));
+ #define READ_OPTION(name) if (d.contains(#name)) c.name = py::cast<decltype(c.name)>(d[#name]);
+@@ -208,6 +231,11 @@
+     READ_OPTION(source_fifo_order)
+     READ_OPTION(route_excess_retry_relaxation_rate)
+     READ_OPTION(future_source_reservation_min_wait_seconds)
++    if (d.contains("enable_future_mask_diagnostics")) {
++        const auto value=d["enable_future_mask_diagnostics"];
++        if (!PyBool_Check(value.ptr())) throw std::invalid_argument("enable_future_mask_diagnostics must be a boolean");
++        c.enable_future_mask_diagnostics=py::cast<bool>(value);
++    }
+     if (d.contains("future_source_reservation_horizon_seconds")) {
+         const auto value=d["future_source_reservation_horizon_seconds"];
+         if (!PyLong_Check(value.ptr()) || PyBool_Check(value.ptr()))
+@@ -226,6 +254,8 @@
+     finite_nonnegative(c.future_source_reservation_min_wait_seconds,"future_source_reservation_min_wait_seconds");
+     if (c.future_source_reservation_horizon_seconds<0 || c.future_source_reservation_horizon_seconds>60)
+         throw std::invalid_argument("future source reservation horizon must be 0..60 integer seconds");
++    if (c.enable_future_mask_diagnostics && c.future_source_reservation_horizon_seconds==0)
++        throw std::invalid_argument("future mask diagnostics require an enabled future reservation horizon");
+     if (c.future_source_reservation_horizon_seconds>0 &&
+         (c.interval_mode!="half_open" || !c.strict_endpoint_resources || c.edge_entry_headway_seconds!=2.0 ||
+          !c.enable_inroute_replanning || !c.enable_ebs_predecessor_gate || !c.source_fifo || c.source_fifo_order!="canonical" ||
+@@ -297,6 +327,7 @@
+     std::uint64_t future_chain_nodes=0,future_calendar_queries=0,future_calendar_entries_scanned=0;
+     std::uint64_t future_validation_queries=0,future_mask_empty=0,future_chain_rejections=0;
+     std::uint64_t future_eligible_failures=0;
++    std::map<FutureMaskBucket,FutureMaskAggregate> future_mask_buckets;
+     double simulation_time = 0;
+     bool event_budget_exhausted = false;
+     double preprocessing_seconds = 0;
+@@ -731,25 +762,50 @@
+         std::vector<Step> path;
+         std::vector<unsigned char> seen(nodes.size(),0);
+         int current=t.start;double arrival=0;
++        int first_fork_index=-1,first_fork_node=-1,first_structural_index=-1,first_structural_node=-1;
++        FutureMaskTransition first_clear,last_push;
++        std::uint64_t initial_mask=0;
++        auto record_diagnostic=[&](int outcome,const FutureMaskTransition& selected,std::uint64_t final_mask) {
++            if (!cfg.enable_future_mask_diagnostics) return;
++            auto& aggregate=future_mask_buckets[{nodes[t.start].id,nodes[t.goal].id,outcome,selected.kind,selected.from,selected.to,selected.chain_index,
++                first_fork_index,first_fork_node,first_structural_index,first_structural_node,
++                selected.node_arrival,selected.lo,selected.hi}];
++            if (aggregate.count++==0) {
++                aggregate.first_before=selected.before;aggregate.first_after=selected.after;
++                aggregate.initial_mask=initial_mask;aggregate.first_final=final_mask;
++            }
++        };
+         for (;;) {
+-            if (current<0 || seen[current] || path.size()>=nodes.size()) {++future_chain_rejections;return false;}
++            if (current<0 || seen[current] || path.size()>=nodes.size()) {++future_chain_rejections;record_diagnostic(2,{},0);return false;}
+             seen[current]=1;
+             const double departure=add_time(arrival,nodes[current].service);
+             path.push_back({current,arrival,departure});++future_chain_nodes;
+             if (current==t.goal) break;
++            if (cfg.enable_future_mask_diagnostics) {
++                const int position=static_cast<int>(path.size())-1;
++                if (first_structural_index<0 && nodes[current].out.size()>1) {
++                    first_structural_index=position;first_structural_node=nodes[current].id;
++                }
++                if (first_fork_index<0) {
++                    int reachable_out=0;
++                    for (const auto& choice:nodes[current].out) if (std::isfinite(gd.h[choice.to])) ++reachable_out;
++                    if (reachable_out>1) {first_fork_index=position;first_fork_node=nodes[current].id;}
++                }
++            }
+             const int next=gd.shortest_successor[current];
+             const auto edge=std::find_if(nodes[current].out.begin(),nodes[current].out.end(),[&](const Edge& e){return e.to==next;});
+-            if (edge==nodes[current].out.end()) {++future_chain_rejections;return false;}
++            if (edge==nodes[current].out.end()) {++future_chain_rejections;record_diagnostic(3,{},0);return false;}
+             arrival=add_time(departure,edge->travel);current=next;
+         }
+         // Freeze extra-distance allowance at the actual attempt, but move the
+         // absolute finish bound with the proposed launch, not with attempt time.
+         if (std::isfinite(t.last_effective_route_excess) &&
+             tick(path.back().arrival)>tick(gd.h[t.start])+tick(t.last_effective_route_excess)) {
+-            ++future_chain_rejections;return false;
++            ++future_chain_rejections;record_diagnostic(4,{},0);return false;
+         }
+         const int horizon=cfg.future_source_reservation_horizon_seconds;
+         std::uint64_t mask=((std::uint64_t(1)<<(horizon+1))-1)&~std::uint64_t(1);
++        if (cfg.enable_future_mask_diagnostics) initial_mask=mask;
+         const auto lower=origin+q,upper=origin+horizon*q;
+         auto intersect_resource=[&](const Calendar& calendar,std::int64_t lo,std::int64_t hi) {
+             if (lo==hi) return;
+@@ -776,13 +832,27 @@
+                 mask&=~bits;
+             }
+         };
++        auto observe_intersection=[&](std::uint64_t before,int kind,int from,int to,int position,
++                                      std::int64_t node_arrival,std::int64_t lo,std::int64_t hi) {
++            if (!cfg.enable_future_mask_diagnostics || before==mask) return;
++            const FutureMaskTransition selected{kind,from,to,position,before,mask,node_arrival,lo,hi};
++            if (before && !mask && !first_clear.kind) first_clear=selected;
++            // The mask only loses bits. Compare its lowest set bit without
++            // querying any calendar or changing the original intersection.
++            if (before && mask && (before&(~before+1))!=(mask&(~mask+1))) last_push=selected;
++        };
+         for (std::size_t i=0;i<path.size();++i) {
+             const auto& step=path[i];
++            std::uint64_t before=mask;
+             intersect_resource(calendars[step.node],tick(step.arrival),tick(step.departure));
+-            if (i+1<path.size())
++            observe_intersection(before,1,nodes[step.node].id,-1,static_cast<int>(i),tick(step.arrival),tick(step.arrival),tick(step.departure));
++            if (i+1<path.size()) {
++                before=mask;
+                 intersect_resource(edge_calendars[edge_ids.at({step.node,path[i+1].node})],tick(step.departure),tick(step.departure)+tick(cfg.edge_entry_headway_seconds));
+-        }
+-        if (!mask) {++future_mask_empty;return false;}
++                observe_intersection(before,2,nodes[step.node].id,nodes[path[i+1].node].id,static_cast<int>(i),tick(step.arrival),tick(step.departure),tick(step.departure)+tick(cfg.edge_entry_headway_seconds));
++            }
++        }
++        if (!mask) {++future_mask_empty;record_diagnostic(1,first_clear,mask);return false;}
+         int offset=1;while (!(mask&(std::uint64_t(1)<<offset))) ++offset;
+         const double launch=seconds(origin+offset*q);
+         for (auto& step:path) {step.arrival=add_time(launch,step.arrival);step.departure=add_time(launch,step.departure);}
+@@ -802,6 +872,7 @@
+         }
+         // Entire certificate exists before the first calendar mutation. Its
+         // rights participate in all later checks even before physical admission.
++        record_diagnostic(0,last_push,mask);
+         t.future_reserved=true;t.reservation_time=time;t.planned_admission=launch;
+         t.route=std::move(path);t.route_generation=1;t.arrived_index=-1;
+         t.max_certificate_depth=std::max(t.max_certificate_depth,static_cast<int>(t.route.size()));
+@@ -1340,6 +1411,47 @@
+             stats["future_mask_empty"]=future_mask_empty;stats["future_chain_rejections"]=future_chain_rejections;
+             stats["source_decision_wall_seconds"]=std::accumulate(decision_microseconds.begin(),decision_microseconds.end(),0.0)*1e-6;
+             stats["inroute_decision_wall_seconds"]=std::accumulate(inroute_microseconds.begin(),inroute_microseconds.end(),0.0)*1e-6;
++        }
++        if (cfg.enable_future_mask_diagnostics) {
++            py::dict diagnostic;py::list buckets;std::uint64_t searches=0;
++            const char* outcomes[]={"precommitted","mask_empty","chain_rejected_state","chain_rejected_successor","chain_rejected_bound"};
++            auto relation=[](int kind,int position,int fork) {
++                if (!kind) return "not_selected";
++                if (fork<0) return "no_fork";
++                return position<fork || (position==fork && kind==1) ? "before" : "after";
++            };
++            for (const auto& entry:future_mask_buckets) {
++                const auto& k=entry.first;const auto& value=entry.second;py::dict row;searches+=value.count;
++                row["source"]=k.source;row["goal"]=k.goal;row["outcome"]=outcomes[k.outcome];row["search_count"]=value.count;
++                row["selection"]=k.outcome==1?"first_resource_clearing_mask":k.outcome==0?(k.kind?"last_resource_advancing_earliest_bit":"earliest_bit_unchanged"):"no_resource_intersection";
++                row["resource_kind"]=k.kind==1?"node":k.kind==2?"edge":"none";
++                row["node"]=k.kind==1?py::cast(k.from):py::none();
++                row["from"]=k.kind==2?py::cast(k.from):py::none();row["to"]=k.kind==2?py::cast(k.to):py::none();
++                row["chain_index"]=k.kind?py::cast(k.chain_index):py::none();
++                row["chain_node_arrival_offset_us"]=k.kind?py::cast(k.node_arrival):py::none();
++                row["resource_start_offset_us"]=k.kind?py::cast(k.lo):py::none();
++                row["resource_end_offset_us"]=k.kind?py::cast(k.hi):py::none();
++                row["first_static_fork_index"]=k.first_fork_index>=0?py::cast(k.first_fork_index):py::none();
++                row["first_static_fork_node"]=k.first_fork_index>=0?py::cast(k.first_fork_node):py::none();
++                row["first_structural_fork_index"]=k.first_structural_index>=0?py::cast(k.first_structural_index):py::none();
++                row["first_structural_fork_node"]=k.first_structural_index>=0?py::cast(k.first_structural_node):py::none();
++                row["relative_to_static_fork"]=relation(k.kind,k.chain_index,k.first_fork_index);
++                row["relative_to_structural_fork"]=relation(k.kind,k.chain_index,k.first_structural_index);
++                row["initial_mask"]=value.initial_mask?py::cast(value.initial_mask):py::none();
++                row["before_mask"]=k.kind?py::cast(value.first_before):py::none();row["after_mask"]=k.kind?py::cast(value.first_after):py::none();
++                row["final_mask"]=value.initial_mask?py::cast(value.first_final):py::none();
++                row["mask_sample_scope"]="first_search_in_this_resource_bucket_only";
++                row["chain_complete"]=k.outcome!=2 && k.outcome!=3;
++                buckets.append(std::move(row));
++            }
++            diagnostic["schema"]="g31.future_mask_aggregation.v1";
++            diagnostic["search_count"]=searches;diagnostic["bucket_count"]=future_mask_buckets.size();diagnostic["buckets"]=buckets;
++            diagnostic["bit_unit_seconds"]=1;diagnostic["offset_unit"]="integer_microseconds_relative_to_source_launch";
++            diagnostic["static_fork_definition"]="At least two outgoing edges with finite goal H; ignores calendars, visited-prefix constraints and full continuation feasibility. Goal outgoing edges excluded. Structural fork additionally reports outdegree>1 without H filtering.";
++            diagnostic["boundary_definition"]="The first-fork node resource is before its exit choice; that node's outgoing edge is after. Indices are zero-based along the original fixed chain.";
++            diagnostic["aggregation_definition"]="Keys contain source/goal, outcome, resource, static chain/fork positions and offsets, never masks, task IDs or time. search_count counts all matching searches; mask fields retain only the first witness. Later different masks cannot create another bucket for that same resource key.";
++            diagnostic["interpretation"]="One aggregate bucket per repeated future search, not independent opportunities or causal delay. First clearing resource depends on scan order and jointly accumulated exclusions; avoiding it need not restore feasibility. A prior fork does not prove a usable alternative, and a longer prefix may change arrival at the same resource. No extra calendar query, changed intersection, early break or alternative path probe.";
++            stats["diagnostic_future_mask_aggregation"]=diagnostic;
+         }
+         stats["planning_attempts"]=planning_attempts;stats["failed_attempts"]=failed_attempts;
+         stats["search_expansions"]=total_exp;stats["score_expansions"]=total_score_exp;stats["backtracks"]=total_back;
+@@ -1428,6 +1540,8 @@
+             contract["future_source_measurement"]="Fixed-chain construction, calendar-entry scanning and exact validation are included in existing source decision wall samples (goal-table lookup through reservation/dispatch, not pure DFS). Wall sums reuse existing samples without new clock calls. Separate queries/scanned counters expose extra work, not measured protocol messages. Future chain route_decisions requested_k=0 records no local rank query; committed_route_hop_k_histogram retains original immediate-DFS scope. No real network timing or global throughput guarantee.";
+             contract["rolling_event_order"]="at equal time: physical arrival or reserved source launch by event serial, resource cleanup, source release, source attempt, EBS activation; ledger_order is global";
+         }
++        if (cfg.enable_future_mask_diagnostics)
++            contract["future_mask_diagnostics"]="Observes before/after masks at the existing resource boundaries; aggregates one selected transition or rejection per future search. Does not change routes, rights, event order, masks, retry clocks or stopping conditions. Diagnostic-enabled wall/CPU measurements are not uninstrumented performance evidence.";
+         stats["contract"]=contract;
+         py::list ledger;
+         for (const auto& r:rolling_records) {
+--- candidate017/continuous_adapter.py
++++ candidate019/continuous_adapter.py
+@@ -1,4 +1,4 @@
+-"""Isolated candidate017 runner derived from the official continuous adapter.
++"""Isolated candidate019 runner derived from the official continuous adapter.
+ 
+ The registered model uses local next-hop scoring and a complete continuation
+ certificate. Registration is not a performance promotion or distributed-network
+@@ -31,7 +31,7 @@
+     congestion_weight=1.0,pressure_window=30.0,max_expansions=256,max_score_expansions=64,
+     max_retries=100000,max_events=10000000,retry_mode="calendar_jump",retry_step=1.0,
+     audit_failed_calendar_hash=False,skip_scoring_single_choice=True,route_excess_retry_relaxation_rate=0.0,
+-    future_source_reservation_horizon_seconds=0,future_source_reservation_min_wait_seconds=2.0,**FIXED)
++    future_source_reservation_horizon_seconds=0,future_source_reservation_min_wait_seconds=2.0,enable_future_mask_diagnostics=False,**FIXED)
+ ALLOWED = set(DEFAULT_CONTROLS) | {"max_route_excess_seconds"}
+ 
+ 
+@@ -94,7 +94,9 @@
+     if not 0<=future<=60:
+         raise ValueError("future reservation horizon must be an integer in [0,60]")
+     if future and controls["congestion_weight"] not in (0,1):
+-        raise ValueError("candidate017 future reservations support only congestion weight 0 or 1")
++        raise ValueError("candidate019 future reservations support only congestion weight 0 or 1")
++    if controls["enable_future_mask_diagnostics"] and not future:
++        raise ValueError("mask diagnostics require future reservations")
+     return controls
+ 
+ 
+@@ -241,7 +243,7 @@
+ def verified_auditors(source_dir):
+     """Load the frozen audit package, checking every live source against it."""
+     names=("headway_audit","future_metadata","rolling_replay","tht_metrics","source_policy_audit")
+-    package_name="g31_candidate017_auditors_"+hashlib.sha256(str(source_dir.resolve()).encode()).hexdigest()[:16]
++    package_name="g31_candidate019_auditors_"+hashlib.sha256(str(source_dir.resolve()).encode()).hexdigest()[:16]
+     package=types.ModuleType(package_name)
+     package.__path__=[str(source_dir)]
+     sys.modules[package_name]=package

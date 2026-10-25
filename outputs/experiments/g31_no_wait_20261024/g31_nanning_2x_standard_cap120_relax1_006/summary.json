@@ -1,0 +1,2030 @@
+{
+  "execution_model": "continuous_headway_2s",
+  "primary_metric": "sum_leg_finish_minus_first_planning_attempt_per_business",
+  "primary_metric_status": "explicit_first_planning_attempt_time; admission-based paper/network values are diagnostic",
+  "tht": {
+    "schema": "g31.nowait.tht_metrics.v2",
+    "passed": true,
+    "horizon": 98259.0,
+    "units": "seconds",
+    "primary": "user_tht",
+    "segment_denominator": 87206,
+    "business_denominator": 57012,
+    "completed_segments": 62408,
+    "completed_businesses": 32214,
+    "censored_segments": 24798,
+    "censored_businesses": 24798,
+    "unreleased_segments": 0,
+    "missing_segments": 0,
+    "violation_counts": {},
+    "violations": [],
+    "user_tht": {
+      "definition": "Primary user THT: per original business sum of each leg continuous finish minus first_planning_attempt_time. Includes every planning retry, device passage and internal wait; excludes EBS inter-leg storage and preplanning hold. No fallback for missing first-attempt telemetry.",
+      "denominator": 57012,
+      "observed_count": 32214,
+      "censored_count": 24798,
+      "full_population": {
+        "sum": null,
+        "mean": null,
+        "min": null,
+        "p50": null,
+        "p95": null,
+        "p99": null,
+        "max": null,
+        "count": 57012
+      },
+      "completed_subset_diagnostic": {
+        "count": 32214,
+        "sum": 9005249.725000001,
+        "mean": 279.5445993977774,
+        "min": 59.0,
+        "p50": 232.7149999999965,
+        "p95": 552.9849999999933,
+        "p99": 672.0550000000003,
+        "max": 16838.289999999994
+      },
+      "restricted_full_population": {
+        "count": 57012,
+        "sum": 14748079.705000002,
+        "mean": 258.6837806952922,
+        "min": 59.0,
+        "p50": 239.5749999999971,
+        "p95": 513.2652499999964,
+        "p99": 622.054999999993,
+        "max": 16838.289999999994
+      }
+    },
+    "user_tht_total_seconds": null,
+    "user_tht_mean_per_business_seconds": null,
+    "missing_first_planning_attempt_segments": 0,
+    "user_tht_full_population_available": false,
+    "paper_tht": {
+      "definition": "Network-elapsed component: per business sum of each leg continuous finish minus successful actual admission. Includes device passage and internal wait, excludes planning retries and EBS dwell. Legacy paper_tht field is not the user THT objective.",
+      "denominator": 57012,
+      "observed_count": 32214,
+      "censored_count": 24798,
+      "full_population": {
+        "sum": null,
+        "mean": null,
+        "min": null,
+        "p50": null,
+        "p95": null,
+        "p99": null,
+        "max": null,
+        "count": 57012
+      },
+      "completed_subset_diagnostic": {
+        "count": 32214,
+        "sum": 8681901.725000001,
+        "mean": 269.5071001738375,
+        "min": 59.0,
+        "p50": 230.09999999999854,
+        "p95": 543.4900000000016,
+        "p99": 622.939999999995,
+        "max": 777.2699999999968
+      },
+      "restricted_full_population": {
+        "count": 57012,
+        "sum": 14309465.705000002,
+        "mean": 250.99041789447838,
+        "min": 59.0,
+        "p50": 238.0500000000029,
+        "p95": 502.71450000000124,
+        "p99": 586.135000000002,
+        "max": 777.2699999999968
+      }
+    },
+    "network_elapsed": {
+      "definition": "Network-elapsed component: per business sum of each leg continuous finish minus successful actual admission. Includes device passage and internal wait, excludes planning retries and EBS dwell. Legacy paper_tht field is not the user THT objective.",
+      "denominator": 57012,
+      "observed_count": 32214,
+      "censored_count": 24798,
+      "full_population": {
+        "sum": null,
+        "mean": null,
+        "min": null,
+        "p50": null,
+        "p95": null,
+        "p99": null,
+        "max": null,
+        "count": 57012
+      },
+      "completed_subset_diagnostic": {
+        "count": 32214,
+        "sum": 8681901.725000001,
+        "mean": 269.5071001738375,
+        "min": 59.0,
+        "p50": 230.09999999999854,
+        "p95": 543.4900000000016,
+        "p99": 622.939999999995,
+        "max": 777.2699999999968
+      },
+      "restricted_full_population": {
+        "count": 57012,
+        "sum": 14309465.705000002,
+        "mean": 250.99041789447838,
+        "min": 59.0,
+        "p50": 238.0500000000029,
+        "p95": 502.71450000000124,
+        "p99": 586.135000000002,
+        "max": 777.2699999999968
+      }
+    },
+    "paper_tht_total_seconds": null,
+    "paper_tht_mean_per_business_seconds": null,
+    "secondary": {
+      "segment_canonical_elapsed": {
+        "definition": "Continuous finish minus canonical pass_time for each independent transport leg; includes every hold before actual admission.",
+        "denominator": 87206,
+        "observed_count": 62408,
+        "censored_count": 24798,
+        "full_population": {
+          "sum": null,
+          "mean": null,
+          "min": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null,
+          "count": 87206
+        },
+        "completed_subset_diagnostic": {
+          "count": 62408,
+          "sum": 772235823.131106,
+          "mean": 12373.987679962602,
+          "min": 59.0147300000026,
+          "p50": 839.6188900000016,
+          "p95": 68751.67775,
+          "p99": 71221.40805,
+          "max": 71995.69
+        },
+        "restricted_full_population": {
+          "count": 87206,
+          "sum": 1904512905.131106,
+          "mean": 21839.241624786206,
+          "min": 59.0147300000026,
+          "p50": 6831.500044999999,
+          "p95": 69459.0,
+          "p99": 71559.0,
+          "max": 72009.0
+        }
+      },
+      "business_sum_canonical_elapsed": {
+        "definition": "Sum of leg canonical elapsed per original business bag; excludes the interval between inbound finish and nominal outbound release.",
+        "denominator": 57012,
+        "observed_count": 32214,
+        "censored_count": 24798,
+        "full_population": {
+          "sum": null,
+          "mean": null,
+          "min": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null,
+          "count": 57012
+        },
+        "completed_subset_diagnostic": {
+          "count": 32214,
+          "sum": 531642835.081396,
+          "mean": 16503.47162976954,
+          "min": 59.0147300000026,
+          "p50": 1281.693865000001,
+          "p95": 73676.14185499998,
+          "p99": 136192.82720109998,
+          "max": 139461.56047
+        },
+        "restricted_full_population": {
+          "count": 57012,
+          "sum": 1904512905.131106,
+          "mean": 33405.47437611566,
+          "min": 59.0147300000026,
+          "p50": 26514.888340000005,
+          "p95": 90964.70699349999,
+          "p99": 133400.4580130999,
+          "max": 139635.97838
+        }
+      },
+      "segment_network_duration": {
+        "definition": "Continuous finish minus actual admission per independent leg.",
+        "denominator": 87206,
+        "observed_count": 62408,
+        "censored_count": 24798,
+        "full_population": {
+          "sum": null,
+          "mean": null,
+          "min": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null,
+          "count": 87206
+        },
+        "completed_subset_diagnostic": {
+          "count": 62408,
+          "sum": 14290743.705000002,
+          "mean": 228.98897104537883,
+          "min": 59.0,
+          "p50": 236.79999999999927,
+          "p95": 367.23974999999547,
+          "p99": 506.21500000000015,
+          "max": 569.885000000002
+        },
+        "restricted_full_population": {
+          "count": 87206,
+          "sum": 14309465.705000002,
+          "mean": 164.08808688622344,
+          "min": 0.0,
+          "p50": 169.59999999999854,
+          "p95": 340.1050000000032,
+          "p99": 489.5650000000023,
+          "max": 569.885000000002
+        }
+      },
+      "segment_source_hold": {
+        "definition": "Canonical-to-admission component: actual admission minus canonical pass_time. Includes preplanning hold and planning retries; not wholly outside-system waiting. Canonical pass_time is not actual source-generation time.",
+        "denominator": 87206,
+        "observed_count": 62544,
+        "censored_count": 24662,
+        "full_population": {
+          "sum": null,
+          "mean": null,
+          "min": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null,
+          "count": 87206
+        },
+        "completed_subset_diagnostic": {
+          "count": 62544,
+          "sum": 767700531.426106,
+          "mean": 12274.567207503613,
+          "min": 0.0,
+          "p50": 615.9757300000001,
+          "p95": 68580.961438,
+          "p99": 71091.0,
+          "max": 71859.0
+        },
+        "restricted_full_population": {
+          "count": 87206,
+          "sum": 1890203439.426106,
+          "mean": 21675.153537899983,
+          "min": 0.0,
+          "p50": 6611.340880000002,
+          "p95": 69309.0,
+          "p99": 71446.9,
+          "max": 71859.0
+        }
+      },
+      "business_sum_source_hold": {
+        "definition": "Sum of leg canonical source hold per original business bag.",
+        "denominator": 57012,
+        "observed_count": 32350,
+        "censored_count": 24662,
+        "full_population": {
+          "sum": null,
+          "mean": null,
+          "min": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null,
+          "count": 57012
+        },
+        "completed_subset_diagnostic": {
+          "count": 32350,
+          "sum": 535050896.91587603,
+          "mean": 16539.440399254283,
+          "min": 9.999999747378752e-06,
+          "p50": 1056.9075950000042,
+          "p95": 73663.024519,
+          "p99": 135870.42668140001,
+          "max": 139336.51519
+        },
+        "restricted_full_population": {
+          "count": 57012,
+          "sum": 1890203439.426106,
+          "mean": 33154.48395822118,
+          "min": 9.999999747378752e-06,
+          "p50": 26293.208605,
+          "p95": 90757.98411799989,
+          "p99": 133262.7080130999,
+          "max": 139336.51519
+        }
+      },
+      "business_end_to_end": {
+        "definition": "Final leg continuous finish minus original_entry_time; includes EBS dwell and all external holds. Requires all legs complete.",
+        "denominator": 57012,
+        "observed_count": 32214,
+        "censored_count": 24798,
+        "full_population": {
+          "sum": null,
+          "mean": null,
+          "min": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null,
+          "count": 57012
+        },
+        "completed_subset_diagnostic": {
+          "count": 32214,
+          "sum": 504286221.161396,
+          "mean": 15654.25657047855,
+          "min": 59.0147300000026,
+          "p50": 1343.6002899999985,
+          "p95": 74416.4182985,
+          "p99": 77864.03280010002,
+          "max": 82821.08551
+        },
+        "restricted_full_population": {
+          "count": 57012,
+          "sum": 1741155866.231106,
+          "mean": 30540.164636060934,
+          "min": 59.0147300000026,
+          "p50": 27236.97969,
+          "p95": 74522.0778705,
+          "p99": 78099.16492629999,
+          "max": 83403.16473
+        }
+      },
+      "business_first_admission_to_final_goal": {
+        "definition": "Final leg continuous finish minus actual admission of the first leg (storage_in or direct); includes EBS dwell, excludes initial external hold. Requires all legs complete.",
+        "denominator": 57012,
+        "observed_count": 32214,
+        "censored_count": 24798,
+        "full_population": {
+          "sum": null,
+          "mean": null,
+          "min": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null,
+          "count": 57012
+        },
+        "completed_subset_diagnostic": {
+          "count": 32214,
+          "sum": 329082007.805,
+          "mean": 10215.496610324704,
+          "min": 59.0,
+          "p50": 230.09999999999854,
+          "p95": 73107.3875,
+          "p99": 77686.94149999999,
+          "max": 82820.69
+        },
+        "restricted_full_population": {
+          "count": 57012,
+          "sum": 1330967506.805,
+          "mean": 23345.392317494563,
+          "min": 59.0,
+          "p50": 7856.0,
+          "p95": 72810.49675,
+          "p99": 77594.98625,
+          "max": 83403.0
+        }
+      },
+      "segment_user_tht": {
+        "definition": "Primary user THT: per original business sum of each leg continuous finish minus first_planning_attempt_time. Includes every planning retry, device passage and internal wait; excludes EBS inter-leg storage and preplanning hold. No fallback for missing first-attempt telemetry.",
+        "denominator": 87206,
+        "observed_count": 62408,
+        "censored_count": 24798,
+        "full_population": {
+          "sum": null,
+          "mean": null,
+          "min": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null,
+          "count": 87206
+        },
+        "completed_subset_diagnostic": {
+          "count": 62408,
+          "sum": 14729221.705000002,
+          "mean": 236.0149613030381,
+          "min": 59.0,
+          "p50": 239.04999999999927,
+          "p95": 393.38500000000204,
+          "p99": 513.8059999999997,
+          "max": 16544.75
+        },
+        "restricted_full_population": {
+          "count": 87206,
+          "sum": 14748079.705000002,
+          "mean": 169.11771787491688,
+          "min": 0.0,
+          "p50": 174.59999999999854,
+          "p95": 378.3999999999942,
+          "p99": 499.66500000000053,
+          "max": 16544.75
+        }
+      },
+      "segment_planning_wait": {
+        "definition": "Successful admission minus first planning attempt; all failed-retry delay.",
+        "denominator": 87206,
+        "observed_count": 62544,
+        "censored_count": 24662,
+        "full_population": {
+          "sum": null,
+          "mean": null,
+          "min": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null,
+          "count": 87206
+        },
+        "completed_subset_diagnostic": {
+          "count": 62544,
+          "sum": 438614.0,
+          "mean": 7.012886927602968,
+          "min": 0.0,
+          "p50": 1.0,
+          "p95": 28.0,
+          "p99": 55.0,
+          "max": 16407.0
+        },
+        "restricted_full_population": {
+          "count": 87206,
+          "sum": 438614.0,
+          "mean": 5.029630988693438,
+          "min": 0.0,
+          "p50": 1.0,
+          "p95": 23.0,
+          "p99": 50.0,
+          "max": 16407.0
+        }
+      },
+      "business_sum_planning_wait": {
+        "definition": "Sum of leg planning retry wait per business.",
+        "denominator": 57012,
+        "observed_count": 32350,
+        "censored_count": 24662,
+        "full_population": {
+          "sum": null,
+          "mean": null,
+          "min": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null,
+          "count": 57012
+        },
+        "completed_subset_diagnostic": {
+          "count": 32350,
+          "sum": 329078.0,
+          "mean": 10.17242658423493,
+          "min": 0.0,
+          "p50": 1.0,
+          "p95": 33.0,
+          "p99": 62.0,
+          "max": 16408.0
+        },
+        "restricted_full_population": {
+          "count": 57012,
+          "sum": 438614.0,
+          "mean": 7.693362800813864,
+          "min": 0.0,
+          "p50": 1.0,
+          "p95": 29.0,
+          "p99": 57.0,
+          "max": 16408.0
+        }
+      },
+      "segment_canonical_preplanning": {
+        "definition": "First planning attempt minus canonical release; includes generation, causal gate and pre-head FIFO delay where present.",
+        "denominator": 87206,
+        "observed_count": 62544,
+        "censored_count": 24662,
+        "full_population": {
+          "sum": null,
+          "mean": null,
+          "min": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null,
+          "count": 87206
+        },
+        "completed_subset_diagnostic": {
+          "count": 62544,
+          "sum": 767261917.426106,
+          "mean": 12267.55432057601,
+          "min": 0.0,
+          "p50": 608.4712600000003,
+          "p95": 68579.645132,
+          "p99": 71090.0,
+          "max": 71858.0
+        },
+        "restricted_full_population": {
+          "count": 87206,
+          "sum": 1889764825.426106,
+          "mean": 21670.12390691129,
+          "min": 0.0,
+          "p50": 6605.924374999999,
+          "p95": 69309.0,
+          "p99": 71445.9,
+          "max": 71859.0
+        }
+      },
+      "business_sum_canonical_preplanning": {
+        "definition": "Sum of leg canonical-release-to-first-planning hold per business; mandatory companion to user THT.",
+        "denominator": 57012,
+        "observed_count": 32350,
+        "censored_count": 24662,
+        "full_population": {
+          "sum": null,
+          "mean": null,
+          "min": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null,
+          "count": 57012
+        },
+        "completed_subset_diagnostic": {
+          "count": 32350,
+          "sum": 534721818.91587603,
+          "mean": 16529.267972670048,
+          "min": 9.999999747378752e-06,
+          "p50": 1045.912549999999,
+          "p95": 73625.1992955,
+          "p99": 135864.3324465,
+          "max": 139334.51519
+        },
+        "restricted_full_population": {
+          "count": 57012,
+          "sum": 1889764825.426106,
+          "mean": 33146.79059542037,
+          "min": 9.999999747378752e-06,
+          "p50": 26289.137395,
+          "p95": 90724.04326799994,
+          "p99": 133092.78626749982,
+          "max": 139334.51519
+        }
+      },
+      "business_sum_activation_to_first_planning": {
+        "definition": "Sum first attempt minus actual source-queue activation; unavailable where activation telemetry is absent.",
+        "denominator": 57012,
+        "observed_count": 32350,
+        "censored_count": 24662,
+        "full_population": {
+          "sum": null,
+          "mean": null,
+          "min": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null,
+          "count": 57012
+        },
+        "completed_subset_diagnostic": {
+          "count": 32350,
+          "sum": 489365931.0,
+          "mean": 15127.231251931993,
+          "min": 0.0,
+          "p50": 1045.0,
+          "p95": 71393.55,
+          "p99": 74534.51,
+          "max": 78003.0
+        },
+        "restricted_full_population": {
+          "count": 57012,
+          "sum": 1647865594.0,
+          "mean": 28903.837683294743,
+          "min": 0.0,
+          "p50": 25997.5,
+          "p95": 71680.0,
+          "p99": 74912.67,
+          "max": 78003.0
+        }
+      },
+      "business_sum_canonical_to_activation": {
+        "definition": "Sum actual source-queue activation minus canonical release; activation is not the primary THT anchor.",
+        "denominator": 57012,
+        "observed_count": 57012,
+        "censored_count": 0,
+        "full_population": {
+          "count": 57012,
+          "sum": 241899231.426106,
+          "mean": 4242.952912125623,
+          "min": 0.0,
+          "p50": 8.340655000003608,
+          "p95": 33562.15244299999,
+          "p99": 59552.32011089999,
+          "max": 66791.52934000001
+        },
+        "completed_subset_diagnostic": {
+          "count": 57012,
+          "sum": 241899231.426106,
+          "mean": 4242.952912125623,
+          "min": 0.0,
+          "p50": 8.340655000003608,
+          "p95": 33562.15244299999,
+          "p99": 59552.32011089999,
+          "max": 66791.52934000001
+        },
+        "restricted_full_population": {
+          "count": 57012,
+          "sum": 241899231.426106,
+          "mean": 4242.952912125623,
+          "min": 0.0,
+          "p50": 8.340655000003608,
+          "p95": 33562.15244299999,
+          "p99": 59552.32011089999,
+          "max": 66791.52934000001
+        }
+      },
+      "by_leg": {
+        "direct": {
+          "user_tht": {
+            "definition": "Primary user THT: per original business sum of each leg continuous finish minus first_planning_attempt_time. Includes every planning retry, device passage and internal wait; excludes EBS inter-leg storage and preplanning hold. No fallback for missing first-attempt telemetry.",
+            "denominator": 26818,
+            "observed_count": 26818,
+            "censored_count": 0,
+            "full_population": {
+              "count": 26818,
+              "sum": 6202526.159999999,
+              "mean": 231.28220448952194,
+              "min": 59.0,
+              "p50": 208.90000000000146,
+              "p95": 479.4379999999982,
+              "p99": 546.9089999999968,
+              "max": 579.5149999999994
+            },
+            "completed_subset_diagnostic": {
+              "count": 26818,
+              "sum": 6202526.159999999,
+              "mean": 231.28220448952194,
+              "min": 59.0,
+              "p50": 208.90000000000146,
+              "p95": 479.4379999999982,
+              "p99": 546.9089999999968,
+              "max": 579.5149999999994
+            },
+            "restricted_full_population": {
+              "count": 26818,
+              "sum": 6202526.159999999,
+              "mean": 231.28220448952194,
+              "min": 59.0,
+              "p50": 208.90000000000146,
+              "p95": 479.4379999999982,
+              "p99": 546.9089999999968,
+              "max": 579.5149999999994
+            }
+          },
+          "planning_wait": {
+            "definition": "Successful admission minus first planning attempt.",
+            "denominator": 26818,
+            "observed_count": 26818,
+            "censored_count": 0,
+            "full_population": {
+              "count": 26818,
+              "sum": 143041.0,
+              "mean": 5.333768364531285,
+              "min": 0.0,
+              "p50": 1.0,
+              "p95": 27.0,
+              "p99": 47.0,
+              "max": 258.0
+            },
+            "completed_subset_diagnostic": {
+              "count": 26818,
+              "sum": 143041.0,
+              "mean": 5.333768364531285,
+              "min": 0.0,
+              "p50": 1.0,
+              "p95": 27.0,
+              "p99": 47.0,
+              "max": 258.0
+            },
+            "restricted_full_population": {
+              "count": 26818,
+              "sum": 143041.0,
+              "mean": 5.333768364531285,
+              "min": 0.0,
+              "p50": 1.0,
+              "p95": 27.0,
+              "p99": 47.0,
+              "max": 258.0
+            }
+          },
+          "canonical_preplanning": {
+            "definition": "First planning attempt minus canonical release.",
+            "denominator": 26818,
+            "observed_count": 26818,
+            "censored_count": 0,
+            "full_population": {
+              "count": 26818,
+              "sum": 125724221.05762,
+              "mean": 4688.053585562682,
+              "min": 9.999999747378752e-06,
+              "p50": 371.4070700000011,
+              "p95": 25905.651513999997,
+              "p99": 47120.74265099987,
+              "max": 68413.86269000001
+            },
+            "completed_subset_diagnostic": {
+              "count": 26818,
+              "sum": 125724221.05762,
+              "mean": 4688.053585562682,
+              "min": 9.999999747378752e-06,
+              "p50": 371.4070700000011,
+              "p95": 25905.651513999997,
+              "p99": 47120.74265099987,
+              "max": 68413.86269000001
+            },
+            "restricted_full_population": {
+              "count": 26818,
+              "sum": 125724221.05762,
+              "mean": 4688.053585562682,
+              "min": 9.999999747378752e-06,
+              "p50": 371.4070700000011,
+              "p95": 25905.651513999997,
+              "p99": 47120.74265099987,
+              "max": 68413.86269000001
+            }
+          },
+          "canonical_elapsed": {
+            "definition": "Continuous finish minus canonical pass_time for each independent transport leg; includes every hold before actual admission.",
+            "denominator": 26818,
+            "observed_count": 26818,
+            "censored_count": 0,
+            "full_population": {
+              "count": 26818,
+              "sum": 131926747.21762,
+              "mean": 4919.335790052204,
+              "min": 59.0147300000026,
+              "p50": 620.5469350000003,
+              "p95": 26132.5516915,
+              "p99": 47367.11031179964,
+              "max": 68740.75769
+            },
+            "completed_subset_diagnostic": {
+              "count": 26818,
+              "sum": 131926747.21762,
+              "mean": 4919.335790052204,
+              "min": 59.0147300000026,
+              "p50": 620.5469350000003,
+              "p95": 26132.5516915,
+              "p99": 47367.11031179964,
+              "max": 68740.75769
+            },
+            "restricted_full_population": {
+              "count": 26818,
+              "sum": 131926747.21762,
+              "mean": 4919.335790052204,
+              "min": 59.0147300000026,
+              "p50": 620.5469350000003,
+              "p95": 26132.5516915,
+              "p99": 47367.11031179964,
+              "max": 68740.75769
+            }
+          },
+          "network_duration": {
+            "definition": "Continuous finish minus actual admission per leg.",
+            "denominator": 26818,
+            "observed_count": 26818,
+            "censored_count": 0,
+            "full_population": {
+              "count": 26818,
+              "sum": 6059485.159999999,
+              "mean": 225.94843612499065,
+              "min": 59.0,
+              "p50": 205.84999999999854,
+              "p95": 478.38500000000204,
+              "p99": 545.0449999999983,
+              "max": 569.885000000002
+            },
+            "completed_subset_diagnostic": {
+              "count": 26818,
+              "sum": 6059485.159999999,
+              "mean": 225.94843612499065,
+              "min": 59.0,
+              "p50": 205.84999999999854,
+              "p95": 478.38500000000204,
+              "p99": 545.0449999999983,
+              "max": 569.885000000002
+            },
+            "restricted_full_population": {
+              "count": 26818,
+              "sum": 6059485.159999999,
+              "mean": 225.94843612499065,
+              "min": 59.0,
+              "p50": 205.84999999999854,
+              "p95": 478.38500000000204,
+              "p99": 545.0449999999983,
+              "max": 569.885000000002
+            }
+          },
+          "source_hold": {
+            "definition": "Canonical-to-admission component: actual admission minus canonical pass_time. Includes preplanning hold and planning retries; not wholly outside-system waiting. Canonical pass_time is not actual source-generation time.",
+            "denominator": 26818,
+            "observed_count": 26818,
+            "censored_count": 0,
+            "full_population": {
+              "count": 26818,
+              "sum": 125867262.05762,
+              "mean": 4693.387353927214,
+              "min": 9.999999747378752e-06,
+              "p50": 380.4863150000019,
+              "p95": 25909.506532499992,
+              "p99": 47121.74265099987,
+              "max": 68414.86269000001
+            },
+            "completed_subset_diagnostic": {
+              "count": 26818,
+              "sum": 125867262.05762,
+              "mean": 4693.387353927214,
+              "min": 9.999999747378752e-06,
+              "p50": 380.4863150000019,
+              "p95": 25909.506532499992,
+              "p99": 47121.74265099987,
+              "max": 68414.86269000001
+            },
+            "restricted_full_population": {
+              "count": 26818,
+              "sum": 125867262.05762,
+              "mean": 4693.387353927214,
+              "min": 9.999999747378752e-06,
+              "p50": 380.4863150000019,
+              "p95": 25909.506532499992,
+              "p99": 47121.74265099987,
+              "max": 68414.86269000001
+            }
+          }
+        },
+        "storage_in": {
+          "user_tht": {
+            "definition": "Primary user THT: per original business sum of each leg continuous finish minus first_planning_attempt_time. Includes every planning retry, device passage and internal wait; excludes EBS inter-leg storage and preplanning hold. No fallback for missing first-attempt telemetry.",
+            "denominator": 30194,
+            "observed_count": 30194,
+            "censored_count": 0,
+            "full_population": {
+              "count": 30194,
+              "sum": 7160964.9,
+              "mean": 237.16516195270586,
+              "min": 137.75,
+              "p50": 241.0500000000029,
+              "p95": 346.92899999999906,
+              "p99": 397.35349999999875,
+              "max": 16544.75
+            },
+            "completed_subset_diagnostic": {
+              "count": 30194,
+              "sum": 7160964.9,
+              "mean": 237.16516195270586,
+              "min": 137.75,
+              "p50": 241.0500000000029,
+              "p95": 346.92899999999906,
+              "p99": 397.35349999999875,
+              "max": 16544.75
+            },
+            "restricted_full_population": {
+              "count": 30194,
+              "sum": 7160964.9,
+              "mean": 237.16516195270586,
+              "min": 137.75,
+              "p50": 241.0500000000029,
+              "p95": 346.92899999999906,
+              "p99": 397.35349999999875,
+              "max": 16544.75
+            }
+          },
+          "planning_wait": {
+            "definition": "Successful admission minus first planning attempt.",
+            "denominator": 30194,
+            "observed_count": 30194,
+            "censored_count": 0,
+            "full_population": {
+              "count": 30194,
+              "sum": 289291.0,
+              "mean": 9.581075710406042,
+              "min": 0.0,
+              "p50": 1.0,
+              "p95": 36.0,
+              "p99": 62.0,
+              "max": 16407.0
+            },
+            "completed_subset_diagnostic": {
+              "count": 30194,
+              "sum": 289291.0,
+              "mean": 9.581075710406042,
+              "min": 0.0,
+              "p50": 1.0,
+              "p95": 36.0,
+              "p99": 62.0,
+              "max": 16407.0
+            },
+            "restricted_full_population": {
+              "count": 30194,
+              "sum": 289291.0,
+              "mean": 9.581075710406042,
+              "min": 0.0,
+              "p50": 1.0,
+              "p95": 36.0,
+              "p99": 62.0,
+              "max": 16407.0
+            }
+          },
+          "canonical_preplanning": {
+            "definition": "First planning attempt minus canonical release.",
+            "denominator": 30194,
+            "observed_count": 30194,
+            "censored_count": 0,
+            "full_population": {
+              "count": 30194,
+              "sum": 284031806.368486,
+              "mean": 9406.895620602967,
+              "min": 3.9999998989515007e-05,
+              "p50": 197.71121499999936,
+              "p95": 53390.9148695,
+              "p99": 66719.9396459,
+              "max": 69070.02077
+            },
+            "completed_subset_diagnostic": {
+              "count": 30194,
+              "sum": 284031806.368486,
+              "mean": 9406.895620602967,
+              "min": 3.9999998989515007e-05,
+              "p50": 197.71121499999936,
+              "p95": 53390.9148695,
+              "p99": 66719.9396459,
+              "max": 69070.02077
+            },
+            "restricted_full_population": {
+              "count": 30194,
+              "sum": 284031806.368486,
+              "mean": 9406.895620602967,
+              "min": 3.9999998989515007e-05,
+              "p50": 197.71121499999936,
+              "p95": 53390.9148695,
+              "p99": 66719.9396459,
+              "max": 69070.02077
+            }
+          },
+          "canonical_elapsed": {
+            "definition": "Continuous finish minus canonical pass_time for each independent transport leg; includes every hold before actual admission.",
+            "denominator": 30194,
+            "observed_count": 30194,
+            "censored_count": 0,
+            "full_population": {
+              "count": 30194,
+              "sum": 291192771.268486,
+              "mean": 9644.060782555674,
+              "min": 137.75772999999936,
+              "p50": 453.8581049999975,
+              "p95": 53535.79658999999,
+              "p99": 66865.5272187,
+              "max": 69213.05773
+            },
+            "completed_subset_diagnostic": {
+              "count": 30194,
+              "sum": 291192771.268486,
+              "mean": 9644.060782555674,
+              "min": 137.75772999999936,
+              "p50": 453.8581049999975,
+              "p95": 53535.79658999999,
+              "p99": 66865.5272187,
+              "max": 69213.05773
+            },
+            "restricted_full_population": {
+              "count": 30194,
+              "sum": 291192771.268486,
+              "mean": 9644.060782555674,
+              "min": 137.75772999999936,
+              "p50": 453.8581049999975,
+              "p95": 53535.79658999999,
+              "p99": 66865.5272187,
+              "max": 69213.05773
+            }
+          },
+          "network_duration": {
+            "definition": "Continuous finish minus actual admission per leg.",
+            "denominator": 30194,
+            "observed_count": 30194,
+            "censored_count": 0,
+            "full_population": {
+              "count": 30194,
+              "sum": 6871673.9,
+              "mean": 227.5840862422998,
+              "min": 137.75,
+              "p50": 238.5749999999971,
+              "p95": 331.9649999999965,
+              "p99": 362.130000000001,
+              "max": 486.09999999999854
+            },
+            "completed_subset_diagnostic": {
+              "count": 30194,
+              "sum": 6871673.9,
+              "mean": 227.5840862422998,
+              "min": 137.75,
+              "p50": 238.5749999999971,
+              "p95": 331.9649999999965,
+              "p99": 362.130000000001,
+              "max": 486.09999999999854
+            },
+            "restricted_full_population": {
+              "count": 30194,
+              "sum": 6871673.9,
+              "mean": 227.5840862422998,
+              "min": 137.75,
+              "p50": 238.5749999999971,
+              "p95": 331.9649999999965,
+              "p99": 362.130000000001,
+              "max": 486.09999999999854
+            }
+          },
+          "source_hold": {
+            "definition": "Canonical-to-admission component: actual admission minus canonical pass_time. Includes preplanning hold and planning retries; not wholly outside-system waiting. Canonical pass_time is not actual source-generation time.",
+            "denominator": 30194,
+            "observed_count": 30194,
+            "censored_count": 0,
+            "full_population": {
+              "count": 30194,
+              "sum": 284321097.368486,
+              "mean": 9416.476696313373,
+              "min": 3.9999998989515007e-05,
+              "p50": 204.7824099999998,
+              "p95": 53397.750014499994,
+              "p99": 66727.7772187,
+              "max": 69075.30773
+            },
+            "completed_subset_diagnostic": {
+              "count": 30194,
+              "sum": 284321097.368486,
+              "mean": 9416.476696313373,
+              "min": 3.9999998989515007e-05,
+              "p50": 204.7824099999998,
+              "p95": 53397.750014499994,
+              "p99": 66727.7772187,
+              "max": 69075.30773
+            },
+            "restricted_full_population": {
+              "count": 30194,
+              "sum": 284321097.368486,
+              "mean": 9416.476696313373,
+              "min": 3.9999998989515007e-05,
+              "p50": 204.7824099999998,
+              "p95": 53397.750014499994,
+              "p99": 66727.7772187,
+              "max": 69075.30773
+            }
+          }
+        },
+        "storage_out": {
+          "user_tht": {
+            "definition": "Primary user THT: per original business sum of each leg continuous finish minus first_planning_attempt_time. Includes every planning retry, device passage and internal wait; excludes EBS inter-leg storage and preplanning hold. No fallback for missing first-attempt telemetry.",
+            "denominator": 30194,
+            "observed_count": 5396,
+            "censored_count": 24798,
+            "full_population": {
+              "sum": null,
+              "mean": null,
+              "min": null,
+              "p50": null,
+              "p95": null,
+              "p99": null,
+              "max": null,
+              "count": 30194
+            },
+            "completed_subset_diagnostic": {
+              "count": 5396,
+              "sum": 1365730.6450000028,
+              "mean": 253.1005643068945,
+              "min": 169.6949999999997,
+              "p50": 246.0850000000064,
+              "p95": 325.6900000000023,
+              "p99": 354.6900000000023,
+              "max": 410.8199999999997
+            },
+            "restricted_full_population": {
+              "count": 30194,
+              "sum": 1384588.6450000028,
+              "mean": 45.85641667218662,
+              "min": 0.0,
+              "p50": 0.0,
+              "p95": 292.5399999999936,
+              "p99": 325.6900000000023,
+              "max": 410.8199999999997
+            }
+          },
+          "planning_wait": {
+            "definition": "Successful admission minus first planning attempt.",
+            "denominator": 30194,
+            "observed_count": 5532,
+            "censored_count": 24662,
+            "full_population": {
+              "sum": null,
+              "mean": null,
+              "min": null,
+              "p50": null,
+              "p95": null,
+              "p99": null,
+              "max": null,
+              "count": 30194
+            },
+            "completed_subset_diagnostic": {
+              "count": 5532,
+              "sum": 6282.0,
+              "mean": 1.1355748373101953,
+              "min": 0.0,
+              "p50": 1.0,
+              "p95": 1.0,
+              "p99": 5.0,
+              "max": 19.0
+            },
+            "restricted_full_population": {
+              "count": 30194,
+              "sum": 6282.0,
+              "mean": 0.208054580380208,
+              "min": 0.0,
+              "p50": 0.0,
+              "p95": 1.0,
+              "p99": 1.0,
+              "max": 19.0
+            }
+          },
+          "canonical_preplanning": {
+            "definition": "First planning attempt minus canonical release.",
+            "denominator": 30194,
+            "observed_count": 5532,
+            "censored_count": 24662,
+            "full_population": {
+              "sum": null,
+              "mean": null,
+              "min": null,
+              "p50": null,
+              "p95": null,
+              "p99": null,
+              "max": null,
+              "count": 30194
+            },
+            "completed_subset_diagnostic": {
+              "count": 5532,
+              "sum": 357505890.0,
+              "mean": 64625.070498915404,
+              "min": 0.0,
+              "p50": 68845.0,
+              "p95": 71570.9,
+              "p99": 71747.38,
+              "max": 71858.0
+            },
+            "restricted_full_population": {
+              "count": 30194,
+              "sum": 1480008798.0,
+              "mean": 49016.65224879115,
+              "min": 0.0,
+              "p50": 50559.0,
+              "p95": 71032.7,
+              "p99": 71736.0,
+              "max": 71859.0
+            }
+          },
+          "canonical_elapsed": {
+            "definition": "Continuous finish minus canonical pass_time for each independent transport leg; includes every hold before actual admission.",
+            "denominator": 30194,
+            "observed_count": 5396,
+            "censored_count": 24798,
+            "full_population": {
+              "sum": null,
+              "mean": null,
+              "min": null,
+              "p50": null,
+              "p95": null,
+              "p99": null,
+              "max": null,
+              "count": 30194
+            },
+            "completed_subset_diagnostic": {
+              "count": 5396,
+              "sum": 349116304.645,
+              "mean": 64699.09278076352,
+              "min": 195.10499999999956,
+              "p50": 68998.1275,
+              "p95": 71604.10375,
+              "p99": 71923.62825,
+              "max": 71995.69
+            },
+            "restricted_full_population": {
+              "count": 30194,
+              "sum": 1481393386.645,
+              "mean": 49062.508665463334,
+              "min": 195.10499999999956,
+              "p50": 50559.0,
+              "p95": 71259.0,
+              "p99": 71859.0,
+              "max": 72009.0
+            }
+          },
+          "network_duration": {
+            "definition": "Continuous finish minus actual admission per leg.",
+            "denominator": 30194,
+            "observed_count": 5396,
+            "censored_count": 24798,
+            "full_population": {
+              "sum": null,
+              "mean": null,
+              "min": null,
+              "p50": null,
+              "p95": null,
+              "p99": null,
+              "max": null,
+              "count": 30194
+            },
+            "completed_subset_diagnostic": {
+              "count": 5396,
+              "sum": 1359584.6450000028,
+              "mean": 251.9615724610828,
+              "min": 169.6949999999997,
+              "p50": 245.0850000000064,
+              "p95": 324.6900000000023,
+              "p99": 353.369999999999,
+              "max": 405.570000000007
+            },
+            "restricted_full_population": {
+              "count": 30194,
+              "sum": 1378306.6450000028,
+              "mean": 45.64836209180641,
+              "min": 0.0,
+              "p50": 0.0,
+              "p95": 291.5399999999936,
+              "p99": 324.6900000000023,
+              "max": 405.570000000007
+            }
+          },
+          "source_hold": {
+            "definition": "Canonical-to-admission component: actual admission minus canonical pass_time. Includes preplanning hold and planning retries; not wholly outside-system waiting. Canonical pass_time is not actual source-generation time.",
+            "denominator": 30194,
+            "observed_count": 5532,
+            "censored_count": 24662,
+            "full_population": {
+              "sum": null,
+              "mean": null,
+              "min": null,
+              "p50": null,
+              "p95": null,
+              "p99": null,
+              "max": null,
+              "count": 30194
+            },
+            "completed_subset_diagnostic": {
+              "count": 5532,
+              "sum": 357512172.0,
+              "mean": 64626.20607375271,
+              "min": 0.0,
+              "p50": 68846.5,
+              "p95": 71571.9,
+              "p99": 71748.38,
+              "max": 71859.0
+            },
+            "restricted_full_population": {
+              "count": 30194,
+              "sum": 1480015080.0,
+              "mean": 49016.86030337153,
+              "min": 0.0,
+              "p50": 50559.0,
+              "p95": 71033.7,
+              "p99": 71737.0,
+              "max": 71859.0
+            }
+          }
+        }
+      }
+    },
+    "observed_ceil_finish": {
+      "definition": "Auxiliary only: replace each completed continuous finish with ceil(finish), for both algorithms; admissions/releases unchanged.",
+      "user_tht": {
+        "definition": "Primary user THT: per original business sum of each leg continuous finish minus first_planning_attempt_time. Includes every planning retry, device passage and internal wait; excludes EBS inter-leg storage and preplanning hold. No fallback for missing first-attempt telemetry.",
+        "denominator": 57012,
+        "observed_count": 32214,
+        "censored_count": 24798,
+        "full_population": {
+          "sum": null,
+          "mean": null,
+          "min": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null,
+          "count": 57012
+        },
+        "completed_subset_diagnostic": {
+          "count": 32214,
+          "sum": 9023613.0,
+          "mean": 280.1146395976904,
+          "min": 59.0,
+          "p50": 233.0,
+          "p95": 554.0,
+          "p99": 673.0,
+          "max": 16839.0
+        }
+      },
+      "paper_tht": {
+        "definition": "Network-elapsed component: per business sum of each leg continuous finish minus successful actual admission. Includes device passage and internal wait, excludes planning retries and EBS dwell. Legacy paper_tht field is not the user THT objective.",
+        "denominator": 57012,
+        "observed_count": 32214,
+        "censored_count": 24798,
+        "full_population": {
+          "sum": null,
+          "mean": null,
+          "min": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null,
+          "count": 57012
+        },
+        "completed_subset_diagnostic": {
+          "count": 32214,
+          "sum": 8700265.0,
+          "mean": 270.0771403737505,
+          "min": 59.0,
+          "p50": 231.0,
+          "p95": 544.0,
+          "p99": 624.0,
+          "max": 778.0
+        }
+      },
+      "segment_canonical_elapsed": {
+        "definition": "Continuous finish minus canonical pass_time for each independent transport leg; includes every hold before actual admission.",
+        "denominator": 87206,
+        "observed_count": 62408,
+        "censored_count": 24798,
+        "full_population": {
+          "sum": null,
+          "mean": null,
+          "min": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null,
+          "count": 87206
+        },
+        "completed_subset_diagnostic": {
+          "count": 62408,
+          "sum": 772265224.426106,
+          "mean": 12374.458794162703,
+          "min": 59.0147300000026,
+          "p50": 840.0655800000004,
+          "p95": 68752.0,
+          "p99": 71221.86,
+          "max": 71996.0
+        }
+      },
+      "business_sum_canonical_elapsed": {
+        "definition": "Sum of leg canonical elapsed per original business bag; excludes the interval between inbound finish and nominal outbound release.",
+        "denominator": 57012,
+        "observed_count": 32214,
+        "censored_count": 24798,
+        "full_population": {
+          "sum": null,
+          "mean": null,
+          "min": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null,
+          "count": 57012
+        },
+        "completed_subset_diagnostic": {
+          "count": 32214,
+          "sum": 531661198.356396,
+          "mean": 16504.041669969454,
+          "min": 59.0147300000026,
+          "p50": 1281.9799449999991,
+          "p95": 73677.24710499996,
+          "p99": 136193.5762011,
+          "max": 139462.18547
+        }
+      },
+      "business_end_to_end": {
+        "definition": "Final leg continuous finish minus original_entry_time; includes EBS dwell and all external holds. Requires all legs complete.",
+        "denominator": 57012,
+        "observed_count": 32214,
+        "censored_count": 24798,
+        "full_population": {
+          "sum": null,
+          "mean": null,
+          "min": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null,
+          "count": 57012
+        },
+        "completed_subset_diagnostic": {
+          "count": 32214,
+          "sum": 504302064.356396,
+          "mean": 15654.748381337184,
+          "min": 59.0147300000026,
+          "p50": 1344.1552899999988,
+          "p95": 74416.8557985,
+          "p99": 77864.8431501,
+          "max": 82821.39551
+        }
+      },
+      "business_first_admission_to_final_goal": {
+        "definition": "Final leg continuous finish minus actual admission of the first leg (storage_in or direct); includes EBS dwell, excludes initial external hold. Requires all legs complete.",
+        "denominator": 57012,
+        "observed_count": 32214,
+        "censored_count": 24798,
+        "full_population": {
+          "sum": null,
+          "mean": null,
+          "min": null,
+          "p50": null,
+          "p95": null,
+          "p99": null,
+          "max": null,
+          "count": 57012
+        },
+        "completed_subset_diagnostic": {
+          "count": 32214,
+          "sum": 329097851.0,
+          "mean": 10215.988421183336,
+          "min": 59.0,
+          "p50": 231.0,
+          "p95": 73108.0,
+          "p99": 77687.30999999998,
+          "max": 82821.0
+        }
+      }
+    },
+    "interpretation": [
+      "Full-population duration statistics are null whenever any member lacks the required completed observation; completed-subset values are diagnostic only.",
+      "Canonical-to-admission observations become known at actual admission even if transport is incomplete; they include both preplanning hold and retries.",
+      "User THT requires explicit first_planning_attempt_time. A source activation, generated_release, successful admission or canonical release never fills a missing anchor.",
+      "Restricted elapsed is finish-release for completed legs, otherwise max(0,horizon-release). Restricted network is finish-admission or observed in-network exposure; unadmitted legs contribute zero exposure, not zero eventual THT.",
+      "Missing telemetry preserves denominators and invalidates source/network exposure split. Restricted canonical elapsed conservatively treats missing records as uncompleted through horizon.",
+      "Observed ceil finish is an auxiliary common transformation; continuous physical finish defines the primary result.",
+      "Metric validity does not establish physical safety, EBS causality, optimality, or a performance advantage. These require independent audits."
+    ]
+  },
+  "business": {
+    "schema": "g31.continuous.business_audit.v1",
+    "passed": true,
+    "business_denominator": 57012,
+    "segment_denominator": 87206,
+    "completed_businesses": 32214,
+    "finish_le_std": 19116,
+    "finish_le_std_minus_2700": 13827,
+    "violation_count": 0,
+    "violation_examples": []
+  },
+  "native": {
+    "tasks": 87206,
+    "admitted": 62544,
+    "completed": 62408,
+    "on_time": 40546,
+    "planning_attempts": 249702,
+    "failed_attempts": 187158,
+    "search_expansions": 3901764,
+    "score_expansions": 0,
+    "backtracks": 2214788,
+    "local_scoring_calendar_queries": 0,
+    "safety_neighbor_queries": 4192810,
+    "logical_request_reply_messages": 17057826,
+    "commit_node_messages": 878977,
+    "max_certificate_nodes": 51,
+    "max_observation_depth": 1,
+    "search_decision_k_histogram": {
+      "1": 3783384
+    },
+    "committed_route_hop_k_histogram": {
+      "1": 816433
+    },
+    "search_actual_calendar_query_depth_histogram": {
+      "0": 3783384
+    },
+    "local_score_budget_exhausted_decisions": 0,
+    "scored_neighbor_candidates": 6299242,
+    "edge_safety_queries": 4255375,
+    "source_resource_queries": 80728,
+    "goal_resource_queries": 32350,
+    "peak_edge_calendar_entries": 5646,
+    "skipped_single_choice_scoring": 1432821,
+    "static_rank_fastpath_candidates": 4747734,
+    "source_relaxed_budget_attempts": 187158,
+    "source_relaxed_budget_admissions": 52305,
+    "source_route_budget_violations": 0,
+    "route_bound_prunes": 791815,
+    "inroute_decisions": 752163,
+    "inroute_keep_certificate": 712943,
+    "inroute_replacement_attempts": 39220,
+    "inroute_replacement_successes": 0,
+    "inroute_fallbacks": 39220,
+    "inroute_search_expansions": 320022,
+    "inroute_scoring_queries": 0,
+    "inroute_node_safety_queries": 418567,
+    "stale_arrivals_ignored": 0,
+    "stale_cleanups_ignored": 0,
+    "conflict_diagnostics": {
+      "source_admission_node": [
+        {
+          "node": 0,
+          "conflict_queries": 5711
+        },
+        {
+          "node": 2,
+          "conflict_queries": 14086
+        },
+        {
+          "node": 3,
+          "conflict_queries": 602
+        },
+        {
+          "node": 5,
+          "conflict_queries": 432
+        },
+        {
+          "node": 7,
+          "conflict_queries": 29
+        },
+        {
+          "node": 9,
+          "conflict_queries": 281
+        },
+        {
+          "node": 10,
+          "conflict_queries": 213
+        },
+        {
+          "node": 11,
+          "conflict_queries": 3263
+        },
+        {
+          "node": 13,
+          "conflict_queries": 66
+        },
+        {
+          "node": 15,
+          "conflict_queries": 120
+        },
+        {
+          "node": 24,
+          "conflict_queries": 2243
+        },
+        {
+          "node": 25,
+          "conflict_queries": 6912
+        },
+        {
+          "node": 26,
+          "conflict_queries": 5473
+        },
+        {
+          "node": 27,
+          "conflict_queries": 4879
+        },
+        {
+          "node": 28,
+          "conflict_queries": 17345
+        },
+        {
+          "node": 30,
+          "conflict_queries": 128
+        },
+        {
+          "node": 32,
+          "conflict_queries": 65
+        },
+        {
+          "node": 33,
+          "conflict_queries": 8783
+        },
+        {
+          "node": 34,
+          "conflict_queries": 46851
+        },
+        {
+          "node": 35,
+          "conflict_queries": 6559
+        },
+        {
+          "node": 37,
+          "conflict_queries": 1860
+        },
+        {
+          "node": 39,
+          "conflict_queries": 2782
+        },
+        {
+          "node": 40,
+          "conflict_queries": 2072
+        },
+        {
+          "node": 49,
+          "conflict_queries": 2757
+        },
+        {
+          "node": 59,
+          "conflict_queries": 1386
+        },
+        {
+          "node": 61,
+          "conflict_queries": 2845
+        },
+        {
+          "node": 65,
+          "conflict_queries": 26
+        },
+        {
+          "node": 70,
+          "conflict_queries": 22
+        },
+        {
+          "node": 74,
+          "conflict_queries": 40
+        },
+        {
+          "node": 76,
+          "conflict_queries": 3117
+        },
+        {
+          "node": 78,
+          "conflict_queries": 349
+        },
+        {
+          "node": 82,
+          "conflict_queries": 710
+        },
+        {
+          "node": 86,
+          "conflict_queries": 188
+        },
+        {
+          "node": 88,
+          "conflict_queries": 712
+        },
+        {
+          "node": 89,
+          "conflict_queries": 2
+        },
+        {
+          "node": 94,
+          "conflict_queries": 20959
+        },
+        {
+          "node": 96,
+          "conflict_queries": 4050
+        },
+        {
+          "node": 97,
+          "conflict_queries": 11136
+        },
+        {
+          "node": 100,
+          "conflict_queries": 2842
+        },
+        {
+          "node": 104,
+          "conflict_queries": 5922
+        },
+        {
+          "node": 109,
+          "conflict_queries": 14722
+        },
+        {
+          "node": 111,
+          "conflict_queries": 23236
+        },
+        {
+          "node": 112,
+          "conflict_queries": 234098
+        },
+        {
+          "node": 117,
+          "conflict_queries": 17
+        },
+        {
+          "node": 119,
+          "conflict_queries": 57
+        },
+        {
+          "node": 121,
+          "conflict_queries": 154
+        },
+        {
+          "node": 125,
+          "conflict_queries": 64
+        },
+        {
+          "node": 127,
+          "conflict_queries": 19619
+        },
+        {
+          "node": 135,
+          "conflict_queries": 481
+        },
+        {
+          "node": 144,
+          "conflict_queries": 1
+        },
+        {
+          "node": 150,
+          "conflict_queries": 3823
+        }
+      ],
+      "source_admission_edge": [
+        {
+          "from": 53,
+          "to": 49,
+          "conflict_queries": 5643
+        },
+        {
+          "from": 95,
+          "to": 96,
+          "conflict_queries": 5142
+        },
+        {
+          "from": 134,
+          "to": 135,
+          "conflict_queries": 1192
+        },
+        {
+          "from": 136,
+          "to": 137,
+          "conflict_queries": 2829
+        },
+        {
+          "from": 138,
+          "to": 139,
+          "conflict_queries": 2785
+        },
+        {
+          "from": 149,
+          "to": 150,
+          "conflict_queries": 6589
+        },
+        {
+          "from": 57,
+          "to": 58,
+          "conflict_queries": 2991
+        },
+        {
+          "from": 92,
+          "to": 93,
+          "conflict_queries": 5200
+        }
+      ],
+      "inroute_replacement_node": [
+        {
+          "node": 2,
+          "conflict_queries": 499
+        },
+        {
+          "node": 3,
+          "conflict_queries": 308
+        },
+        {
+          "node": 5,
+          "conflict_queries": 249
+        },
+        {
+          "node": 7,
+          "conflict_queries": 12
+        },
+        {
+          "node": 9,
+          "conflict_queries": 40
+        },
+        {
+          "node": 10,
+          "conflict_queries": 108
+        },
+        {
+          "node": 11,
+          "conflict_queries": 1120
+        },
+        {
+          "node": 25,
+          "conflict_queries": 200
+        },
+        {
+          "node": 27,
+          "conflict_queries": 37
+        },
+        {
+          "node": 28,
+          "conflict_queries": 5010
+        },
+        {
+          "node": 30,
+          "conflict_queries": 84
+        },
+        {
+          "node": 32,
+          "conflict_queries": 69
+        },
+        {
+          "node": 33,
+          "conflict_queries": 3301
+        },
+        {
+          "node": 34,
+          "conflict_queries": 13186
+        },
+        {
+          "node": 35,
+          "conflict_queries": 875
+        },
+        {
+          "node": 37,
+          "conflict_queries": 483
+        },
+        {
+          "node": 39,
+          "conflict_queries": 678
+        },
+        {
+          "node": 40,
+          "conflict_queries": 463
+        },
+        {
+          "node": 59,
+          "conflict_queries": 17
+        },
+        {
+          "node": 61,
+          "conflict_queries": 767
+        },
+        {
+          "node": 65,
+          "conflict_queries": 20
+        },
+        {
+          "node": 70,
+          "conflict_queries": 16
+        },
+        {
+          "node": 74,
+          "conflict_queries": 35
+        },
+        {
+          "node": 76,
+          "conflict_queries": 1072
+        },
+        {
+          "node": 78,
+          "conflict_queries": 261
+        },
+        {
+          "node": 82,
+          "conflict_queries": 501
+        },
+        {
+          "node": 86,
+          "conflict_queries": 97
+        },
+        {
+          "node": 88,
+          "conflict_queries": 496
+        },
+        {
+          "node": 89,
+          "conflict_queries": 2
+        },
+        {
+          "node": 94,
+          "conflict_queries": 2194
+        },
+        {
+          "node": 96,
+          "conflict_queries": 10
+        },
+        {
+          "node": 97,
+          "conflict_queries": 1835
+        },
+        {
+          "node": 100,
+          "conflict_queries": 815
+        },
+        {
+          "node": 104,
+          "conflict_queries": 1454
+        },
+        {
+          "node": 109,
+          "conflict_queries": 2876
+        },
+        {
+          "node": 111,
+          "conflict_queries": 4889
+        },
+        {
+          "node": 112,
+          "conflict_queries": 47114
+        },
+        {
+          "node": 117,
+          "conflict_queries": 2
+        },
+        {
+          "node": 119,
+          "conflict_queries": 29
+        },
+        {
+          "node": 121,
+          "conflict_queries": 78
+        },
+        {
+          "node": 125,
+          "conflict_queries": 14
+        },
+        {
+          "node": 127,
+          "conflict_queries": 7222
+        },
+        {
+          "node": 150,
+          "conflict_queries": 7
+        }
+      ],
+      "inroute_replacement_edge": [],
+      "interpretation": "Repeated failed exact resource queries, not unique bags or a causal delay decomposition; local ranking probes excluded"
+    },
+    "search_budget_failures": 4491,
+    "score_budget_exhaustions": 0,
+    "source_endpoint_ignored_conflict_admissions": 0,
+    "goal_endpoint_ignored_conflict_admissions": 0,
+    "failed_search_hash_checks": 0,
+    "futurecalendar_retry_jumps": 187158,
+    "events": 1223898,
+    "event_budget_exhausted": false,
+    "last_processed_event_time": 98259.0,
+    "peak_calendar_entries": 5303,
+    "executed_horizon": 98259.0,
+    "peak_pending_events": 87209,
+    "cached_goal_tables": 43,
+    "preprocessing_seconds": 0.0043406,
+    "run_wall_seconds": 8.8559682,
+    "run_cpu_seconds": 8.625,
+    "run_cpu_measurement": "Windows GetProcessTimes kernel+user; std::clock on non-Windows; event loop only",
+    "decision_microseconds_p50": 6.2,
+    "decision_microseconds_p95": 124.6,
+    "decision_microseconds_p99": 279.9,
+    "inroute_decision_microseconds_p50": 1.0,
+    "inroute_decision_microseconds_p95": 2.7,
+    "inroute_decision_microseconds_p99": 13.2,
+    "contract": {
+      "planner": "local lookahead ordered neighbour DFS with atomic full continuation certificate",
+      "runtime_dynamic_rerouting": true,
+      "safety_information_range": "may extend to goal, independently of observation depth",
+      "max_route_excess_seconds": 120.0,
+      "route_excess_retry_relaxation_rate": 1.0,
+      "source_route_budget_relaxation": "Only on actual source attempts: base excess + rate * age since immutable first planning attempt; growth floors to integer microseconds. No new wake event; an existing calendar jump may skip an earlier newly permitted detour. No earliest-feasible or monotone THT guarantee; in-route finish-nonincreasing fallback policy unchanged.",
+      "static_rank_fastpath": "At requested depth1 and zero congestion weight, return static H without calendar probes; logical score-budget consumption/exhaustion and choice order preserved; actual query depth/count zero.",
+      "rolling_policy": "at each physical internal arrival rank neighbours; a single choice or unchanged best keeps fallback; strictly better next attempts exact suffix exchange, finish cannot become later; failure retains all rights",
+      "rolling_event_order": "at equal time: physical arrival, resource cleanup, source release, source attempt, EBS activation; each ledger event has a unique increasing ledger_order",
+      "rolling_ebs_gate": "release depends on actual predecessor goal event and latest route generation, never a stale predicted completion",
+      "timing_clocks": "activation_time records first entry into the external source FIFO; first_planning_attempt_time records first actual head-eligible planning attempt and never resets on failure; admission is successful physical network entry",
+      "primary_tht_clock": "sum per original business bag of each leg actual goal arrival minus first_planning_attempt_time; source preplanning hold and canonical elapsed are mandatory companion measures",
+      "internal_wait_actions": false,
+      "interval_mode": "half_open",
+      "physical_ticks_per_second": 1000000,
+      "interval_conflict": "half-open intervals on integer microsecond grid; touching endpoints allowed; zero-service points occupy no resource",
+      "strict_endpoint_resources": true,
+      "source_endpoint": "positive-service source checked and reserved before external admission",
+      "goal_endpoint": "finish at arrival; positive-service goal checked and resource retained through departure",
+      "edge_entry_headway_seconds": 2.0,
+      "edge_resource": "directed-edge entry interval only, not whole-edge unit capacity; all endpoint and zero-connector flows included",
+      "node_resource_intervals_columns": [
+        "node",
+        "arrival",
+        "departure",
+        "role",
+        "checked",
+        "reserved"
+      ],
+      "edge_resource_intervals_columns": [
+        "from",
+        "to",
+        "entry",
+        "protected_until"
+      ],
+      "resource_cleanup": "ceil_q(max(business completion epoch, strict goal reservation end, all edge entry window ends)); business finish remains goal arrival",
+      "failed_search_transaction": "read-only; no reservation is inserted before a complete route exists",
+      "retry_bound_scope": "explored prefixes only; budget truncation can skip an earlier feasible alternative",
+      "logical_messages": "simulation counts, no network latency or real distributed concurrency model",
+      "global_static_preprocessing": "one service-aware reverse Dijkstra per distinct goal; topology only",
+      "score_budget_scope": "max_score_expansions per current-node local ranking; max_expansions per full DFS attempt",
+      "route_decisions_columns": [
+        "node",
+        "requested_k",
+        "actual_calendar_query_depth",
+        "local_score_queries",
+        "score_budget_exhausted"
+      ],
+      "congestion_signal": "exact-window blocking delay proxy plus union seconds of active reservations in the future pressure_window; ranking only, no internal waiting",
+      "source_generation": "precomputed eligibility uses stable nominal order and source interval; source_fifo additionally paces successful admissions by that interval; no early release; not an exact reproduction of Java generation/comparator quirks",
+      "source_fifo_order": "canonical",
+      "canonical_source_order": "when explicitly enabled: stable original nominal release order, input row order for ties; an unreleased or predecessor-blocked head blocks every later source item, activation does not append/reorder"
+    },
+    "rolling_ledger_records": 939523
+  },
+  "performance_promoted": false
+}

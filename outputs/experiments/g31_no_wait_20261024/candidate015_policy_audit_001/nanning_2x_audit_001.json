@@ -1,0 +1,213 @@
+{
+  "schema": "g31.candidate015.policy_telemetry_audit.v1",
+  "passed": true,
+  "mode": "enabled",
+  "core_sha256": "602d39a4f2b42a9cfbe7e2f6fd1b34b025c9370ac3f9b0584a5f348c5a344561",
+  "violations": 0,
+  "examples": [],
+  "population": {
+    "segments": 87206,
+    "unique_segments": 87206,
+    "businesses": 57012,
+    "expected_segments": 87206,
+    "expected_businesses": 57012,
+    "exact_saved_request_ids_checked": true
+  },
+  "counts": {
+    "records": 87206,
+    "attempts": 287719,
+    "admitted": 87206,
+    "completed": 87206,
+    "reserved": 19604,
+    "launches": 19604,
+    "pending": 0,
+    "future_searches": 113255,
+    "comparisons": 77474,
+    "preferred": 9872,
+    "kept": 67602
+  },
+  "equalities": {
+    "tasks=sum bag population": {
+      "left": 87206,
+      "right": 87206,
+      "passed": true
+    },
+    "admitted=sum actual admitted": {
+      "left": 87206,
+      "right": 87206,
+      "passed": true
+    },
+    "completed=sum actual completed": {
+      "left": 87206,
+      "right": 87206,
+      "passed": true
+    },
+    "planning_attempts=sum bag attempts": {
+      "left": 287719,
+      "right": 287719,
+      "passed": true
+    },
+    "future_searches=sum bag searches": {
+      "left": 113255,
+      "right": 113255,
+      "passed": true
+    },
+    "precommits=sum ever future_reserved": {
+      "left": 19604,
+      "right": 19604,
+      "passed": true
+    },
+    "launches=sum future_reserved and actual admitted": {
+      "left": 19604,
+      "right": 19604,
+      "passed": true
+    },
+    "pending=precommit-launches": {
+      "left": 0,
+      "right": 0,
+      "passed": true
+    },
+    "success comparisons=sum bag comparisons": {
+      "left": 77474,
+      "right": 77474,
+      "passed": true
+    },
+    "success preferred=sum bag preferred": {
+      "left": 9872,
+      "right": 9872,
+      "passed": true
+    },
+    "kept immediate=sum compared not preferred": {
+      "left": 67602,
+      "right": 67602,
+      "passed": true
+    },
+    "comparisons=preferred+kept": {
+      "left": 77474,
+      "right": 77474,
+      "passed": true
+    },
+    "future_searches=failed eligible+successful comparisons": {
+      "left": 113255,
+      "right": 113255,
+      "passed": true
+    },
+    "planning-failed=successful comparisons": {
+      "left": 77474,
+      "right": 77474,
+      "passed": true
+    },
+    "successful DFS=admitted-future launches+preferred including pending": {
+      "left": 77474,
+      "right": 77474,
+      "passed": true
+    }
+  },
+  "selected_plan_advance": {
+    "sum_ticks": 592920670000,
+    "maximum_ticks": 246620000,
+    "mean_seconds": 60.060845826580234,
+    "selected_by_leg": {
+      "storage_out": 347,
+      "storage_in": 5163,
+      "direct": 4362
+    },
+    "causal_savings": false
+  },
+  "boundaries": [
+    "New-policy telemetry consistency only; existing five independent audits remain responsible for physical/causal safety.",
+    "The discarded successful immediate route is not saved. Its scalar finish cannot independently prove that counterfactual certificate was feasible.",
+    "Advance is against that attempt's found immediate certificate, not actual per-bag or system THT benefit. Future FIFO holding and effects on other bags remain.",
+    "Initial reserved route/planned finish may differ from later rolling route/finish; only immutable initial evidence is compared.",
+    "Count identities distinguish success comparisons from failed DFS at aggregate level; no per-failure cause or timing trace is reconstructed."
+  ],
+  "run": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_prefer_earlier_w0_fixed1_drain200000_015",
+  "manifest_status": "complete",
+  "five_physical_gates": {
+    "headway_audit": true,
+    "rolling_replay": true,
+    "source_policy_audit": true,
+    "tht_audit": true,
+    "business_audit": true
+  },
+  "input_identity": {
+    "map": "nanning",
+    "scale": 2,
+    "canonical": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\g31_continuous\\nanning_2x_canonical.jsonl.gz",
+      "sha256": "5e0d3feef7b3f94aae2f3ec3c445720bc971599c82252383ab1ebc44fa46491b",
+      "bytes": 2299529
+    },
+    "profile": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\g31_continuous\\nanning_service2.json",
+      "sha256": "9b1a78344ec89aaac377feb05afccd48d9b957174286b29eedfe57a73a93c426",
+      "bytes": 714420
+    },
+    "binary": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build\\g31_no_wait_015\\python\\g31_nowait.cp311-win_amd64.pyd",
+      "sha256": "45fe37e4eb266cf7952e8ec399d7adb7d29ca0a8a2e42f251bbe924ab13b7855",
+      "bytes": 334336
+    },
+    "native_source": {
+      "path": "build\\g31_no_wait_015\\source\\core.cpp",
+      "bytes": 103867,
+      "sha256": "602d39a4f2b42a9cfbe7e2f6fd1b34b025c9370ac3f9b0584a5f348c5a344561"
+    },
+    "contract": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate015\\registered_contracts_015\\physical_contract_drain200000.json",
+      "sha256": "925fad2f7e4d2c2a833d721302ac28b72da959eb911d9746190beb0e42ea4a08",
+      "bytes": 7387
+    },
+    "build_receipt": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build\\g31_no_wait_015\\build_receipt.json",
+      "sha256": "1c79da73956c4669dc1df763b1c599bd2566742bc517a9ad207323952ff45785",
+      "bytes": 865
+    }
+  },
+  "input_identity_scope": "Registered canonical/profile identity recorded from completed five-gate manifest; this helper hashes saved actual request and matches all its task identities, not a fresh canonical/profile rehash.",
+  "actual_request_content_sha256": "b530ed172e2a53325c767d6e02f50d2dc222244b57e1103982cd1998d9181e6b",
+  "evidence_files": {
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_prefer_earlier_w0_fixed1_drain200000_015\\manifest.json": {
+      "sha256": "e57cbeb0d2930f4de6b9b3721163eb78993378922c0c6187d914e9571c015d76",
+      "bytes": 6902
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_prefer_earlier_w0_fixed1_drain200000_015\\headway_audit.json": {
+      "sha256": "a39bce03d4915a1df0814545341a17a7a9277c1a3019db6bda31d9df530aec62",
+      "bytes": 34115
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_prefer_earlier_w0_fixed1_drain200000_015\\rolling_replay.json": {
+      "sha256": "f23415d746ca676909b9a04b0022cdb89f33fb581d88edba23290cb6cd0d7076",
+      "bytes": 1783
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_prefer_earlier_w0_fixed1_drain200000_015\\source_policy_audit.json": {
+      "sha256": "aeaa56f08790db7deb09d72935ad3c0766b833f6a48033f9ada35edb8cefef1a",
+      "bytes": 1948
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_prefer_earlier_w0_fixed1_drain200000_015\\tht_audit.json": {
+      "sha256": "75af677b8e5cf6c202be60e03feccdba315107905069e0a678b3cfe9660e0b06",
+      "bytes": 51107
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_prefer_earlier_w0_fixed1_drain200000_015\\business_audit.json": {
+      "sha256": "b9292f1fba3ea79f245d7cd2ccdf53a6c4b28a30c1be4fd031c27bc8c7725cdd",
+      "bytes": 602
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_prefer_earlier_w0_fixed1_drain200000_015\\standard_sources\\core.cpp": {
+      "sha256": "602d39a4f2b42a9cfbe7e2f6fd1b34b025c9370ac3f9b0584a5f348c5a344561",
+      "bytes": 103867
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_prefer_earlier_w0_fixed1_drain200000_015\\native_summary.json": {
+      "sha256": "3eaa93483d4ba3bd95a3b16cc24727195cfc8b92767cea1fc662b1411a307df7",
+      "bytes": 18291
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_prefer_earlier_w0_fixed1_drain200000_015\\request.json.gz": {
+      "sha256": "f36f515c11bbc30667590da872d4465e961943c91c8df8c82e75e441ae46a758",
+      "bytes": 1160137
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_prefer_earlier_w0_fixed1_drain200000_015\\bags.jsonl": {
+      "sha256": "473dbd2d2bfaaaab65616f1e15bd092f9bc8da04599922a127a571afc874e09d",
+      "bytes": 369890996,
+      "records": 87206
+    }
+  },
+  "tool_sha256": "84506b4b248464bbdc32e9a440cc1f4377dd91e378451f50b2792b5618b44560"
+}

@@ -1,0 +1,1453 @@
+{
+  "schema": "g31.candidate020.small_comparison.v1",
+  "status": "existing_small_summaries_only",
+  "runs": [
+    {
+      "label": "020_one_alternative",
+      "kind": "native",
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_w0_fixed1_onealternative_drain200000_020",
+      "status": "complete",
+      "metrics": {
+        "business_denominator": 57012,
+        "segment_denominator": 87206,
+        "completed_businesses": 57012,
+        "completed_segments": 87206,
+        "full_population_available": true,
+        "user_tht": {
+          "status": "available",
+          "count": 57012,
+          "sum": 21319736.510000028,
+          "mean": 373.9517384059501,
+          "min": 59.0,
+          "p50": 411.9350000000122,
+          "p95": 604.8152500000014,
+          "p99": 677.7573000000002,
+          "max": 1656.0149999999994
+        },
+        "preplanning": {
+          "status": "available",
+          "count": 57012,
+          "sum": 1868143425.426106,
+          "mean": 32767.547629027325,
+          "min": 9.999999747378752e-06,
+          "p50": 31405.877765,
+          "p95": 84026.0905045,
+          "p99": 98033.1670585,
+          "max": 103452.31087
+        },
+        "planning_retry_wait": {
+          "status": "available",
+          "count": 57012,
+          "sum": 643562.0,
+          "mean": 11.288184943520662,
+          "min": 0.0,
+          "p50": 2.0,
+          "p95": 49.0,
+          "p99": 86.0,
+          "max": 1447.0
+        },
+        "canonical_elapsed": {
+          "status": "available",
+          "count": 57012,
+          "sum": 1889463161.936106,
+          "mean": 33141.49936743328,
+          "min": 59.0147300000026,
+          "p50": 31818.590865000006,
+          "p95": 84460.46245699999,
+          "p99": 98452.3924898,
+          "max": 103892.69933
+        },
+        "network_elapsed": {
+          "status": "available",
+          "count": 57012,
+          "sum": 20676174.510000028,
+          "mean": 362.66355346242943,
+          "min": 59.0,
+          "p50": 398.4349999999995,
+          "p95": 587.8399999999965,
+          "p99": 652.8899999999994,
+          "max": 818.570000000007
+        },
+        "original_window_end": 98259.0,
+        "original_window_completed_businesses": 41766,
+        "original_window_unfinished_businesses": 15246,
+        "original_window_source": "All transport legs completed; final actual goal arrival at or before the common original cutoff. Derived from this run, not a separate short execution.",
+        "original_window_state_split": null,
+        "original_window_state_split_status": "not_computed_from_small_summaries",
+        "STD": {
+          "count": 14963,
+          "denominator": 57012,
+          "rate": 0.26245351855749666,
+          "status": "available"
+        },
+        "STD_minus_2700": {
+          "count": 9331,
+          "denominator": 57012,
+          "rate": 0.16366729811267802,
+          "status": "available"
+        },
+        "activation_to_first_planning": {
+          "status": "available",
+          "count": 57012,
+          "sum": 1594800504.0,
+          "mean": 27973.06714375921,
+          "min": 0.0,
+          "p50": 30204.5,
+          "p95": 53805.0,
+          "p99": 56708.56,
+          "max": 61898.0
+        },
+        "canonical_to_activation": {
+          "status": "available",
+          "count": 57012,
+          "sum": 273342921.426106,
+          "mean": 4794.480485268118,
+          "min": 0.0,
+          "p50": 10.65874999999869,
+          "p95": 31693.12651749999,
+          "p99": 44524.6422023,
+          "max": 50462.01478
+        },
+        "supplemental_ready_mean_derived": {
+          "status": "derived_from_full_population_sums_not_new_bag_scan",
+          "count": 57012,
+          "sum": 1616120240.51,
+          "mean": 28347.018882165157,
+          "p95": null,
+          "p99": null,
+          "max": null,
+          "definition": "sum per business of actual finish minus actual source activation = primary THT + activation-to-first-attempt; unchanged native activation contract corresponds to common nominal-feed/causal readiness, but no new per-bag G/activation equality check is made here.",
+          "tail_reason": "Quantiles/max of sums cannot be obtained by adding component quantiles/max."
+        }
+      },
+      "audit_gates": {
+        "headway": {
+          "status": "passed",
+          "passed": true,
+          "source": "headway_audit.json"
+        },
+        "rolling": {
+          "status": "passed",
+          "passed": true,
+          "source": "rolling_replay.json"
+        },
+        "source_policy": {
+          "status": "passed",
+          "passed": true,
+          "source": "source_policy_audit.json"
+        },
+        "tht": {
+          "status": "passed",
+          "passed": true,
+          "source": "tht_audit.json"
+        },
+        "business": {
+          "status": "passed",
+          "passed": true,
+          "source": "business_audit.json"
+        }
+      },
+      "all_five_passed": true,
+      "identity_issues": [],
+      "usable_reported_result": true,
+      "controls": {
+        "end_time": 200000,
+        "min_depth": 1,
+        "max_depth": 1,
+        "adaptive": false,
+        "congestion_weight": 0,
+        "pressure_window": 30,
+        "max_expansions": 256,
+        "max_score_expansions": 64,
+        "max_retries": 100000,
+        "max_events": 10000000,
+        "retry_mode": "calendar_jump",
+        "retry_step": 1.0,
+        "audit_failed_calendar_hash": false,
+        "skip_scoring_single_choice": true,
+        "route_excess_retry_relaxation_rate": 1,
+        "future_source_reservation_horizon_seconds": 60,
+        "future_source_reservation_min_wait_seconds": 2,
+        "enable_future_mask_diagnostics": false,
+        "enable_one_alternative_future_chain": true,
+        "interval_mode": "half_open",
+        "strict_endpoint_resources": true,
+        "edge_entry_headway_seconds": 2,
+        "time_grid_seconds": 1e-06,
+        "terminal_reservation_service": true,
+        "enable_inroute_replanning": true,
+        "enable_ebs_predecessor_gate": true,
+        "release_quantum": 1,
+        "completion_quantum": 1,
+        "source_fifo": true,
+        "source_generation_interval": 1,
+        "source_fifo_order": "canonical",
+        "max_route_excess_seconds": 120
+      },
+      "identity": {
+        "binary": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build\\g31_no_wait_020\\python\\g31_nowait.cp311-win_amd64.pyd",
+          "sha256": "529ed355d4427e453d5fd3f5f7a248839c5a2fdeb4f978256d99c0be479bfb92",
+          "bytes": 359936
+        },
+        "native_source": {
+          "path": "build\\g31_no_wait_020\\source\\core.cpp",
+          "bytes": 120451,
+          "sha256": "6883e77e5c16fbec077e4fbd3fd9879dd68ea9dfed4ff0b87d29403e8b9e9397"
+        },
+        "canonical": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\g31_continuous\\nanning_2x_canonical.jsonl.gz",
+          "sha256": "5e0d3feef7b3f94aae2f3ec3c445720bc971599c82252383ab1ebc44fa46491b",
+          "bytes": 2299529
+        },
+        "profile": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\g31_continuous\\nanning_service2.json",
+          "sha256": "9b1a78344ec89aaac377feb05afccd48d9b957174286b29eedfe57a73a93c426",
+          "bytes": 714420
+        },
+        "build_receipt": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build\\g31_no_wait_020\\build_receipt.json",
+          "sha256": "2944544a3418eb959f0711d45e85f45ca70cf1460070e3a663342d9d005f5ce9",
+          "bytes": 865
+        }
+      },
+      "compute": {
+        "native_event_loop_cpu_seconds": 6.25,
+        "native_event_loop_wall_seconds": 6.5437779,
+        "native_api_process_cpu_seconds": 14.828125,
+        "native_api_wall_seconds": 15.437076000031084,
+        "end_to_end_wall_seconds": null,
+        "source_decision_wall_seconds": 3.7637818000000336,
+        "inroute_decision_wall_seconds": 1.2267873999984058,
+        "scope": "Windows GetProcessTimes kernel+user; std::clock on non-Windows; event loop only",
+        "end_to_end_status": "not_measured_in_available_small_summary"
+      },
+      "telemetry": {
+        "planning_attempts": 289383,
+        "failed_attempts": 213827,
+        "search_expansions": 4420021,
+        "score_expansions": 0,
+        "local_scoring_calendar_queries": 0,
+        "search_decision_k_histogram": {
+          "1": 4530774
+        },
+        "search_actual_calendar_query_depth_histogram": {
+          "0": 4530774
+        },
+        "committed_route_hop_k_histogram": {
+          "1": 1067195
+        },
+        "max_observation_depth": 1,
+        "scored_neighbor_candidates": 7745332,
+        "local_score_budget_exhausted_decisions": 0,
+        "score_budget_exhaustions": 0,
+        "search_budget_failures": 3891,
+        "inroute_decisions": 1092842,
+        "inroute_replacement_attempts": 41050,
+        "inroute_replacement_successes": 0,
+        "inroute_fallbacks": 41050,
+        "inroute_search_expansions": 306406,
+        "inroute_scoring_queries": 0,
+        "future_source_precommits": 11650,
+        "future_source_pending_at_horizon": 0,
+        "future_calendar_entries_scanned": 4798074
+      },
+      "future_work": {
+        "future_source_eligible_failures": 27992,
+        "future_source_searches": 27992,
+        "future_source_precommits": 11650,
+        "future_source_launches": 11650,
+        "future_source_pending_at_horizon": 0,
+        "future_chain_nodes": 397824,
+        "future_calendar_queries": 632628,
+        "future_calendar_entries_scanned": 4798074,
+        "future_validation_queries": 216825,
+        "future_mask_empty": 16827,
+        "future_chain_rejections": 0
+      },
+      "original_window_evidence": "drain retrospective actual completion count; no short/drain prefix claimed for this candidate"
+    },
+    {
+      "label": "017_w0_reference",
+      "kind": "native",
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_w0_fixed1_cap120_relax1_drain200000_017",
+      "status": "complete",
+      "metrics": {
+        "business_denominator": 57012,
+        "segment_denominator": 87206,
+        "completed_businesses": 57012,
+        "completed_segments": 87206,
+        "full_population_available": true,
+        "user_tht": {
+          "status": "available",
+          "count": 57012,
+          "sum": 21322026.20000003,
+          "mean": 373.99189995088807,
+          "min": 59.0,
+          "p50": 411.9350000000122,
+          "p95": 607.1922499999979,
+          "p99": 677.3399999999997,
+          "max": 1497.3349999999991
+        },
+        "preplanning": {
+          "status": "available",
+          "count": 57012,
+          "sum": 1873513609.426106,
+          "mean": 32861.74155311348,
+          "min": 9.999999747378752e-06,
+          "p50": 31556.156665000002,
+          "p95": 84552.39515299998,
+          "p99": 97744.64934709998,
+          "max": 103644.04099000001
+        },
+        "planning_retry_wait": {
+          "status": "available",
+          "count": 57012,
+          "sum": 648115.0,
+          "mean": 11.368045323791483,
+          "min": 0.0,
+          "p50": 2.0,
+          "p95": 49.0,
+          "p99": 87.0,
+          "max": 1048.0
+        },
+        "canonical_elapsed": {
+          "status": "available",
+          "count": 57012,
+          "sum": 1894835635.626106,
+          "mean": 33235.73345306437,
+          "min": 59.0147300000026,
+          "p50": 31883.188544999997,
+          "p95": 85028.56999999998,
+          "p99": 98169.07797229997,
+          "max": 104014.58098999999
+        },
+        "network_elapsed": {
+          "status": "available",
+          "count": 57012,
+          "sum": 20673911.20000003,
+          "mean": 362.62385462709653,
+          "min": 59.0,
+          "p50": 396.6025000000009,
+          "p95": 588.0399999999972,
+          "p99": 653.2050000000017,
+          "max": 807.2699999999895
+        },
+        "original_window_end": 98259.0,
+        "original_window_completed_businesses": 41722,
+        "original_window_unfinished_businesses": 15290,
+        "original_window_source": "All transport legs completed; final actual goal arrival at or before the common original cutoff. Derived from this run, not a separate short execution.",
+        "original_window_state_split": null,
+        "original_window_state_split_status": "not_computed_from_small_summaries",
+        "STD": {
+          "count": 14762,
+          "denominator": 57012,
+          "rate": 0.2589279449940363,
+          "status": "available"
+        },
+        "STD_minus_2700": {
+          "count": 8996,
+          "denominator": 57012,
+          "rate": 0.1577913421735775,
+          "status": "available"
+        },
+        "activation_to_first_planning": {
+          "status": "available",
+          "count": 57012,
+          "sum": 1595579561.0,
+          "mean": 27986.73193362801,
+          "min": 0.0,
+          "p50": 30415.5,
+          "p95": 53783.45,
+          "p99": 56744.78,
+          "max": 61859.0
+        },
+        "canonical_to_activation": {
+          "status": "available",
+          "count": 57012,
+          "sum": 277934048.426106,
+          "mean": 4875.009619485476,
+          "min": 0.0,
+          "p50": 10.767175000000861,
+          "p95": 32141.60801399993,
+          "p99": 44514.91157239999,
+          "max": 50395.6814
+        },
+        "supplemental_ready_mean_derived": {
+          "status": "derived_from_full_population_sums_not_new_bag_scan",
+          "count": 57012,
+          "sum": 1616901587.2,
+          "mean": 28360.723833578897,
+          "p95": null,
+          "p99": null,
+          "max": null,
+          "definition": "sum per business of actual finish minus actual source activation = primary THT + activation-to-first-attempt; unchanged native activation contract corresponds to common nominal-feed/causal readiness, but no new per-bag G/activation equality check is made here.",
+          "tail_reason": "Quantiles/max of sums cannot be obtained by adding component quantiles/max."
+        }
+      },
+      "audit_gates": {
+        "headway": {
+          "status": "passed",
+          "passed": true,
+          "source": "headway_audit.json"
+        },
+        "rolling": {
+          "status": "passed",
+          "passed": true,
+          "source": "rolling_replay.json"
+        },
+        "source_policy": {
+          "status": "passed",
+          "passed": true,
+          "source": "source_policy_audit.json"
+        },
+        "tht": {
+          "status": "passed",
+          "passed": true,
+          "source": "tht_audit.json"
+        },
+        "business": {
+          "status": "passed",
+          "passed": true,
+          "source": "business_audit.json"
+        }
+      },
+      "all_five_passed": true,
+      "identity_issues": [],
+      "usable_reported_result": true,
+      "controls": {
+        "end_time": 200000,
+        "min_depth": 1,
+        "max_depth": 1,
+        "adaptive": false,
+        "congestion_weight": 0,
+        "pressure_window": 30,
+        "max_expansions": 256,
+        "max_score_expansions": 64,
+        "max_retries": 100000,
+        "max_events": 10000000,
+        "retry_mode": "calendar_jump",
+        "retry_step": 1.0,
+        "audit_failed_calendar_hash": false,
+        "skip_scoring_single_choice": true,
+        "route_excess_retry_relaxation_rate": 1,
+        "future_source_reservation_horizon_seconds": 60,
+        "future_source_reservation_min_wait_seconds": 2,
+        "interval_mode": "half_open",
+        "strict_endpoint_resources": true,
+        "edge_entry_headway_seconds": 2,
+        "time_grid_seconds": 1e-06,
+        "terminal_reservation_service": true,
+        "enable_inroute_replanning": true,
+        "enable_ebs_predecessor_gate": true,
+        "release_quantum": 1,
+        "completion_quantum": 1,
+        "source_fifo": true,
+        "source_generation_interval": 1,
+        "source_fifo_order": "canonical",
+        "max_route_excess_seconds": 120
+      },
+      "identity": {
+        "binary": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build\\g31_no_wait_017\\python\\g31_nowait.cp311-win_amd64.pyd",
+          "sha256": "7b0ef33632cdd58e87ed095cbc67df23972f1465fb3bcd61c0ced73d14629a63",
+          "bytes": 339968
+        },
+        "native_source": {
+          "path": "build\\g31_no_wait_017\\source\\core.cpp",
+          "bytes": 99239,
+          "sha256": "a024f859cf493b73c2d5b0789a318e8c99013c044b3b1782bc8d1a7b6f8fff27"
+        },
+        "canonical": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\g31_continuous\\nanning_2x_canonical.jsonl.gz",
+          "sha256": "5e0d3feef7b3f94aae2f3ec3c445720bc971599c82252383ab1ebc44fa46491b",
+          "bytes": 2299529
+        },
+        "profile": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\g31_continuous\\nanning_service2.json",
+          "sha256": "9b1a78344ec89aaac377feb05afccd48d9b957174286b29eedfe57a73a93c426",
+          "bytes": 714420
+        },
+        "build_receipt": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build\\g31_no_wait_017\\build_receipt.json",
+          "sha256": "4faea41fd3da30ccfacaffcb9358c10bdc07b85c180f4026fc001df477380f33",
+          "bytes": 865
+        }
+      },
+      "compute": {
+        "native_event_loop_cpu_seconds": 6.25,
+        "native_event_loop_wall_seconds": 6.553202,
+        "native_api_process_cpu_seconds": 14.8125,
+        "native_api_wall_seconds": 15.273090899921954,
+        "end_to_end_wall_seconds": null,
+        "source_decision_wall_seconds": 3.873031799999981,
+        "inroute_decision_wall_seconds": 1.275106999998445,
+        "scope": "Windows GetProcessTimes kernel+user; std::clock on non-Windows; event loop only",
+        "end_to_end_status": "not_measured_in_available_small_summary"
+      },
+      "telemetry": {
+        "planning_attempts": 293354,
+        "failed_attempts": 217399,
+        "search_expansions": 4470155,
+        "score_expansions": 0,
+        "local_scoring_calendar_queries": 0,
+        "search_decision_k_histogram": {
+          "1": 4575200
+        },
+        "search_actual_calendar_query_depth_histogram": {
+          "0": 4575200
+        },
+        "committed_route_hop_k_histogram": {
+          "1": 1073915
+        },
+        "max_observation_depth": 1,
+        "scored_neighbor_candidates": 7812637,
+        "local_score_budget_exhausted_decisions": 0,
+        "score_budget_exhaustions": 0,
+        "search_budget_failures": 4020,
+        "inroute_decisions": 1092376,
+        "inroute_replacement_attempts": 40926,
+        "inroute_replacement_successes": 0,
+        "inroute_fallbacks": 40926,
+        "inroute_search_expansions": 304340,
+        "inroute_scoring_queries": 0,
+        "future_source_precommits": 11251,
+        "future_source_pending_at_horizon": 0,
+        "future_calendar_entries_scanned": 4130318
+      },
+      "future_work": {
+        "future_source_eligible_failures": 29990,
+        "future_source_searches": 29990,
+        "future_source_precommits": 11251,
+        "future_source_launches": 11251,
+        "future_source_pending_at_horizon": 0,
+        "future_chain_nodes": 315467,
+        "future_calendar_queries": 548406,
+        "future_calendar_entries_scanned": 4130318,
+        "future_validation_queries": 202746,
+        "future_mask_empty": 18739,
+        "future_chain_rejections": 0
+      },
+      "original_window_evidence": "drain retrospective actual completion count; no short/drain prefix claimed for this candidate"
+    },
+    {
+      "label": "011_w0_main",
+      "kind": "native",
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_cap120_relax1_drain200000_011",
+      "status": "complete",
+      "metrics": {
+        "business_denominator": 57012,
+        "segment_denominator": 87206,
+        "completed_businesses": 57012,
+        "completed_segments": 87206,
+        "full_population_available": true,
+        "user_tht": {
+          "status": "available",
+          "count": 57012,
+          "sum": 21322026.20000003,
+          "mean": 373.99189995088807,
+          "min": 59.0,
+          "p50": 411.9350000000122,
+          "p95": 607.1922499999979,
+          "p99": 677.3399999999997,
+          "max": 1497.3349999999991
+        },
+        "preplanning": {
+          "status": "available",
+          "count": 57012,
+          "sum": 1873513609.426106,
+          "mean": 32861.74155311348,
+          "min": 9.999999747378752e-06,
+          "p50": 31556.156665000002,
+          "p95": 84552.39515299998,
+          "p99": 97744.64934709998,
+          "max": 103644.04099000001
+        },
+        "planning_retry_wait": {
+          "status": "available",
+          "count": 57012,
+          "sum": 648115.0,
+          "mean": 11.368045323791483,
+          "min": 0.0,
+          "p50": 2.0,
+          "p95": 49.0,
+          "p99": 87.0,
+          "max": 1048.0
+        },
+        "canonical_elapsed": {
+          "status": "available",
+          "count": 57012,
+          "sum": 1894835635.626106,
+          "mean": 33235.73345306437,
+          "min": 59.0147300000026,
+          "p50": 31883.188544999997,
+          "p95": 85028.56999999998,
+          "p99": 98169.07797229997,
+          "max": 104014.58098999999
+        },
+        "network_elapsed": {
+          "status": "available",
+          "count": 57012,
+          "sum": 20673911.20000003,
+          "mean": 362.62385462709653,
+          "min": 59.0,
+          "p50": 396.6025000000009,
+          "p95": 588.0399999999972,
+          "p99": 653.2050000000017,
+          "max": 807.2699999999895
+        },
+        "original_window_end": 98259.0,
+        "original_window_completed_businesses": 41722,
+        "original_window_unfinished_businesses": 15290,
+        "original_window_source": "All transport legs completed; final actual goal arrival at or before the common original cutoff. Derived from this run, not a separate short execution.",
+        "original_window_state_split": null,
+        "original_window_state_split_status": "not_computed_from_small_summaries",
+        "STD": {
+          "count": 14762,
+          "denominator": 57012,
+          "rate": 0.2589279449940363,
+          "status": "available"
+        },
+        "STD_minus_2700": {
+          "count": 8996,
+          "denominator": 57012,
+          "rate": 0.1577913421735775,
+          "status": "available"
+        },
+        "activation_to_first_planning": {
+          "status": "available",
+          "count": 57012,
+          "sum": 1595579561.0,
+          "mean": 27986.73193362801,
+          "min": 0.0,
+          "p50": 30415.5,
+          "p95": 53783.45,
+          "p99": 56744.78,
+          "max": 61859.0
+        },
+        "canonical_to_activation": {
+          "status": "available",
+          "count": 57012,
+          "sum": 277934048.426106,
+          "mean": 4875.009619485476,
+          "min": 0.0,
+          "p50": 10.767175000000861,
+          "p95": 32141.60801399993,
+          "p99": 44514.91157239999,
+          "max": 50395.6814
+        },
+        "supplemental_ready_mean_derived": {
+          "status": "derived_from_full_population_sums_not_new_bag_scan",
+          "count": 57012,
+          "sum": 1616901587.2,
+          "mean": 28360.723833578897,
+          "p95": null,
+          "p99": null,
+          "max": null,
+          "definition": "sum per business of actual finish minus actual source activation = primary THT + activation-to-first-attempt; unchanged native activation contract corresponds to common nominal-feed/causal readiness, but no new per-bag G/activation equality check is made here.",
+          "tail_reason": "Quantiles/max of sums cannot be obtained by adding component quantiles/max."
+        }
+      },
+      "audit_gates": {
+        "headway": {
+          "status": "passed",
+          "passed": true,
+          "source": "headway_audit.json"
+        },
+        "rolling": {
+          "status": "passed",
+          "passed": true,
+          "source": "rolling_replay.json"
+        },
+        "source_policy": {
+          "status": "passed",
+          "passed": true,
+          "source": "source_policy_audit.json"
+        },
+        "tht": {
+          "status": "passed",
+          "passed": true,
+          "source": "tht_audit.json"
+        },
+        "business": {
+          "status": "passed",
+          "passed": true,
+          "source": "business_audit.json"
+        }
+      },
+      "all_five_passed": true,
+      "identity_issues": [],
+      "usable_reported_result": true,
+      "controls": {
+        "end_time": 200000,
+        "min_depth": 1,
+        "max_depth": 1,
+        "adaptive": false,
+        "congestion_weight": 0,
+        "pressure_window": 30,
+        "max_expansions": 256,
+        "max_score_expansions": 64,
+        "max_retries": 100000,
+        "max_events": 10000000,
+        "retry_mode": "calendar_jump",
+        "retry_step": 1.0,
+        "audit_failed_calendar_hash": false,
+        "skip_scoring_single_choice": true,
+        "route_excess_retry_relaxation_rate": 1,
+        "future_source_reservation_horizon_seconds": 60,
+        "future_source_reservation_min_wait_seconds": 2,
+        "interval_mode": "half_open",
+        "strict_endpoint_resources": true,
+        "edge_entry_headway_seconds": 2,
+        "time_grid_seconds": 1e-06,
+        "terminal_reservation_service": true,
+        "enable_inroute_replanning": true,
+        "enable_ebs_predecessor_gate": true,
+        "release_quantum": 1,
+        "completion_quantum": 1,
+        "source_fifo": true,
+        "source_generation_interval": 1,
+        "source_fifo_order": "canonical",
+        "max_route_excess_seconds": 120
+      },
+      "identity": {
+        "binary": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build\\g31_no_wait_011\\python\\g31_nowait.cp311-win_amd64.pyd",
+          "sha256": "e0b0d90a486b119cfcce70bf539501b96d08ac6d9d0a56aca21c72a7002f61c1",
+          "bytes": 338944
+        },
+        "native_source": {
+          "path": "build\\g31_no_wait_011\\source\\core.cpp",
+          "bytes": 98964,
+          "sha256": "c03b54db9ff7756ca90bbf5fe22fd64ea3117dde0493dd60850ed16162a1866c"
+        },
+        "canonical": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\g31_continuous\\nanning_2x_canonical.jsonl.gz",
+          "sha256": "5e0d3feef7b3f94aae2f3ec3c445720bc971599c82252383ab1ebc44fa46491b",
+          "bytes": 2299529
+        },
+        "profile": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\g31_continuous\\nanning_service2.json",
+          "sha256": "9b1a78344ec89aaac377feb05afccd48d9b957174286b29eedfe57a73a93c426",
+          "bytes": 714420
+        },
+        "build_receipt": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build\\g31_no_wait_011\\build_receipt.json",
+          "sha256": "d78c6dae09cd88a0bfdbfdc2bc862a098814168644fc28dc0703797a5aebcef0",
+          "bytes": 865
+        }
+      },
+      "compute": {
+        "native_event_loop_cpu_seconds": 7.859375,
+        "native_event_loop_wall_seconds": 8.030331,
+        "native_api_process_cpu_seconds": 18.625,
+        "native_api_wall_seconds": 19.05762840004172,
+        "end_to_end_wall_seconds": null,
+        "source_decision_wall_seconds": 4.680301899999959,
+        "inroute_decision_wall_seconds": 1.7300368999993676,
+        "scope": "Windows GetProcessTimes kernel+user; std::clock on non-Windows; event loop only",
+        "end_to_end_status": "not_measured_in_available_small_summary"
+      },
+      "telemetry": {
+        "planning_attempts": 293354,
+        "failed_attempts": 217399,
+        "search_expansions": 4470155,
+        "score_expansions": 0,
+        "local_scoring_calendar_queries": 0,
+        "search_decision_k_histogram": {
+          "1": 4575200
+        },
+        "search_actual_calendar_query_depth_histogram": {
+          "0": 4575200
+        },
+        "committed_route_hop_k_histogram": {
+          "1": 1073915
+        },
+        "max_observation_depth": 1,
+        "scored_neighbor_candidates": 7812637,
+        "local_score_budget_exhausted_decisions": 0,
+        "score_budget_exhaustions": 0,
+        "search_budget_failures": 4020,
+        "inroute_decisions": 1092376,
+        "inroute_replacement_attempts": 40926,
+        "inroute_replacement_successes": 0,
+        "inroute_fallbacks": 40926,
+        "inroute_search_expansions": 304340,
+        "inroute_scoring_queries": 0,
+        "future_source_precommits": 11251,
+        "future_source_pending_at_horizon": 0,
+        "future_calendar_entries_scanned": 4130318
+      },
+      "future_work": {
+        "future_source_eligible_failures": 29990,
+        "future_source_searches": 29990,
+        "future_source_precommits": 11251,
+        "future_source_launches": 11251,
+        "future_source_pending_at_horizon": 0,
+        "future_chain_nodes": 315467,
+        "future_calendar_queries": 548406,
+        "future_calendar_entries_scanned": 4130318,
+        "future_validation_queries": 202746,
+        "future_mask_empty": 18739,
+        "future_chain_rejections": 0
+      },
+      "original_window_evidence": "actual separate short/drain prefix PASS (existing receipt); no new scan"
+    },
+    {
+      "label": "HCA_repaired",
+      "kind": "hca",
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_repaired_uniform_profile_004_drain200000_001\\nanning_2x",
+      "status": "complete",
+      "metrics": {
+        "business_denominator": 57012,
+        "segment_denominator": 87206,
+        "completed_businesses": 57012,
+        "completed_segments": 87206,
+        "full_population_available": true,
+        "user_tht": {
+          "status": "available",
+          "count": 57012,
+          "sum": 27633103.72000005,
+          "mean": 484.68925349049414,
+          "min": 60.0,
+          "p50": 490.35499999999956,
+          "p95": 791.9000000000015,
+          "p99": 945.0872500000036,
+          "max": 4123.835000000006
+        },
+        "preplanning": {
+          "status": "available",
+          "count": 57012,
+          "sum": 2176495324.426106,
+          "mean": 38176.091426824285,
+          "min": 0.0,
+          "p50": 59915.46566,
+          "p95": 92856.24586099997,
+          "p99": 120558.5885198,
+          "max": 129211.46126
+        },
+        "planning_retry_wait": {
+          "status": "available",
+          "count": 57012,
+          "sum": 424294.0,
+          "mean": 7.4421876096260435,
+          "min": 0.0,
+          "p50": 2.0,
+          "p95": 22.0,
+          "p99": 106.0,
+          "max": 3741.0
+        },
+        "canonical_elapsed": {
+          "status": "available",
+          "count": 57012,
+          "sum": 2204128428.1461062,
+          "mean": 38660.78068031478,
+          "min": 60.40472999999474,
+          "p50": 60596.68945,
+          "p95": 93464.33675199999,
+          "p99": 120957.81234359997,
+          "max": 129617.29207
+        },
+        "network_elapsed": {
+          "status": "available",
+          "count": 57012,
+          "sum": 27208809.72000005,
+          "mean": 477.2470658808681,
+          "min": 59.0,
+          "p50": 483.4900000000198,
+          "p95": 780.0767500000132,
+          "p99": 928.9150000000081,
+          "max": 1334.8099999999977
+        },
+        "original_window_end": 98259,
+        "original_window_completed_businesses": 35397,
+        "original_window_unfinished_businesses": 21615,
+        "original_window_source": "Existing independently audited derived HCA prefix; not a separate short Java execution.",
+        "original_window_state_split": null,
+        "original_window_state_split_status": "not_computed_from_small_summaries",
+        "STD": {
+          "count": 21533,
+          "denominator": 57012,
+          "rate": 0.37769241563179684,
+          "status": "available"
+        },
+        "STD_minus_2700": {
+          "count": 16021,
+          "denominator": 57012,
+          "rate": 0.28101101522486494,
+          "status": "available"
+        },
+        "activation_to_first_planning": {
+          "status": "not_exported",
+          "mean": null,
+          "p95": null,
+          "p99": null,
+          "max": null
+        },
+        "supplemental_ready_previously_scanned": {
+          "denominator": 57012,
+          "observed_count": 57012,
+          "censored_or_unavailable_count": 0,
+          "full_population": {
+            "count": 57012,
+            "sum": 2013651126.72,
+            "mean": 35319.77700694591,
+            "min": 60.26,
+            "p50": 59789.5125,
+            "p95": 69576.79225,
+            "p99": 71829.80535,
+            "max": 76996.94
+          }
+        }
+      },
+      "audit_gates": {
+        "headway": {
+          "status": "passed",
+          "passed": true,
+          "source": "physical_headway_audit.json"
+        },
+        "source_policy": {
+          "status": "passed",
+          "passed": true,
+          "source": "source_policy_audit_001.json"
+        },
+        "tht": {
+          "status": "passed",
+          "passed": true,
+          "source": "tht_metrics.json"
+        },
+        "rolling": {
+          "status": "not_applicable",
+          "passed": null,
+          "reason": "HCA commits an immutable full route; it has no rolling-replacement ledger."
+        },
+        "business": {
+          "status": "not_separately_exported",
+          "passed": null,
+          "reason": "Counts read from final_summary_001.json; no separate small business_audit.json exists here. No synthetic fifth PASS is asserted."
+        }
+      },
+      "all_five_passed": null,
+      "aggregate_physical_passed": true,
+      "frozen_identity_postrun_exact": true,
+      "usable_reported_result": true,
+      "original_prefix_bound": true,
+      "compute": {
+        "astar_thread_cpu_seconds": 9.3125,
+        "astar_wall_seconds": 10.1035406,
+        "java_window_thread_cpu_seconds": 898.625,
+        "java_window_wall_seconds": 937.5422884,
+        "end_to_end_wall_seconds": 938.3560456000268,
+        "whole_process_cpu_seconds": null,
+        "scopes_overlap": true,
+        "scope": "Profile CPU is current planner thread only, including kernel+user but excluding other JVM threads; scopes overlap. No whole-JVM process CPU was measured."
+      },
+      "telemetry": {
+        "astar_calls": 511500,
+        "search_success": 87206,
+        "search_failure": 424294,
+        "per_bag_retry_count": null,
+        "requested_k": null,
+        "actual_query_depth": null,
+        "missing_reason": "HCA does not export G31 k/local-score telemetry; aggregate search failures are not inferred per-bag retry counts."
+      },
+      "physical_contract_evidence": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_uniform_profile_004",
+        "manifest_sha256": "82351eda944d63957fc5ae76704dbe20f7d5f488f1832b358d32d168decd3cbe",
+        "label": "HCA_repaired_uniform_headway2_us_profile",
+        "timestamp_fix": true,
+        "ceil_release": true,
+        "causal_ebs": true,
+        "interval_boundary": "half_open_us",
+        "node_headway_override": 2,
+        "contract": {
+          "time_comparison": "long Math.round(seconds*1e6); every physical addition sums quantized integer durations; no epsilon",
+          "node_intervals": "half-open [arrival,departure), including positive source and goal; zero service empty",
+          "goal_resource": "retained until planned departure even after business arrival completion",
+          "edge_resource": "directed edge-entry [departure,departure+2s); permits multiple bags travelling on an edge",
+          "source_admission": "chronological stable FIFO; wrapper strict ceil + causal EBS options must both be enabled for final baseline",
+          "expiration": "end<=current planning epoch; independent of saved-route cleanup",
+          "faults": "rejected"
+        },
+        "source_order": "chronological stable FIFO using Double.compare on unchanged nominal pass_time; exact ties keep input order",
+        "profiling": {
+          "schema": "g31.hca.profile.v1",
+          "status": "micro_semantic_validation_passed",
+          "parent": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_uniform_headway2_002",
+          "parent_freeze_sha256": "8e89758d3c4d4383247e8b153d0240cca6704edc8133f893ea6cc59af2f08885",
+          "flag": "-Dg31.hca.profile=true",
+          "default": false,
+          "scopes": [
+            "Astar search with all physical conflict lookup; success/failure/exception counts",
+            "controller including search+calendar+legacy IO",
+            "generator including epoch file write and read",
+            "ledger prune",
+            "ledger commit",
+            "full window before final telemetry export"
+          ],
+          "cpu": "ThreadMXBean current planner thread user+kernel CPU; excludes other JVM/JIT/GC threads; unavailable is null, never zero",
+          "overlap": "Controller contains search/prune/commit and IO. Window contains controller/generator. Do not sum nested scopes.",
+          "required_validation": [
+            "Compile separate classes; disabled and enabled micro old route/release/summary/output bytes exact against frozen002",
+            "Same independent full-population physical audit",
+            "Warmup and empty-scope timer overhead calibration reported separately",
+            "No full rerun without root timing slot; never overwrite physical002 results"
+          ],
+          "allowed_cost_inference": "Compare G31 whole event-loop process CPU against HCA Astar cumulative planner-thread CPU, retaining clock resolution and measurement overhead caveats and C++/Java distinction. Do not infer algorithmic complexity or use IO wall ratios."
+        },
+        "warning": "This is a separately labelled adaptation, not the unchanged original HCA baseline. Whole-edge exclusive capacity is not imposed."
+      }
+    }
+  ],
+  "checks": {
+    "020_vs_017_control_difference": [
+      "enable_one_alternative_future_chain"
+    ],
+    "020_vs_011_control_difference": [
+      "enable_one_alternative_future_chain"
+    ],
+    "physical_contract_equal_except_implementation_identity": true,
+    "alternative_counter_audit": {
+      "passed": true,
+      "checks": {
+        "considered_equals_original_empty": true,
+        "considered_partition": true,
+        "constructed_partition": true,
+        "complete_mask_partition": true,
+        "precommit_origins": true,
+        "original_search_partition": true,
+        "pending_partition": true,
+        "launch_subset": true,
+        "pending_subset": true,
+        "chain_nodes_constructed_subset": true,
+        "calendar_queries_subset": true,
+        "calendar_entries_scanned_subset": true,
+        "validation_queries_subset": true
+      },
+      "counters": {
+        "considered_original_mask_empty": 16827,
+        "no_eligible_fork": 11066,
+        "constructed_candidates": 5761,
+        "rejected_cycle": 1053,
+        "rejected_successor": 0,
+        "rejected_cap": 738,
+        "complete_masks": 3970,
+        "mask_empty": 3485,
+        "precommits": 485,
+        "launches": 485,
+        "pending_at_horizon": 0,
+        "chain_nodes_constructed": 120224,
+        "calendar_queries": 153495,
+        "calendar_entries_scanned": 1331200,
+        "validation_queries": 17429,
+        "original_chain_precommits": 11165,
+        "counter_scope": "future_source_searches and future_mask_empty describe original-chain invocations/outcomes; total precommits include both origins. Existing chain/calendar/validation work totals include additional work; these counters identify its subset. Original019 diagnostic buckets remain original-chain outcomes."
+      },
+      "boundary": "Added work is a subset of native totals. Counts are attempts/searches, not distinct saved bags or net benefit; counter consistency is not an independent provenance or physical audit."
+    },
+    "parent019_vs017_full_byte_parity": {
+      "schema": "g31.candidate019.strict_full_parity.v1",
+      "passed": true,
+      "reference_run": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_w0_fixed1_cap120_relax1_drain200000_017",
+      "candidate_run": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_w0_fixed1_maskdiag_drain200000_019",
+      "bags": {
+        "passed": true,
+        "serialized_bytes_exact": true,
+        "reference_sha256": "aafb20aaa2c045e12b0a141c05cb3ed4e61db31bae11114ce3a71ea367af220f",
+        "candidate_sha256": "aafb20aaa2c045e12b0a141c05cb3ed4e61db31bae11114ce3a71ea367af220f",
+        "reference_bytes": 352086224,
+        "candidate_bytes": 352086224,
+        "records": 87206,
+        "candidate_records": 87206
+      },
+      "rolling_events": {
+        "passed": true,
+        "serialized_bytes_exact": true,
+        "reference_sha256": "4ce247c117823bcd39115952fe197deb8016a5b47d397fe764c0db1978953539",
+        "candidate_sha256": "4ce247c117823bcd39115952fe197deb8016a5b47d397fe764c0db1978953539",
+        "reference_bytes": 283079387,
+        "candidate_bytes": 283079387,
+        "records": 1365245,
+        "candidate_records": 1365245
+      },
+      "request_identity": [
+        {
+          "sha256": "81063ce7c394fba815f1b1d3c505a2df2c3a322a0da43e350bb4739a50fb9dcb",
+          "bytes": 12359974,
+          "removed_diagnostic_flag_count": 0
+        },
+        {
+          "sha256": "81063ce7c394fba815f1b1d3c505a2df2c3a322a0da43e350bb4739a50fb9dcb",
+          "bytes": 12359974,
+          "removed_diagnostic_flag_count": 1
+        }
+      ],
+      "all_old_non_time_summary_exact": true,
+      "independent_audits_exact": [
+        "headway_audit",
+        "rolling_replay",
+        "source_policy_audit",
+        "tht_audit",
+        "business_audit"
+      ],
+      "diagnostic_aggregation_conservation": true,
+      "allowed_time_fields": [
+        "decision_microseconds_p50",
+        "decision_microseconds_p95",
+        "decision_microseconds_p99",
+        "inroute_decision_microseconds_p50",
+        "inroute_decision_microseconds_p95",
+        "inroute_decision_microseconds_p99",
+        "inroute_decision_wall_seconds",
+        "preprocessing_seconds",
+        "run_cpu_seconds",
+        "run_wall_seconds",
+        "source_decision_wall_seconds"
+      ],
+      "allowed_new_fields": [
+        "summary.diagnostic_future_mask_aggregation",
+        "native_contract.future_mask_diagnostics"
+      ],
+      "source_sha256": {
+        "reference": "a024f859cf493b73c2d5b0789a318e8c99013c044b3b1782bc8d1a7b6f8fff27",
+        "candidate": "681b8b1fd1760bb59ed9b841bbf1d042de8d2d26bd32e2f309eaca376c3d8f11",
+        "tool": "fd40371eb1ebea497939ebf12e2caaea5efc652a6c2df9fea7eb1cdfcbaf37f4",
+        "micro_validator": "0aa9bc5c17c1019fb3554bbe75c9c2b6ee2d10c5d7e0392158e8c18e01235a84"
+      },
+      "manifest_sha256": [
+        "0a4c00189640c9bede1350b4786ee5e664c5791b4d75134703b5534bb0b2a423",
+        "da9b9c1e186a2801dc572473abca1814972992b2ea180b79933383f7da18d77b"
+      ],
+      "boundary": "Raw bags/ledger compared as streams without per-row JSON decoding. No scan/query/counter exemptions; instrumented time is not performance evidence."
+    }
+  },
+  "comparisons": [
+    {
+      "label": "020 vs017 strategy factor; binary lineage explicitly differs",
+      "new": "020_one_alternative",
+      "reference": "017_w0_reference",
+      "inputs_usable": true,
+      "metrics": {
+        "tht_mean": {
+          "delta": -0.040161544937973304,
+          "percent": -0.010738613575119472,
+          "status": "available"
+        },
+        "tht_p95": {
+          "delta": -2.376999999996542,
+          "percent": -0.39147403478824877,
+          "status": "available"
+        },
+        "tht_p99": {
+          "delta": 0.41730000000052314,
+          "percent": 0.06160864558427427,
+          "status": "available"
+        },
+        "tht_max": {
+          "delta": 158.6800000000003,
+          "percent": 10.597494882574733,
+          "status": "available"
+        },
+        "preplanning_mean": {
+          "delta": -94.1939240861575,
+          "percent": -0.2866370424522832,
+          "status": "available"
+        },
+        "canonical_elapsed_mean": {
+          "delta": -94.23408563109115,
+          "percent": -0.28353243885581425,
+          "status": "available"
+        },
+        "cutoff_completed": {
+          "delta": 44,
+          "percent": 0.10545994918747903,
+          "status": "available"
+        },
+        "STD_count": {
+          "delta": 201,
+          "percent": 1.3616041186831054,
+          "status": "available"
+        },
+        "early_count": {
+          "delta": 335,
+          "percent": 3.7238772787905736,
+          "status": "available"
+        }
+      },
+      "timing_ratio": null,
+      "timing_reason": "No cross-scope native-event-loop versus Java-thread/whole-window speed ratio is calculated."
+    },
+    {
+      "label": "020 vs011 main reference",
+      "new": "020_one_alternative",
+      "reference": "011_w0_main",
+      "inputs_usable": true,
+      "metrics": {
+        "tht_mean": {
+          "delta": -0.040161544937973304,
+          "percent": -0.010738613575119472,
+          "status": "available"
+        },
+        "tht_p95": {
+          "delta": -2.376999999996542,
+          "percent": -0.39147403478824877,
+          "status": "available"
+        },
+        "tht_p99": {
+          "delta": 0.41730000000052314,
+          "percent": 0.06160864558427427,
+          "status": "available"
+        },
+        "tht_max": {
+          "delta": 158.6800000000003,
+          "percent": 10.597494882574733,
+          "status": "available"
+        },
+        "preplanning_mean": {
+          "delta": -94.1939240861575,
+          "percent": -0.2866370424522832,
+          "status": "available"
+        },
+        "canonical_elapsed_mean": {
+          "delta": -94.23408563109115,
+          "percent": -0.28353243885581425,
+          "status": "available"
+        },
+        "cutoff_completed": {
+          "delta": 44,
+          "percent": 0.10545994918747903,
+          "status": "available"
+        },
+        "STD_count": {
+          "delta": 201,
+          "percent": 1.3616041186831054,
+          "status": "available"
+        },
+        "early_count": {
+          "delta": 335,
+          "percent": 3.7238772787905736,
+          "status": "available"
+        }
+      },
+      "timing_ratio": null,
+      "timing_reason": "No cross-scope native-event-loop versus Java-thread/whole-window speed ratio is calculated."
+    },
+    {
+      "label": "020 vs repaired HCA",
+      "new": "020_one_alternative",
+      "reference": "HCA_repaired",
+      "inputs_usable": true,
+      "metrics": {
+        "tht_mean": {
+          "delta": -110.73751508454404,
+          "percent": -22.84711581432161,
+          "status": "available"
+        },
+        "tht_p95": {
+          "delta": -187.0847500000001,
+          "percent": -23.624794797322863,
+          "status": "available"
+        },
+        "tht_p99": {
+          "delta": -267.32995000000335,
+          "percent": -28.28627198176701,
+          "status": "available"
+        },
+        "tht_max": {
+          "delta": -2467.820000000007,
+          "percent": -59.8428404628217,
+          "status": "available"
+        },
+        "preplanning_mean": {
+          "delta": -5408.54379779696,
+          "percent": -14.167358667830168,
+          "status": "available"
+        },
+        "canonical_elapsed_mean": {
+          "delta": -5519.281312881503,
+          "percent": -14.276176569015327,
+          "status": "available"
+        },
+        "cutoff_completed": {
+          "delta": 6369,
+          "percent": 17.99305025849648,
+          "status": "available"
+        },
+        "STD_count": {
+          "delta": -6570,
+          "percent": -30.51130822458552,
+          "status": "available"
+        },
+        "early_count": {
+          "delta": -6690,
+          "percent": -41.75769302790088,
+          "status": "available"
+        }
+      },
+      "timing_ratio": null,
+      "timing_reason": "No cross-scope native-event-loop versus Java-thread/whole-window speed ratio is calculated."
+    }
+  ],
+  "source_files": {
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate020\\PREDECLARED_PLAN.json": {
+      "sha256": "8e662d5275f4d70c988ddbddef273c10a3d1fab2c3b8d79ea8428c9399b54ea7",
+      "bytes": 2228
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate020\\SOURCE_FREEZE_020_001.json": {
+      "sha256": "d73c9f34e30ad9818c720ad9d19ff5a6d694d210fd71b3f9cb736eae3da247d5",
+      "bytes": 6357
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate020\\controls_alternative_drain200000.json": {
+      "sha256": "d15c7e42e3454c32fadba4441ebedbfb69332ef64f73c84a498c7d148e14e25d",
+      "bytes": 1007
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_w0_fixed1_onealternative_drain200000_020\\manifest.json": {
+      "sha256": "53f43acab85fd3b10f375a498467f57fff556e7609dc3bccaf7c403ac871e2f3",
+      "bytes": 6980
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_w0_fixed1_onealternative_drain200000_020\\headway_audit.json": {
+      "sha256": "a41293f7f07bb8c7c142d7ba5cea257fa21aca868f911376ba64f0fc6d0681f6",
+      "bytes": 34760
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_w0_fixed1_onealternative_drain200000_020\\rolling_replay.json": {
+      "sha256": "3fe3de7a8574caeffea6a8d3fc2ed909d63d6446043f7104dd2dab54003cc5cf",
+      "bytes": 1783
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_w0_fixed1_onealternative_drain200000_020\\source_policy_audit.json": {
+      "sha256": "08016b110982cd2bde517d7df3b8f7f1eba98231f020519a03ed93a94a5410b7",
+      "bytes": 1948
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_w0_fixed1_onealternative_drain200000_020\\tht_audit.json": {
+      "sha256": "c5d8450cd7173ee0039f4470553d23adf9112d6022a25a076f1351a24d4bddf0",
+      "bytes": 50971
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_w0_fixed1_onealternative_drain200000_020\\business_audit.json": {
+      "sha256": "fb8c21d0c0fb1605cffd0a2c15b744524010c929f58e6b6821c286ae67a9c597",
+      "bytes": 602
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_w0_fixed1_onealternative_drain200000_020\\native_summary.json": {
+      "sha256": "7cfa69624a57e0a0340b171b2c670915492d8d6df616d03e3762cbdd11d0fe16",
+      "bytes": 18432
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_w0_fixed1_cap120_relax1_drain200000_017\\manifest.json": {
+      "sha256": "0a4c00189640c9bede1350b4786ee5e664c5791b4d75134703b5534bb0b2a423",
+      "bytes": 6831
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_w0_fixed1_cap120_relax1_drain200000_017\\headway_audit.json": {
+      "sha256": "c30e95e6cf0592ab87444ba0d03d55d2d5198579f9f922cd0d1b9996b9f725eb",
+      "bytes": 35951
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_w0_fixed1_cap120_relax1_drain200000_017\\rolling_replay.json": {
+      "sha256": "7fb4615efbcce15a1449b86c43bafff55a057a42032d3a09cea8704840f87bfa",
+      "bytes": 1783
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_w0_fixed1_cap120_relax1_drain200000_017\\source_policy_audit.json": {
+      "sha256": "dd7f343903fe502dc8c3d23618f559fe4f335604878971bc808be8886c1a69a6",
+      "bytes": 1948
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_w0_fixed1_cap120_relax1_drain200000_017\\tht_audit.json": {
+      "sha256": "3e5483d44379b07fa931c78f0f226f8eca62f9abd1706216d96f31fa6c187e1d",
+      "bytes": 51219
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_w0_fixed1_cap120_relax1_drain200000_017\\business_audit.json": {
+      "sha256": "fda39d211278eb6dbf7d8bc9246e3f70cc356140c53e9eaab36d991f2c19e96c",
+      "bytes": 602
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_w0_fixed1_cap120_relax1_drain200000_017\\native_summary.json": {
+      "sha256": "cf1c51faa2883bcb743a302c5ee71009c1085e3eda1cd2538403b57308bc80a2",
+      "bytes": 17088
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_cap120_relax1_drain200000_011\\manifest.json": {
+      "sha256": "dc820f9e1cf69bfa0dd83dee3c79d681b3aef54dbfe36697371ce8948ede94f6",
+      "bytes": 6786
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_cap120_relax1_drain200000_011\\headway_audit.json": {
+      "sha256": "c30e95e6cf0592ab87444ba0d03d55d2d5198579f9f922cd0d1b9996b9f725eb",
+      "bytes": 35951
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_cap120_relax1_drain200000_011\\rolling_replay.json": {
+      "sha256": "7fb4615efbcce15a1449b86c43bafff55a057a42032d3a09cea8704840f87bfa",
+      "bytes": 1783
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_cap120_relax1_drain200000_011\\source_policy_audit.json": {
+      "sha256": "dd7f343903fe502dc8c3d23618f559fe4f335604878971bc808be8886c1a69a6",
+      "bytes": 1948
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_cap120_relax1_drain200000_011\\tht_audit.json": {
+      "sha256": "3e5483d44379b07fa931c78f0f226f8eca62f9abd1706216d96f31fa6c187e1d",
+      "bytes": 51219
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_cap120_relax1_drain200000_011\\business_audit.json": {
+      "sha256": "fda39d211278eb6dbf7d8bc9246e3f70cc356140c53e9eaab36d991f2c19e96c",
+      "bytes": 602
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_cap120_relax1_drain200000_011\\native_summary.json": {
+      "sha256": "957f866d581a13454b49f7adc5ab269777bfbace95dcc69c82c6ce125a2868ba",
+      "bytes": 17094
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate020\\registered_contracts_020\\physical_contract_drain200000.json": {
+      "sha256": "4b91568c1bf2a2a5fa7f3d61a4c50dd4fa15007047c1c027266da37c403b724e",
+      "bytes": 7424
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate017\\registered_contracts_017\\physical_contract_drain200000.json": {
+      "sha256": "e7f2c332e33f6b0d461db44175e10f59c315b62936890207c246e4cc5e546b21",
+      "bytes": 7390
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate019\\full_parity_nanning2x_001.json": {
+      "sha256": "4beee4bde99d1df96e5b324ec966a476223c48b9d9097296be1dcad5ded0951e",
+      "bytes": 3122
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate011_prefix_001\\nanning_2x_prefix_001.json": {
+      "sha256": "5229511ab1ae4cecaea4e3e3f6b02ab267dc957e68e4d5e632550022ad8bc92f",
+      "bytes": 6953
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_repaired_uniform_profile_004_drain200000_001\\nanning_2x\\final_summary_001.json": {
+      "sha256": "42f3913320c755c2f99f5b554447a14d8c7c60728cd3dc5011fff6f8af9f7b83",
+      "bytes": 3739
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_repaired_uniform_profile_004_drain200000_001\\nanning_2x\\tht_metrics.json": {
+      "sha256": "7a40bb56b485479f8e6f7febd3ef6be2def89bdf343e5761277b9a985203afe7",
+      "bytes": 49772
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_repaired_uniform_profile_004_drain200000_001\\nanning_2x\\source_policy_audit_001.json": {
+      "sha256": "6ad59fecd84eb6275513976b0587388490d7dd6f75e6e712eb87c7a9578d7338",
+      "bytes": 1331
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_repaired_uniform_profile_004_drain200000_001\\nanning_2x\\physical_headway_audit.json": {
+      "sha256": "3b0e140a6fc52f12da72f5de9ffecf0b607ea4a3d8d4b306786a43cc799a0c51",
+      "bytes": 31113
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_repaired_uniform_profile_004_drain200000_001\\nanning_2x\\run_01\\run_status.json": {
+      "sha256": "f6823075ddeafa62202efa7e7d357133fdf9b77119077becede627296ebce018",
+      "bytes": 2210
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_profile004_drain_prefix98259_001\\nanning_2x\\manifest.json": {
+      "sha256": "267601036c14f1bd67d52fce4095351bdc651258e9f87ce0521702ba61e4b1d4",
+      "bytes": 1929
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_profile004_drain_prefix98259_001\\nanning_2x\\tht_metrics.json": {
+      "sha256": "f6f043f9978b8a77ce65956b210d395127baea0d9384b9067517227aeffe5409",
+      "bytes": 48068
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\causal_ready_supplement_001\\hca_2x_002.json": {
+      "sha256": "440a3edcec4e6e45401f2d80c667d160865f2d7e9e4b431c81771cf32735d7fe",
+      "bytes": 40254
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_repaired_uniform_profile_004_drain200000_001\\manifest.json": {
+      "sha256": "b2fa33f9899f53bc2eef83c36f556f3fc289d96c0686112c5b6752f9a125bc0e",
+      "bytes": 22566
+    }
+  },
+  "tool_sha256": "b6872c1995b343a53521ea54fb7b9e780d7b5c76fc8e56c1db7bbb22788fef07",
+  "summary_base_sha256": "9952659ac3219cea8491b86738facf024bc32e7f87e0e4e883ddc24566e9a5d2",
+  "boundaries": [
+    "Missing run/metric stays null; no expected outcome is filled in.",
+    "Primary THT is first-planning to actual goal; preplanning, activation-to-first, cutoff/backlog, both deadlines and full tails remain visible.",
+    "Candidate020 is a new policy and not expected to reproduce bags/ledger. Parent019 neutrality is established by its own prior strict full parity.",
+    "CPU scopes are preserved separately; no ratios between native API/event loop and Java search/window/end-to-end costs.",
+    "Full-population means/tails never fall back to completed-only samples. A full-pop metric may be null while a valid original-window count exists.",
+    "Supplemental native finish-minus-activation mean is a sum identity on the same full population, not a new per-bag readiness audit; its tail statistics are unavailable.",
+    "Old physical audits remain authoritative; this helper checks summary/identity and counter conservation only.",
+    "No large data or native execution occurs here. Reported input/binary identity is receipt metadata, not fresh large-file hashing."
+  ]
+}

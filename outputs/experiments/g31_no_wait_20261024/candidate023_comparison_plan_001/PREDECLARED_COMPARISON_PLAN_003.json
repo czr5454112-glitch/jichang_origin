@@ -1,0 +1,219 @@
+{
+  "schema": "g31.candidate023.comparison_plan.v3",
+  "status": "final_identity_bound_after_off_dispatch_before_comparison",
+  "created_utc": "2026-10-24T14:36:28.326256+00:00",
+  "user_priority": "First test Nanning1x with nearer absolute deadline receiving higher priority. EBS ready-first is explicitly deferred.",
+  "scope": {
+    "maps": [
+      "nanning"
+    ],
+    "first_scale": 1,
+    "first_horizon": 98259,
+    "second_scale": 2,
+    "second_horizon_if_authorized": 200000,
+    "second_scale_status": "conditional_not_authorized_for_execution_by_this_plan"
+  },
+  "candidate": {
+    "id": "023",
+    "parent": "019",
+    "source_freeze": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate023\\SOURCE_FREEZE_023_001.json",
+      "sha256": "dc65788de339f618050e57999c0cc7ea46986d536e0465cbe53b72e4a4c8a484"
+    },
+    "binary_sha256": "0eed486163aff456384cf624498eb0ffb5a905ba1c84a1a7404a669a78e9ab50",
+    "opt_in_flag_name": "enable_source_attempt_edf",
+    "flag_type": "strict bool",
+    "default": false,
+    "reason_for_null_identity": null,
+    "control_pair_only_difference_verified": "enable_source_attempt_edf",
+    "registered_contract_expected_path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate023\\registered_contracts_023\\physical_contract_original_window.json",
+    "freeze_status": "passed_finalfreeze_bound_after_off_dispatch",
+    "source_sha256": "e832bc62401e8612c14285a905476e531988a88c1967df239c23295babb68d0d"
+  },
+  "policy_hypothesis": "Among already queued valid source EV_TRY requests with identical event time and phase, order by absolute per-segment deadline ascending, then original serial. This may allocate still-free rights to tighter deadlines earlier; it cannot preempt existing reservations.",
+  "invariants": [
+    "All other event phases, actual times, integer-us safety and 2s resource contracts unchanged.",
+    "Canonical per-source FIFO and1s feed unchanged; no overtaking a blocked head.",
+    "EBS actual-predecessor gate unchanged; ready-first was allowed as future work but deferred by the user.",
+    "Already committed/future-reserved rights remain valid and cannot be stolen by a nearer-deadline request.",
+    "First-planning, admission, completion and STD timestamps/definitions unchanged.",
+    "Full continuous route certificate remains required; no internal waiting or overlapping device/edge-entry rights."
+  ],
+  "execution_order": [
+    {
+      "id": "023_off_nanning1x",
+      "scale": 1,
+      "horizon": 98259,
+      "switch": false,
+      "required": true,
+      "controls": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate023\\controls_off_original_window.json",
+        "sha256": "ae3fd17bde5028dcf63393a17d66815b212f4f0353f8111f6950c7d687a1959d"
+      },
+      "status": "rootreported_started_session98919_no_result_read",
+      "five_gates_required": true,
+      "output": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_1x_future60_minwait2_w0_fixed1_edf_off_original98259_023"
+    },
+    {
+      "id": "023_edf_nanning1x",
+      "scale": 1,
+      "horizon": 98259,
+      "switch": true,
+      "required": true,
+      "controls": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate023\\controls_original_window.json",
+        "sha256": "5bc6c439d45f400cb98d5c1a5f6568362785764fe9fb0b4a0038032ef50d00ff"
+      },
+      "status": "rootdispatch_only_afteroffterminal_andfivegatepass",
+      "five_gates_required": true,
+      "output": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_1x_future60_minwait2_w0_fixed1_edf_on_original98259_023"
+    },
+    {
+      "id": "conditional023_nanning2x",
+      "scale": 2,
+      "horizon": 200000,
+      "switch": true,
+      "status": "no_dispatch_without_new_root_authorization_after1x_pair_review"
+    }
+  ],
+  "input_identity": {
+    "nanning1x": {
+      "canonical_compressed_sha256": "3f2cc8d8e5e2934e2568b299d2d3321eec07f1f47e5fa0750537993eaee1340d",
+      "canonical_content_sha256": "f167648ca524770b48465c66eaa7a548390f31e35815fb9c73accff68520c3a1",
+      "businesses": 28506,
+      "segments": 43603
+    },
+    "profile_sha256": "9b1a78344ec89aaac377feb05afccd48d9b957174286b29eedfe57a73a93c426"
+  },
+  "missing_reference_explicit": "Parent019 has no asserted completed full1x. Requiredsame023false replaces any inference from missingparentfull1x. Historical010c/HCA context cannot replace missingpairbaseline.",
+  "required_metrics": {
+    "primary": "Full-business sum of each actual leg finish minus first_planning_attempt_time, including retries, excluding inter-leg EBS storage.",
+    "full_population": [
+      "mean",
+      "p95",
+      "p99",
+      "max",
+      "network_elapsed",
+      "planning_retry_wait",
+      "preplanning",
+      "canonical_elapsed"
+    ],
+    "fixed_window": [
+      "actual completed businesses<=98259",
+      "unfinished businesses at98259",
+      "completed segments",
+      "business/segment denominators"
+    ],
+    "deadlines_separate": [
+      "finish<=STD strict causal count/rate",
+      "finish<=STD-2700 strict causal count/rate"
+    ],
+    "supplemental": "If same completed population and activation identity remain valid, derive mean finish-minus-activation = primary mean + activation-to-first mean; label derived without a new bag scan; p95/p99/max remain null.",
+    "cost": [
+      "native event-loop CPU/wall",
+      "native API CPU/wall",
+      "planning attempts/failed attempts",
+      "available deadline-priority counters"
+    ],
+    "gates": [
+      "headway_audit",
+      "rolling_replay",
+      "source_policy_audit",
+      "tht_audit",
+      "business_audit"
+    ],
+    "censoring": "If any business remains incomplete, full-population THT/tails remain unavailable; never substitute a completed subset."
+  },
+  "conditional2x_screen": {
+    "necessary_conditions": [
+      "Five gates and all input/control identities pass.",
+      "No censoring or lost population hidden by means.",
+      "Root reviews1x primary THT plus preplanning/throughput/tails and both deadline rates; all negative changes retained."
+    ],
+    "sufficient_automatic_trigger": null,
+    "decision_rule": "No automatic2x dispatch. Root determines whether observed1x tradeoff is useful, rather than choosing only the best metric."
+  },
+  "interpretation_limits": [
+    "Earlier absolute deadline among concurrent source attempts is not global EDF and does not reorder requests across different times or phases.",
+    "Subtracting a common2700s from every compared deadline preserves their order; the two deadline standards are distinct outcome columns, not evidence of two distinct scheduling experiments.",
+    "Existing FIFO can still hide a tighter deadline behind a head. This experiment does not fix EBS or FIFO head-of-line blocking.",
+    "No bounded fairness under arbitrary infinite arrivals is claimed.",
+    "No ratio between C++ API/event-loop timing and Java whole-run timing; local single runs do not establish statistical speedup."
+  ],
+  "paused_work": [
+    "011 paired timingv2 prepared but deferred by user priority.",
+    "022 bounded-static real-map experiments deferred."
+  ],
+  "commands": [
+    {
+      "mode": "off",
+      "argv": [
+        "C:/PROGRAMING/python3.11.9/python.exe",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate023\\run_candidate.py",
+        "--map",
+        "nanning",
+        "--scale",
+        "1",
+        "--controls",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate023\\controls_off_original_window.json",
+        "--physical-contract",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate023\\registered_contracts_023\\physical_contract_original_window.json",
+        "--output",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_1x_future60_minwait2_w0_fixed1_edf_off_original98259_023"
+      ]
+    },
+    {
+      "mode": "on",
+      "argv": [
+        "C:/PROGRAMING/python3.11.9/python.exe",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate023\\run_candidate.py",
+        "--map",
+        "nanning",
+        "--scale",
+        "1",
+        "--controls",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate023\\controls_original_window.json",
+        "--physical-contract",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate023\\registered_contracts_023\\physical_contract_original_window.json",
+        "--output",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_1x_future60_minwait2_w0_fixed1_edf_on_original98259_023"
+      ]
+    }
+  ],
+  "commands_boundary": "Copiedcodeagentfrozenhandoff; root alone dispatches. Off alreadyreportedrunning; no duplicateoff launch authorized by this artifact.",
+  "supersedes": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate023_comparison_plan_001\\PREDECLARED_COMPARISON_PLAN_002.json",
+    "sha256": "e2c10c168ece61a15e8ec012fd6046a28ac44db63b5b12a8ea92e41c32606adb",
+    "change": "Finalbuild identities androotprovidedpaths bound afteroff dispatch; samepredeclaredpolicy/metric rules from002, not a new pre-off registration."
+  },
+  "context_references": [
+    {
+      "label": "historical010c_w0future60min2_1x",
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_1x_future60_cap120_relax1_010c",
+      "scope": "Existing full audited main-line1x. Historical compiled lineage; not same-binary policy isolation or pure policy timing."
+    },
+    {
+      "label": "HCA_repaired_1x",
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_repaired_uniform_headway2_002\\nanning_1x",
+      "scope": "Existing shared repaired physics/source-generation/EBS comparator remains applicable because source FIFO/EBS readiness are unchanged."
+    }
+  ],
+  "primary_reference": {
+    "label": "same023_binary_false_1x",
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_1x_future60_minwait2_w0_fixed1_edf_off_original98259_023",
+    "status": "rootreported_started_not_result_read",
+    "definition": "Primary policy contrast is023true versus023false with identical binary,input,physicalcontract and all controls except strictbool enable_source_attempt_edf."
+  },
+  "freeze_binding_required_before_run": [
+    "Finalsourcefreeze passed build/micros/defaultoffparity and unchanged fiveaudit micro tests.",
+    "Hash both controls againstthis revision; reject any nonflag difference.",
+    "Bind same exactbinarysha/registeredcontract and canonical/profile identities forbotharms in newappendonly revision.",
+    "No observed outcome may be inserted into this preregistration."
+  ],
+  "counter_boundary": "source_attempt_edf.valid_source_attempts and already_overdue_valid_attempts count actual valid source attempts after guards, not distinct bags or contention victories. Expose without guessing unexported competition statistics.",
+  "final_binding": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate023_comparison_plan_001\\FROZEN_BINDING_001.json",
+    "sha256": "e8514cd97d2553dfe8eb3dadf079378e5bb3857d641d5517f52c6b4f13f3e651"
+  },
+  "registration_timing_boundary": "Root reportedoff dispatchsession98919 after2026-10-24T14:34:39Z before this binding. Plan002 and testedhelper rules pre-existed dispatch. Finalsourcefreeze itself is timestamped14:34:01Z, but this binding was created afteroff dispatch; do not claim its finalhash registration precededoff. On had not started according to root at this authorization. No running output was read."
+}

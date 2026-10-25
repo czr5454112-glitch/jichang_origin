@@ -1,0 +1,178 @@
+--- frozen013/core.cpp
++++ candidate015/core.cpp
+@@ -77,6 +77,7 @@
+     double route_excess_retry_relaxation_rate = 0.0;
+     int future_source_reservation_horizon_seconds = 0;
+     double future_source_reservation_min_wait_seconds = 2.0;
++    bool future_source_prefer_earlier_finish = false;
+ };
+ struct Edge { int to; double travel; int id; };
+ struct Node { int id; double service; std::vector<Edge> out; int indegree = 0; };
+@@ -123,6 +124,9 @@
+     int arrived_index = 0;
+     bool physically_completed = false;
+     bool future_reserved=false;
++    std::uint64_t future_success_comparisons=0;
++    bool future_success_preferred=false;
++    double compared_immediate_finish=inf;
+     double reservation_time=inf,planned_admission=inf,planned_finish=inf,planned_cleanup=inf;
+     std::uint64_t reservation_order=0,future_searches=0,future_calendar_entries_scanned=0;
+     std::vector<Step> reserved_route;
+@@ -191,7 +195,7 @@
+         "interval_mode","strict_endpoint_resources","edge_entry_headway_seconds","skip_scoring_single_choice",
+         "enable_inroute_replanning","time_grid_seconds","max_route_excess_seconds","source_fifo_order",
+         "route_excess_retry_relaxation_rate","future_source_reservation_horizon_seconds",
+-        "future_source_reservation_min_wait_seconds"};
++        "future_source_reservation_min_wait_seconds","future_source_prefer_earlier_finish"};
+     for (auto item : d) if (!allowed.count(py::cast<std::string>(item.first)))
+         throw std::invalid_argument("unknown config key: "+py::cast<std::string>(item.first));
+ #define READ_OPTION(name) if (d.contains(#name)) c.name = py::cast<decltype(c.name)>(d[#name]);
+@@ -208,6 +212,12 @@
+     READ_OPTION(source_fifo_order)
+     READ_OPTION(route_excess_retry_relaxation_rate)
+     READ_OPTION(future_source_reservation_min_wait_seconds)
++    if (d.contains("future_source_prefer_earlier_finish")) {
++        const auto value=d["future_source_prefer_earlier_finish"];
++        if (!PyBool_Check(value.ptr()))
++            throw std::invalid_argument("future_source_prefer_earlier_finish must be a boolean");
++        c.future_source_prefer_earlier_finish=py::cast<bool>(value);
++    }
+     if (d.contains("future_source_reservation_horizon_seconds")) {
+         const auto value=d["future_source_reservation_horizon_seconds"];
+         if (!PyLong_Check(value.ptr()) || PyBool_Check(value.ptr()))
+@@ -231,6 +241,8 @@
+          !c.enable_inroute_replanning || !c.enable_ebs_predecessor_gate || !c.source_fifo || c.source_fifo_order!="canonical" ||
+          c.release_quantum!=1.0 || c.completion_quantum!=1.0 || c.source_generation_interval!=1.0 || (c.congestion_weight!=0.0 && c.congestion_weight!=1.0)))
+         throw std::invalid_argument("future source reservation requires canonical FIFO, causal rolling, strict half-open node/edge2 resources, q1 source/completion/feed and congestion weight exactly 0 or 1");
++    if (c.future_source_prefer_earlier_finish && c.future_source_reservation_horizon_seconds==0)
++        throw std::invalid_argument("earlier-finish source comparison requires enabled future source reservation");
+     if (c.time_grid_seconds!=0.000001) throw std::invalid_argument("time_grid_seconds must equal 1e-6");
+     if (c.source_fifo_order!="activation" && c.source_fifo_order!="canonical")
+         throw std::invalid_argument("source_fifo_order must be activation or canonical");
+@@ -297,6 +309,8 @@
+     std::uint64_t future_chain_nodes=0,future_calendar_queries=0,future_calendar_entries_scanned=0;
+     std::uint64_t future_validation_queries=0,future_mask_empty=0,future_chain_rejections=0;
+     std::uint64_t future_eligible_failures=0;
++    std::uint64_t future_success_comparisons=0,future_success_preferred=0,future_success_kept_immediate=0;
++    std::uint64_t future_success_finish_bound_rejections=0,future_success_mask_empty=0;
+     double simulation_time = 0;
+     bool event_budget_exhausted = false;
+     double preprocessing_seconds = 0;
+@@ -723,7 +737,7 @@
+ 
+     // One complete static shortest chain; temporal alternatives are a 61-bit
+     // integer-launch mask, not repeated DFS and not spatial lookahead depth.
+-    bool reserve_future_source(int task,double time,const GoalData& gd) {
++    bool reserve_future_source(int task,double time,const GoalData& gd,double strict_finish_before=inf) {
+         Task& t=tasks[task];
+         const auto origin=tick(time),q=std::int64_t(1000000);
+         if (origin%q) throw std::logic_error("future source attempt must be on the integer-second grid");
+@@ -748,7 +762,16 @@
+             tick(path.back().arrival)>tick(gd.h[t.start])+tick(t.last_effective_route_excess)) {
+             ++future_chain_rejections;return false;
+         }
+-        const int horizon=cfg.future_source_reservation_horizon_seconds;
++        int horizon=cfg.future_source_reservation_horizon_seconds;
++        const bool comparing=std::isfinite(strict_finish_before);
++        if (comparing) {
++            // Only launches satisfying R + exact-chain-duration < immediate
++            // certificate finish can improve this candidate. Integer-us -1
++            // preserves strictness, including equality and a one-us boundary.
++            const auto headroom=tick(strict_finish_before)-origin-tick(path.back().arrival)-1;
++            if (headroom<q) {++future_success_finish_bound_rejections;return false;}
++            horizon=static_cast<int>(std::min<std::int64_t>(horizon,headroom/q));
++        }
+         std::uint64_t mask=((std::uint64_t(1)<<(horizon+1))-1)&~std::uint64_t(1);
+         const auto lower=origin+q,upper=origin+horizon*q;
+         auto intersect_resource=[&](const Calendar& calendar,std::int64_t lo,std::int64_t hi) {
+@@ -782,10 +805,14 @@
+             if (i+1<path.size())
+                 intersect_resource(edge_calendars[edge_ids.at({step.node,path[i+1].node})],tick(step.departure),tick(step.departure)+tick(cfg.edge_entry_headway_seconds));
+         }
+-        if (!mask) {++future_mask_empty;return false;}
++        if (!mask) {++future_mask_empty;if (comparing) ++future_success_mask_empty;return false;}
+         int offset=1;while (!(mask&(std::uint64_t(1)<<offset))) ++offset;
+         const double launch=seconds(origin+offset*q);
+         for (auto& step:path) {step.arrival=add_time(launch,step.arrival);step.departure=add_time(launch,step.departure);}
++        // Reject before changing route state, reservation IDs, calendar or events.
++        if (comparing && tick(path.back().arrival)>=tick(strict_finish_before)) {
++            ++future_success_finish_bound_rejections;return false;
++        }
+         // Defensive exact validation uses the same calendars without any event
+         // interleaving. It is counted separately and never searches another path.
+         for (std::size_t i=0;i<path.size();++i) {
+@@ -879,7 +906,22 @@
+         t.max_certificate_depth=std::max(t.max_certificate_depth,a.max_depth);
+         t.max_observation_depth=std::max(t.max_observation_depth,a.max_observation_depth);
+         if (a.score_budget_exhausted) ++score_budget_exhaustions;
+-        if (success) {
++        bool preferred_future=false;
++        if (success && cfg.future_source_prefer_earlier_finish) {
++            // The successful immediate DFS remains an uncommitted fallback.
++            // This comparison has no forced-prefix or failure-age requirement;
++            // the old failed-DFS rescue gate below remains unchanged.
++            ++future_success_comparisons;++t.future_success_comparisons;
++            t.compared_immediate_finish=a.path.back().arrival;
++            preferred_future=reserve_future_source(task,time,gd,t.compared_immediate_finish);
++            if (preferred_future) {++future_success_preferred;t.future_success_preferred=true;}
++            else {
++                ++future_success_kept_immediate;
++                if (cfg.audit_failed_calendar_hash && calendar_hash()!=before)
++                    throw std::logic_error("rejected future comparison mutated a calendar");
++            }
++        }
++        if (success && !preferred_future) {
+             t.admitted=true; t.admission=time; t.route=std::move(a.path);
+             last_source_admission[t.start]=time;
+             t.commit_order=++next_commit;
+@@ -929,7 +971,7 @@
+             if (!cfg.enable_inroute_replanning && t.dependent>=0 && tasks[t.dependent].released && !tasks[t.dependent].activated)
+                 push_event(std::max(time,quantize(std::max(tasks[t.dependent].release,t.finish),cfg.release_quantum)),3,t.dependent);
+             advance_source(t.start,time);
+-        } else {
++        } else if (!success) {
+             ++failed_attempts;
+             if (cfg.audit_failed_calendar_hash) {
+                 ++failed_hash_checks;
+@@ -1274,6 +1316,14 @@
+                 b["reserved_route"]=reserved;b["reserved_node_reservation_ids"]=t.reserved_node_ids;b["reserved_edge_reservation_ids"]=t.reserved_edge_ids;
+                 b["future_source_searches"]=t.future_searches;b["future_calendar_entries_scanned"]=t.future_calendar_entries_scanned;
+             }
++            if (cfg.future_source_prefer_earlier_finish) {
++                b["future_success_comparisons"]=t.future_success_comparisons;
++                b["future_success_preferred"]=t.future_success_preferred;
++                b["selected_future_finish"]=t.future_success_preferred?py::cast(t.planned_finish):py::none();
++                b["immediate_candidate_finish"]=std::isfinite(t.compared_immediate_finish)?py::cast(t.compared_immediate_finish):py::none();
++                b["planned_finish_advance_vs_immediate_certificate_seconds"]=t.future_success_preferred?
++                    py::cast(seconds(tick(t.compared_immediate_finish)-tick(t.planned_finish))):py::none();
++            }
+             b["status"]=event_budget_exhausted&&!done?"event_budget_exhausted":t.reason;
+             b["attempts"]=t.attempts; b["retries"]=std::max(0,t.attempts-1);
+             b["source_wait_seconds"]=t.admitted?py::cast(t.admission-t.release):py::none();
+@@ -1321,6 +1371,13 @@
+             stats["future_mask_empty"]=future_mask_empty;stats["future_chain_rejections"]=future_chain_rejections;
+             stats["source_decision_wall_seconds"]=std::accumulate(decision_microseconds.begin(),decision_microseconds.end(),0.0)*1e-6;
+             stats["inroute_decision_wall_seconds"]=std::accumulate(inroute_microseconds.begin(),inroute_microseconds.end(),0.0)*1e-6;
++        }
++        if (cfg.future_source_prefer_earlier_finish) {
++            stats["future_success_comparisons"]=future_success_comparisons;
++            stats["future_success_preferred"]=future_success_preferred;
++            stats["future_success_kept_immediate"]=future_success_kept_immediate;
++            stats["future_success_finish_bound_rejections"]=future_success_finish_bound_rejections;
++            stats["future_success_mask_empty"]=future_success_mask_empty;
+         }
+         stats["planning_attempts"]=planning_attempts;stats["failed_attempts"]=failed_attempts;
+         stats["search_expansions"]=total_exp;stats["score_expansions"]=total_score_exp;stats["backtracks"]=total_back;
+@@ -1409,6 +1466,12 @@
+             contract["future_source_measurement"]="Fixed-chain construction, calendar-entry scanning and exact validation are included in existing source decision wall samples (goal-table lookup through reservation/dispatch, not pure DFS). Wall sums reuse existing samples without new clock calls. Separate queries/scanned counters expose extra work, not measured protocol messages. Future chain route_decisions requested_k=0 records no local rank query; committed_route_hop_k_histogram retains original immediate-DFS scope. No real network timing or global throughput guarantee.";
+             contract["rolling_event_order"]="at equal time: physical arrival or reserved source launch by event serial, resource cleanup, source release, source attempt, EBS activation; ledger_order is global";
+         }
++        if (cfg.future_source_prefer_earlier_finish) {
++            contract["future_source_prefer_earlier_finish"]=true;
++            contract["future_source_policy"]="Failed immediate DFS keeps the existing forced-prefix and minimum-age rescue gate. Successful immediate DFS additionally compares a complete static-chain future certificate, selecting it only if its integer-us goal arrival is strictly earlier than the found immediate certificate. Both branches atomically reserve all positive-node and directed-edge entry rights, preserve canonical FIFO until actual launch, freeze route allowance at the actual attempt, and keep the temporal window independent of observation end. Earliest is only for this chain/current snapshot, not all paths.";
++            contract["future_success_comparison"]="After successful immediate DFS and before any admission mutation, compare the complete static-chain future certificate. Choose only strictly earlier goal arrival on integer-us ticks; equal/later/no improving slot keeps the original immediate certificate. This success branch is independent of failure min-wait/forced-prefix; failed-DFS rescue remains unchanged. A finite finish bound removes only non-improving launch offsets, never uses observation end.";
++            contract["future_success_measurement"]="Comparisons are not failed_attempts or future_eligible_failures. Existing future searches/queries/scans also include these comparisons; an empty comparison mask means no improving slot in its finish-bounded window. All work remains inside the original source decision sample. Planned advance is relative only to this attempt's found immediate certificate, not a causal individual or system THT guarantee; later rerouting and other bags may change outcomes. FIFO remains blocked until actual future launch; preplanning and fixed-window completion must be reported.";
++        }
+         stats["contract"]=contract;
+         py::list ledger;
+         for (const auto& r:rolling_records) {

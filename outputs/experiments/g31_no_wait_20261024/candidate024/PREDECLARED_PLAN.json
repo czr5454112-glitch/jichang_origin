@@ -1,0 +1,26 @@
+{
+  "schema": "g31.candidate024.predeclared.v1",
+  "prepared_at_utc": "2026-10-24T14:42:02.608270+00:00",
+  "status": "prepared_not_built_not_executed",
+  "parent_source": "e832bc62401e8612c14285a905476e531988a88c1967df239c23295babb68d0d",
+  "control": "prefer_nonexpired_source_attempts",
+  "default": false,
+  "requires": "enable_source_attempt_edf=true",
+  "key": "(time, original phase, int(STD < scheduled event time) only for kind2, EDF deadline, original serial)",
+  "key_immutable_at_enqueue": true,
+  "source_deadlines_finite": true,
+  "default_compatibility": "Both omitted and explicit false against all194 saved023 records; 388 comparisons incl EDFoff/on. Only11 original time fields may differ.",
+  "features": "15 off/on pairs; same-time feasible/expired win reversal; deadline==time still not path-feasible; all-expired EDF; canonical FIFO; phase3; confirmed/future rights; 0/2 endpoints; short/drain.",
+  "guards": "4 bool-type +2 nonfinite deadline +unknown +dependency",
+  "stale_boundary": "Unchanged real generation gate statically pinned, plus pure immutable-event heap model for stale pop. No synthetic insertion into production event queue or claim of native stale-injection test.",
+  "limitations": [
+    "No remaining-H feasibility claim",
+    "No STD-2700 protection",
+    "Overdue task delay/starvation possible",
+    "Not distributed node auction",
+    "No change to EBS ready-first or canonical source queues",
+    "No throughput or THT guarantee"
+  ],
+  "first_population": "Nanning1x only if root authorizes after023results",
+  "build_requires_new_root_authorization": true
+}

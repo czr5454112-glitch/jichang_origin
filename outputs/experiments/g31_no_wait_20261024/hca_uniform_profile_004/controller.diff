@@ -1,0 +1,25 @@
+--- 
++++ 
+@@ -26,7 +26,7 @@
+ 
+ 	public void ICS_path_finding(Tasks tasks, Map map, double epoch, ICS_PathFinding ICS) throws IOException {
+         if (!tasks.getFault_edges().isEmpty() || !ICS.getFault_edges().isEmpty()) throw new IllegalArgumentException("uniform physical HCA supports no-fault execution only");
+-        ICS.physicalReservations.prune(epoch);
++        HcaPlanningProfile.prune(ICS.physicalReservations,epoch);
+ 		//移除修好的弧
+ 		for (Edge edge :tasks.getRepaired_edges()) {
+ 			remove_edge(edge,ICS.getFault_edges());
+@@ -147,11 +147,11 @@
+ 			Node star=new Node();Node end =new Node();
+ 			star.setLocation(curTask.star);end.setLocation(curTask.goal);
+ 			star.setT1(tasks.cur_time);
+-			ArrayList<Node>path=Astar.research(star, end, map, constrains, ICS.getFault_edges(), ICS.physicalReservations);
++			ArrayList<Node>path=HcaPlanningProfile.search(star, end, map, constrains, ICS.getFault_edges(), ICS.physicalReservations);
+ 			if (path.isEmpty()) {
+ 				ICS.getUnfinishTasks().add(curTask);
+ 			}else {
+-				ICS.physicalReservations.commit(path);
++				HcaPlanningProfile.commit(ICS.physicalReservations,path);
+                 ICS.getSaved_routes().put(curTask.task_ID, path);
+ 				update_constrain(curTask.task_ID,path,constrains);
+ 				BufferedWriter bw = new BufferedWriter(new FileWriter(outputstarttime,true));

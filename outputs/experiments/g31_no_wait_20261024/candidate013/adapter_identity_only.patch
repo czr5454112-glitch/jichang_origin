@@ -1,0 +1,26 @@
+--- frozen012/continuous_adapter.py
++++ candidate013/continuous_adapter.py
+@@ -1,4 +1,4 @@
+-"""Isolated candidate012 runner derived from the official continuous adapter.
++"""Isolated candidate013 runner derived from the official continuous adapter.
+ 
+ The registered model uses local next-hop scoring and a complete continuation
+ certificate. Registration is not a performance promotion or distributed-network
+@@ -94,7 +94,7 @@
+     if not 0<=future<=60:
+         raise ValueError("future reservation horizon must be an integer in [0,60]")
+     if future and controls["congestion_weight"] not in (0,1):
+-        raise ValueError("candidate012 future reservations support only congestion weight 0 or 1")
++        raise ValueError("candidate013 future reservations support only congestion weight 0 or 1")
+     return controls
+ 
+ 
+@@ -241,7 +241,7 @@
+ def verified_auditors(source_dir):
+     """Load the frozen audit package, checking every live source against it."""
+     names=("headway_audit","future_metadata","rolling_replay","tht_metrics","source_policy_audit")
+-    package_name="g31_candidate012_auditors_"+hashlib.sha256(str(source_dir.resolve()).encode()).hexdigest()[:16]
++    package_name="g31_candidate013_auditors_"+hashlib.sha256(str(source_dir.resolve()).encode()).hexdigest()[:16]
+     package=types.ModuleType(package_name)
+     package.__path__=[str(source_dir)]
+     sys.modules[package_name]=package

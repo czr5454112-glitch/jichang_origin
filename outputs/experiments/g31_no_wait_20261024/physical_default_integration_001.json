@@ -1,0 +1,35 @@
+{
+  "schema": "g31.physical_default_integration.v1",
+  "physics_default": "continuous_headway_2s",
+  "performance_promoted": false,
+  "engine": "frozen006",
+  "controls_sha256": "fa8db33741bdb2dadb0a13f02e9b9597f8044cb459bf4f38431d9c70fcfb0a9a",
+  "controls_byte_exact_to_selected006_original_window": true,
+  "core_sha256": "8ccaa58f56fd0b941aebf8527b713d1b1f0605164ee779f1abf3ecd689c924b0",
+  "legacy_config_sha256": "03072660fee7b05faad609a9b19cc2903de3467eeea33b8763d194f08f69db7c",
+  "files_sha256": {
+    "scripts/eval/run_g31_standard.py": "2bf1ee91d744e8b6a67140ae335ebebd6dc0f18ff6407dca0705bb1fb86a5966",
+    "scripts/eval/g31_continuous_adapter.py": "cf03829d335b95b6ced464b8ac36b8bc8d59ec8123c0fd319619ad6e58c409f2",
+    "configs/eval/g31_continuous/contract.json": "9316a62946c21b74cbe2e1b5de319c6129a608a358443017e64c24c31559b21e",
+    "configs/eval/g31_continuous/default_controls.json": "fa8db33741bdb2dadb0a13f02e9b9597f8044cb459bf4f38431d9c70fcfb0a9a",
+    "configs/eval/g31_continuous/usage.json": "99aa77071cc83bc0698fff425a4c43666bb5068c59ca83368788d75f7989d400",
+    "tests/test_g31_standard.py": "056cefc73ce5cf5a04392174ff2b1c69d776fe531d3c95167632cd9925a4c080",
+    "tests/test_g31_continuous_standard.py": "8c019d395b24f010e0c3442a32c695b03f35d922b92df2e00c0e87a84f4598cb",
+    "docs/g31_ics_circulation/README.md": "f69a813b109d6fa374404fd019955446e56187633e8c24e0b68f8cc88e497e81",
+    "docs/g31_ics_circulation/G31_STANDARD_20261023.md": "cae877008386a8903f41b7a24fb77bb1ace0d9984cc59a217e8edff08f2df827",
+    "docs/g31_continuous_motion/README.md": "3f6e0255290ffa5916dd17031bec40069cb031c3ce7f1c8d29660f5a77aa83c4"
+  },
+  "tests": {
+    "command": "C:/PROGRAMING/python3.11.9/python.exe -m pytest tests/test_g31_standard.py tests/test_g31_continuous_standard.py -q -k 'not explicit_legacy_matches_frozen_legacy_request and not actual_native_micro' --basetemp outputs/experiments/g31_no_wait_20261024/physical_default_tests_001",
+    "exit_code": 0,
+    "passed": 32,
+    "deselected": 3,
+    "scope": "mock/pure small registration and dispatch tests; no native or full population scan"
+  },
+  "deferred_checks": [
+    "two-map full archived legacy request equality, retained as explicit legacy tests",
+    "one optional native micro (unchanged engine)"
+  ],
+  "results_document_modified": false,
+  "frozen_core_or_auditors_modified": false
+}

@@ -1,0 +1,237 @@
+{
+  "schema": "g31.variable_lookahead_013.nanning_only.v1",
+  "status": "prepared_not_executed",
+  "date": "2026-10-24",
+  "development_not_heldout": true,
+  "purpose": "Compare configured adaptive spatial observation2..4 with existing fixed2 under weight1 and future horizon60/minwait2, retaining all physics and budgets.",
+  "hypothesis": "Deeper upstream observations may distinguish congestion behind immediate neighbours. The existing topology/H-ratio rule permits variation; actual requested-k and calendar-query-depth distributions must establish what was really used.",
+  "source_freeze": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate013\\SOURCE_FREEZE_013_001.json",
+    "sha256": "b8684160991a2f6ae9a478f2509a876e9bbf38805b301d88252068d01b0f5f4f",
+    "native_source_sha256": "7c0ef237a0816091f8d851cc7f8b0574e72a36c5f6a726ba6e3ebba3b80c7ea5",
+    "binary": {
+      "path": "build/g31_no_wait_013/python/g31_nowait.cp311-win_amd64.pyd",
+      "sha256": "ff65155d0cf58a38f9f18ba70fe4313f4e43a78a88d62796e54945e6ffd9e2a1"
+    }
+  },
+  "runner": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate013\\run_candidate.py",
+    "sha256": "7ff61c5fa1cb76525b0ba3c1cad2c3757ce7c50b133abbd1457dd5a539504d9e"
+  },
+  "adapter": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate013\\continuous_adapter.py",
+    "sha256": "977aabc1d3733ed13e9abfaecbaba76ef4d8d44d0a80fd180662595bfd9e1eac"
+  },
+  "prerequisite": {
+    "required": true,
+    "status_at_preparation": "actual_full_parity_passed",
+    "purpose": "Equivalent implementation replay, not a new policy/parameter arm.",
+    "reference_run": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_w1_fixed2_cap120_relax1_drain200000_012",
+    "candidate_run": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_w1_fixed2_cap120_relax1_drain200000_013",
+    "fixed_controls": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate013\\controls_w1_fixed2_drain200000.json",
+    "frozen_controls_byte_equal_to012": true,
+    "replay_command_argv": [
+      "C:/PROGRAMING/python3.11.9/python.exe",
+      "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate013\\run_candidate.py",
+      "--map",
+      "nanning",
+      "--scale",
+      "2",
+      "--controls",
+      "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate013\\controls_w1_fixed2_drain200000.json",
+      "--physical-contract",
+      "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate013\\registered_contracts_013\\physical_contract_drain200000.json",
+      "--output",
+      "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_w1_fixed2_cap120_relax1_drain200000_013"
+    ],
+    "strict_parity_tool": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate013\\strict_full_parity_v2.py",
+      "sha256": "fff6ae49a941808f2a3a8adc3416d17cfcaee604b9b2f9c5015fd86ec387cd99",
+      "schema": "g31.candidate013.full_parity.v1"
+    },
+    "strict_parity_receipt": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate013\\full_nanning_2x_fixed2_parity_001.json",
+    "parity_command_argv": [
+      "C:/PROGRAMING/python3.11.9/python.exe",
+      "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate013\\strict_full_parity_v2.py",
+      "--reference",
+      "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_w1_fixed2_cap120_relax1_drain200000_012",
+      "--candidate",
+      "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_w1_fixed2_cap120_relax1_drain200000_013",
+      "--output",
+      "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate013\\full_nanning_2x_fixed2_parity_001.json"
+    ],
+    "hard_gate": "Do not start either adaptive full run until the registered fixed2 replay is complete with all five gates and this actual full-parity receipt passed=true, binding the stated012/013 paths, same inputs/controls, all bag/ledger bytes and all non-time fields exact. Micro parity alone is insufficient. A differently named receipt is acceptable only if it has the identical bound run identities and successful schema.",
+    "heavy_scheduling": "Root runs replay, then strict full comparison, then adaptive2x, then adaptive1x, each alone in the heavy slot. No automatic launch from this plan.",
+    "actual_full_parity_receipt": {
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate013\\full_nanning_2x_fixed2_parity_001.json",
+      "sha256": "5145d0f7c8d68386978ff6af2cb1802ff25819a285cce7e4159676fb13c66ca6",
+      "schema": "g31.candidate013.full_parity.v1",
+      "passed": true
+    }
+  },
+  "cells": [
+    {
+      "order": 1,
+      "map": "nanning",
+      "scale": 2,
+      "end_time": 200000,
+      "controls": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\variable_lookahead_013_001\\controls_adaptive2_4_drain200000.json",
+        "sha256": "e6e3ba2fced1d0764789e3fdbe3f9529160a3314935342355476c5a519a8a93c",
+        "frozen_fixed2_source": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate013\\controls_w1_fixed2_drain200000.json",
+        "frozen_fixed2_sha256": "cb426f42f144f905ca87915fa0d19f48e3697401e8bbf36a26e51e63490b76c6",
+        "difference": {
+          "min_depth": {
+            "fixed2": 1,
+            "adaptive": 2
+          },
+          "max_depth": {
+            "fixed2": 2,
+            "adaptive": 4
+          },
+          "adaptive": {
+            "fixed2": false,
+            "adaptive": true
+          }
+        }
+      },
+      "physical_contract": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate013\\registered_contracts_013\\physical_contract_drain200000.json",
+        "sha256": "0e53e208f4f8e142b19ff531d391361e330efe360d7036524ef606ec2b647ac4"
+      },
+      "input_identity": {
+        "canonical": {
+          "path": "data/processed/g31_continuous/nanning_2x_canonical.jsonl.gz",
+          "sha256": "5e0d3feef7b3f94aae2f3ec3c445720bc971599c82252383ab1ebc44fa46491b",
+          "bytes": 2299529,
+          "encoding": "gzip_jsonl",
+          "content_sha256": "55538837011a1ed31eb272cc170fdc9fefb3b40ec14e2ae0574877a8c465a115"
+        },
+        "business_denominator": 57012,
+        "segment_denominator": 87206,
+        "temporal_identity_sha256": "8b0419dfa96bcbfec8f58f7407fc756a9d7a1df1e0b39df517a3e268757538c1",
+        "performance_status": "not_registered"
+      },
+      "output": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_w1_adaptive2_4_cap120_relax1_drain200000_013",
+      "command_argv": [
+        "C:/PROGRAMING/python3.11.9/python.exe",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate013\\run_candidate.py",
+        "--map",
+        "nanning",
+        "--scale",
+        "2",
+        "--controls",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\variable_lookahead_013_001\\controls_adaptive2_4_drain200000.json",
+        "--physical-contract",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate013\\registered_contracts_013\\physical_contract_drain200000.json",
+        "--output",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_w1_adaptive2_4_cap120_relax1_drain200000_013"
+      ]
+    },
+    {
+      "order": 2,
+      "map": "nanning",
+      "scale": 1,
+      "end_time": 98259,
+      "controls": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\variable_lookahead_013_001\\controls_adaptive2_4_original98259.json",
+        "sha256": "9a69d58cdf2308c2c266dd6a0f12061fa9700dfa5b378cef40cc8e8bf280b59d",
+        "frozen_fixed2_source": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate013\\controls_w1_fixed2_original_window.json",
+        "frozen_fixed2_sha256": "711690fa61e5a992a18605e30ad44e2e74dcbf5542303a3a2da648923ce87cae",
+        "difference": {
+          "min_depth": {
+            "fixed2": 1,
+            "adaptive": 2
+          },
+          "max_depth": {
+            "fixed2": 2,
+            "adaptive": 4
+          },
+          "adaptive": {
+            "fixed2": false,
+            "adaptive": true
+          }
+        }
+      },
+      "physical_contract": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate013\\registered_contracts_013\\physical_contract_original_window.json",
+        "sha256": "4ac542a8137df5895cea574af2a3b1fbac00e470db7c04d56b7e892e5a3b5e9b"
+      },
+      "input_identity": {
+        "canonical": {
+          "path": "data/processed/g31_continuous/nanning_1x_canonical.jsonl.gz",
+          "sha256": "3f2cc8d8e5e2934e2568b299d2d3321eec07f1f47e5fa0750537993eaee1340d",
+          "bytes": 1117468,
+          "encoding": "gzip_jsonl",
+          "content_sha256": "f167648ca524770b48465c66eaa7a548390f31e35815fb9c73accff68520c3a1"
+        },
+        "business_denominator": 28506,
+        "segment_denominator": 43603,
+        "temporal_identity_sha256": "c80f4a213b0418c1fa4c55f0e4d6c6e1d680771cc234e9021b55ba15fc795e1b",
+        "performance_status": "not_registered"
+      },
+      "output": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_1x_future60_minwait2_w1_adaptive2_4_cap120_relax1_original98259_013",
+      "command_argv": [
+        "C:/PROGRAMING/python3.11.9/python.exe",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate013\\run_candidate.py",
+        "--map",
+        "nanning",
+        "--scale",
+        "1",
+        "--controls",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\variable_lookahead_013_001\\controls_adaptive2_4_original98259.json",
+        "--physical-contract",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate013\\registered_contracts_013\\physical_contract_original_window.json",
+        "--output",
+        "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_1x_future60_minwait2_w1_adaptive2_4_cap120_relax1_original98259_013"
+      ]
+    }
+  ],
+  "only_changed_controls": [
+    "adaptive",
+    "min_depth",
+    "max_depth"
+  ],
+  "fixed_parameters": "congestion_weight1, future_horizon60, minwait2, cap120/relaxation1, pressure_window30, max_expansions256, max_score_expansions64, retries100000/events10000000, all original source FIFO/release/EBS/interval controls unchanged.",
+  "physical_hard_gates": [
+    "No internal waiting; positive source/internal/goal2s and original0s retained.",
+    "Integer1us grid, half-open exact2s device and directed-edge entry separation, including diverters.",
+    "Canonical FIFO, ceil release, actual EBS predecessor completion,1s source pacing, non-increasing rolling finish.",
+    "All five independent audits must pass and all canonical businesses remain in the population; censored full THT remains null."
+  ],
+  "interpretation_limits": [
+    "This is development on repeatedly inspected Nanning1x/2x data, not held-out evidence or a generalization claim.",
+    "Increasing depth changes cumulative score_suffix penalty magnitude and scoring work; it is not a pure information-only gain at normalized congestion strength.",
+    "The unchanged64 scoring-expansion cap can bind differently; requested depth is not guaranteed actual query depth.",
+    "Configured2..4 can still report requested1 at goal/short remaining-hop caps or skipped scoring; report full histograms and score-budget exhaustion rather than claiming every decision used2..4.",
+    "At forced prefixes with no routing alternative, larger k cannot create another exit.",
+    "No assumption of improvement; retain negative, censored and invalid results. The completed fixed2 replay tests implementation equivalence, not adaptive benefit."
+  ],
+  "required_metrics": [
+    "Full-population userTHT mean/p95/p99/max and total, with first-attempt origin and no survivor fallback.",
+    "Actual completed business count at98259, backlog, preplanning mean/tails, retry wait, network and canonical elapsed.",
+    "STD and STD-2700 strict full-business counts/rates, and last actual goal finish when available.",
+    "Requested-k histogram, actual query-depth histogram, scored neighbours, score queries/expansions/exhaustion, DFS search-budget failures, retries and rolling replacements/fallbacks.",
+    "Eventloop CPU/wall and nativeAPI CPU/wall separately; HCA planner-thread/wholewindow scopes remain distinct.",
+    "Future precommit/launch/pending counts and atomic/physical/source/THT/business audit status."
+  ],
+  "comparison_context": {
+    "2x_controlled_reference": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_2x_future60_minwait2_w1_fixed2_cap120_relax1_drain200000_013",
+    "1x_reference": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_1x_future60_minwait2_w1_fixed2_cap120_relax1_original98259_012",
+    "reference_scope": "1x currently uses012 historical fixed2; timing from a different implementation is labelled. Only after actual013 same-input fixed replay can its timing be treated as same-implementation baseline. Existing shared HCA and011w0future references remain contextual."
+  },
+  "timing_and_window": "2x runs200000 and derives98259 completion retrospectively;1x executes98259. No independent short runtime or unseen prefix parity is inferred for the adaptive arm.",
+  "stop_policy": "Root enforces user23:00 Asia/Shanghai checkpoint and exclusive heavy-slot scheduling. This plan starts no process. No map2 execution or scan.",
+  "validation": {
+    "new_controls_pass_frozen_adapter_validation": true,
+    "existing_sources_adapters_auditors_controls_modified": false,
+    "native_or_fullscan_executed": false
+  },
+  "revision": 2,
+  "supersedes": {
+    "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\variable_lookahead_013_001\\PREDECLARED_PLAN_001.json",
+    "sha256": "47a1b18455af31f9e9a37b612f8885a33470088a0bf0ad7b3a5a332a3b6198bf",
+    "scope": "Prerequisite tool v2 and actual successful full parity receipt binding only; controls/cells/hypotheses unchanged."
+  },
+  "revision_reason": "The original tool rejected runner-only candidate012-to-candidate013 identity names. Tool v2 permits that narrow identity change while strictly checking transformed source text; native/auditors/policy remain unchanged."
+}

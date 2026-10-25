@@ -1,0 +1,38 @@
+{
+  "schema": "g31.nowait.source_policy_audit.v1",
+  "passed": true,
+  "declared_source_fifo_order": "canonical",
+  "reference": "stable canonical raw pass_time, original row order for equal releases; never generated or activation order",
+  "source_generation_interval": 1,
+  "release_quantum": 1,
+  "segment_denominator": 43603,
+  "business_denominator": 28506,
+  "source_count": 12,
+  "attempted_segments": 43603,
+  "admitted_segments": 43603,
+  "unattempted_segments": 0,
+  "missing_segments": 0,
+  "missing_first_attempt_telemetry": 0,
+  "predecessor_pacing_checks": 43591,
+  "ebs_gate_checks": 15097,
+  "canonical_source_order_sha256": "0c557843f751b39b7def92a0bd5bfde99485e0c9c04ef4474cc775a6ff871fb2",
+  "violation_count": 0,
+  "violation_counts": {},
+  "violation_examples": [],
+  "boundaries": [
+    "Checks no early attempt/admission and no canonical overtaking; does not assert a head must start immediately.",
+    "Explicit unattempted future or blocked tasks remain in the full denominator and are legal unless bypassed.",
+    "EBS gate uses verified completed inbound continuous finish rounded to the source quantum and any supplied later actual report.",
+    "Resource safety and exact physical arrival are independent audits; this check is not an optimality or performance proof.",
+    "Future reservation retains the source head: pacing and predecessor release use actual admission, never reservation_time or planned_admission."
+  ],
+  "future_reservation_audit": {
+    "schema": "g31.nowait.future_metadata_audit.v1",
+    "passed": true,
+    "violation_count": 0,
+    "violation_counts": {},
+    "violation_examples": [],
+    "stats": {},
+    "boundary": "Initial reserved certificate is persistent provenance. Pending plans are not actual admissions, routes, finishes or completed observations."
+  }
+}

@@ -1,0 +1,122 @@
+{
+  "schema": "g31.hca.completed_window_summary.v1",
+  "cell": "map2_2x",
+  "horizon": 200000,
+  "completed_segments": 87206,
+  "segment_denominator": 87206,
+  "completed_businesses": 57012,
+  "business_denominator": 57012,
+  "all_completed_before_horizon": true,
+  "user_tht": {
+    "count": 57012,
+    "sum": 18335048.0,
+    "mean": 321.5998035501298,
+    "min": 242.0,
+    "p50": 323.0,
+    "p95": 395.5,
+    "p99": 463.5,
+    "max": 3284.5
+  },
+  "preplanning": {
+    "count": 57012,
+    "sum": 1592079321.426106,
+    "mean": 27925.33714702354,
+    "min": 9.999999747378752e-06,
+    "p50": 25450.65685,
+    "p95": 79625.57047549999,
+    "p99": 94053.9638326,
+    "max": 97982.01482
+  },
+  "planning_retry_wait": {
+    "count": 57012,
+    "sum": 283784.0,
+    "mean": 4.977618746930471,
+    "min": 0.0,
+    "p50": 1.0,
+    "p95": 15.0,
+    "p99": 58.0,
+    "max": 2966.0
+  },
+  "canonical_elapsed": {
+    "count": 57012,
+    "sum": 1610414369.426106,
+    "mean": 28246.93695057367,
+    "min": 244.92635000000155,
+    "p50": 25805.489999999998,
+    "p95": 79913.7401135,
+    "p99": 94382.4222044,
+    "max": 98342.02937999999
+  },
+  "network_elapsed": {
+    "count": 57012,
+    "sum": 18051264.0,
+    "mean": 316.62218480319933,
+    "min": 241.0,
+    "p50": 321.0,
+    "p95": 384.5,
+    "p99": 460.5,
+    "max": 466.5
+  },
+  "STD": {
+    "count": 19660,
+    "denominator": 57012,
+    "rate": 0.344839682873781
+  },
+  "STD_minus_2700": {
+    "count": 14941,
+    "denominator": 57012,
+    "rate": 0.26206763488388407
+  },
+  "last_continuous_goal_actual_finish": 119380.5,
+  "last_actual_goal_report": 119381.0,
+  "java_end_to_end_wall_seconds": 690.0773081000661,
+  "planning_profile": {
+    "schema": "g31.hca.planning_profile.v1",
+    "enabled": true,
+    "thread_cpu_available": true,
+    "thread_id": 1,
+    "search_success": 87206,
+    "search_failure": 283784,
+    "search_exceptions": 0,
+    "scopes_overlap_do_not_sum": true,
+    "cpu_scope": "Current planner thread total CPU; excludes other JVM/JIT/GC threads. Wall includes blocking and instrumentation overhead.",
+    "scopes": {
+      "window": {
+        "calls": 1,
+        "elapsed_ns": 689347677100,
+        "thread_cpu_ns": 657703125000
+      },
+      "astar_search": {
+        "calls": 370990,
+        "elapsed_ns": 5693729600,
+        "thread_cpu_ns": 2718750000
+      },
+      "controller_including_search_calendar_and_io": {
+        "calls": 191741,
+        "elapsed_ns": 211380243300,
+        "thread_cpu_ns": 216718750000
+      },
+      "generator_including_epoch_file_write_read": {
+        "calls": 191741,
+        "elapsed_ns": 468289268200,
+        "thread_cpu_ns": 434578125000
+      },
+      "calendar_prune": {
+        "calls": 191741,
+        "elapsed_ns": 1912414500,
+        "thread_cpu_ns": 1734375000
+      },
+      "calendar_commit": {
+        "calls": 87206,
+        "elapsed_ns": 801504900,
+        "thread_cpu_ns": 390625000
+      }
+    }
+  },
+  "whole_jvm_process_cpu_seconds": null,
+  "cpu_scope_note": "Profile CPU is current planner thread only, including kernel+user but excluding other JVM threads; scopes overlap. No whole-JVM process CPU was measured.",
+  "source_policy_passed": true,
+  "physical_passed": true,
+  "frozen_inputs_and_classes_postrun_exact": true,
+  "posthoc_source_and_tht_wall_seconds": 11.294677800033242
+}

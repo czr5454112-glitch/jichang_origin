@@ -1,0 +1,53 @@
+--- frozen013/continuous_adapter.py
++++ candidate014/continuous_adapter.py
+@@ -1,4 +1,4 @@
+-"""Isolated candidate013 runner derived from the official continuous adapter.
++"""Isolated candidate014 runner derived from the official continuous adapter.
+ 
+ The registered model uses local next-hop scoring and a complete continuation
+ certificate. Registration is not a performance promotion or distributed-network
+@@ -28,7 +28,7 @@
+              enable_ebs_predecessor_gate=True,release_quantum=1.0,completion_quantum=1.0,
+              source_fifo=True,source_generation_interval=1.0,source_fifo_order="canonical")
+ DEFAULT_CONTROLS = dict(end_time=98259.0,min_depth=1,max_depth=4,adaptive=True,
+-    congestion_weight=1.0,pressure_window=30.0,max_expansions=256,max_score_expansions=64,
++    congestion_weight=1.0,pressure_window=30.0,pressure_signal="union_occupied",max_expansions=256,max_score_expansions=64,
+     max_retries=100000,max_events=10000000,retry_mode="calendar_jump",retry_step=1.0,
+     audit_failed_calendar_hash=False,skip_scoring_single_choice=True,route_excess_retry_relaxation_rate=0.0,
+     future_source_reservation_horizon_seconds=0,future_source_reservation_min_wait_seconds=2.0,**FIXED)
+@@ -79,7 +79,7 @@
+             if type(value) is not int: raise ValueError(key+" must be an integer")
+         elif key in booleans:
+             if type(value) is not bool: raise ValueError(key+" must be a boolean")
+-        elif key not in ("interval_mode","retry_mode","source_fifo_order"):
++        elif key not in ("interval_mode","retry_mode","source_fifo_order","pressure_signal"):
+             if isinstance(value,bool) or not isinstance(value,(int,float)) or not math.isfinite(value) or value<0:
+                 raise ValueError(key+" must be finite and nonnegative")
+     if not 1<=controls["min_depth"]<=controls["max_depth"]<=32: raise ValueError("invalid observation depth")
+@@ -90,11 +90,16 @@
+         raise ValueError("retry cap relaxation requires a finite base route excess")
+     if controls["retry_mode"] not in ("calendar_jump","futurecalendar_jump","1s","fixed_step"):
+         raise ValueError("unknown retry mode")
++    signal=controls["pressure_signal"]
++    if type(signal) is not str or signal not in ("union_occupied","slot_loss"):
++        raise ValueError("pressure_signal must be union_occupied or slot_loss")
++    if signal=="slot_loss" and controls["pressure_window"]!=30:
++        raise ValueError("slot_loss requires unchanged 30-second pressure window")
+     future=controls["future_source_reservation_horizon_seconds"]
+     if not 0<=future<=60:
+         raise ValueError("future reservation horizon must be an integer in [0,60]")
+     if future and controls["congestion_weight"] not in (0,1):
+-        raise ValueError("candidate013 future reservations support only congestion weight 0 or 1")
++        raise ValueError("candidate014 future reservations support only congestion weight 0 or 1")
+     return controls
+ 
+ 
+@@ -241,7 +246,7 @@
+ def verified_auditors(source_dir):
+     """Load the frozen audit package, checking every live source against it."""
+     names=("headway_audit","future_metadata","rolling_replay","tht_metrics","source_policy_audit")
+-    package_name="g31_candidate013_auditors_"+hashlib.sha256(str(source_dir.resolve()).encode()).hexdigest()[:16]
++    package_name="g31_candidate014_auditors_"+hashlib.sha256(str(source_dir.resolve()).encode()).hexdigest()[:16]
+     package=types.ModuleType(package_name)
+     package.__path__=[str(source_dir)]
+     sys.modules[package_name]=package

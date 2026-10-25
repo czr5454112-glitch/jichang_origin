@@ -1,0 +1,94 @@
+--- frozen013/core.cpp
++++ candidate014/core.cpp
+@@ -58,6 +58,7 @@
+     std::string source_fifo_order = "activation";
+     double congestion_weight = 1.0;
+     double pressure_window = 30.0;
++    std::string pressure_signal = "union_occupied";
+     int max_expansions = 256, max_score_expansions = 256;
+     int max_retries = 10000;
+     std::uint64_t max_events = 10000000;
+@@ -191,7 +192,7 @@
+         "interval_mode","strict_endpoint_resources","edge_entry_headway_seconds","skip_scoring_single_choice",
+         "enable_inroute_replanning","time_grid_seconds","max_route_excess_seconds","source_fifo_order",
+         "route_excess_retry_relaxation_rate","future_source_reservation_horizon_seconds",
+-        "future_source_reservation_min_wait_seconds"};
++        "future_source_reservation_min_wait_seconds","pressure_signal"};
+     for (auto item : d) if (!allowed.count(py::cast<std::string>(item.first)))
+         throw std::invalid_argument("unknown config key: "+py::cast<std::string>(item.first));
+ #define READ_OPTION(name) if (d.contains(#name)) c.name = py::cast<decltype(c.name)>(d[#name]);
+@@ -208,6 +209,11 @@
+     READ_OPTION(source_fifo_order)
+     READ_OPTION(route_excess_retry_relaxation_rate)
+     READ_OPTION(future_source_reservation_min_wait_seconds)
++    if (d.contains("pressure_signal")) {
++        if (!PyUnicode_Check(d["pressure_signal"].ptr()))
++            throw std::invalid_argument("pressure_signal must be a string");
++        c.pressure_signal=py::cast<std::string>(d["pressure_signal"]);
++    }
+     if (d.contains("future_source_reservation_horizon_seconds")) {
+         const auto value=d["future_source_reservation_horizon_seconds"];
+         if (!PyLong_Check(value.ptr()) || PyBool_Check(value.ptr()))
+@@ -215,6 +221,12 @@
+         c.future_source_reservation_horizon_seconds=py::cast<int>(value);
+     }
+ #undef READ_OPTION
++    if (c.pressure_signal!="union_occupied" && c.pressure_signal!="slot_loss")
++        throw std::invalid_argument("pressure_signal must be union_occupied or slot_loss");
++    if (c.pressure_signal=="slot_loss" &&
++        (c.interval_mode!="half_open" || !c.strict_endpoint_resources ||
++         c.edge_entry_headway_seconds!=2.0 || c.pressure_window!=30.0))
++        throw std::invalid_argument("slot_loss requires strict half-open fixed2 resources and a 30-second pressure window");
+     finite_nonnegative(c.end_time,"end_time");
+     finite_nonnegative(c.congestion_weight,"congestion_weight");
+     finite_nonnegative(c.pressure_window,"pressure_window");
+@@ -432,8 +444,28 @@
+         }
+         return std::max(1,std::min(selected,gd.hops[node]+1));
+     }
++    // Single-resource packing proxy only. It never grants a later arrival,
++    // changes a certificate, or permits waiting inside the network.
++    double slot_loss_seconds(int node,double arrival,int ignore_owner) const {
++        const auto start=tick(arrival),until=tick(add_time(arrival,cfg.pressure_window));
++        constexpr std::int64_t duration=2000000;
++        std::int64_t cursor=start,slots=0;
++        const auto& calendar=calendars[node];
++        auto it=calendar.lower_bound(seconds(std::max<std::int64_t>(0,start-duration)));
++        for (;it!=calendar.end() && tick(it->first)<until;++it) {
++            if (it->second.task==ignore_owner) continue;
++            const auto left=std::max(start,tick(it->first));
++            const auto end=std::min(until,tick(it->second.end));
++            if (end<=left) continue;
++            if (left>cursor) {slots+=(left-cursor)/duration;cursor=left;}
++            if (end>cursor) cursor=end;
++        }
++        if (cursor<until) slots+=(until-cursor)/duration;
++        return seconds(duration*(15-slots));
++    }
+     double pressure_seconds(int node,double arrival,int ignore_owner=-1) const {
+         if (cfg.pressure_window==0 || nodes[node].service==0) return 0;
++        if (cfg.pressure_signal=="slot_loss") return slot_loss_seconds(node,arrival,ignore_owner);
+         const double until=add_time(arrival,cfg.pressure_window);
+         double occupied=0, union_start=0, union_end=0;
+         bool open=false;
+@@ -1134,6 +1166,8 @@
+             && std::all_of(nodes.begin(),nodes.end(),[](const Node& n) {
+                 return n.service==0.0 || n.service==2.0;
+             });
++        if (cfg.pressure_signal=="slot_loss" && !fixed_two_second_calendars)
++            throw std::invalid_argument("slot_loss requires all node services to be zero or exactly 2 seconds");
+         if (cfg.enable_ebs_predecessor_gate) {
+             std::map<std::int64_t,int> inbound,outbound;
+             for (std::size_t i=0;i<tasks.size();++i) {
+@@ -1398,6 +1432,11 @@
+         contract["score_budget_scope"]="max_score_expansions per current-node local ranking; max_expansions per full DFS attempt";
+         contract["route_decisions_columns"]=py::make_tuple("node","requested_k","actual_calendar_query_depth","local_score_queries","score_budget_exhausted");
+         contract["congestion_signal"]="exact-window blocking delay proxy plus union seconds of active reservations in the future pressure_window; ranking only, no internal waiting";
++        if (cfg.pressure_signal=="slot_loss") {
++            contract["pressure_signal"]="slot_loss";
++            contract["congestion_signal"]="unchanged exact-window blocking delay proxy plus 2*(15-sum floor(free_gap_us/2000000)) over the next 30 seconds; confirmed node rights including pending future owners, ignoring only self; ranking only, no internal waiting";
++            contract["slot_pressure_boundary"]="Single-node integer-us packing proxy, not whole-route feasible starts, source-q1 capacity, fairness or throughput guarantee. Zero-service node pressure remains zero; edge pressure is unchanged.";
++        }
+         contract["source_generation"]="precomputed eligibility uses stable nominal order and source interval; source_fifo additionally paces successful admissions by that interval; no early release; not an exact reproduction of Java generation/comparator quirks";
+         contract["source_fifo_order"]=cfg.source_fifo_order;
+         contract["canonical_source_order"]="when explicitly enabled: stable original nominal release order, input row order for ties; an unreleased or predecessor-blocked head blocks every later source item, activation does not append/reorder";

@@ -1,0 +1,1024 @@
+{
+  "schema": "g31.candidate021.nanning1x.actual_small_comparison.v1",
+  "status": "complete_small_comparison",
+  "passed": true,
+  "runs": [
+    {
+      "label": "021_gap_alignment_1x",
+      "kind": "native",
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_1x_future60_minwait2_w0_fixed1_gap_alignment_original98259_021",
+      "status": "complete",
+      "metrics": {
+        "business_denominator": 28506,
+        "segment_denominator": 43603,
+        "completed_businesses": 28506,
+        "completed_segments": 43603,
+        "full_population_available": true,
+        "user_tht": {
+          "status": "available",
+          "count": 28506,
+          "sum": 10493452.175000004,
+          "mean": 368.1138067424403,
+          "min": 59.0,
+          "p50": 404.9250000000029,
+          "p95": 599.5587499999992,
+          "p99": 677.8839999999996,
+          "max": 1623.7850000000035
+        },
+        "preplanning": {
+          "status": "available",
+          "count": 28506,
+          "sum": 22236324.213053,
+          "mean": 780.0576795430085,
+          "min": 0.0,
+          "p50": 133.03992500000095,
+          "p95": 4338.852957499999,
+          "p99": 6709.42425400001,
+          "max": 10929.02115
+        },
+        "planning_retry_wait": {
+          "status": "available",
+          "count": 28506,
+          "sum": 270018.0,
+          "mean": 9.47232161650179,
+          "min": 0.0,
+          "p50": 2.0,
+          "p95": 44.0,
+          "p99": 85.0,
+          "max": 1052.0
+        },
+        "canonical_elapsed": {
+          "status": "available",
+          "count": 28506,
+          "sum": 32729776.388053004,
+          "mean": 1148.1714862854487,
+          "min": 59.0147300000026,
+          "p50": 583.6314849999981,
+          "p95": 4804.348975,
+          "p99": 7165.7763650000115,
+          "max": 11462.73615
+        },
+        "network_elapsed": {
+          "status": "available",
+          "count": 28506,
+          "sum": 10223434.175000004,
+          "mean": 358.6414851259386,
+          "min": 59.0,
+          "p50": 391.4400000000023,
+          "p95": 586.1299999999983,
+          "p99": 654.6547499999988,
+          "max": 825.4700000000012
+        },
+        "original_window_end": 98259.0,
+        "original_window_completed_businesses": 28506,
+        "original_window_unfinished_businesses": 0,
+        "original_window_source": "All transport legs completed; final actual goal arrival at or before the common original cutoff. Derived from this run, not a separate short execution.",
+        "original_window_state_split": null,
+        "original_window_state_split_status": "not_computed_from_small_summaries",
+        "STD": {
+          "count": 25579,
+          "denominator": 28506,
+          "rate": 0.8973198624850909,
+          "status": "available"
+        },
+        "STD_minus_2700": {
+          "count": 10786,
+          "denominator": 28506,
+          "rate": 0.37837648214411,
+          "status": "available"
+        },
+        "activation_to_first_planning": {
+          "status": "available",
+          "count": 28506,
+          "sum": 20772447.0,
+          "mean": 728.7043780256788,
+          "min": 0.0,
+          "p50": 95.0,
+          "p95": 4260.75,
+          "p99": 6339.950000000001,
+          "max": 9371.0
+        },
+        "canonical_to_activation": {
+          "status": "available",
+          "count": 28506,
+          "sum": 1463877.2130530002,
+          "mean": 51.35330151732969,
+          "min": 0.0,
+          "p50": 5.228035000000091,
+          "p95": 157.953524999999,
+          "p99": 441.3168674999972,
+          "max": 4469.0211500000005
+        },
+        "supplemental_ready_mean_derived": {
+          "status": "derived_from_full_population_sums_not_new_bag_scan",
+          "count": 28506,
+          "sum": 31265899.175000004,
+          "mean": 1096.8181847681192,
+          "p95": null,
+          "p99": null,
+          "max": null,
+          "definition": "sum per business of actual finish minus actual source activation = primary THT + activation-to-first-attempt; unchanged native activation contract corresponds to common nominal-feed/causal readiness, but no new per-bag G/activation equality check is made here.",
+          "tail_reason": "Quantiles/max of sums cannot be obtained by adding component quantiles/max."
+        }
+      },
+      "audit_gates": {
+        "headway": {
+          "status": "passed",
+          "passed": true,
+          "source": "headway_audit.json"
+        },
+        "rolling": {
+          "status": "passed",
+          "passed": true,
+          "source": "rolling_replay.json"
+        },
+        "source_policy": {
+          "status": "passed",
+          "passed": true,
+          "source": "source_policy_audit.json"
+        },
+        "tht": {
+          "status": "passed",
+          "passed": true,
+          "source": "tht_audit.json"
+        },
+        "business": {
+          "status": "passed",
+          "passed": true,
+          "source": "business_audit.json"
+        }
+      },
+      "all_five_passed": true,
+      "identity_issues": [],
+      "usable_reported_result": true,
+      "controls": {
+        "end_time": 98259,
+        "min_depth": 1,
+        "max_depth": 1,
+        "adaptive": false,
+        "congestion_weight": 0,
+        "pressure_window": 30,
+        "max_expansions": 256,
+        "max_score_expansions": 64,
+        "max_retries": 100000,
+        "max_events": 10000000,
+        "retry_mode": "calendar_jump",
+        "retry_step": 1.0,
+        "audit_failed_calendar_hash": false,
+        "skip_scoring_single_choice": true,
+        "route_excess_retry_relaxation_rate": 1,
+        "future_source_reservation_horizon_seconds": 60,
+        "future_source_reservation_min_wait_seconds": 2,
+        "enable_future_mask_diagnostics": false,
+        "enable_future_gap_alignment": true,
+        "interval_mode": "half_open",
+        "strict_endpoint_resources": true,
+        "edge_entry_headway_seconds": 2,
+        "time_grid_seconds": 1e-06,
+        "terminal_reservation_service": true,
+        "enable_inroute_replanning": true,
+        "enable_ebs_predecessor_gate": true,
+        "release_quantum": 1,
+        "completion_quantum": 1,
+        "source_fifo": true,
+        "source_generation_interval": 1,
+        "source_fifo_order": "canonical",
+        "max_route_excess_seconds": 120
+      },
+      "identity": {
+        "binary": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build\\g31_no_wait_021\\python\\g31_nowait.cp311-win_amd64.pyd",
+          "sha256": "6eace633a8eed650a0c84fceae7a9aff0e1686f43e4d290b9b78f3e42c8c3a96",
+          "bytes": 365568
+        },
+        "native_source": {
+          "path": "build\\g31_no_wait_021\\source\\core.cpp",
+          "bytes": 121738,
+          "sha256": "bde93a263eada8844136662a2308908db15624d4a4d0de4f5dd99262e3f9a2e2"
+        },
+        "canonical": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\g31_continuous\\nanning_1x_canonical.jsonl.gz",
+          "sha256": "3f2cc8d8e5e2934e2568b299d2d3321eec07f1f47e5fa0750537993eaee1340d",
+          "bytes": 1117468
+        },
+        "profile": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\g31_continuous\\nanning_service2.json",
+          "sha256": "9b1a78344ec89aaac377feb05afccd48d9b957174286b29eedfe57a73a93c426",
+          "bytes": 714420
+        },
+        "build_receipt": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build\\g31_no_wait_021\\build_receipt.json",
+          "sha256": "2a1500b96bd6e12e7bda8a934e16a68c184a0d70705f61e0a2ca68d951a49286",
+          "bytes": 865
+        }
+      },
+      "compute": {
+        "native_event_loop_cpu_seconds": 2.9375,
+        "native_event_loop_wall_seconds": 3.0268106,
+        "native_api_process_cpu_seconds": 6.875,
+        "native_api_wall_seconds": 7.118262500036508,
+        "end_to_end_wall_seconds": null,
+        "source_decision_wall_seconds": 1.8001168000000043,
+        "inroute_decision_wall_seconds": 0.5934163999999394,
+        "scope": "Windows GetProcessTimes kernel+user; std::clock on non-Windows; event loop only",
+        "end_to_end_status": "not_measured_in_available_small_summary"
+      },
+      "telemetry": {
+        "planning_attempts": 129188,
+        "failed_attempts": 90330,
+        "search_expansions": 2099365,
+        "score_expansions": 0,
+        "local_scoring_calendar_queries": 0,
+        "search_decision_k_histogram": {
+          "1": 2200028
+        },
+        "search_actual_calendar_query_depth_histogram": {
+          "0": 2200028
+        },
+        "committed_route_hop_k_histogram": {
+          "1": 533764
+        },
+        "max_observation_depth": 1,
+        "scored_neighbor_candidates": 3780928,
+        "local_score_budget_exhausted_decisions": 0,
+        "score_budget_exhaustions": 0,
+        "search_budget_failures": 1736,
+        "inroute_decisions": 537587,
+        "inroute_replacement_attempts": 19717,
+        "inroute_replacement_successes": 0,
+        "inroute_fallbacks": 19717,
+        "inroute_search_expansions": 133219,
+        "inroute_scoring_queries": 0,
+        "future_source_precommits": 4745,
+        "future_source_pending_at_horizon": 0,
+        "future_calendar_entries_scanned": 3223676
+      },
+      "future_work": {
+        "future_source_eligible_failures": 15891,
+        "future_source_searches": 15891,
+        "future_source_precommits": 4745,
+        "future_source_launches": 4745,
+        "future_source_pending_at_horizon": 0,
+        "future_chain_nodes": 200286,
+        "future_calendar_queries": 360115,
+        "future_calendar_entries_scanned": 3223676,
+        "future_validation_queries": 91513,
+        "future_mask_empty": 11146,
+        "future_chain_rejections": 0
+      },
+      "original_window_evidence": {
+        "end_time": 98259,
+        "original_cutoff_count_kind": "actual_original_window_run",
+        "full_population_completion_certified": true,
+        "short_drain_prefix_proved": false,
+        "full_population_metric_policy": "available only if all original businesses complete and all first-attempt clocks are present; otherwise null, never completed-only fallback"
+      }
+    },
+    {
+      "label": "historical010c_w0future60min2_1x",
+      "kind": "native",
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_1x_future60_cap120_relax1_010c",
+      "status": "complete",
+      "metrics": {
+        "business_denominator": 28506,
+        "segment_denominator": 43603,
+        "completed_businesses": 28506,
+        "completed_segments": 43603,
+        "full_population_available": true,
+        "user_tht": {
+          "status": "available",
+          "count": 28506,
+          "sum": 10483210.145000003,
+          "mean": 367.754512909563,
+          "min": 59.0,
+          "p50": 403.8874999999989,
+          "p95": 598.583749999998,
+          "p99": 670.4455000000017,
+          "max": 1864.5849999999991
+        },
+        "preplanning": {
+          "status": "available",
+          "count": 28506,
+          "sum": 22521042.213053,
+          "mean": 790.0456820687925,
+          "min": 0.0,
+          "p50": 132.2252799999951,
+          "p95": 4366.33744,
+          "p99": 6734.756673000002,
+          "max": 11022.02115
+        },
+        "planning_retry_wait": {
+          "status": "available",
+          "count": 28506,
+          "sum": 270406.0,
+          "mean": 9.485932786080124,
+          "min": 0.0,
+          "p50": 2.0,
+          "p95": 45.0,
+          "p99": 84.0,
+          "max": 1286.0
+        },
+        "canonical_elapsed": {
+          "status": "available",
+          "count": 28506,
+          "sum": 33004252.358053003,
+          "mean": 1157.8001949783554,
+          "min": 59.0147300000026,
+          "p50": 582.7771850000008,
+          "p95": 4827.5632125,
+          "p99": 7151.662877500009,
+          "max": 11552.73615
+        },
+        "network_elapsed": {
+          "status": "available",
+          "count": 28506,
+          "sum": 10212804.145000003,
+          "mean": 358.2685801234829,
+          "min": 59.0,
+          "p50": 390.8899999999994,
+          "p95": 583.8400000000038,
+          "p99": 649.3907499999989,
+          "max": 815.6200000000026
+        },
+        "original_window_end": 98259.0,
+        "original_window_completed_businesses": 28506,
+        "original_window_unfinished_businesses": 0,
+        "original_window_source": "All transport legs completed; final actual goal arrival at or before the common original cutoff. Derived from this run, not a separate short execution.",
+        "original_window_state_split": null,
+        "original_window_state_split_status": "not_computed_from_small_summaries",
+        "STD": {
+          "count": 25501,
+          "denominator": 28506,
+          "rate": 0.8945835964358381,
+          "status": "available"
+        },
+        "STD_minus_2700": {
+          "count": 10725,
+          "denominator": 28506,
+          "rate": 0.3762365817722585,
+          "status": "available"
+        },
+        "activation_to_first_planning": {
+          "status": "available",
+          "count": 28506,
+          "sum": 21056282.0,
+          "mean": 738.661404616572,
+          "min": 0.0,
+          "p50": 94.0,
+          "p95": 4286.75,
+          "p99": 6375.850000000002,
+          "max": 9462.0
+        },
+        "canonical_to_activation": {
+          "status": "available",
+          "count": 28506,
+          "sum": 1464760.2130530002,
+          "mean": 51.384277452220594,
+          "min": 0.0,
+          "p50": 5.228035000000091,
+          "p95": 157.02303250000296,
+          "p99": 353.5782840000094,
+          "max": 4514.0211500000005
+        },
+        "supplemental_ready_mean_derived": {
+          "status": "derived_from_full_population_sums_not_new_bag_scan",
+          "count": 28506,
+          "sum": 31539492.145000003,
+          "mean": 1106.415917526135,
+          "p95": null,
+          "p99": null,
+          "max": null,
+          "definition": "sum per business of actual finish minus actual source activation = primary THT + activation-to-first-attempt; unchanged native activation contract corresponds to common nominal-feed/causal readiness, but no new per-bag G/activation equality check is made here.",
+          "tail_reason": "Quantiles/max of sums cannot be obtained by adding component quantiles/max."
+        }
+      },
+      "audit_gates": {
+        "headway": {
+          "status": "passed",
+          "passed": true,
+          "source": "headway_audit.json"
+        },
+        "rolling": {
+          "status": "passed",
+          "passed": true,
+          "source": "rolling_replay.json"
+        },
+        "source_policy": {
+          "status": "passed",
+          "passed": true,
+          "source": "source_policy_audit.json"
+        },
+        "tht": {
+          "status": "passed",
+          "passed": true,
+          "source": "tht_audit.json"
+        },
+        "business": {
+          "status": "passed",
+          "passed": true,
+          "source": "business_audit.json"
+        }
+      },
+      "all_five_passed": true,
+      "identity_issues": [],
+      "usable_reported_result": true,
+      "controls": {
+        "end_time": 98259,
+        "min_depth": 1,
+        "max_depth": 1,
+        "adaptive": false,
+        "congestion_weight": 0,
+        "pressure_window": 30,
+        "max_expansions": 256,
+        "max_score_expansions": 64,
+        "max_retries": 100000,
+        "max_events": 10000000,
+        "retry_mode": "calendar_jump",
+        "retry_step": 1.0,
+        "audit_failed_calendar_hash": false,
+        "skip_scoring_single_choice": true,
+        "route_excess_retry_relaxation_rate": 1,
+        "future_source_reservation_horizon_seconds": 60,
+        "future_source_reservation_min_wait_seconds": 2,
+        "interval_mode": "half_open",
+        "strict_endpoint_resources": true,
+        "edge_entry_headway_seconds": 2,
+        "time_grid_seconds": 1e-06,
+        "terminal_reservation_service": true,
+        "enable_inroute_replanning": true,
+        "enable_ebs_predecessor_gate": true,
+        "release_quantum": 1,
+        "completion_quantum": 1,
+        "source_fifo": true,
+        "source_generation_interval": 1,
+        "source_fifo_order": "canonical",
+        "max_route_excess_seconds": 120
+      },
+      "identity": {
+        "binary": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build\\g31_no_wait_010c\\python\\g31_nowait.cp311-win_amd64.pyd",
+          "sha256": "493ffb54331e6f0010b1fea524a64d74d1fe8d04896f1d2e6927d92628c5c0f5",
+          "bytes": 338432
+        },
+        "native_source": {
+          "path": "build\\g31_no_wait_010c\\source\\core.cpp",
+          "bytes": 96188,
+          "sha256": "01e3289e7934ae164fd0014c34878657027cff7811186384080cf885d68523e3"
+        },
+        "canonical": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\g31_continuous\\nanning_1x_canonical.jsonl.gz",
+          "sha256": "3f2cc8d8e5e2934e2568b299d2d3321eec07f1f47e5fa0750537993eaee1340d",
+          "bytes": 1117468
+        },
+        "profile": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\data\\processed\\g31_continuous\\nanning_service2.json",
+          "sha256": "9b1a78344ec89aaac377feb05afccd48d9b957174286b29eedfe57a73a93c426",
+          "bytes": 714420
+        },
+        "build_receipt": {
+          "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\build\\g31_no_wait_010c\\build_receipt.json",
+          "sha256": "39e0105221aae2c6a30742f8597c7d1f927da8378ec61c93ed7ec7887182263f",
+          "bytes": 866
+        }
+      },
+      "compute": {
+        "native_event_loop_cpu_seconds": 5.828125,
+        "native_event_loop_wall_seconds": 6.1154035,
+        "native_api_process_cpu_seconds": 10.796875,
+        "native_api_wall_seconds": 11.257363999960944,
+        "end_to_end_wall_seconds": null,
+        "source_decision_wall_seconds": 4.517228400000042,
+        "inroute_decision_wall_seconds": 0.8762567000000335,
+        "scope": "Windows GetProcessTimes kernel+user; std::clock on non-Windows; event loop only",
+        "end_to_end_status": "not_measured_in_available_small_summary"
+      },
+      "telemetry": {
+        "planning_attempts": 128825,
+        "failed_attempts": 89997,
+        "search_expansions": 2115520,
+        "score_expansions": 0,
+        "local_scoring_calendar_queries": 0,
+        "search_decision_k_histogram": {
+          "1": 2214320
+        },
+        "search_actual_calendar_query_depth_histogram": {
+          "0": 2214320
+        },
+        "committed_route_hop_k_histogram": {
+          "1": 533423
+        },
+        "max_observation_depth": 1,
+        "scored_neighbor_candidates": 3800032,
+        "local_score_budget_exhausted_decisions": 0,
+        "score_budget_exhaustions": 0,
+        "search_budget_failures": 1828,
+        "inroute_decisions": 537445,
+        "inroute_replacement_attempts": 19906,
+        "inroute_replacement_successes": 0,
+        "inroute_fallbacks": 19906,
+        "inroute_search_expansions": 137385,
+        "inroute_scoring_queries": 0,
+        "future_source_precommits": 4775,
+        "future_source_pending_at_horizon": 0,
+        "future_calendar_entries_scanned": 15880427
+      },
+      "future_work": {
+        "future_source_eligible_failures": 16014,
+        "future_source_searches": 16014,
+        "future_source_precommits": 4775,
+        "future_source_launches": 4775,
+        "future_source_pending_at_horizon": 0,
+        "future_chain_nodes": 203173,
+        "future_calendar_queries": 365464,
+        "future_calendar_entries_scanned": 15880427,
+        "future_validation_queries": 91859,
+        "future_mask_empty": 11239,
+        "future_chain_rejections": 0
+      },
+      "original_window_evidence": {
+        "end_time": 98259,
+        "original_cutoff_count_kind": "actual_original_window_run",
+        "full_population_completion_certified": true,
+        "short_drain_prefix_proved": false,
+        "full_population_metric_policy": "available only if all original businesses complete and all first-attempt clocks are present; otherwise null, never completed-only fallback"
+      }
+    },
+    {
+      "label": "HCA_repaired_1x",
+      "kind": "hca",
+      "status": "complete",
+      "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_repaired_uniform_headway2_002\\nanning_1x",
+      "metrics": {
+        "business_denominator": 28506,
+        "segment_denominator": 43603,
+        "completed_businesses": 28506,
+        "completed_segments": 43603,
+        "full_population_available": true,
+        "original_window_end": 98259,
+        "original_window_completed_businesses": 28506,
+        "original_window_unfinished_businesses": 0,
+        "original_window_source": "Previously audited actual original-window HCA run; reused small comparison receipt, no bag rescan.",
+        "STD": {
+          "count": 22224,
+          "denominator": 28506,
+          "rate": 0.7796253420332562,
+          "status": "available"
+        },
+        "STD_minus_2700": {
+          "count": 10666,
+          "denominator": 28506,
+          "rate": 0.3741668420683365,
+          "status": "available"
+        },
+        "user_tht": {
+          "status": "available",
+          "count": 28506,
+          "sum": 13391995.745000001,
+          "mean": 469.795683189504,
+          "min": 59.0,
+          "p50": 471.22000000000116,
+          "p95": 822.3425000000007,
+          "p99": 988.2859999999995,
+          "max": 2959.5149999999994
+        },
+        "preplanning": {
+          "status": "available",
+          "count": 28506,
+          "sum": 39243360.213053,
+          "mean": 1376.6701821740337,
+          "min": 0.0,
+          "p50": 116.06606500000271,
+          "p95": 6238.273327499997,
+          "p99": 10169.89358700001,
+          "max": 14926.79782
+        },
+        "planning_retry_wait": {
+          "status": "available",
+          "count": 28506,
+          "sum": 187274.0,
+          "mean": 6.569634462920087,
+          "min": 0.0,
+          "p50": 1.0,
+          "p95": 20.0,
+          "p99": 76.0,
+          "max": 2724.0
+        },
+        "canonical_elapsed": {
+          "status": "available",
+          "count": 28506,
+          "sum": 52635355.958053,
+          "mean": 1846.4658653635374,
+          "min": 59.0147300000026,
+          "p50": 684.6884999999966,
+          "p95": 6881.266304999998,
+          "p99": 10660.580568500012,
+          "max": 15625.21282
+        },
+        "network_elapsed": {
+          "status": "available",
+          "count": 28506,
+          "sum": 13204721.745000001,
+          "mean": 463.22604872658394,
+          "min": 59.0,
+          "p50": 465.24000000000524,
+          "p95": 813.0550000000003,
+          "p99": 976.8037500000033,
+          "max": 1407.234999999997
+        }
+      },
+      "usable_reported_result": true,
+      "audit_gates": {
+        "physical_headway": {
+          "status": "passed",
+          "passed": true
+        },
+        "annotation_original_fields_exact": {
+          "status": "passed",
+          "passed": true
+        },
+        "causal_ebs": {
+          "status": "passed",
+          "passed": true
+        },
+        "recomputed_tht": {
+          "status": "passed",
+          "passed": true
+        },
+        "recomputed_source_policy": {
+          "status": "passed",
+          "passed": true
+        }
+      },
+      "prior_audited_reference": {
+        "path": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\current_comparison_005_003\\comparison.json",
+        "run_id": "hca_repaired_uniform_headway2_002__nanning_1x",
+        "source_hashes_from_prior_receipt": {
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_repaired_uniform_headway2_002\\manifest.json": {
+            "sha256": "c51e51eaa1e9d5a7b184f5028324204ab0131f395d82f898c114eb4658c1f368",
+            "bytes": 19366
+          },
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_uniform_headway2_002\\manifest.json": {
+            "sha256": "2adc785c2b6fd2fd18e054bbf52d94ad6623173bfe7bb9d37b6330004e0c7bc2",
+            "bytes": 9022
+          },
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_uniform_headway2_002\\SOURCE_FREEZE.json": {
+            "sha256": "8e89758d3c4d4383247e8b153d0240cca6704edc8133f893ea6cc59af2f08885",
+            "bytes": 7273
+          },
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_repaired_uniform_headway2_002\\nanning_1x\\run_01\\run_status.json": {
+            "sha256": "3a2bb91bddd641f7fb1a259e92e21c5a9addbc55046da7dcd1d8283f9b6af7a7",
+            "bytes": 2118
+          },
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_repaired_uniform_headway2_002\\nanning_1x\\annotated_physical_bags_receipt.json": {
+            "sha256": "194f11cf3ab84d851bd738cb5af07bb7dec7927375d703aaf57fdfa61cc6fa03",
+            "bytes": 999
+          },
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_repaired_uniform_headway2_002\\nanning_1x\\continuous_analysis.json": {
+            "sha256": "3d015e9b9b2ef283891503af9c53266ff93389c4eabc360a66abe8524f1c06b6",
+            "bytes": 13995134
+          },
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_repaired_uniform_headway2_002\\nanning_1x\\physical_headway_audit.json": {
+            "sha256": "7d0da9ad5ae602a57cac6c46351b2215df6c38f9061e9964c3ace7d56ee91f0a",
+            "bytes": 31022
+          },
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_repaired_uniform_headway2_002\\nanning_1x\\annotated_physical_bags.jsonl": {
+            "sha256": "7eb852b7b8ba62e413b710848fa991ad6ec98510e1e362913b1211aacde82c3d",
+            "bytes": 43307524
+          }
+        },
+        "note": "Hashes are retained prior evidence, not rescanned large files."
+      },
+      "compute": {
+        "end_to_end_wall_seconds": 451.0903057999676,
+        "astar_thread_cpu_seconds": null,
+        "astar_wall_seconds": null,
+        "java_window_thread_cpu_seconds": null,
+        "java_window_wall_seconds": null,
+        "whole_process_cpu_seconds": null,
+        "scope": "Java whole-run wall includes per-epoch I/O; optional explicit A* profiling has a narrower scope."
+      },
+      "telemetry": {
+        "status": "not_exported_in_this_historical_small_summary"
+      },
+      "scale": 1,
+      "arm": "HCA_repaired",
+      "implementation": "HCA002",
+      "original_window_evidence": {
+        "end_time": 98259,
+        "original_cutoff_count_kind": "actual_original_window_run",
+        "full_population_completion_certified": true,
+        "short_drain_prefix_proved": false,
+        "full_population_metric_policy": "available only if all original businesses complete and all first-attempt clocks are present; otherwise null, never completed-only fallback"
+      },
+      "reference_revalidation": {
+        "small_files_refreshed": [
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_repaired_uniform_headway2_002\\manifest.json",
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_uniform_headway2_002\\manifest.json",
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_uniform_headway2_002\\SOURCE_FREEZE.json",
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_repaired_uniform_headway2_002\\nanning_1x\\run_01\\run_status.json",
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_repaired_uniform_headway2_002\\nanning_1x\\annotated_physical_bags_receipt.json",
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_repaired_uniform_headway2_002\\nanning_1x\\physical_headway_audit.json"
+        ],
+        "large_file_identity_retained_without_rescan": [
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_repaired_uniform_headway2_002\\nanning_1x\\continuous_analysis.json",
+          "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_repaired_uniform_headway2_002\\nanning_1x\\annotated_physical_bags.jsonl"
+        ]
+      }
+    }
+  ],
+  "comparisons": [
+    {
+      "label": "0211x versus historical010c1x; different compiled implementation",
+      "new": "021_gap_alignment_1x",
+      "reference": "historical010c_w0future60min2_1x",
+      "inputs_usable": true,
+      "metrics": {
+        "tht_mean": {
+          "delta": 0.359293832877313,
+          "percent": 0.09769936744886917,
+          "status": "available"
+        },
+        "tht_p95": {
+          "delta": 0.9750000000012733,
+          "percent": 0.1628844752302876,
+          "status": "available"
+        },
+        "tht_p99": {
+          "delta": 7.438499999997816,
+          "percent": 1.1094861551010182,
+          "status": "available"
+        },
+        "tht_max": {
+          "delta": -240.79999999999563,
+          "percent": -12.914401864221569,
+          "status": "available"
+        },
+        "preplanning_mean": {
+          "delta": -9.988002525784054,
+          "percent": -1.2642310125193947,
+          "status": "available"
+        },
+        "canonical_elapsed_mean": {
+          "delta": -9.628708692906685,
+          "percent": -0.8316381992910866,
+          "status": "available"
+        },
+        "cutoff_completed": {
+          "delta": 0,
+          "percent": 0.0,
+          "status": "available"
+        },
+        "STD_count": {
+          "delta": 78,
+          "percent": 0.3058703580251755,
+          "status": "available"
+        },
+        "early_count": {
+          "delta": 61,
+          "percent": 0.5687645687645687,
+          "status": "available"
+        }
+      },
+      "timing_ratio": null,
+      "timing_reason": "No cross-scope native-event-loop versus Java-thread/whole-window speed ratio is calculated."
+    },
+    {
+      "label": "0211x versus repaired physical HCA1x",
+      "new": "021_gap_alignment_1x",
+      "reference": "HCA_repaired_1x",
+      "inputs_usable": true,
+      "metrics": {
+        "tht_mean": {
+          "delta": -101.6818764470637,
+          "percent": -21.64385073884294,
+          "status": "available"
+        },
+        "tht_p95": {
+          "delta": -222.78375000000142,
+          "percent": -27.091357919601776,
+          "status": "available"
+        },
+        "tht_p99": {
+          "delta": -310.40199999999993,
+          "percent": -31.408114655069493,
+          "status": "available"
+        },
+        "tht_max": {
+          "delta": -1335.729999999996,
+          "percent": -45.133408683517274,
+          "status": "available"
+        },
+        "preplanning_mean": {
+          "delta": -596.6125026310252,
+          "percent": -43.33735925687418,
+          "status": "available"
+        },
+        "canonical_elapsed_mean": {
+          "delta": -698.2943790780887,
+          "percent": -37.81788725027996,
+          "status": "available"
+        },
+        "cutoff_completed": {
+          "delta": 0,
+          "percent": 0.0,
+          "status": "available"
+        },
+        "STD_count": {
+          "delta": 3355,
+          "percent": 15.096292296616271,
+          "status": "available"
+        },
+        "early_count": {
+          "delta": 120,
+          "percent": 1.125070316894806,
+          "status": "available"
+        }
+      },
+      "timing_ratio": null,
+      "timing_reason": "No cross-scope native-event-loop versus Java-thread/whole-window speed ratio is calculated."
+    }
+  ],
+  "checks": {
+    "sole_control_difference": {
+      "raw_changed_keys": [
+        "enable_future_gap_alignment"
+      ],
+      "strategy_changed_keys": [
+        "enable_future_gap_alignment"
+      ],
+      "reference_diagnostic_normalized": false,
+      "timing_comparison": "Preserve reported scope; single-run timing is not repeated performance evidence."
+    },
+    "gap_counter_audit": {
+      "passed": true,
+      "checks": {
+        "considered_successes_only": true,
+        "search_partition": true,
+        "considered_partition": true,
+        "adjacent_partition": true,
+        "hit_partition": true,
+        "lifecycle_partition": true,
+        "query_partition": true,
+        "first_witness_known": true,
+        "node_walk_lower_bound": true,
+        "veto_bounds": true,
+        "neighbor_bounds": true
+      },
+      "counters": {
+        "original_chain_successes_considered": 4745,
+        "adjacent_bit_available": 3697,
+        "next_bit_unavailable": 1048,
+        "no_positive_merge": 0,
+        "first_merge_unknown": 1645,
+        "first_merge_no_improvement": 1906,
+        "first_merge_hits": 146,
+        "known_resources_checked": 3315,
+        "unknown_resources_checked": 1304,
+        "veto_resources": 685,
+        "veto_decisions": 75,
+        "delayed_precommits": 71,
+        "merge_nodes_examined": 8863,
+        "calendar_resource_queries": 8170,
+        "calendar_neighbor_visits": 13372,
+        "scope": "Additional bounded neighbor checks, timed inside source decision; no extra DFS/mask search. Known/unknown resource totals describe full-chain reviews after first-merge hit; query totals also include failed first-merge probes."
+      },
+      "boundary": "Considered counts only original-chain mask successes that atomically precommit in a successful native call, including pending at horizon. It does not include original failed/empty/rejected searches. Counter consistency is not an independent policy-witness or physical audit."
+    },
+    "registered_common_input_physics": true
+  },
+  "cross_scale_window_context": {
+    "1x": {
+      "end_time": 98259,
+      "original_cutoff_count_kind": "actual_original_window_run",
+      "full_population_completion_certified": true,
+      "short_drain_prefix_proved": false,
+      "full_population_metric_policy": "available only if all original businesses complete and all first-attempt clocks are present; otherwise null, never completed-only fallback"
+    },
+    "2x": {
+      "end_time": 200000,
+      "original_cutoff_count_kind": "drain_retrospective_actual_finish_count",
+      "full_population_completion_certified": true,
+      "short_drain_prefix_proved": false,
+      "full_population_metric_policy": "available only if all original businesses complete and all first-attempt clocks are present; otherwise null, never completed-only fallback",
+      "original_completed": 41916,
+      "source": "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate021_comparison_001\\comparison_001.json"
+    },
+    "meaning": "Separate1x/2x populations;1x is an actual original-window execution,2x count is retrospective from drain. This is not a true same-population short/drain prefix test."
+  },
+  "source_files": {
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate021_nanning1x_001\\PREDECLARED_PLAN_001.json": {
+      "sha256": "6d4c447b5fd0fba3e48dbc726cc923ba1dfb209a24d328f372fb502618c929d0",
+      "bytes": 11297
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate021\\SOURCE_FREEZE_021_001.json": {
+      "sha256": "e98f62aac274e8fca821a831c875687aa72b2dd47cac5028f72053c7340c8730",
+      "bytes": 10849
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_1x_future60_minwait2_w0_fixed1_gap_alignment_original98259_021\\manifest.json": {
+      "sha256": "c36876ccd40061f8f3acb069290c7f95d41f337e2cce31133efa84f22dcdd540",
+      "bytes": 6959
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_1x_future60_cap120_relax1_010c\\manifest.json": {
+      "sha256": "53e78d9055642a9fba73dc3bc576ffb3b2145c8a0f3ca3fa25ae4538811d7b29",
+      "bytes": 6787
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_1x_future60_minwait2_w0_fixed1_gap_alignment_original98259_021\\headway_audit.json": {
+      "sha256": "43602c831b69566b17a5510d125ffa38cbfc9d89dcfb7a7b7c41c0986f1ea8e8",
+      "bytes": 35711
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_1x_future60_minwait2_w0_fixed1_gap_alignment_original98259_021\\rolling_replay.json": {
+      "sha256": "6d5abf0121a7223a16446448b9479e84122537025537e7a1012da408a3cf348e",
+      "bytes": 1775
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_1x_future60_minwait2_w0_fixed1_gap_alignment_original98259_021\\source_policy_audit.json": {
+      "sha256": "dc5ba6aa8fa91621bb599975c19f5a1485d35b4f20250e0ab7fde6d001ca34c5",
+      "bytes": 1946
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_1x_future60_minwait2_w0_fixed1_gap_alignment_original98259_021\\tht_audit.json": {
+      "sha256": "b4c2015b74f9c46454502be6cd0a12cd55cff34873ab5ea965dc90a926959d94",
+      "bytes": 51378
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_1x_future60_minwait2_w0_fixed1_gap_alignment_original98259_021\\business_audit.json": {
+      "sha256": "9607376be0bc1b736330c893e549c7f49211d314f41c385889383a26d9ff2e3d",
+      "bytes": 603
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_1x_future60_minwait2_w0_fixed1_gap_alignment_original98259_021\\native_summary.json": {
+      "sha256": "f2ac32af15e5ff84f7af461068ba58685a1f0db8fe54d71e606ae451a76b66b9",
+      "bytes": 18261
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_1x_future60_cap120_relax1_010c\\headway_audit.json": {
+      "sha256": "ef14a9c3828199c304dd6c629540d8b3117640ef29dd75b21b9a42ede3021e1e",
+      "bytes": 35254
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_1x_future60_cap120_relax1_010c\\rolling_replay.json": {
+      "sha256": "1c33add6512826b8d604f5391101f7746f744219378611f81714eb230fe5fe04",
+      "bytes": 1775
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_1x_future60_cap120_relax1_010c\\source_policy_audit.json": {
+      "sha256": "50c89a91dc90f469fb868d75b6e49947e7599b451a228d37a5f92b008993415f",
+      "bytes": 1946
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_1x_future60_cap120_relax1_010c\\tht_audit.json": {
+      "sha256": "befc898967126d184ce13416cae1d2fa5a85bf170f026f3a31f155b70e1d88f0",
+      "bytes": 51378
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_1x_future60_cap120_relax1_010c\\business_audit.json": {
+      "sha256": "41a76250f241a4c142b13c721c59a41e620eb93c2e4ef91c518e7c979d8a6714",
+      "bytes": 603
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\g31_nanning_1x_future60_cap120_relax1_010c\\native_summary.json": {
+      "sha256": "76ca8b093e0607103c0f1cea4b22e013d94d97cb0cd61e3ed2cf702ce8c5a694",
+      "bytes": 17117
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate021\\registered_contracts_021\\physical_contract_original_window.json": {
+      "sha256": "c47469ddbb5d2e997f2f71ffd85379241b86b2645747ba6ad3bcdec35ff6a8aa",
+      "bytes": 7955
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\nanning_campaign_snapshot_001\\snapshot_003.json": {
+      "sha256": "974a9db89a2f238b148ba3e0eb21f175d43cc2e8cdc62b065fcf3d95d1869d1e",
+      "bytes": 362738
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\current_comparison_005_003\\comparison.json": {
+      "sha256": "a3b0df754598563027648f1f59818572639952fd680f3c617475cc8cbb6559b0",
+      "bytes": 180210
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_repaired_uniform_headway2_002\\manifest.json": {
+      "sha256": "c51e51eaa1e9d5a7b184f5028324204ab0131f395d82f898c114eb4658c1f368",
+      "bytes": 19366
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_uniform_headway2_002\\manifest.json": {
+      "sha256": "2adc785c2b6fd2fd18e054bbf52d94ad6623173bfe7bb9d37b6330004e0c7bc2",
+      "bytes": 9022
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_uniform_headway2_002\\SOURCE_FREEZE.json": {
+      "sha256": "8e89758d3c4d4383247e8b153d0240cca6704edc8133f893ea6cc59af2f08885",
+      "bytes": 7273
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_repaired_uniform_headway2_002\\nanning_1x\\run_01\\run_status.json": {
+      "sha256": "3a2bb91bddd641f7fb1a259e92e21c5a9addbc55046da7dcd1d8283f9b6af7a7",
+      "bytes": 2118
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_repaired_uniform_headway2_002\\nanning_1x\\annotated_physical_bags_receipt.json": {
+      "sha256": "194f11cf3ab84d851bd738cb5af07bb7dec7927375d703aaf57fdfa61cc6fa03",
+      "bytes": 999
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\hca_repaired_uniform_headway2_002\\nanning_1x\\physical_headway_audit.json": {
+      "sha256": "7d0da9ad5ae602a57cac6c46351b2215df6c38f9061e9964c3ace7d56ee91f0a",
+      "bytes": 31022
+    },
+    "C:\\PROGRAMING\\czr005\\.g31_ics_circulation_worktree\\outputs\\experiments\\g31_no_wait_20261024\\candidate021_comparison_001\\comparison_001.json": {
+      "sha256": "6891b9f2e8ca445196407a8dfc7e83192905736b1f2b78f1070c8920739e60a9",
+      "bytes": 77673
+    }
+  },
+  "helper_sha256": "fb672b230861303cf4530d2680911d753cd8e12c998ab6170bf382f070949b5e",
+  "shared_helper_sha256": "1340763a2c74b11c48e83d54b340a6a20bce4562ebc8f440e42a9632e6cea2d0",
+  "boundaries": [
+    "Candidate0211x fields are read from completed small run evidence; no native/bag/ledger scan.",
+    "Primary full-population metrics remain null if not all28506 businesses complete; no survivor fallback.",
+    "Historical010c is a different compiled implementation. Control equivalence does not make observed runtime differences a pure policy-cost experiment.",
+    "HCA0021x has whole-run wall but no Astar CPU profile; no cross-scope speed ratio.",
+    "Standard five-gate and summary counter checks do not constitute a new full-bag gap-witness provenance audit.",
+    "Derived native ready mean adds full-population sums, not quantiles, and is not a new per-bag causal-ready audit."
+  ]
+}

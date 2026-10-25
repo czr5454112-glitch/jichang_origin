@@ -1,0 +1,126 @@
+{
+  "schema": "g31.continuous.standard_integration.v1",
+  "status": "implemented_explicit_candidate_not_promoted",
+  "default_legacy_unchanged": true,
+  "selected_controls": null,
+  "candidate": "g31_continuous_005_canonical_fifo",
+  "source_and_inputs": [
+    {
+      "path": "scripts/eval/run_g31_standard.py",
+      "sha256": "39e7618047e5bdb35128536fb81eda6a89aede77ce27f4acc95b149b11f2abf2",
+      "bytes": 13564
+    },
+    {
+      "path": "scripts/eval/g31_continuous_adapter.py",
+      "sha256": "cbe5fd884a2f73f2ea5880d738ca9533feae29ba618d9d4ab592d311d8d4171b",
+      "bytes": 19004
+    },
+    {
+      "path": "scripts/eval/build_g31_continuous.py",
+      "sha256": "c86e924e43bd7eafde2dd75c53343ae6b20259e42bee4ea84541541544233919",
+      "bytes": 2596
+    },
+    {
+      "path": "cpp/ics_core/continuous_motion/core.cpp",
+      "sha256": "c997415fe060833da35712b6179ab24a99c122811e1364dd1f1344f098674537",
+      "bytes": 73625
+    },
+    {
+      "path": "cpp/ics_core/continuous_motion/CMakeLists.txt",
+      "sha256": "f0f475718ebde38b4722e2cd87409fdfe51efd3c6a45b32b025d165a37fb8bf0",
+      "bytes": 789
+    },
+    {
+      "path": "configs/eval/g31_continuous/contract.json",
+      "sha256": "4ae963ee4674cf8dfb53c472aed8c3b9e5f41b57759bb2beae6577b7f2e37516",
+      "bytes": 5922
+    },
+    {
+      "path": "configs/eval/g31_continuous/example_fixed1.json",
+      "sha256": "17458907eb1ab539109e698476cc266481d93dd2e8e5229fd9bfc3d847290f4b",
+      "bytes": 730
+    },
+    {
+      "path": "configs/eval/g31_continuous/usage.json",
+      "sha256": "50568ad8726e6361787b8ea1498750ac7bb949bc4e5e9a6598bddd1db8094937",
+      "bytes": 3621
+    },
+    {
+      "path": "tests/test_g31_standard.py",
+      "sha256": "e8bf30014875f822cebd73ab70e5a6be8539753fc7a180f21bf78e2efdab39e6",
+      "bytes": 5378
+    },
+    {
+      "path": "tests/test_g31_continuous_standard.py",
+      "sha256": "4ecdb09187d45bdffb248eb41495666a81bc12c50d8d52aa3f9dea7962fbda8b",
+      "bytes": 9527
+    },
+    {
+      "path": "data/processed/g31_continuous/map2_2x_canonical.jsonl.gz",
+      "sha256": "dce27344b5a2a55cc6e04984d7b44877625a3e8ba4e100ada35bed78ec4ea7ca",
+      "bytes": 2123066
+    },
+    {
+      "path": "data/processed/g31_continuous/map2_service2.json",
+      "sha256": "e404313b75b86477050915b643ad9cc11d8ef25a346805d18d4c7bfc71b00903",
+      "bytes": 105551
+    },
+    {
+      "path": "data/processed/g31_continuous/nanning_1x_canonical.jsonl.gz",
+      "sha256": "3f2cc8d8e5e2934e2568b299d2d3321eec07f1f47e5fa0750537993eaee1340d",
+      "bytes": 1117468
+    },
+    {
+      "path": "data/processed/g31_continuous/nanning_2x_canonical.jsonl.gz",
+      "sha256": "5e0d3feef7b3f94aae2f3ec3c445720bc971599c82252383ab1ebc44fa46491b",
+      "bytes": 2299529
+    },
+    {
+      "path": "data/processed/g31_continuous/nanning_service2.json",
+      "sha256": "9b1a78344ec89aaac377feb05afccd48d9b957174286b29eedfe57a73a93c426",
+      "bytes": 714420
+    },
+    {
+      "path": "scripts/experiments/g31_no_wait/source_policy_audit.py",
+      "sha256": "257dab855d4445622e6fde9c21608643c17868f263c79fd697370319e2e1d370",
+      "bytes": 9393
+    },
+    {
+      "path": "scripts/experiments/g31_no_wait/test_canonical_source_micro.py",
+      "sha256": "5217f472e54930274ac757de346c08799040816507f724e7d47e803fe1070de3",
+      "bytes": 5005
+    }
+  ],
+  "native_binary": {
+    "path": "build/g31_no_wait_005/python/g31_nowait.cp311-win_amd64.pyd",
+    "sha256": "f2643e3657e7d9da4e25e403a396801125c533efaaa67b5599c3b49f768f9713",
+    "bytes": 310272
+  },
+  "validation": {
+    "canonical_cases": 6,
+    "prior_bag_fields_exact": 1399,
+    "prior_ledger_records_exact": 112,
+    "canonical_receipt": "canonical_source_micro_005.json",
+    "independent_canonical_receipt": "source_fifo005_independent_native_review.json",
+    "full_input_inspect_receipt": "standard_inspect_nanning_005.json",
+    "new_full_simulation_run": false,
+    "formal_cmake_recompiled": false,
+    "formal_core_matches_verified_005": true,
+    "pytest": {
+      "tests": 29,
+      "errors": 0,
+      "failures": 0,
+      "skipped": 0
+    },
+    "pytest_receipt": "standard_tests_005_with_source_audit.xml",
+    "source_policy_native_integration": true
+  },
+  "boundaries": [
+    "Default native activation order remains exact with 003/004; the explicit standard model requires canonical nominal FIFO.",
+    "No selected controls or performance winner; 004 activation-order experiments are diagnostic, not matched canonical-FIFO comparisons.",
+    "Unready EBS queue heads block later tasks; equal raw nominal release ties retain original input row order.",
+    "User THT starts at first actual planning attempt; source preplanning, physical network elapsed and canonical elapsed remain companion metrics.",
+    "The formal CMake recipe has not been separately compiled; formal core is byte-identical to the verified immutable 005 build.",
+    "Source policy, headway, rolling transactions, business identity/causality and THT each form an independent audit gate."
+  ]
+}

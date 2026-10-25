@@ -1,0 +1,284 @@
+--- candidate020/source/core.cpp
++++ candidate022/source/core.cpp
+@@ -79,6 +79,7 @@
+     double future_source_reservation_min_wait_seconds = 2.0;
+     bool enable_future_mask_diagnostics = false;
+     bool enable_one_alternative_future_chain = false;
++    int alternative_future_static_candidate_limit = 1;
+ };
+ struct Edge { int to; double travel; int id; };
+ struct Node { int id; double service; std::vector<Edge> out; int indegree = 0; };
+@@ -96,6 +97,16 @@
+ };
+ struct Reservation { double end; int task; std::uint64_t id; };
+ using Calendar = std::multimap<double, Reservation>;
++struct AlternativeStaticProbe {
++    int fork=-1,fork_node=-1,next=-1,outcome=0;
++    std::int64_t duration=-1;
++};
++struct BoundedAlternativeStats {
++    std::uint64_t invocations=0,eligible_candidates=0,checked=0,cycle=0,missing=0,cap=0,valid=0;
++    std::uint64_t no_eligible=0,limit_exhausted=0,all_invalid=0;
++    int last_mask_nonempty=-1;
++    std::vector<AlternativeStaticProbe> last;
++};
+ struct Task {
+     std::string segment_id, leg;
+     std::int64_t task_id = 0;
+@@ -135,6 +146,7 @@
+     int alternative_fork_index=-1,alternative_original_next=-1,alternative_next=-1;
+     int original_clear_kind=0,original_clear_from=-1,original_clear_to=-1,original_clear_index=-1;
+     std::vector<Step> original_future_chain;
++    BoundedAlternativeStats bounded_alternative;
+ };
+ struct RollingRecord {
+     std::string kind;
+@@ -220,7 +232,7 @@
+         "interval_mode","strict_endpoint_resources","edge_entry_headway_seconds","skip_scoring_single_choice",
+         "enable_inroute_replanning","time_grid_seconds","max_route_excess_seconds","source_fifo_order",
+         "route_excess_retry_relaxation_rate","future_source_reservation_horizon_seconds",
+-        "future_source_reservation_min_wait_seconds","enable_future_mask_diagnostics","enable_one_alternative_future_chain"};
++        "future_source_reservation_min_wait_seconds","enable_future_mask_diagnostics","enable_one_alternative_future_chain","alternative_future_static_candidate_limit"};
+     for (auto item : d) if (!allowed.count(py::cast<std::string>(item.first)))
+         throw std::invalid_argument("unknown config key: "+py::cast<std::string>(item.first));
+ #define READ_OPTION(name) if (d.contains(#name)) c.name = py::cast<decltype(c.name)>(d[#name]);
+@@ -242,6 +254,12 @@
+         if (!PyBool_Check(value.ptr())) throw std::invalid_argument("enable_future_mask_diagnostics must be a boolean");
+         c.enable_future_mask_diagnostics=py::cast<bool>(value);
+     }
++    if (d.contains("alternative_future_static_candidate_limit")) {
++        const auto value=d["alternative_future_static_candidate_limit"];
++        if (!PyLong_Check(value.ptr()) || PyBool_Check(value.ptr()))
++            throw std::invalid_argument("alternative_future_static_candidate_limit must be an integer");
++        c.alternative_future_static_candidate_limit=py::cast<int>(value);
++    }
+     if (d.contains("enable_one_alternative_future_chain")) {
+         const auto value=d["enable_one_alternative_future_chain"];
+         if (!PyBool_Check(value.ptr())) throw std::invalid_argument("enable_one_alternative_future_chain must be a boolean");
+@@ -267,6 +285,10 @@
+         throw std::invalid_argument("future source reservation horizon must be 0..60 integer seconds");
+     if (c.enable_future_mask_diagnostics && c.future_source_reservation_horizon_seconds==0)
+         throw std::invalid_argument("future mask diagnostics require an enabled future reservation horizon");
++    if (c.alternative_future_static_candidate_limit<1 || c.alternative_future_static_candidate_limit>4)
++        throw std::invalid_argument("alternative static candidate limit must be 1..4");
++    if (c.alternative_future_static_candidate_limit>1 && !c.enable_one_alternative_future_chain)
++        throw std::invalid_argument("bounded static alternatives require the alternative future-chain policy");
+     if (c.enable_one_alternative_future_chain && c.future_source_reservation_horizon_seconds==0)
+         throw std::invalid_argument("one alternative future chain requires an enabled future reservation horizon");
+     if (c.future_source_reservation_horizon_seconds>0 &&
+@@ -773,9 +795,103 @@
+     // integer-launch mask, not repeated DFS and not spatial lookahead depth.
+     // One topology-guided candidate only. This helper never queries calendars,
+     // touches scheduling state, or modifies the immediate DFS retry suggestion.
++    // Enumerate only static invalid alternatives. The first valid chain is
++    // returned for the single existing mask query; a calendar-empty valid
++    // chain never causes another static candidate to be tried.
++    bool construct_bounded_alternative(const std::vector<Step>& original,const FutureMaskTransition& clear,
++                                   const GoalData& gd,Task& task,std::vector<Step>& candidate,
++                                   int& fork,int& original_next,int& alternative_next) {
++        ++alternative_considered;++task.alternative_future_considered;
++        auto& stats=task.bounded_alternative;
++        ++stats.invocations;stats.last.clear();stats.last_mask_nonempty=-1;
++        struct StaticChoice {int fork;const Edge* edge;};
++        std::vector<StaticChoice> choices;
++        std::vector<int> position(nodes.size(),-1);
++        for (std::size_t i=0;i<original.size();++i) position[original[i].node]=static_cast<int>(i);
++        const int latest=std::min(static_cast<int>(original.size())-2,clear.chain_index-(clear.kind==1?1:0));
++        for (int f=latest;f>=0;--f) {
++            const int u=original[f].node,next=original[f+1].node;
++            std::vector<const Edge*> local;
++            for (const auto& edge:nodes[u].out) {
++                if (edge.to==next || !std::isfinite(gd.h[edge.to]) || (position[edge.to]>=0 && position[edge.to]<=f)) continue;
++                local.push_back(&edge);
++            }
++            std::sort(local.begin(),local.end(),[&](const Edge* a,const Edge* b) {
++                return std::make_tuple(nodes[u].service+a->travel+gd.h[a->to],nodes[a->to].id,a->id)
++                     < std::make_tuple(nodes[u].service+b->travel+gd.h[b->to],nodes[b->to].id,b->id);
++            });
++            for (const auto* edge:local) choices.push_back({f,edge});
++        }
++        stats.eligible_candidates+=choices.size();
++        if (choices.empty()) {++alternative_no_fork;++stats.no_eligible;return false;}
++        const auto count=std::min<std::size_t>(choices.size(),cfg.alternative_future_static_candidate_limit);
++        for (std::size_t choice_index=0;choice_index<count;++choice_index) {
++            const auto& choice=choices[choice_index];
++            fork=choice.fork;original_next=original[fork+1].node;alternative_next=choice.edge->to;
++            ++alternative_constructed;++stats.checked;
++            candidate.assign(original.begin(),original.begin()+fork+1);
++            alternative_chain_nodes+=candidate.size();future_chain_nodes+=candidate.size();
++            std::vector<unsigned char> seen(nodes.size(),0);
++            for (const auto& step:candidate) seen[step.node]=1;
++            int current=choice.edge->to;double arrival=add_time(candidate.back().departure,choice.edge->travel);
++            AlternativeStaticProbe probe;
++            probe.fork=fork;probe.fork_node=nodes[original[fork].node].id;probe.next=nodes[alternative_next].id;
++            for (;;) {
++                if (current<0 || seen[current] || candidate.size()>=nodes.size()) {
++                    probe.outcome=0;++alternative_cycle;++stats.cycle;break;
++                }
++                seen[current]=1;const double departure=add_time(arrival,nodes[current].service);
++                candidate.push_back({current,arrival,departure});++alternative_chain_nodes;++future_chain_nodes;
++                if (current==task.goal) {
++                    probe.duration=tick(candidate.back().arrival);
++                    if (std::isfinite(task.last_effective_route_excess) &&
++                        probe.duration>tick(gd.h[task.start])+tick(task.last_effective_route_excess)) {
++                        probe.outcome=2;++alternative_cap;++stats.cap;
++                    } else {probe.outcome=3;++stats.valid;}
++                    break;
++                }
++                const int next=gd.shortest_successor[current];
++                const auto edge=std::find_if(nodes[current].out.begin(),nodes[current].out.end(),[&](const Edge& e){return e.to==next;});
++                if (edge==nodes[current].out.end()) {
++                    probe.outcome=1;++alternative_missing_successor;++stats.missing;break;
++                }
++                arrival=add_time(departure,edge->travel);current=next;
++            }
++            stats.last.push_back(probe);
++            if (probe.outcome==3) return true;
++        }
++        if (choices.size()>count) ++stats.limit_exhausted;
++        else ++stats.all_invalid;
++        return false;
++    }
++
++    py::dict bounded_alternative_dict(const BoundedAlternativeStats& stats,bool witnesses) const {
++        py::dict d;d["static_candidate_limit"]=cfg.alternative_future_static_candidate_limit;
++        d["invocations"]=stats.invocations;d["cheap_eligible_candidates"]=stats.eligible_candidates;
++        d["static_candidates_checked"]=stats.checked;d["rejected_cycle"]=stats.cycle;
++        d["rejected_successor"]=stats.missing;d["rejected_cap"]=stats.cap;
++        d["first_valid_chains"]=stats.valid;d["no_eligible_candidates"]=stats.no_eligible;
++        d["static_limit_exhausted"]=stats.limit_exhausted;d["all_candidates_invalid"]=stats.all_invalid;
++        if (witnesses) {
++            d["last_mask_nonempty"]=stats.last_mask_nonempty<0?py::none():py::cast(stats.last_mask_nonempty==1);
++            py::list probes;
++            const char* names[]={"cycle","missing_successor","frozen_cap","selected_for_single_mask"};
++            for (const auto& probe:stats.last) {
++                py::dict p;p["fork_index"]=probe.fork;p["fork_node"]=probe.fork_node;p["alternative_next"]=probe.next;
++                p["outcome"]=names[probe.outcome];p["static_duration_us"]=probe.duration<0?py::none():py::cast(probe.duration);
++                probes.append(p);
++            }
++            d["last_static_candidates"]=probes;
++            d["witness_scope"]="At most limit probes from the most recent original-mask-empty invocation. A selected_for_single_mask witness is only static-valid, not an admission. Existing alternative_future_provenance identifies the actually precommitted immutable chain.";
++        }
++        return d;
++    }
++
+     bool construct_one_alternative(const std::vector<Step>& original,const FutureMaskTransition& clear,
+                                    const GoalData& gd,Task& task,std::vector<Step>& candidate,
+                                    int& fork,int& original_next,int& alternative_next) {
++        if (cfg.alternative_future_static_candidate_limit>1)
++            return construct_bounded_alternative(original,clear,gd,task,candidate,fork,original_next,alternative_next);
+         ++alternative_considered;++task.alternative_future_considered;
+         std::vector<int> position(nodes.size(),-1);
+         for (std::size_t i=0;i<original.size();++i) position[original[i].node]=static_cast<int>(i);
+@@ -933,6 +1049,7 @@
+             }
+             alternative_calendar_queries+=future_calendar_queries-queries_before;
+             alternative_calendar_entries_scanned+=future_calendar_entries_scanned-entries_before;
++            if (cfg.alternative_future_static_candidate_limit>1) t.bounded_alternative.last_mask_nonempty=mask?1:0;
+             if (!mask) {++alternative_empty;return false;}
+             original_chain=std::move(path);path=std::move(alternative);used_alternative=true;
+         }
+@@ -1481,6 +1598,8 @@
+                 if (i+1<t.route.size()) service+=step.departure-step.arrival;
+                 if (i>0) travel+=step.arrival-t.route[i-1].departure;
+             }
++            if (cfg.alternative_future_static_candidate_limit>1)
++                b["bounded_alternative_search"]=bounded_alternative_dict(t.bounded_alternative,true);
+             if (cfg.enable_one_alternative_future_chain) {
+                 b["alternative_future_considered"]=t.alternative_future_considered;
+                 b["future_certificate_origin"]=t.future_reserved?py::cast(t.alternative_future_reserved?"one_alternative":"original_shortest"):py::none();
+@@ -1540,6 +1659,8 @@
+             alternative["validation_queries"]=alternative_validation_queries;
+             alternative["original_chain_precommits"]=future_precommits-alternative_precommits;
+             alternative["counter_scope"]="future_source_searches and future_mask_empty describe original-chain invocations/outcomes; total precommits include both origins. Existing chain/calendar/validation work totals include additional work; these counters identify its subset. Original019 diagnostic buckets remain original-chain outcomes.";
++            if (cfg.alternative_future_static_candidate_limit>1)
++                alternative["counter_scope"]="Original mask outcomes and total precommits retain their meanings. constructed_candidates and rejected_cycle/successor/cap now count static candidate checks, potentially several per invocation. complete_masks counts at most one first-valid chain per invocation. Use bounded_alternative_search invocation identities, not the020 one-candidate identity. Work totals count all actual checks; original019 diagnostic buckets still describe the original chain.";
+             stats["alternative_future_chain"]=alternative;
+         }
+         if (cfg.enable_future_mask_diagnostics) {
+@@ -1582,6 +1703,21 @@
+             diagnostic["aggregation_definition"]="Keys contain source/goal, outcome, resource, static chain/fork positions and offsets, never masks, task IDs or time. search_count counts all matching searches; mask fields retain only the first witness. Later different masks cannot create another bucket for that same resource key.";
+             diagnostic["interpretation"]="One aggregate bucket per repeated future search, not independent opportunities or causal delay. First clearing resource depends on scan order and jointly accumulated exclusions; avoiding it need not restore feasibility. A prior fork does not prove a usable alternative, and a longer prefix may change arrival at the same resource. No extra calendar query, changed intersection, early break or alternative path probe.";
+             stats["diagnostic_future_mask_aggregation"]=diagnostic;
++        }
++        if (cfg.alternative_future_static_candidate_limit>1) {
++            BoundedAlternativeStats totals;
++            for (const auto& task:tasks) {
++                const auto& x=task.bounded_alternative;
++#define ADD_BOUNDED(name) totals.name+=x.name;
++                ADD_BOUNDED(invocations) ADD_BOUNDED(eligible_candidates) ADD_BOUNDED(checked)
++                ADD_BOUNDED(cycle) ADD_BOUNDED(missing) ADD_BOUNDED(cap) ADD_BOUNDED(valid)
++                ADD_BOUNDED(no_eligible) ADD_BOUNDED(limit_exhausted) ADD_BOUNDED(all_invalid)
++#undef ADD_BOUNDED
++            }
++            auto bounded=bounded_alternative_dict(totals,false);
++            bounded["complete_mask_queries"]=alternative_masks;
++            bounded["scope"]="Up to the configured number of static-invalid candidates are skipped. The first static-valid chain gets exactly one complete calendar mask; an empty mask does not try another chain. No immediate DFS, retry, FIFO or physical rule change.";
++            stats["bounded_alternative_search"]=bounded;
+         }
+         stats["planning_attempts"]=planning_attempts;stats["failed_attempts"]=failed_attempts;
+         stats["search_expansions"]=total_exp;stats["score_expansions"]=total_score_exp;stats["backtracks"]=total_back;
+@@ -1676,6 +1812,11 @@
+             contract["future_source_policy"]="Original failed-DFS gate/minwait and original static-shortest-chain mask remain first. Only an empty original mask triggers at most one alternative: nearest prior eligible fork (node conflict excludes its own exit; edge conflict includes it), cheapest finite-H non-prefix alternative neighbor with stable physical-ID tie, then cached shortest successor. Reject repeated nodes/missing successor/frozen cap without another candidate. Recompute the complete launch mask and validate every resource before the existing atomic precommit. Original nonempty masks and all failed-rescue retry clocks remain unchanged.";
+             contract["one_alternative_future_chain"]="Opt-in topology-guided rescue, not an exhaustive route search or throughput guarantee. Additional work stays inside source decision timing and separate counters. No confirmed rights removed; no unreleased future tasks read. Source FIFO advances only at actual launch. Original-chain diagnostic outcomes and alternative actual precommits have separate accounting.";
+         }
++        if (cfg.alternative_future_static_candidate_limit>1) {
++            contract["alternative_future_static_candidate_limit"]=cfg.alternative_future_static_candidate_limit;
++            contract["future_source_policy"]="Original failed-DFS gate and original static shortest mask remain first. Only original mask-empty invokes bounded static alternative validation: nearest prior fork first, then original service+travel+H / physical-ID / edge-ID neighbor ordering. Skip only cached-suffix repeated nodes, missing successors or frozen-current-attempt route-cap violations, up to limit static checks. The first valid chain gets the sole complete mask; calendar-empty never continues enumeration. Existing exact validation, atomic precommit, actual-launch FIFO, first clock and failed retry recommendation remain unchanged.";
++            contract["bounded_alternative_search"]="Finite static-invalid filtering, not additional DFS, exhaustive route search or a throughput guarantee. Existing constructed/rejection counters describe static checks in this opt-in mode; invocation counters and bounded last witnesses are separate. Only one alternative full mask per original failed mask.";
++        }
+         stats["contract"]=contract;
+         py::list ledger;
+         for (const auto& r:rolling_records) {
+--- candidate020/continuous_adapter.py
++++ candidate022/continuous_adapter.py
+@@ -1,4 +1,4 @@
+-"""Isolated candidate020 runner derived from the official continuous adapter.
++"""Isolated candidate022 runner derived from the official continuous adapter.
+ 
+ The registered model uses local next-hop scoring and a complete continuation
+ certificate. Registration is not a performance promotion or distributed-network
+@@ -31,7 +31,7 @@
+     congestion_weight=1.0,pressure_window=30.0,max_expansions=256,max_score_expansions=64,
+     max_retries=100000,max_events=10000000,retry_mode="calendar_jump",retry_step=1.0,
+     audit_failed_calendar_hash=False,skip_scoring_single_choice=True,route_excess_retry_relaxation_rate=0.0,
+-    future_source_reservation_horizon_seconds=0,future_source_reservation_min_wait_seconds=2.0,enable_future_mask_diagnostics=False,enable_one_alternative_future_chain=False,**FIXED)
++    future_source_reservation_horizon_seconds=0,future_source_reservation_min_wait_seconds=2.0,enable_future_mask_diagnostics=False,enable_one_alternative_future_chain=False,alternative_future_static_candidate_limit=1,**FIXED)
+ ALLOWED = set(DEFAULT_CONTROLS) | {"max_route_excess_seconds"}
+ 
+ 
+@@ -72,7 +72,7 @@
+         if controls[key]!=value or (isinstance(value,bool) and type(controls[key]) is not bool):
+             raise ValueError("continuous model requires "+key+"="+str(value))
+     if controls["end_time"]!=horizon: raise ValueError("registered full-horizon contract changed")
+-    integers={"min_depth","max_depth","max_expansions","max_score_expansions","max_retries","max_events","future_source_reservation_horizon_seconds"}
++    integers={"min_depth","max_depth","max_expansions","max_score_expansions","max_retries","max_events","future_source_reservation_horizon_seconds","alternative_future_static_candidate_limit"}
+     booleans={key for key,value in DEFAULT_CONTROLS.items() if isinstance(value,bool)}
+     for key,value in controls.items():
+         if key in integers:
+@@ -94,11 +94,15 @@
+     if not 0<=future<=60:
+         raise ValueError("future reservation horizon must be an integer in [0,60]")
+     if future and controls["congestion_weight"] not in (0,1):
+-        raise ValueError("candidate020 future reservations support only congestion weight 0 or 1")
++        raise ValueError("candidate022 future reservations support only congestion weight 0 or 1")
+     if controls["enable_future_mask_diagnostics"] and not future:
+         raise ValueError("mask diagnostics require future reservations")
+     if controls["enable_one_alternative_future_chain"] and not future:
+         raise ValueError("one alternative chain requires future reservations")
++    if not 1<=controls["alternative_future_static_candidate_limit"]<=4:
++        raise ValueError("alternative static candidate limit must be1..4")
++    if controls["alternative_future_static_candidate_limit"]>1 and not controls["enable_one_alternative_future_chain"]:
++        raise ValueError("bounded static alternatives require alternative policy")
+     return controls
+ 
+ 
+@@ -245,7 +249,7 @@
+ def verified_auditors(source_dir):
+     """Load the frozen audit package, checking every live source against it."""
+     names=("headway_audit","future_metadata","rolling_replay","tht_metrics","source_policy_audit")
+-    package_name="g31_candidate020_auditors_"+hashlib.sha256(str(source_dir.resolve()).encode()).hexdigest()[:16]
++    package_name="g31_candidate022_auditors_"+hashlib.sha256(str(source_dir.resolve()).encode()).hexdigest()[:16]
+     package=types.ModuleType(package_name)
+     package.__path__=[str(source_dir)]
+     sys.modules[package_name]=package
